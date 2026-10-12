@@ -39,7 +39,7 @@ fn not_blank(value: Option<String>, message: &str) -> Result<String, ApiError> {
 }
 
 /// Jackson이 `SocialProvider` 열거형을 읽는 규칙. 없거나 `null`이면 `None`(이어서 `@NotNull`이 거절한다).
-/// - 문자열: 앞뒤 `trim()`(U+0020 이하) 뒤 이름이 정확히 같아야 한다. 비면 `null`로 본다. 숫자로 시작하면 서수 문자열로
+/// - 문자열: 앞뒤 `trim()`(U+0020 이하) 뒤 이름이 정확히 같아야 한다. 비면 본문 해석 오류다. 숫자로 시작하면 서수 문자열로
 ///   본다.
 /// - 정수: 서수. 범위 밖이거나 실수·불리언·배열·객체이면 본문 해석 오류(400).
 pub fn parse_provider(value: Option<&Value>) -> Result<Option<SocialProvider>, ApiError> {
@@ -47,8 +47,9 @@ pub fn parse_provider(value: Option<&Value>) -> Result<Option<SocialProvider>, A
         None | Some(Value::Null) => Ok(None),
         Some(Value::String(text)) => {
             let text = text.trim_matches(|c: char| c <= ' ');
+            // 빈 문자열은 `null`로 바꾸지 않고 강제 변환 거절로 이어져 본문 해석 오류다.
             if text.is_empty() {
-                return Ok(None);
+                return Err(ApiError::UnreadableBody);
             }
             if let Some(provider) = SocialProvider::from_name(text) {
                 return Ok(Some(provider));
@@ -318,6 +319,8 @@ mod tests {
             json!({}),
             json!("3"),
             json!("1x"),
+            json!(""),
+            json!("  "),
         ] {
             assert!(
                 matches!(provider(bad.clone()), Err(ApiError::UnreadableBody)),

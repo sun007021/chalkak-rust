@@ -5,7 +5,8 @@ compare_db = false
 
 # 근거: AuthController, SocialLoginRequest(@NotNull provider, @NotBlank idToken·rawNonce, isValidAuthorizationCode),
 # SocialSignupSignatureUploadRequest, SocialSignupRequest, AuthControllerTest, Jackson 열거형 해석.
-# 형식 오류는 ID Token 검증보다 앞서 400이다.
+# 형식 오류는 ID Token 검증보다 앞서 400이다. 위반이 둘 이상이면 원본은 어느 메시지를 고를지 정해져 있지 않아(해시 집합
+# 순서) 한 번에 하나만 어긴다.
 
 [[id_token]]
 name = "g"
@@ -40,10 +41,10 @@ headers = { "Content-Type" = "text/plain" }
 body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":"nonce-v"}'
 
 [[step]]
-name = "빈 객체"
+name = "rawNonce가 null"
 method = "POST"
 path = "/api/v1/auth/social-login"
-body = '{}'
+body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":null}'
 
 [[step]]
 name = "제공자 없음"

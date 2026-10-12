@@ -221,10 +221,10 @@ path = "/api/v1/auth/refresh"
 body = '{"refreshToken":"${r5}"}'
 opaque = ["refreshToken", "accessToken"]
 capture = { r5b = "refreshToken" }
-advance_seconds = 86400
+advance_seconds = 86460
 
 [[step]]
-name = "정확히 30일째는 이미 만료(계보 4)"
+name = "30일이 지나면 만료(계보 4)"
 method = "POST"
 path = "/api/v1/auth/refresh"
 body = '{"refreshToken":"${r4}"}'
@@ -235,7 +235,7 @@ name = "만료로 폐기된 계보는 이후에도 쓸 수 없다"
 method = "POST"
 path = "/api/v1/auth/refresh"
 body = '{"refreshToken":"${r4}"}'
-advance_seconds = 2419199
+advance_seconds = 2419139
 
 [[step]]
 name = "58일째 재발급(계보 5: r5b → r5c, 만료는 88일째)"
@@ -247,11 +247,12 @@ capture = { r5c = "refreshToken" }
 advance_seconds = 2505600
 
 [[step]]
+# 절대 만료로 줄어든 남은 시간은 두 요청이 각자 단계 안에서 시각을 읽는 순간(밀리초)의 차이로 1초 흔들려 비교하지 않는다.
 name = "87일째 재발급(만료는 절대 만료인 90일째로 줄어든다)"
 method = "POST"
 path = "/api/v1/auth/refresh"
 body = '{"refreshToken":"${r5c}"}'
-opaque = ["refreshToken", "accessToken"]
+opaque = ["refreshToken", "accessToken", "refreshTokenExpiresIn"]
 capture = { r5d = "refreshToken" }
 advance_seconds = 345600
 
