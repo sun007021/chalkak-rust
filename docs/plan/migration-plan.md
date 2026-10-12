@@ -20,7 +20,8 @@
 | 주기 작업 | 리프레시 토큰 정리(04:30), 가입 토큰 정리(04:40), 알림 정리(04:50), Apple 임시 인증 정리(매시), 런타임 스냅샷 로그(1분) — 모두 Asia/Seoul | `@Scheduled` 5곳 |
 | 외부 연동 | Google·Kakao·Apple OIDC(JWKS 조회, RS256 검증), Apple 토큰 교환·철회(ES256 client secret), Slack Incoming Webhook, S3 presigned PUT·HeadObject(EC2 인스턴스 역할 자격증명), Lambda 이미지 처리 콜백(HMAC-SHA256) | `auth/infrastructure`, `post|user/infrastructure` |
 | 암호 | HS256 JWT(액세스·가입 토큰), HMAC-SHA256(소셜 식별자 지문·콜백 서명), AES-256-GCM(Apple 리프레시 토큰), BCrypt(관리자 비밀번호) | `*Cipher`, `*Encoder`, `SecurityConfig` |
-| 배포 | CodeBuild → CodeDeploy → EC2 systemd(`java -jar`), 헬스체크 `GET :8080/actuator/health`, **로드밸런서 없이 공개 EC2 직접 노출** | `backend/deploy/` |
+| 배포(원본) | CodeBuild → CodeDeploy → EC2 systemd(`java -jar`), 헬스체크 `GET :8080/actuator/health` | `backend/deploy/` |
+| 배포(이 프로젝트) | 학습용. 원본 서비스를 교체하지 않고 로컬과 별도 AWS 계정에 private하게 배포 | 2026-10-12 sunwook |
 | 로그 | dev·prod는 logstash 형식 JSON 파일 → CloudWatch Agent, 대시보드가 필드명에 의존 | `logback-spring.xml`, `deploy/monitoring` |
 
 테스트 1,200개의 구성: Spring+DB 통합 476, 단위 438, 웹 슬라이스(MockMvc) 209, JPA 슬라이스 74, 아키텍처 3. 대부분 Spring에 묶여 있어 그대로 옮길 수 없으므로, **테스트 케이스(검증 의도)를 이식하고 Spring 결합부는 블랙박스 시나리오로 대체**한다([java-test-inventory.csv](java-test-inventory.csv)).
@@ -49,7 +50,7 @@ B안 허용 목록 초안 (모두 `cargo-deny`로 고정·감사):
 | JSON | `serde`, `serde_json` | derive 매크로 포함 |
 | 식별자·시간 | `uuid`(v7), `jiff` 또는 `time` + tzdb | Asia/Seoul 계산 |
 | 종료 신호 | `signal-hook` | 표준 라이브러리로는 SIGTERM을 받을 수 없음. graceful shutdown(`TimeoutStopSec=30`)에 필요 |
-| HTTP 파싱(선택) | `httparse` | 직접 구현 시 퍼징 필수. 공개 EC2 직접 노출이라 파서 견고성이 보안 문제임 |
+| HTTP 파싱(선택) | `httparse` | 직접 구현 시 퍼징 권장 |
 
 허용하지 않는 것: axum·actix·rocket 등 웹 프레임워크, diesel·sea-orm·sqlx 매크로 ORM, AWS SDK(무거운 런타임을 끌고 옴 → SigV4·IMDSv2는 직접 구현하고 AWS 공식 테스트 벡터로 검증).
 
@@ -67,7 +68,7 @@ B안 허용 목록 초안 (모두 `cargo-deny`로 고정·감사):
 
 - `std::net::TcpListener` + 고정 크기 워커 스레드 풀 + 블로킹 DB 커넥션 풀(직접 구현, Hikari와 같은 크기 설정).
 - 같은 동시성 모델이라 락 순서·트랜잭션 경계·풀 고갈 동작이 원본과 같아져 정합성 검증이 쉽다. 비동기 런타임 의존도 없다.
-- 공개 EC2 직접 노출이므로 연결 수 상한, 헤더 크기·개수 상한, 요청 읽기 타임아웃, keep-alive 유휴 타임아웃, 본문 상한을 첫 단계부터 넣는다. 유휴 keep-alive 연결이 워커를 붙잡는 문제가 부하 시험에서 보이면 accept 스레드에서 유휴 연결을 관리하는 구조로 바꾼다(성능 게이트로 판단).
+- 연결 수 상한, 헤더 크기·개수 상한, 요청 읽기 타임아웃, keep-alive 유휴 타임아웃, 본문 상한은 기본값으로 넣는다(private 배포라 보안 강화보다는 원본과 같은 동작이 목적). 유휴 keep-alive 연결이 워커를 붙잡는 문제가 부하 시험에서 보이면 accept 스레드에서 유휴 연결을 관리하는 구조로 바꾼다(성능 게이트로 판단).
 
 ### 3.2 저장소 구조
 
@@ -175,7 +176,7 @@ chalkak-rust/
 - **동시성:** 같은 요청을 N개 스레드로 동시에 보낸 뒤 DB 불변식을 검사한다. 대상: 좋아요 중복, 리프레시 토큰 회전 재사용 감지, 같은 주제 재게시, 업로드 콜백 중복 도착, 관리자 세션 advisory lock, 탈퇴와 게시 경합. 두 구현 모두 불변식을 지키고 최종 상태가 같은지 본다.
 - **마이그레이션 호환:** (a) Flyway로 적용한 DB를 Rust 마이그레이터가 검증 통과, (b) Rust로 적용한 DB를 Flyway `validate`가 통과, (c) 두 경우 `pg_dump --schema-only` 결과 동일. 운영 전환 후에도 Java로 즉시 되돌릴 수 있게 하는 조건이다.
 - **Lambda 콜백 계약:** `backend/lambda/image-processor`의 실제 서명 코드(`callback.py`)로 Rust 콜백 엔드포인트를 호출하는 계약 시험. 본문 상한(`CALLBACK_MAX_BODY_BYTES`), 시각 허용 범위(과거 300초, 미래 30초), 환경 바인딩 포함.
-- **HTTP 견고성:** 파서 퍼징(`cargo-fuzz`), 느린 클라이언트, 과대 헤더, chunked 본문, `Expect: 100-continue`, 잘못된 Content-Length, 요청 스머글링 패턴. 여기서는 Java와 같은 응답보다 **안전한 거절**을 기준으로 삼는다.
+- **HTTP 견고성:** chunked 본문, `Expect: 100-continue`, 잘못된 Content-Length, 과대 헤더 등 정상 클라이언트가 보낼 수 있는 형태 위주로 확인하고, 파서 퍼징은 야간 선택 항목으로 둔다(private 배포라 우선순위 낮음).
 - **설정 계약:** 원본의 `check_env_contract.sh`가 검사하는 환경변수 계약을 Rust도 그대로 따른다. 기간 형식(`15m`, `PT1H`, `30d`), 누락·잘못된 값에서 기동 실패하는 조건(예: 리프레시 절대 만료 < 비활동 만료, 콜백 비밀 32자 미만, dev·prod에서 관리자 우회 켜짐)도 시나리오로 검사.
 
 ### 4.5 성능 검증
@@ -249,17 +250,18 @@ PR마다: `cargo fmt`/`clippy -D warnings`, `forbid(unsafe_code)` 확인, `cargo
 - 성능 게이트(4.5), 24시간 장시간 시험, 동시성 시험 전체, 차등 퍼징 무차이 연속 유지, 보안 점검(`cargo-deny`, `cargo-audit`, 의존성 `unsafe` 보고서, 비밀값 로그 노출 검사).
 - **완료 조건:** 모든 게이트 통과 기록을 문서로 남김.
 
-### Phase 4. 배포 준비
-- 빌드: CodeBuild에서 `cargo build --release`(정적 링크 바이너리 검토), 같은 산출물을 dev·prod에 사용.
-- systemd unit 교체(`ExecStart`만 바꾸고 보안 옵션 유지), CodeDeploy 스크립트의 헬스체크 경로 유지.
-- 로그·대시보드: JSON 필드 호환 확인, JVM 지표 위젯을 프로세스 지표로 교체.
-- 환경변수 계약 동일 유지(`check_env_contract.sh` 그대로 통과).
+### Phase 4. 배포 (학습용 private 환경)
 
-### Phase 5. 전환과 롤백
-1. **dev 전환:** dev EC2에서 Rust로 교체하고 앱으로 실제 사용. 이 기간에 dev 트래픽의 읽기 요청을 Java로 재생해 응답을 비교(쓰기 요청은 재생하지 않음).
-2. **prod 전환:** 같은 DB, 같은 `flyway_schema_history`를 쓰므로 바이너리만 바꾼다. 롤백은 이전 JAR로 CodeDeploy 재배포.
-3. **롤백 조건:** 5xx 비율, p99 지연, 헬스체크 실패, 클라이언트 오류 보고 중 하나라도 기준을 넘으면 즉시 롤백.
-4. 전환 후 일정 기간 Java 산출물과 하네스를 유지한다.
+원본 서비스를 교체하지 않는다. 로컬과 별도 AWS 계정에 private하게 띄워 Java와 나란히 비교하는 것이 목표다.
+- 빌드: `cargo build --release` 단일 바이너리. 로컬은 `compose.yaml`로 Rust·Java·PostgreSQL·fakes를 함께 띄운다.
+- 별도 AWS: private 서브넷 EC2(또는 같은 수준의 구성) + PostgreSQL. 원본 `deploy/`의 systemd unit·환경변수 계약·헬스체크 경로를 그대로 따라 배포 방식도 같게 맞춘다.
+- 실제 외부 연동(OIDC, Apple, Slack, S3)을 쓸지는 그 시점에 정한다. 기본값은 fakes를 함께 배포해 외부 계정 없이 동작을 확인하는 것이다.
+- 로그: 원본과 같은 JSON 필드로 남겨 CloudWatch 구성도 재현할 수 있게 한다.
+
+### Phase 5. 나란히 운영하며 비교
+1. 같은 private 환경에 Java와 Rust를 함께 띄우고 같은 부하·시나리오를 양쪽에 돌려 결과와 지표를 비교한다.
+2. Flyway 교차 호환이 유지되므로 같은 DB에서 바이너리만 바꿔 Java ↔ Rust 전환·복귀도 시험한다.
+3. 결과(정합성·성능 게이트 통과 기록)를 문서로 남기는 것을 마무리로 본다.
 
 ---
 
@@ -270,7 +272,7 @@ PR마다: `cargo fmt`/`clippy -D warnings`, `forbid(unsafe_code)` 확인, `cargo
 - 기준 커밋을 `harness/BASELINE`에 고정한다. 하네스의 Java oracle은 항상 이 커밋으로 빌드한다.
 - 주기적으로 기준 커밋과 원본 최신 `backend/` 차이를 뽑아 "따라잡기 작업 목록"을 만든다: 새 마이그레이션, 바뀐 컨트롤러·DTO·서비스, 새 테스트, 바뀐 규칙 문서.
 - 따라잡기는 ① 기준 커밋 올리기 → ② golden 재녹화 → ③ 실패한 시나리오가 곧 Rust 작업 목록, 순서로 진행한다.
-- 운영 전환 직전에는 원본 백엔드 변경을 잠시 멈추는(코드 프리즈) 합의가 필요하다.
+- 원본 서비스를 교체하지 않으므로 코드 프리즈는 필요 없다. 기준 커밋을 원하는 시점에 올리면 된다.
 
 ---
 
@@ -278,11 +280,11 @@ PR마다: `cargo fmt`/`clippy -D warnings`, `forbid(unsafe_code)` 확인, `cargo
 
 | 리스크 | 영향 | 대응 |
 | --- | --- | --- |
-| 공개 EC2 직접 노출 상태에서 직접 만든 HTTP 서버의 결함 | 서비스 거부, 요청 스머글링 | 상한·타임아웃 기본값, 퍼징, 필요하면 앞단 프록시 도입을 별도 결정으로 |
+| 직접 만든 HTTP 서버의 파싱 결함 | 일부 요청 오동작 | 정상 클라이언트 형태 시나리오, 선택적 퍼징 (private 배포라 보안 위험은 낮음) |
 | Spring·Jackson·Hibernate의 암묵 동작 누락 | 클라이언트 오동작 | 차등 비교를 바이트 단위로, 생성형 퍼징 |
 | 시계 제어가 JVM에서 불완전 | 시간 의존 시나리오 불안정 | libfaketime 실패 시 테스트 전용 에이전트로 대체 |
-| Flyway 체크섬 비호환 | 롤백 불가 | 교차 적용 시험을 Phase 1 완료 조건으로 |
-| 원본이 계속 바뀜 | 끝나지 않는 추격 | 기준 커밋 고정, 따라잡기 절차, 전환 전 프리즈 |
+| Flyway 체크섬 비호환 | 같은 DB에서 Java↔Rust 교체 불가 | 교차 적용 시험을 Phase 1 완료 조건으로 |
+| 원본이 계속 바뀜 | 끝나지 않는 추격 | 기준 커밋 고정, 따라잡기 절차 |
 | 암호·JWT 세부 차이(키 형식, 클레임, 시계 오차 허용) | 로그인 장애 | Java 발급 토큰을 Rust가 검증, 그 반대도 검증하는 교차 시험 |
 | 의존성 정책이 더 엄격하게 정해짐(A안) | 범위가 크게 늘어남 | 2장 결정을 Phase 0 전에 확정 |
 
