@@ -54,6 +54,7 @@ fn harness_with(bypass: bool, database_up: bool) -> Harness {
     let env = Env::from_pairs([
         ("ACCESS_TOKEN_SECRET", SECRET_HEX),
         ("ACCESS_TOKEN_EXPIRATION", "15m"),
+        ("CLOUDFRONT_ORIGIN_PATH", "/chalkak"),
         (
             "ADMIN_DEVELOPMENT_BYPASS_ENABLED",
             if bypass { "true" } else { "false" },

@@ -76,6 +76,7 @@ pub fn build_handler(
         pool: pool.clone(),
         clock: Arc::clone(&clock),
         logger: Arc::clone(&logger),
+        image_urls: Arc::new(settings.image_urls.clone()),
     };
     let router = register_routes(Routes::new(Arc::clone(&logger)), &ctx).into_router();
     Arc::new(build_chain(

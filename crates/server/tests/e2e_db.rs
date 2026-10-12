@@ -21,6 +21,8 @@ fn handler(db: &TestDb) -> Arc<dyn Handler> {
         ("ACCESS_TOKEN_SECRET", SECRET_HEX),
         ("ACCESS_TOKEN_EXPIRATION", "15m"),
         ("ADMIN_DEVELOPMENT_BYPASS_ENABLED", "false"),
+        ("CLOUDFRONT_BASE_URL", "https://cdn.test.chalkak"),
+        ("CLOUDFRONT_ORIGIN_PATH", "/chalkak"),
     ]);
     let settings = Settings::from_env(&env).unwrap();
     let clock: Arc<dyn Clock> = Arc::new(FixedClock::new(NOW.parse().unwrap()));
