@@ -10,6 +10,7 @@
 //! `harness/out/<시나리오>.{left,right}.json`에도 남는다. 하나라도 다르면 종료 코드 1.
 //! 끝나면 대상의 시계 파일을 "+0"(실제 시각)으로 되돌린다.
 
+mod callback;
 mod fakes;
 mod http;
 mod idtoken;

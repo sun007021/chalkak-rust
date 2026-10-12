@@ -120,6 +120,7 @@ size = 2048
 content_type = "image/png"
 ```
 
+- 이미지 처리 콜백(`/internal/v1/**`) 단계는 `callback = {}`로 HMAC 헤더(`X-Chalkak-Callback-Timestamp`, `-Signature`)를 붙인다. 서명 대상은 `타임스탬프\nPOST\n경로\nsha256hex(빈 본문)\nlocal`이고 비밀키는 `oracle.env`의 `IMAGE_PROCESSOR_CALLBACK_SECRET`이다. `timestamp_offset`, `sign_path`, `secret`, `audience`, `signature`, `omit_timestamp`, `omit_signature`로 잘못된 요청을 만든다.
 - 응답 지정과 s3 키의 `${변수}`는 단계마다 현재 변수 값으로 채운다. 그래서 앞 단계에서 `capture`한 `uploadId`로 키를 지정할 수 있다.
 - 비교에서 **빼는 것**: JWKS 조회(앱의 공개키 캐시 상태로 횟수가 달라진다), 요청 헤더(Content-Type만 남긴다), S3의 호스트·경로 방식(`버킷/키`만 남긴다).
 - Apple 요청 본문은 폼 필드로 풀어 이름순으로 비교하고, `client_secret`(ES256 JWT)은 헤더·클레임으로 풀어 비교한다. **서명 검증은 하지 않는다**(허용 목록에 `p256`이 없다).

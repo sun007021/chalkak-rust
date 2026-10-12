@@ -1,5 +1,6 @@
 //! 시나리오 하나를 대상 하나에 실행하고, 정규화된 결과(Outcome)를 만든다.
 
+use crate::callback;
 use crate::http::{self, Request};
 use crate::normalize::Normalizer;
 use crate::scenario::FakesSpec;
@@ -124,9 +125,14 @@ fn run_once(target: &Target, scenario: &Scenario) -> Result<Value, String> {
                 authorization(target, auth, clock + app_offset, &vars)?,
             ));
         }
+        let path = subst(&step.path, &vars);
+        if let Some(spec) = &step.callback {
+            let route = path.split('?').next().unwrap_or(&path);
+            headers.extend(callback::headers(spec, clock + app_offset, route));
+        }
         let req = Request {
             method: step.method.clone(),
-            path: subst(&step.path, &vars),
+            path,
             headers,
             body: step.body.as_ref().map(|b| subst(b, &vars).into_bytes()),
         };
