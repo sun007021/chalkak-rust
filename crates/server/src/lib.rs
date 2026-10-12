@@ -4,12 +4,14 @@
 //! `chalkak-platform-*`에 있고 여기서는 둘을 엮고 HTTP 계층(보안·CORS·접근 로그)을 얹는다.
 
 pub mod logging;
+mod post_s3;
 pub mod settings;
 pub mod web;
 
 use std::error::Error;
 use std::sync::Arc;
 
+use chalkak_app::post::{NoopPostModerationPendingListener, PostWiring};
 use chalkak_app::web::Routes;
 use chalkak_app::{AppContext, register_routes};
 use chalkak_core::log::Logger;
@@ -23,6 +25,7 @@ use web::access::AccessLog;
 use web::actuator::{Actuator, DatabaseCheck};
 use web::authorize::Authorize;
 use web::bearer::BearerAuth;
+use web::callback_limit::CallbackBodyLimit;
 use web::cors::AdminCors;
 use web::dispatch::Dispatcher;
 use web::firewall::Firewall;
@@ -49,6 +52,9 @@ pub fn build_chain(
     Chain::new(Dispatcher::new(router, actuator))
         .layer(Tomcat::new(Arc::clone(&clock)))
         .layer(AccessLog::new(Arc::clone(&logger)))
+        .layer(CallbackBodyLimit::new(
+            settings.post.callback_max_body_bytes,
+        ))
         .layer(Firewall::new(Arc::clone(&clock)))
         .layer(SecurityHeaders)
         .layer(AdminCors::new(&settings.admin_cors_allowed_origins))
@@ -72,10 +78,21 @@ pub fn build_handler(
     clock: Arc<dyn Clock>,
     logger: Arc<Logger>,
 ) -> Arc<dyn Handler> {
+    let object_store = post_s3::S3ObjectStore::new(
+        &settings.post.image,
+        settings.post.s3_endpoint_url.as_deref(),
+        Arc::clone(&clock),
+    )
+    .expect("S3 클라이언트를 만들 수 없습니다");
     let ctx = AppContext {
         pool: pool.clone(),
         clock: Arc::clone(&clock),
         logger: Arc::clone(&logger),
+        post: PostWiring::new(
+            settings.post.clone(),
+            Arc::new(object_store),
+            Arc::new(NoopPostModerationPendingListener),
+        ),
     };
     let router = register_routes(Routes::new(Arc::clone(&logger)), &ctx).into_router();
     Arc::new(build_chain(

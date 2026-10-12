@@ -58,6 +58,13 @@ fn harness_with(bypass: bool, database_up: bool) -> Harness {
             "ADMIN_DEVELOPMENT_BYPASS_ENABLED",
             if bypass { "true" } else { "false" },
         ),
+        ("CLOUDFRONT_ORIGIN_PATH", "/chalkak"),
+        (
+            "IMAGE_PROCESSOR_CALLBACK_SECRET",
+            "test-callback-secret-with-enough-length",
+        ),
+        ("CALLBACK_MAX_BODY_BYTES", "65536"),
+        ("POST_IMAGE_PROCESSING_TIMEOUT", "7m"),
     ]);
     let settings = Settings::from_env(&env).unwrap();
     let clock: Arc<dyn Clock> = Arc::new(FixedClock::new(NOW.parse().unwrap()));

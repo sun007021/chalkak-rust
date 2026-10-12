@@ -21,6 +21,13 @@ fn handler(db: &TestDb) -> Arc<dyn Handler> {
         ("ACCESS_TOKEN_SECRET", SECRET_HEX),
         ("ACCESS_TOKEN_EXPIRATION", "15m"),
         ("ADMIN_DEVELOPMENT_BYPASS_ENABLED", "false"),
+        ("CLOUDFRONT_ORIGIN_PATH", "/chalkak"),
+        (
+            "IMAGE_PROCESSOR_CALLBACK_SECRET",
+            "test-callback-secret-with-enough-length",
+        ),
+        ("CALLBACK_MAX_BODY_BYTES", "65536"),
+        ("POST_IMAGE_PROCESSING_TIMEOUT", "7m"),
     ]);
     let settings = Settings::from_env(&env).unwrap();
     let clock: Arc<dyn Clock> = Arc::new(FixedClock::new(NOW.parse().unwrap()));

@@ -34,6 +34,8 @@ pub struct PostSettings {
     pub callback_max_body_bytes: u64,
     /// `POST_IMAGE_PROCESSING_TIMEOUT`
     pub image_processing_timeout: Duration,
+    /// AWS SDK 공통 `AWS_ENDPOINT_URL_S3`(없으면 `AWS_ENDPOINT_URL`). 로컬 스택·하네스 가짜 서버용이다.
+    pub s3_endpoint_url: Option<String>,
 }
 
 fn invalid(key: &str, reason: &str) -> ConfigError {
@@ -107,6 +109,10 @@ impl PostSettings {
             callback_secret,
             callback_max_body_bytes,
             image_processing_timeout,
+            s3_endpoint_url: ["AWS_ENDPOINT_URL_S3", "AWS_ENDPOINT_URL"]
+                .iter()
+                .find_map(|key| env.get(key).map(str::trim).filter(|v| !v.is_empty()))
+                .map(str::to_owned),
         })
     }
 }
@@ -153,6 +159,35 @@ mod tests {
         let s = PostSettings::from_env(&full, "prod").unwrap();
         assert_eq!(s.image.environment, "prod");
         assert!(!s.image.anonymous_access);
+    }
+
+    #[test]
+    fn s3_엔드포인트는_서비스별_변수를_먼저_본다() {
+        let e = env(&[
+            ("AWS_ENDPOINT_URL", "http://general:1"),
+            ("AWS_ENDPOINT_URL_S3", " http://s3:2 "),
+        ]);
+        assert_eq!(
+            PostSettings::from_env(&e, "local")
+                .unwrap()
+                .s3_endpoint_url
+                .as_deref(),
+            Some("http://s3:2")
+        );
+        let e = env(&[("AWS_ENDPOINT_URL", "http://general:1")]);
+        assert_eq!(
+            PostSettings::from_env(&e, "local")
+                .unwrap()
+                .s3_endpoint_url
+                .as_deref(),
+            Some("http://general:1")
+        );
+        assert_eq!(
+            PostSettings::from_env(&env(&[]), "local")
+                .unwrap()
+                .s3_endpoint_url,
+            None
+        );
     }
 
     #[test]
