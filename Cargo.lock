@@ -93,6 +93,9 @@ version = "0.0.0"
 [[package]]
 name = "chalkak-db"
 version = "0.0.0"
+dependencies = [
+ "postgres",
+]
 
 [[package]]
 name = "chalkak-http"
