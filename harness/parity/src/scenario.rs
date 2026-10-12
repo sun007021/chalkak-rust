@@ -104,6 +104,8 @@ pub struct Step {
     #[serde(default)]
     pub headers: BTreeMap<String, String>,
     pub body: Option<String>,
+    /// 본문 대신 `a`를 이 바이트 수만큼 채운 본문을 보낸다(크기 제한 시험용). `body`와 함께 쓸 수 없다.
+    pub body_size: Option<usize>,
     pub auth: Option<Auth>,
     #[serde(default)]
     pub capture: BTreeMap<String, String>,

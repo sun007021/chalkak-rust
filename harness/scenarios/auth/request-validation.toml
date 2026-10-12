@@ -1,0 +1,281 @@
+name = "인증: 소셜 로그인·업로드 URL·가입 요청의 형식 검증(제공자 열거형, 필수 값, authorizationCode)"
+tags = ["auth", "validation", "oidc"]
+clock = "2026-10-12T09:00:00+09:00"
+compare_db = false
+
+# 근거: AuthController, SocialLoginRequest(@NotNull provider, @NotBlank idToken·rawNonce, isValidAuthorizationCode),
+# SocialSignupSignatureUploadRequest, SocialSignupRequest, AuthControllerTest, Jackson 열거형 해석.
+# 형식 오류는 ID Token 검증보다 앞서 400이다.
+
+[[id_token]]
+name = "g"
+provider = "google"
+sub = "google-sub-validation"
+nonce = "nonce-v"
+email = "validation@example.com"
+email_verified = true
+
+[[step]]
+name = "본문 없음"
+method = "POST"
+path = "/api/v1/auth/social-login"
+
+[[step]]
+name = "본문이 JSON이 아님"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = 'provider=GOOGLE'
+
+[[step]]
+name = "본문이 배열"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '[1]'
+
+[[step]]
+name = "Content-Type이 JSON이 아님"
+method = "POST"
+path = "/api/v1/auth/social-login"
+headers = { "Content-Type" = "text/plain" }
+body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":"nonce-v"}'
+
+[[step]]
+name = "빈 객체"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{}'
+
+[[step]]
+name = "제공자 없음"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"idToken":"${g}","rawNonce":"nonce-v"}'
+
+[[step]]
+name = "제공자가 null"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":null,"idToken":"${g}","rawNonce":"nonce-v"}'
+
+[[step]]
+name = "제공자가 빈 문자열"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"","idToken":"${g}","rawNonce":"nonce-v"}'
+
+[[step]]
+name = "제공자 이름이 소문자"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"google","idToken":"${g}","rawNonce":"nonce-v"}'
+
+[[step]]
+name = "모르는 제공자"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"NAVER","idToken":"${g}","rawNonce":"nonce-v"}'
+
+[[step]]
+name = "제공자 이름 앞뒤 공백은 잘라서 읽는다"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":" GOOGLE ","idToken":"${g}","rawNonce":"nonce-v"}'
+
+[[step]]
+name = "제공자를 서수(0)로 보냄"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":0,"idToken":"${g}","rawNonce":"nonce-v"}'
+
+[[step]]
+name = "제공자를 서수 문자열로 보냄"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"0","idToken":"${g}","rawNonce":"nonce-v"}'
+
+[[step]]
+name = "범위 밖 서수"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":3,"idToken":"${g}","rawNonce":"nonce-v"}'
+
+[[step]]
+name = "음수 서수"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":-1,"idToken":"${g}","rawNonce":"nonce-v"}'
+
+[[step]]
+name = "제공자가 실수"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":1.0,"idToken":"${g}","rawNonce":"nonce-v"}'
+
+[[step]]
+name = "제공자가 불리언"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":true,"idToken":"${g}","rawNonce":"nonce-v"}'
+
+[[step]]
+name = "제공자가 배열"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":["GOOGLE"],"idToken":"${g}","rawNonce":"nonce-v"}'
+
+[[step]]
+name = "제공자가 객체"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":{},"idToken":"${g}","rawNonce":"nonce-v"}'
+
+[[step]]
+name = "idToken 없음"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","rawNonce":"nonce-v"}'
+
+[[step]]
+name = "idToken 공백"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"  ","rawNonce":"nonce-v"}'
+
+[[step]]
+name = "rawNonce 없음"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${g}"}'
+
+[[step]]
+name = "rawNonce 공백"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":"\n"}'
+
+[[step]]
+name = "idToken이 숫자(문자열로 바뀌어 형식 오류 토큰)"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":123,"rawNonce":"nonce-v"}'
+
+[[step]]
+name = "idToken이 객체"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":{"a":1},"rawNonce":"nonce-v"}'
+
+[[step]]
+name = "구글에 authorizationCode를 보내면 거절"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":"nonce-v","authorizationCode":"code"}'
+
+[[step]]
+name = "구글에 빈 authorizationCode도 거절"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":"nonce-v","authorizationCode":""}'
+
+[[step]]
+name = "구글에 null authorizationCode는 통과"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":"nonce-v","authorizationCode":null}'
+
+[[step]]
+name = "Apple은 authorizationCode가 필요"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"APPLE","idToken":"${g}","rawNonce":"nonce-v"}'
+
+[[step]]
+name = "Apple의 공백 authorizationCode도 거절"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"APPLE","idToken":"${g}","rawNonce":"nonce-v","authorizationCode":" "}'
+
+[[step]]
+name = "알 수 없는 필드는 무시하고 정상 로그인"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":"nonce-v","unknown":[1,2]}'
+
+# --- 사인 업로드 URL 발급 -------------------------------------------------------------------
+
+[[step]]
+name = "업로드 URL: 제공자 없음"
+method = "POST"
+path = "/api/v1/auth/social-signup/signature/uploads"
+body = '{"idToken":"${g}","rawNonce":"nonce-v"}'
+
+[[step]]
+name = "업로드 URL: idToken 공백"
+method = "POST"
+path = "/api/v1/auth/social-signup/signature/uploads"
+body = '{"provider":"KAKAO","idToken":"","rawNonce":"nonce-v"}'
+
+[[step]]
+name = "업로드 URL: rawNonce 없음"
+method = "POST"
+path = "/api/v1/auth/social-signup/signature/uploads"
+body = '{"provider":"GOOGLE","idToken":"${g}"}'
+
+[[step]]
+name = "업로드 URL: authorizationCode는 받지 않으므로 무시"
+method = "POST"
+path = "/api/v1/auth/social-signup/signature/uploads"
+body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":"nonce-v","authorizationCode":"ignored"}'
+
+[[step]]
+name = "업로드 URL: 제공자가 잘못된 서수"
+method = "POST"
+path = "/api/v1/auth/social-signup/signature/uploads"
+body = '{"provider":9,"idToken":"${g}","rawNonce":"nonce-v"}'
+
+# --- 가입 -----------------------------------------------------------------------------------
+
+[[step]]
+name = "가입: 본문 없음"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+
+[[step]]
+name = "가입: 토큰 없음"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+body = '{}'
+
+[[step]]
+name = "가입: 토큰 공백"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+body = '{"signupToken":"   "}'
+
+[[step]]
+name = "가입: 형식이 틀린 토큰은 401"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+body = '{"signupToken":"not-a-jwt"}'
+
+[[step]]
+name = "가입: 토큰이 객체"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+body = '{"signupToken":{"a":1}}'
+
+[[step]]
+name = "가입: 액세스 토큰은 회원가입 토큰이 아니다"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+body = '{"signupToken":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.e30.AAAA"}'
+
+[[step]]
+name = "GET은 허용되지 않음"
+method = "GET"
+path = "/api/v1/auth/social-login"
+
+[[step]]
+name = "로그아웃: GET은 허용되지 않음"
+method = "GET"
+path = "/api/v1/auth/logout"

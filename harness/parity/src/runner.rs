@@ -134,7 +134,17 @@ fn run_once(target: &Target, scenario: &Scenario) -> Result<Value, String> {
             method: step.method.clone(),
             path,
             headers,
-            body: step.body.as_ref().map(|b| subst(b, &vars).into_bytes()),
+            body: match (&step.body, step.body_size) {
+                (Some(b), None) => Some(subst(b, &vars).into_bytes()),
+                (None, Some(n)) => Some(vec![b'a'; n]),
+                (None, None) => None,
+                (Some(_), Some(_)) => {
+                    return Err(format!(
+                        "{}: body와 body_size는 함께 쓸 수 없습니다",
+                        step.name
+                    ));
+                }
+            },
         };
         let res = http::send(&target.base_url, &req)
             .map_err(|e| format!("[{}] {}: {e}", target.name, step.name))?;
