@@ -5,7 +5,8 @@
 //! 링크가 든 메시지를 Slack Incoming Webhook으로 보낸다. 같은 스레드에서 동기로 보내고, 실패해도 예외를 밖으로 내지 않는다
 //! (게시물 처리 흐름을 막지 않는다). 전달을 끄면(`ADMIN_NOTIFICATION_DELIVERY_ENABLED=false`) 이 모듈의 구현은 만들지 않는다.
 //!
-//! 검수 대기 이벤트를 내는 쪽(게시물 도메인)과의 연결은 서버 조립에서 한다. 이 모듈은 게시물 도메인에 의존하지 않는다.
+//! 검수 대기 이벤트를 내는 쪽(게시물 도메인)과는 [`crate::post::PostModerationPendingListener`] 구현으로 이어진다.
+//! 서버 조립이 전달 설정이 있을 때만 이 구현을 주입하고, 없으면 아무 구독자도 없는 것과 같다(원본 `@ConditionalOnProperty`).
 
 pub mod settings;
 
@@ -222,6 +223,12 @@ impl PostModerationPendingNotifier {
         self.logger.warn(LISTENER_LOGGER).log(&format!(
             "{what}: postId={post_id}, failureCode={failure_code}"
         ));
+    }
+}
+
+impl crate::post::PostModerationPendingListener for PostModerationPendingNotifier {
+    fn on_pending(&self, post_id: Uuid, occurred_at: Timestamp) {
+        PostModerationPendingNotifier::on_pending(self, post_id, occurred_at);
     }
 }
 
@@ -497,5 +504,17 @@ mod tests {
         assert!(log.contains("NOTIFICATION_DELIVERY_ERROR"), "{log}");
         assert!(!log.contains("hooks.slack.com"), "{log}");
         assert!(!log.contains("SECRET"), "{log}");
+    }
+
+    /// 수동 확인용: 하네스 가짜 서버(`harness/fakes`)의 `/slack/...`로 실제 한 번 보낸다.
+    /// `CHALKAK_FAKES_SLACK_URL=http://127.0.0.1:19000/slack/services/T/B/X cargo test -p chalkak-app --lib -- --ignored fakes`
+    /// 로 돌린 뒤 `GET /__admin/requests`에서 본문을 확인한다.
+    #[test]
+    #[ignore = "하네스 가짜 서버가 필요하다"]
+    fn fakes_slack으로_실제_발송_한_번() {
+        let url = std::env::var("CHALKAK_FAKES_SLACK_URL").expect("CHALKAK_FAKES_SLACK_URL");
+        let client = HttpClient::builder().build().unwrap();
+        let sender = SlackIncomingWebhookNotificationSender::new(client, url);
+        assert!(sender.send(&message()));
     }
 }

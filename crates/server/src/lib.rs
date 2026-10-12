@@ -11,7 +11,13 @@ pub mod web;
 use std::error::Error;
 use std::sync::Arc;
 
-use chalkak_app::post::{NoopPostModerationPendingListener, PostWiring};
+use chalkak_app::notification::slack::{
+    NotificationMessageFactory, PostModerationPendingNotifier,
+    SlackIncomingWebhookNotificationSender,
+};
+use chalkak_app::post::{
+    NoopPostModerationPendingListener, PostModerationPendingListener, PostWiring,
+};
 use chalkak_app::web::Routes;
 use chalkak_app::{AppContext, register_routes};
 use chalkak_core::log::Logger;
@@ -71,6 +77,24 @@ pub fn build_chain(
         ))
 }
 
+/// 검수 대기 구독자. 관리자 알림 전달이 켜져 있을 때만 Slack 발송기를 붙이고, 꺼져 있으면 아무것도 하지 않는다
+/// (원본 `NotificationConfiguration`은 `delivery-enabled=true`일 때만 리스너 빈을 만든다).
+fn moderation_pending_listener(
+    settings: &Settings,
+    logger: Arc<Logger>,
+) -> Arc<dyn PostModerationPendingListener> {
+    let Some(notification) = &settings.admin_notification else {
+        return Arc::new(NoopPostModerationPendingListener);
+    };
+    let sender = SlackIncomingWebhookNotificationSender::from_settings(&notification.slack)
+        .expect("Slack 클라이언트를 만들 수 없습니다");
+    Arc::new(PostModerationPendingNotifier::new(
+        NotificationMessageFactory::new(&notification.admin_web_base_url),
+        Arc::new(sender),
+        logger,
+    ))
+}
+
 /// 요청 하나를 처리하는 전체 핸들러(도메인 라우트 + 미들웨어 체인)를 만든다.
 pub fn build_handler(
     settings: &Settings,
@@ -91,7 +115,7 @@ pub fn build_handler(
         post: PostWiring::new(
             settings.post.clone(),
             Arc::new(object_store),
-            Arc::new(NoopPostModerationPendingListener),
+            moderation_pending_listener(settings, Arc::clone(&logger)),
         ),
     };
     let router = register_routes(Routes::new(Arc::clone(&logger)), &ctx).into_router();
