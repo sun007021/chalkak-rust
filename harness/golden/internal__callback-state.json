@@ -1,0 +1,488 @@
+{
+  "steps": [
+    {
+      "step": "complete: 검증 중 게시물을 검수 대기로",
+      "status": 204,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": ""
+    },
+    {
+      "step": "complete: 다시 보내도 같다",
+      "status": 204,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid2"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": ""
+    },
+    {
+      "step": "complete: 다른 값으로 다시 보내도 처음 값 유지",
+      "status": 204,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid3"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": ""
+    },
+    {
+      "step": "complete: 게시물 없는 업로드",
+      "status": 204,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid4"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": ""
+    },
+    {
+      "step": "complete: 이미 반려된 업로드",
+      "status": 204,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid5"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": ""
+    },
+    {
+      "step": "complete: 없는 업로드는 조용히 끝",
+      "status": 204,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid6"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": ""
+    },
+    {
+      "step": "complete: 이미 승인 대기인 게시물",
+      "status": 204,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid7"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": ""
+    },
+    {
+      "step": "failed: 검증 중 게시물을 반려",
+      "status": 204,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid8"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": ""
+    },
+    {
+      "step": "failed: 다시 보내도 같다",
+      "status": 204,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid9"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": ""
+    },
+    {
+      "step": "failed: 이미 처리 완료된 업로드",
+      "status": 204,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid10"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": ""
+    },
+    {
+      "step": "failed: 게시물 없는 업로드",
+      "status": 204,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid11"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": ""
+    },
+    {
+      "step": "failed: 이미 반려된 업로드",
+      "status": 204,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid12"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": ""
+    },
+    {
+      "step": "failed: 없는 업로드",
+      "status": 204,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid13"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": ""
+    }
+  ],
+  "db": {
+    "photos": [
+      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":null,\"capturedAt\":null,\"metaAttributes\":{}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/$uuid?.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/$uuid?.webp\"}",
+      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/$uuid?.webp\",\"thumbnail_storage_key\":null}",
+      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/$uuid?.webp\",\"thumbnail_storage_key\":null}"
+    ],
+    "post_image_uploads": [
+      "{\"id\":\"$uuid?\",\"status\":\"READY\",\"user_id\":\"$uuid?\",\"claimed_at\":\"<t-3600s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"image_metadata\":{\"width\":1},\"rejection_reason\":null}",
+      "{\"id\":\"$uuid?\",\"status\":\"READY\",\"user_id\":\"$uuid?\",\"claimed_at\":\"<t-3600s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"image_metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":null,\"capturedAt\":null,\"metaAttributes\":{}},\"rejection_reason\":null}",
+      "{\"id\":\"$uuid?\",\"status\":\"READY\",\"user_id\":\"$uuid?\",\"claimed_at\":null,\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"image_metadata\":{\"width\":5,\"height\":6,\"byteSize\":null,\"location\":{\"latitude\":-90.0,\"longitude\":180.0},\"capturedAt\":\"x\",\"metaAttributes\":{}},\"rejection_reason\":null}",
+      "{\"id\":\"$uuid?\",\"status\":\"REJECTED\",\"user_id\":\"$uuid?\",\"claimed_at\":\"<t-3600s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"image_metadata\":null,\"rejection_reason\":\"INVALID_IMAGE\"}",
+      "{\"id\":\"$uuid?\",\"status\":\"REJECTED\",\"user_id\":\"$uuid?\",\"claimed_at\":null,\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"image_metadata\":null,\"rejection_reason\":\"NO_POST\"}",
+      "{\"id\":\"$uuid?\",\"status\":\"REJECTED\",\"user_id\":\"$uuid?\",\"claimed_at\":null,\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"image_metadata\":null,\"rejection_reason\":\"OLD\"}"
+    ],
+    "posts": [
+      "{\"id\":\"$uuid?\",\"title\":\"둘\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-3600s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"REJECTED\",\"post_image_upload_id\":\"$uuid?\"}",
+      "{\"id\":\"$uuid?\",\"title\":\"셋\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-3600s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-3600s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":\"$uuid?\"}",
+      "{\"id\":\"$uuid?\",\"title\":\"하나\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-3600s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":\"$uuid?\"}"
+    ],
+    "topics": [
+      "{\"id\":\"$uuid?\",\"title\":\"오늘\",\"ends_at\":\"<t+54000s db +09:00>\",\"starts_at\":\"<t-32400s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ],
+    "users": [
+      "{\"id\":\"$uuid?\",\"email\":\"u1@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u1/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}",
+      "{\"id\":\"$uuid?\",\"email\":\"u2@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u2/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}",
+      "{\"id\":\"$uuid?\",\"email\":\"u3@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u3/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}",
+      "{\"id\":\"$uuid?\",\"email\":\"u4@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u4/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}"
+    ]
+  }
+}
