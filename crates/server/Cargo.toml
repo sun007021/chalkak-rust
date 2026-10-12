@@ -8,3 +8,23 @@ publish.workspace = true
 
 [lints]
 workspace = true
+
+[lib]
+name = "chalkak_server"
+path = "src/lib.rs"
+
+[[bin]]
+name = "chalkak-server"
+path = "src/main.rs"
+
+[dependencies]
+chalkak-app = { path = "../app" }
+chalkak-core = { path = "../platform/core" }
+chalkak-http = { path = "../platform/http" }
+chalkak-db = { path = "../platform/db" }
+chalkak-jwt = { path = "../platform/jwt" }
+jiff = { workspace = true }
+serde_json = { workspace = true }
+postgres = { workspace = true }
+signal-hook = { workspace = true }
+uuid = { workspace = true }
