@@ -2,4 +2,6 @@
 
 pub mod server;
 
-pub use server::{Headers, Limits, Method, Request, Response};
+pub use server::{
+    Chain, Handler, Headers, Limits, Method, Middleware, Request, Response, RouteMatch, Router,
+};
