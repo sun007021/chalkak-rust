@@ -592,10 +592,7 @@ mod tests {
     // PostTest#createPost_tenCharacterTitle_createsPost
     #[test]
     fn create_post_ten_character_title_creates_post() {
-        assert_eq!(
-            create(Some("1234567890")).title_value(),
-            Some("1234567890")
-        );
+        assert_eq!(create(Some("1234567890")).title_value(), Some("1234567890"));
     }
 
     // PostTest#createPost_longBlankTitle_normalizesTitleToNull
@@ -615,9 +612,14 @@ mod tests {
     // PostTest#createPost_tooLongTitle_throwsBusinessException
     #[test]
     fn create_post_too_long_title_throws_business_exception() {
-        let err =
-            Post::create(AUTHOR_ID, TOPIC_ID, photo(), Some(UPLOAD_ID), Some("12345678901"))
-                .unwrap_err();
+        let err = Post::create(
+            AUTHOR_ID,
+            TOPIC_ID,
+            photo(),
+            Some(UPLOAD_ID),
+            Some("12345678901"),
+        )
+        .unwrap_err();
         assert_eq!(err.message, "제목은 10자 이하여야 합니다.");
     }
 
@@ -643,8 +645,8 @@ mod tests {
     #[test]
     fn create_post_too_long_normalized_title_throws_business_exception() {
         let title = format!("  {}  ", "📸".repeat(11));
-        let err = Post::create(AUTHOR_ID, TOPIC_ID, photo(), Some(UPLOAD_ID), Some(&title))
-            .unwrap_err();
+        let err =
+            Post::create(AUTHOR_ID, TOPIC_ID, photo(), Some(UPLOAD_ID), Some(&title)).unwrap_err();
         assert_eq!(err.message, "제목은 10자 이하여야 합니다.");
     }
 
@@ -751,7 +753,10 @@ mod tests {
         let err = post
             .update_title(AUTHOR_ID, Some("수정 제목"), TopicPhase::Closed)
             .unwrap_err();
-        assert_eq!(err.message, "참여 기간이 종료된 게시물은 수정할 수 없습니다.");
+        assert_eq!(
+            err.message,
+            "참여 기간이 종료된 게시물은 수정할 수 없습니다."
+        );
         assert_eq!(post.title_value(), Some("기존 제목"));
     }
 
@@ -762,7 +767,10 @@ mod tests {
         let err = post
             .update_title(AUTHOR_ID, Some("수정 제목"), TopicPhase::BeforeOpen)
             .unwrap_err();
-        assert_eq!(err.message, "참여 기간이 종료된 게시물은 수정할 수 없습니다.");
+        assert_eq!(
+            err.message,
+            "참여 기간이 종료된 게시물은 수정할 수 없습니다."
+        );
     }
 
     // PostTest#requestModeration_validatingPost_becomesPending
@@ -869,7 +877,8 @@ mod tests {
     #[test]
     fn delete_by_author_pending_post_soft_deletes_post() {
         let mut post = pending_post("제목");
-        post.delete_by_author(AUTHOR_ID, Some(deleted_at())).unwrap();
+        post.delete_by_author(AUTHOR_ID, Some(deleted_at()))
+            .unwrap();
         assert_eq!(post.deleted_at, Some(deleted_at()));
     }
 
@@ -877,7 +886,8 @@ mod tests {
     #[test]
     fn delete_by_author_approved_post_soft_deletes_post_and_photo() {
         let mut post = post_with_status(ModerationStatus::Approved);
-        post.delete_by_author(AUTHOR_ID, Some(deleted_at())).unwrap();
+        post.delete_by_author(AUTHOR_ID, Some(deleted_at()))
+            .unwrap();
         assert_eq!(post.deleted_at, Some(deleted_at()));
         assert_eq!(post.photo.deleted_at, Some(deleted_at()));
     }
@@ -886,7 +896,8 @@ mod tests {
     #[test]
     fn delete_by_author_already_deleted_post_keeps_first_deletion_time() {
         let mut post = pending_post("제목");
-        post.delete_by_author(AUTHOR_ID, Some(deleted_at())).unwrap();
+        post.delete_by_author(AUTHOR_ID, Some(deleted_at()))
+            .unwrap();
         post.delete_by_author(AUTHOR_ID, Some(ts("2026-08-20T01:01:00Z")))
             .unwrap();
         assert_eq!(post.deleted_at, Some(deleted_at()));
@@ -1004,7 +1015,10 @@ mod tests {
         let mut upload = upload();
         upload.fail_processing(Some("UNSUPPORTED_FORMAT"));
         assert_eq!(upload.status, PostImageUploadStatus::Rejected);
-        assert_eq!(upload.rejection_reason.as_deref(), Some("UNSUPPORTED_FORMAT"));
+        assert_eq!(
+            upload.rejection_reason.as_deref(),
+            Some("UNSUPPORTED_FORMAT")
+        );
     }
 
     // PostImageUploadTest#completeProcessing_rejectedUpload_keepsRejected
@@ -1058,7 +1072,10 @@ mod tests {
     #[test]
     fn claim_just_before_expiry_succeeds() {
         let mut upload = upload();
-        let at = upload.expires_at.checked_sub(SignedDuration::from_millis(1)).unwrap();
+        let at = upload
+            .expires_at
+            .checked_sub(SignedDuration::from_millis(1))
+            .unwrap();
         upload.claim(at).unwrap();
         assert_eq!(upload.claimed_at, Some(at));
     }
@@ -1086,7 +1103,10 @@ mod tests {
         let mut upload = upload();
         upload.fail_processing(Some("SOMETHING_NEW"));
         let err = upload.claim(ts("2026-08-20T00:01:00Z")).unwrap_err();
-        assert_eq!(err.message, "처리할 수 없는 사진입니다. 다시 업로드해 주세요.");
+        assert_eq!(
+            err.message,
+            "처리할 수 없는 사진입니다. 다시 업로드해 주세요."
+        );
     }
 
     // PostImageUploadTest#createPostImageUpload_nullUser_throwsBusinessException
@@ -1114,7 +1134,10 @@ mod tests {
     fn 거절_사유_일곱_가지는_각자의_안내_문구를_가진다() {
         for (reason, message) in [
             ("UNSUPPORTED_FORMAT", "WebP 이미지만 업로드할 수 있습니다."),
-            ("CORRUPTED_IMAGE", "사진 파일이 손상되었습니다. 다시 업로드해 주세요."),
+            (
+                "CORRUPTED_IMAGE",
+                "사진 파일이 손상되었습니다. 다시 업로드해 주세요.",
+            ),
             ("ANIMATED_IMAGE", "움직이는 이미지는 업로드할 수 없습니다."),
             ("TOO_LARGE", "더 작은 용량의 이미지를 업로드해 주세요."),
             (
@@ -1125,7 +1148,10 @@ mod tests {
                 "MISSING_OBJECT",
                 "업로드한 사진을 찾을 수 없습니다. 다시 업로드해 주세요.",
             ),
-            ("PROCESSING_ERROR", "사진을 처리하지 못했습니다. 다시 업로드해 주세요."),
+            (
+                "PROCESSING_ERROR",
+                "사진을 처리하지 못했습니다. 다시 업로드해 주세요.",
+            ),
         ] {
             assert_eq!(rejection_message_for(reason), message);
         }
