@@ -16,6 +16,7 @@
 
 use chalkak_http::Request;
 use serde_json::value::RawValue;
+use serde_json::{Map, Value};
 use std::collections::HashMap;
 
 use super::ApiError;
@@ -172,13 +173,27 @@ pub fn required_date_query(req: &Request, name: &str) -> Result<LocalDate, ApiEr
 // ---------------------------------------------------------------------------------------------
 
 /// 해석된 JSON 객체 본문. 필드는 Jackson처럼 느슨하게 꺼낸다. 값은 원문 그대로 들고 있다.
-pub struct JsonObject(HashMap<String, Box<RawValue>>);
+pub struct JsonObject {
+    raw: HashMap<String, Box<RawValue>>,
+    values: Map<String, Value>,
+}
 
 impl JsonObject {
+    fn parse(body: &[u8]) -> Option<JsonObject> {
+        let raw = serde_json::from_slice::<HashMap<String, Box<RawValue>>>(body).ok()?;
+        let values = serde_json::from_slice::<Map<String, Value>>(body).ok()?;
+        Some(JsonObject { raw, values })
+    }
+
+    /// 필드의 원본 JSON 값. 문자열 말고 UUID·숫자 필드를 직접 해석해야 하는 DTO가 쓴다.
+    pub fn value(&self, name: &str) -> Option<&Value> {
+        self.values.get(name)
+    }
+
     /// 문자열 필드. 없거나 `null`이면 `None`, 숫자·불리언은 원문 그대로 문자열로 바꾸고(`1.50` -> `"1.50"`),
     /// 배열·객체는 본문 오류(400).
     pub fn string(&self, name: &str) -> Result<Option<String>, ApiError> {
-        let Some(raw) = self.0.get(name) else {
+        let Some(raw) = self.raw.get(name) else {
             return Ok(None);
         };
         let text = raw.get();
@@ -207,10 +222,7 @@ pub fn read_json_object(req: &Request) -> Result<JsonObject, ApiError> {
         return Err(ApiError::UnreadableBody);
     }
     let body = replace_lone_surrogates(body);
-    match serde_json::from_slice::<HashMap<String, Box<RawValue>>>(&body) {
-        Ok(map) => Ok(JsonObject(map)),
-        Err(_) => Err(ApiError::UnreadableBody),
-    }
+    JsonObject::parse(&body).ok_or(ApiError::UnreadableBody)
 }
 
 /// 문자열 안의 짝 없는 서로게이트 이스케이프(`\ud800` 등)를 `?`로 바꾼다.
@@ -336,8 +348,7 @@ mod tests {
 
     #[test]
     fn 숫자_내용은_원문_그대로_문자열이_된다() {
-        let map = serde_json::from_str(r#"{"a":1.50,"b":1e3,"c":true,"d":null,"e":"x"}"#).unwrap();
-        let o = JsonObject(map);
+        let o = JsonObject::parse(br#"{"a":1.50,"b":1e3,"c":true,"d":null,"e":"x"}"#).unwrap();
         assert_eq!(o.string("a").unwrap().as_deref(), Some("1.50"));
         assert_eq!(o.string("b").unwrap().as_deref(), Some("1e3"));
         assert_eq!(o.string("c").unwrap().as_deref(), Some("true"));

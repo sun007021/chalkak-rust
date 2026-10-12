@@ -9,7 +9,6 @@
 pub mod api;
 pub mod cleanup;
 pub mod domain;
-pub mod image_url;
 pub mod repository;
 pub mod service;
 pub mod slack;

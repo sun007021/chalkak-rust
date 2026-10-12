@@ -9,8 +9,8 @@ use jiff::Timestamp;
 use uuid::Uuid;
 
 use super::domain::NotificationType;
-use super::image_url::ImageUrlProvider;
 use super::repository::NotificationRepository;
+use crate::photo::url::ImageUrlProvider;
 use crate::web::ApiError;
 
 const NOT_FOUND_MESSAGE: &str = "알림을 찾을 수 없습니다.";
@@ -64,6 +64,13 @@ impl NotificationInboxService {
         }
     }
 
+    fn image_url(&self, storage_key: Option<&str>) -> Result<Option<String>, ApiError> {
+        // 키를 URL로 바꿀 수 없으면 원본은 처리되지 않은 예외(500)다.
+        self.images
+            .get_url(storage_key)
+            .map_err(|e| ApiError::Internal(e.to_string()))
+    }
+
     /// `getNotifications`. `page`는 1부터, 두 값 모두 컨트롤러가 범위를 이미 확인했다.
     pub fn get_notifications(
         &self,
@@ -90,7 +97,7 @@ impl NotificationInboxService {
                 kind: n.kind,
                 title: n.title,
                 body: n.body,
-                thumbnail_image_url: self.images.url(summary.thumbnail_storage_key.as_deref())?,
+                thumbnail_image_url: self.image_url(summary.thumbnail_storage_key.as_deref())?,
                 read_at: n.read_at,
                 created_at: n.created_at,
             });
@@ -120,7 +127,7 @@ impl NotificationInboxService {
             kind: n.kind,
             title: n.title,
             body: n.body,
-            original_image_url: self.images.url(Some(&detail.original_storage_key))?,
+            original_image_url: self.image_url(Some(&detail.original_storage_key))?,
             rejection_reason: n.rejection_reason,
             read_at: n.read_at,
             created_at: n.created_at,

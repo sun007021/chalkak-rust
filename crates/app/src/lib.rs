@@ -14,7 +14,10 @@ pub mod admin;
 pub mod auth;
 pub mod common;
 pub mod feedback;
+pub mod like;
 pub mod notification;
+pub mod photo;
+pub mod post;
 pub mod security;
 #[doc(hidden)]
 pub mod testing;
@@ -33,8 +36,8 @@ pub struct AppContext {
     pub pool: Pool,
     pub clock: Arc<dyn Clock>,
     pub logger: Arc<Logger>,
-    /// 저장소 키 -> 공개 이미지 URL(알림함의 사진 썸네일·원본).
-    pub image_urls: Arc<dyn notification::image_url::ImageUrlProvider>,
+    /// 게시물·사진·좋아요 흐름이 서버 조립에서 받는 것(설정, S3 호출, 검수 대기 구독자).
+    pub post: post::PostWiring,
 }
 
 /// 모든 도메인의 라우트를 등록한다.
@@ -42,5 +45,8 @@ pub fn register_routes(routes: web::Routes, ctx: &AppContext) -> web::Routes {
     let routes = topic::api::register(routes, ctx);
     let routes = feedback::api::register(routes, ctx);
     let routes = notification::api::register(routes, ctx);
+    let routes = post::api::register(routes, ctx);
+    let routes = like::api::register(routes, ctx);
+    let routes = post::callback::register(routes, ctx);
     admin::auth_api::register(routes)
 }

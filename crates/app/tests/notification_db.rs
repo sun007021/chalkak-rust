@@ -7,9 +7,9 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use chalkak_app::notification::cleanup::delete_expired_notifications;
-use chalkak_app::notification::image_url::{ImageUrlError, ImageUrlProvider};
 use chalkak_app::notification::service::NotificationInboxService;
 use chalkak_app::notification::{ModerationDecision, NotificationError, create_for_moderation};
+use chalkak_app::photo::url::{ImageUrlProvider, InvalidStorageKey};
 use chalkak_app::testing::TestDb;
 use chalkak_core::FixedClock;
 use chalkak_db::DbError;
@@ -43,7 +43,7 @@ fn ts(s: &str) -> Timestamp {
 struct FakeImageUrls;
 
 impl ImageUrlProvider for FakeImageUrls {
-    fn url(&self, storage_key: Option<&str>) -> Result<Option<String>, ImageUrlError> {
+    fn get_url(&self, storage_key: Option<&str>) -> Result<Option<String>, InvalidStorageKey> {
         Ok(storage_key.map(|k| format!("https://cdn.test/{k}")))
     }
 }

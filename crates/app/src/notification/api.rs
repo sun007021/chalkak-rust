@@ -15,6 +15,7 @@ use super::service::{
 use crate::AppContext;
 use crate::auth::UsableUserPolicy;
 use crate::common::java_uuid_from_string;
+use crate::photo::url::CloudFrontUrlProvider;
 use crate::web::binding::is_java_whitespace;
 use crate::web::json::serialize_instant;
 use crate::web::{ApiError, ApiResult, Routes, ok_json};
@@ -136,7 +137,10 @@ pub fn register(routes: Routes, ctx: &AppContext) -> Routes {
     let service = Arc::new(NotificationInboxService::new(
         ctx.pool.clone(),
         ctx.clock.clone(),
-        ctx.image_urls.clone(),
+        Arc::new(CloudFrontUrlProvider::new(
+            &ctx.post.settings.cloudfront_base_url,
+            &ctx.post.settings.cloudfront_origin_path,
+        )),
     ));
     let policy = Arc::new(UsableUserPolicy::new(ctx.pool.clone()));
 

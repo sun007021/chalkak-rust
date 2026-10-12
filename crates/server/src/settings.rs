@@ -11,8 +11,8 @@
 use std::path::PathBuf;
 use std::time::Duration;
 
-use chalkak_app::notification::image_url::CloudFrontUrlProvider;
 use chalkak_app::notification::slack::settings::AdminNotificationSettings;
+use chalkak_app::post::PostSettings;
 use chalkak_core::config::{ConfigError, Env};
 use chalkak_db::DbConfig;
 
@@ -43,6 +43,15 @@ impl Profile {
         }
     }
 
+    /// 프로필 이름(`application-{name}.yml`).
+    pub fn name(self) -> &'static str {
+        match self {
+            Profile::Local => "local",
+            Profile::Dev => "dev",
+            Profile::Prod => "prod",
+        }
+    }
+
     /// JSON 파일 로그를 남기는 프로필(`logback-spring.xml`의 `dev | prod`).
     pub fn writes_json_log_file(self) -> bool {
         matches!(self, Profile::Dev | Profile::Prod)
@@ -63,8 +72,7 @@ pub struct Settings {
     pub admin_development_bypass: bool,
     pub admin_cors_allowed_origins: Vec<String>,
     pub log_file: PathBuf,
-    /// 저장소 키 -> 공개 이미지 URL(`CLOUDFRONT_BASE_URL`, `CLOUDFRONT_ORIGIN_PATH`).
-    pub image_urls: CloudFrontUrlProvider,
+    pub post: PostSettings,
     /// 관리자 Slack 알림. 전달이 꺼져 있으면 `None`.
     pub admin_notification: Option<AdminNotificationSettings>,
 }
@@ -88,7 +96,7 @@ impl Settings {
             Profile::Dev | Profile::Prod => false,
         };
 
-        let image_urls = cloudfront(env, profile)?;
+        let post = PostSettings::from_env(env, profile.name())?;
         let admin_notification =
             AdminNotificationSettings::from_env(env, profile == Profile::Local)?;
 
@@ -106,7 +114,7 @@ impl Settings {
             log_file: PathBuf::from(
                 env.string_or("CHALKAK_LOGGING_FILE", chalkak_core::log::DEFAULT_LOG_FILE),
             ),
-            image_urls,
+            post,
             admin_notification,
         })
     }
@@ -148,19 +156,6 @@ fn db_config(env: &Env, profile: Profile) -> Result<DbConfig, ConfigError> {
     Ok(DbConfig::new(pg))
 }
 
-/// `CloudFrontUrlProvider`의 `@Value`: 기준 주소는 local만 기본값(`http://localhost:4566`)이 있고, 원본 경로는 항상 필수다.
-fn cloudfront(env: &Env, profile: Profile) -> Result<CloudFrontUrlProvider, ConfigError> {
-    let base_url = match profile {
-        Profile::Local => env.string_or("CLOUDFRONT_BASE_URL", "http://localhost:4566"),
-        Profile::Dev | Profile::Prod => env.required("CLOUDFRONT_BASE_URL")?,
-    };
-    let origin_path = env.required("CLOUDFRONT_ORIGIN_PATH")?;
-    CloudFrontUrlProvider::new(base_url, origin_path).map_err(|e| ConfigError::Invalid {
-        key: "CLOUDFRONT_BASE_URL".to_owned(),
-        reason: e.to_string(),
-    })
-}
-
 /// `AdminCorsProperties`: 비어 있으면 안 되고, 공백이거나 `*`가 든 값도 안 된다.
 fn cors_origins(env: &Env, profile: Profile) -> Result<Vec<String>, ConfigError> {
     const LOCAL_ORIGIN: &str = "http://localhost:3000";
@@ -191,6 +186,15 @@ mod tests {
             ("ACCESS_TOKEN_SECRET", "0011"),
             ("ACCESS_TOKEN_EXPIRATION", "15m"),
             ("CLOUDFRONT_ORIGIN_PATH", "/chalkak"),
+            (
+                "IMAGE_PROCESSOR_CALLBACK_SECRET",
+                "test-callback-secret-with-enough-length",
+            ),
+            ("CALLBACK_MAX_BODY_BYTES", "65536"),
+            ("POST_IMAGE_PROCESSING_TIMEOUT", "7m"),
+            ("S3_BUCKET", "bucket"),
+            ("S3_PREFIX", "chalkak"),
+            ("CLOUDFRONT_BASE_URL", "https://cdn.example.com"),
         ];
         pairs.extend_from_slice(extra);
         Env::from_pairs(pairs)
