@@ -20,6 +20,9 @@ fn handler(db: &TestDb) -> Arc<dyn Handler> {
     let env = Env::from_pairs([
         ("ACCESS_TOKEN_SECRET", SECRET_HEX),
         ("ACCESS_TOKEN_EXPIRATION", "15m"),
+        ("REFRESH_TOKEN_INACTIVITY_EXPIRATION", "30d"),
+        ("REFRESH_TOKEN_ABSOLUTE_EXPIRATION", "90d"),
+        ("CLOUDFRONT_ORIGIN_PATH", "/chalkak"),
         ("ADMIN_DEVELOPMENT_BYPASS_ENABLED", "false"),
     ]);
     let settings = Settings::from_env(&env).unwrap();

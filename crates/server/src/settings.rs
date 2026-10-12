@@ -11,6 +11,7 @@
 use std::path::PathBuf;
 use std::time::Duration;
 
+use chalkak_app::admin::auth::domain::RefreshTokenPolicy;
 use chalkak_core::config::{ConfigError, Env};
 use chalkak_db::DbConfig;
 
@@ -59,6 +60,16 @@ pub struct Settings {
     pub access_token_key: Vec<u8>,
     pub access_token_expiration: Duration,
     pub admin_development_bypass: bool,
+    /// 리프레시 토큰 비활동 만료(`REFRESH_TOKEN_INACTIVITY_EXPIRATION`).
+    pub refresh_token_inactivity: Duration,
+    /// 리프레시 토큰 절대 만료(`REFRESH_TOKEN_ABSOLUTE_EXPIRATION`).
+    pub refresh_token_absolute: Duration,
+    /// 이미지 공개 주소의 기본 주소(`CLOUDFRONT_BASE_URL`). local은 `http://localhost:4566`이 기본이다.
+    pub cloudfront_base_url: String,
+    /// CloudFront 원본 경로(`CLOUDFRONT_ORIGIN_PATH`). 스토리지 키는 이 경로로 시작해야 한다.
+    pub cloudfront_origin_path: String,
+    /// 시작 시 보장할 관리자 계정(`ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`). 비어 있으면 만들지 않는다.
+    pub admin_account: Option<(String, String)>,
     pub admin_cors_allowed_origins: Vec<String>,
     pub log_file: PathBuf,
 }
@@ -82,6 +93,23 @@ impl Settings {
             Profile::Dev | Profile::Prod => false,
         };
 
+        let refresh_token_inactivity =
+            env.required_duration("REFRESH_TOKEN_INACTIVITY_EXPIRATION")?;
+        let refresh_token_absolute = env.required_duration("REFRESH_TOKEN_ABSOLUTE_EXPIRATION")?;
+        RefreshTokenPolicy::new(refresh_token_inactivity, refresh_token_absolute).map_err(
+            |reason| ConfigError::Invalid {
+                key: "REFRESH_TOKEN_INACTIVITY_EXPIRATION".to_owned(),
+                reason,
+            },
+        )?;
+        let cloudfront_base_url = match profile {
+            Profile::Local => env.string_or("CLOUDFRONT_BASE_URL", "http://localhost:4566"),
+            Profile::Dev | Profile::Prod => env.required("CLOUDFRONT_BASE_URL")?,
+        }
+        .to_owned();
+        let cloudfront_origin_path = env.required("CLOUDFRONT_ORIGIN_PATH")?.to_owned();
+        let admin_account = admin_account(env, profile)?;
+
         Ok(Settings {
             profile,
             port,
@@ -92,12 +120,35 @@ impl Settings {
             access_token_key,
             access_token_expiration,
             admin_development_bypass,
+            refresh_token_inactivity,
+            refresh_token_absolute,
+            cloudfront_base_url,
+            cloudfront_origin_path,
+            admin_account,
             admin_cors_allowed_origins: cors_origins(env, profile)?,
             log_file: PathBuf::from(
                 env.string_or("CHALKAK_LOGGING_FILE", chalkak_core::log::DEFAULT_LOG_FILE),
             ),
         })
     }
+}
+
+/// 관리자 계정 설정. dev·prod는 필수, local은 비어 있어도 된다(기본 ``).
+fn admin_account(env: &Env, profile: Profile) -> Result<Option<(String, String)>, ConfigError> {
+    let (username, hash) = match profile {
+        Profile::Local => (
+            env.string_or("ADMIN_USERNAME", ""),
+            env.string_or("ADMIN_PASSWORD_HASH", ""),
+        ),
+        Profile::Dev | Profile::Prod => (
+            env.required("ADMIN_USERNAME")?,
+            env.required("ADMIN_PASSWORD_HASH")?,
+        ),
+    };
+    if username.is_empty() && hash.is_empty() {
+        return Ok(None);
+    }
+    Ok(Some((username.to_owned(), hash.to_owned())))
 }
 
 fn db_config(env: &Env, profile: Profile) -> Result<DbConfig, ConfigError> {
@@ -165,6 +216,9 @@ mod tests {
         let mut pairs = vec![
             ("ACCESS_TOKEN_SECRET", "0011"),
             ("ACCESS_TOKEN_EXPIRATION", "15m"),
+            ("REFRESH_TOKEN_INACTIVITY_EXPIRATION", "30d"),
+            ("REFRESH_TOKEN_ABSOLUTE_EXPIRATION", "90d"),
+            ("CLOUDFRONT_ORIGIN_PATH", "/chalkak"),
         ];
         pairs.extend_from_slice(extra);
         Env::from_pairs(pairs)
@@ -203,6 +257,9 @@ mod tests {
             ("DB_NAME", "chalkak"),
             ("DB_USERNAME", "u"),
             ("DB_PASSWORD", "p"),
+            ("ADMIN_USERNAME", "operator"),
+            ("ADMIN_PASSWORD_HASH", "h"),
+            ("CLOUDFRONT_BASE_URL", "https://cdn.test"),
         ]);
         assert!(!Settings::from_env(&dev).unwrap().admin_development_bypass);
     }
@@ -215,6 +272,9 @@ mod tests {
             ("DB_NAME", "chalkak"),
             ("DB_USERNAME", "u"),
             ("DB_PASSWORD", "p"),
+            ("ADMIN_USERNAME", "operator"),
+            ("ADMIN_PASSWORD_HASH", "h"),
+            ("CLOUDFRONT_BASE_URL", "https://cdn.test"),
         ];
         let mut dev = vec![("SPRING_PROFILES_ACTIVE", "dev")];
         dev.extend_from_slice(&base);
@@ -243,8 +303,103 @@ mod tests {
             ("DB_NAME", "chalkak"),
             ("DB_USERNAME", "u"),
             ("DB_PASSWORD", "p"),
+            ("ADMIN_USERNAME", "operator"),
+            ("ADMIN_PASSWORD_HASH", "h"),
+            ("CLOUDFRONT_BASE_URL", "https://cdn.test"),
         ]);
         assert!(Settings::from_env(&e).is_err());
+    }
+
+    // AdminCorsPropertiesTest: 앞뒤 공백 제거, 빈 값·누락은 기동 실패
+    #[test]
+    fn cors_origin은_앞뒤_공백을_떼고_빈_값과_누락은_거절한다() {
+        let prod = |origin: Option<&str>| {
+            let mut pairs = vec![
+                ("SPRING_PROFILES_ACTIVE", "prod"),
+                ("DB_NAME", "chalkak"),
+                ("DB_USERNAME", "u"),
+                ("DB_PASSWORD", "p"),
+                ("ADMIN_USERNAME", "operator"),
+                ("ADMIN_PASSWORD_HASH", "h"),
+                ("CLOUDFRONT_BASE_URL", "https://cdn.test"),
+            ];
+            if let Some(origin) = origin {
+                pairs.push(("ADMIN_CORS_ALLOWED_ORIGIN", origin));
+            }
+            Settings::from_env(&env(&pairs))
+        };
+        assert_eq!(
+            prod(Some("  https://admin.example.com  "))
+                .unwrap()
+                .admin_cors_allowed_origins,
+            ["https://admin.example.com"]
+        );
+        assert!(prod(Some("   ")).is_err());
+        assert!(prod(None).is_err());
+    }
+
+    #[test]
+    fn 리프레시_토큰과_이미지_주소_설정을_읽는다() {
+        let s = Settings::from_env(&env(&[])).unwrap();
+        assert_eq!(s.refresh_token_inactivity, Duration::from_secs(30 * 86_400));
+        assert_eq!(s.refresh_token_absolute, Duration::from_secs(90 * 86_400));
+        assert_eq!(s.cloudfront_base_url, "http://localhost:4566");
+        assert_eq!(s.cloudfront_origin_path, "/chalkak");
+        assert_eq!(s.admin_account, None);
+        let s = Settings::from_env(&env(&[
+            ("CLOUDFRONT_BASE_URL", "https://cdn.test"),
+            ("ADMIN_USERNAME", "operator"),
+            ("ADMIN_PASSWORD_HASH", "hash"),
+        ]))
+        .unwrap();
+        assert_eq!(s.cloudfront_base_url, "https://cdn.test");
+        assert_eq!(
+            s.admin_account,
+            Some(("operator".to_owned(), "hash".to_owned()))
+        );
+    }
+
+    #[test]
+    fn 리프레시_토큰_수명이_올바르지_않으면_실패한다() {
+        assert!(
+            Settings::from_env(&env(&[
+                ("REFRESH_TOKEN_INACTIVITY_EXPIRATION", "100d"),
+                ("REFRESH_TOKEN_ABSOLUTE_EXPIRATION", "90d"),
+            ]))
+            .is_err()
+        );
+        assert!(Settings::from_env(&env(&[("REFRESH_TOKEN_ABSOLUTE_EXPIRATION", "0s")])).is_err());
+    }
+
+    #[test]
+    fn dev와_prod는_관리자_계정과_이미지_주소가_필수다() {
+        let dev = |extra: &[(&str, &str)]| {
+            let mut pairs = vec![
+                ("SPRING_PROFILES_ACTIVE", "dev"),
+                ("ADMIN_CORS_ALLOWED_ORIGIN", "https://a.test"),
+            ];
+            pairs.extend_from_slice(extra);
+            Settings::from_env(&env(&pairs))
+        };
+        let all = [
+            ("DB_HOST", "h"),
+            ("DB_PORT", "5432"),
+            ("DB_NAME", "n"),
+            ("DB_USERNAME", "u"),
+            ("DB_PASSWORD", "p"),
+            ("CLOUDFRONT_BASE_URL", "https://cdn.test"),
+            ("ADMIN_USERNAME", "operator"),
+            ("ADMIN_PASSWORD_HASH", "hash"),
+        ];
+        assert!(dev(&all).is_ok());
+        for skip in [
+            "CLOUDFRONT_BASE_URL",
+            "ADMIN_USERNAME",
+            "ADMIN_PASSWORD_HASH",
+        ] {
+            let partial: Vec<_> = all.iter().copied().filter(|(k, _)| *k != skip).collect();
+            assert!(dev(&partial).is_err(), "{skip}");
+        }
     }
 
     #[test]
