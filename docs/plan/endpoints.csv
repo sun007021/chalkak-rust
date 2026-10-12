@@ -1,0 +1,52 @@
+domain,method,path,handler,auth
+admin,GET,/api/v1/admin/audit-logs,AdminAuditLogController#getAuditLogs,관리자 토큰
+admin,POST,/api/v1/admin/auth/login,AdminAuthController#login,공개(관리자 인증 전)
+admin,POST,/api/v1/admin/auth/logout,AdminAuthController#logout,공개(관리자 인증 전)
+admin,GET,/api/v1/admin/auth/me,AdminAuthController#getCurrentAdmin,관리자 토큰
+admin,POST,/api/v1/admin/auth/refresh,AdminAuthController#refresh,공개(관리자 인증 전)
+admin,GET,/api/v1/admin/feedbacks,AdminFeedbackController#getFeedbacks,관리자 토큰
+admin,GET,/api/v1/admin/posts,AdminPostController#getPosts,관리자 토큰
+admin,DELETE,/api/v1/admin/posts/{postId},AdminPostController#deletePost,관리자 토큰
+admin,GET,/api/v1/admin/posts/{postId},AdminPostController#getPost,관리자 토큰
+admin,PUT,/api/v1/admin/posts/{postId}/moderation,AdminPostController#moderatePost,관리자 토큰
+admin,GET,/api/v1/admin/topics,AdminTopicController#getTopics,관리자 토큰
+admin,POST,/api/v1/admin/topics,AdminTopicController#createTopic,관리자 토큰
+admin,DELETE,/api/v1/admin/topics/{topicId},AdminTopicController#deleteTopic,관리자 토큰
+admin,GET,/api/v1/admin/topics/{topicId},AdminTopicController#getTopic,관리자 토큰
+admin,PUT,/api/v1/admin/topics/{topicId},AdminTopicController#updateTopic,관리자 토큰
+admin,GET,/api/v1/admin/users,AdminUserController#getUsers,관리자 토큰
+admin,GET,/api/v1/admin/users/{userId},AdminUserController#getUser,관리자 토큰
+admin,PATCH,/api/v1/admin/users/{userId}/status,AdminUserController#updateStatus,관리자 토큰
+auth,POST,/api/v1/auth/logout,AuthController#logout,공개
+auth,POST,/api/v1/auth/refresh,AuthController#refresh,공개
+auth,POST,/api/v1/auth/social-login,AuthController#socialLogin,공개
+auth,POST,/api/v1/auth/social-signup,AuthController#socialSignup,공개
+auth,POST,/api/v1/auth/social-signup/signature/uploads,AuthController#createSocialSignupSignatureUpload,공개
+feedback,POST,/api/v1/feedbacks,FeedbackController#submitFeedback,회원 토큰
+notification,GET,/api/v1/notifications,NotificationController#getNotifications,회원 토큰
+notification,PATCH,/api/v1/notifications/read-all,NotificationController#markAllRead,회원 토큰
+notification,GET,/api/v1/notifications/unread-status,NotificationController#getUnreadStatus,회원 토큰
+notification,GET,/api/v1/notifications/{notificationId},NotificationController#getNotification,회원 토큰
+notification,PATCH,/api/v1/notifications/{notificationId}/read,NotificationController#markRead,회원 토큰
+post,GET,/api/v1/posts,PostController#getPosts,익명 또는 회원
+post,POST,/api/v1/posts,PostController#createPost,회원 토큰
+post,GET,/api/v1/posts/calendar,PostController#getMyPostCalendar,회원 토큰
+post,GET,/api/v1/posts/calendar/months,PostController#getMyPostCalendarMonths,회원 토큰
+post,GET,/api/v1/posts/today,PostController#getMyTodayPostStatus,회원 토큰
+post,POST,/api/v1/posts/uploads,PostController#createPostImageUpload,회원 토큰
+post,DELETE,/api/v1/posts/{postId},PostController#deletePost,회원 토큰
+post,GET,/api/v1/posts/{postId},PostController#getPost,회원 토큰
+post,PUT,/api/v1/posts/{postId},PostController#updatePost,회원 토큰
+like,DELETE,/api/v1/posts/{postId}/likes,PostLikeController#unlikePost,회원 토큰
+like,PUT,/api/v1/posts/{postId}/likes,PostLikeController#likePost,회원 토큰
+topic,GET,/api/v1/topics,TopicController#getTopic,익명 또는 회원
+user,DELETE,/api/v1/users/me,UserController#withdraw,회원 토큰
+user,GET,/api/v1/users/me/signature,UserController#getSignature,회원 토큰
+user,PUT,/api/v1/users/me/signature,UserController#updateSignature,회원 토큰
+user,POST,/api/v1/users/me/signature/uploads,UserController#createSignatureUpload,회원 토큰
+post,POST,/internal/v1/post-image-processing/{uploadId}/complete,PostImageProcessingCallbackController#complete,HMAC 콜백
+post,POST,/internal/v1/post-image-processing/{uploadId}/failed,PostImageProcessingCallbackController#fail,HMAC 콜백
+post,POST,/internal/v1/post-image-processing/{uploadId}/upload-urls,PostImageProcessingCallbackController#issueUploadUrls,HMAC 콜백
+user,POST,/internal/v1/signature-processing/{uploadId}/complete,SignatureProcessingCallbackController#complete,HMAC 콜백
+user,POST,/internal/v1/signature-processing/{uploadId}/failed,SignatureProcessingCallbackController#fail,HMAC 콜백
+user,POST,/internal/v1/signature-processing/{uploadId}/upload-urls,SignatureProcessingCallbackController#issueUploadUrls,HMAC 콜백

@@ -1,0 +1,1201 @@
+domain,file,method,display_name,java_layer,annotation,rust_target,status
+BackendApplicationTests.java,BackendApplicationTests.java,contextLoads,,통합(Spring+DB),@Test,,미이식
+admin,admin/api/support/AdminArgumentResolverFailClosedWebMvcTest.java,request_withoutAdminActorResolver_returnsForbidden,작업자 전략이 누락되어도 요청 값으로 관리자 ID를 위조하지 못한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/support/AdminCorsProdProfileTest.java,preflight_configuredProductionOrigin_allowsAdminRequest,운영 프로필에서도 설정한 관리자 웹 Origin의 사전 요청만 허용한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/support/AdminCorsProdProfileTest.java,request_unconfiguredProductionOrigin_rejectsAdminRequest,운영 프로필에서 등록하지 않은 Origin은 차단한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/support/AdminCorsPropertiesTest.java,create_withBlankOrigin_throwsException,빈 관리자 웹 Origin을 거부한다,단위,@Test,,미이식
+admin,admin/api/support/AdminCorsPropertiesTest.java,create_withEmptyOrigins_throwsException,관리자 웹 Origin 목록이 비어 있으면 거부한다,단위,@Test,,미이식
+admin,admin/api/support/AdminCorsPropertiesTest.java,create_withSurroundingWhitespace_trimsOrigin,관리자 웹 Origin 앞뒤 공백을 제거한다,단위,@Test,,미이식
+admin,admin/api/support/AdminCorsPropertiesTest.java,create_withWildcardOrigin_throwsException,와일드카드 관리자 웹 Origin을 거부한다,단위,@Test,,미이식
+admin,admin/api/support/AdminWebMvcConfigTest.java,getAdminEndpoint_withoutAuthentication_injectsDevelopmentAdmin,등록한 CurrentAdmin Resolver로 개발 관리자를 Controller에 주입한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/support/AdminWebMvcConfigTest.java,preflight_configuredOrigin_allowsAdminRequest,설정한 관리자 웹 Origin의 사전 요청을 허용한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/support/AdminWebMvcConfigTest.java,preflight_unconfiguredOrigin_rejectsAdminRequest,설정하지 않은 Origin의 관리자 API 사전 요청을 차단한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/support/AdminWebMvcConfigTest.java,request_configuredOrigin_allowsAdminRequest,설정한 관리자 웹 Origin의 실제 요청에 허용 응답 헤더와 요청 식별자 노출 헤더를 제공한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/support/AdminWebMvcConfigTest.java,request_unconfiguredOrigin_rejectsBeforeResolvingAdmin,설정하지 않은 Origin의 실제 관리자 API 요청을 작업자 조회 전에 차단한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/support/CurrentAdminArgumentResolverTest.java,resolveArgument_withForgedAdminHeader_ignoresHeader,가짜 관리자 ID 헤더를 보내도 개발 관리자의 ID를 전달한다,단위,@Test,,미이식
+admin,admin/api/support/CurrentAdminArgumentResolverTest.java,resolveArgument_withoutAdminHeader_injectsDevelopmentAdmin,관리자 ID 헤더 없이 현재 개발 관리자를 Controller에 전달한다,단위,@Test,,미이식
+admin,admin/api/v1/controller/AdminAuditLogControllerTest.java,getAuditLogs_allFilters_returnsAuditHistory,,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminAuditLogControllerTest.java,getAuditLogs_invalidPage_returnsBadRequest,,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminAuditLogControllerTest.java,getAuditLogs_unknownEnum_returnsBadRequest,,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminAuditLogControllerTest.java,getAuditLogs_withoutFilters_usesDefaults,,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminAuditRequestIdTest.java,updateStatus_adminRequest_savesResponseRequestIdInAuditLog,관리자 API 요청이 남긴 감사 로그의 requestId는 응답의 X-Request-Id와 같다,통합(Spring+DB),@Test,,미이식
+admin,admin/api/v1/controller/AdminAuthControllerTest.java,getCurrentAdmin_authenticatedAdmin_returnsCurrentAdmin,인증된 관리자는 자신의 식별자와 아이디를 조회한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminAuthControllerTest.java,login_blankUsername_returnsBadRequest,관리자 로그인 아이디가 비어 있으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminAuthControllerTest.java,login_validRequest_returnsAccessTokenAndRefreshToken,관리자 로그인에 성공하면 액세스 토큰과 리프레시 토큰을 함께 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminAuthControllerTest.java,logout_blankRefreshToken_returnsBadRequest,로그아웃 요청의 리프레시 토큰이 비어 있으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminAuthControllerTest.java,logout_refreshToken_revokesLineageWithoutAccessToken,액세스 토큰 없이 리프레시 토큰만으로 로그아웃하면 그 기기의 계보를 폐기한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminAuthControllerTest.java,refresh_blankRefreshToken_returnsBadRequest,재발급 요청의 리프레시 토큰이 비어 있으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminAuthControllerTest.java,refresh_unusableRefreshToken_returnsReauthenticationRequired,쓸 수 없는 리프레시 토큰으로 재발급하면 재로그인 필요를 알린다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminAuthControllerTest.java,refresh_validRefreshToken_returnsRotatedTokens,리프레시 토큰으로 재발급하면 새 액세스 토큰과 회전된 리프레시 토큰을 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminFeedbackControllerTest.java,getFeedbacks_invalidSort_returnsBadRequest,정렬 조건이 올바르지 않으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminFeedbackControllerTest.java,getFeedbacks_pageSizeOverMax_returnsBadRequest,페이지당 피드백 수가 100을 넘으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminFeedbackControllerTest.java,getFeedbacks_withParameters_passesThemToService,오래된 순 정렬과 페이지 조건을 전달한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminFeedbackControllerTest.java,getFeedbacks_withoutParameters_usesDefaults,조회 조건을 생략하면 최신순 첫 페이지를 조회한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_alreadyDeletedPost_delegatesIdempotentlyAndReturnsNoContent,이미 삭제된 게시물도 삭제 서비스에 위임해 멱등하게 204를 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_emptyBody_returnsBadRequest,삭제 요청 본문이 비어 있으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_invalidPostId_returnsBadRequest,삭제할 게시물 ID 형식이 올바르지 않으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_missingOrBlankReason_returnsBadRequest,삭제 사유가 누락되거나 비어 있으면 400을 반환한다,웹 슬라이스,@ParameterizedTest,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_reasonAtMaximum_returnsNoContent,삭제 사유 입력 원문이 500자이면 허용한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_reasonOverMaximum_returnsBadRequest,삭제 사유 입력 원문이 500자를 초과하면 400을 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_unknownPost_returnsNotFound,삭제할 게시물을 찾을 수 없으면 404를 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_validReason_returnsNoContent,관리자는 사유와 함께 게시물을 삭제하고 204를 반환받는다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_validatingPost_returnsBusinessError,이미지 처리 중인 게시물을 삭제하면 기본 비즈니스 오류 400을 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,getPost_existingPost_returnsPostDetail,관리자는 삭제된 게시물을 포함한 게시물 상세 정보를 조회한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,getPost_invalidPostId_returnsBadRequest,관리자 게시물 ID 형식이 올바르지 않으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,getPost_unknownPost_returnsNotFound,관리자 게시물 상세 조회 대상이 없으면 404를 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,getPost_withoutModeratedOrDeletedAt_returnsNullTimes,처리 시각이 없는 게시물 상세 정보는 null로 직렬화한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,getPosts_invalidFilterFormat_returnsBadRequest,관리자 게시물 필터 형식이 잘못되면 400을 반환한다,웹 슬라이스,@ParameterizedTest,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,getPosts_invalidPagination_returnsBadRequest,관리자 게시물 페이지 조건이 범위를 벗어나면 400을 반환한다,웹 슬라이스,@ParameterizedTest,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,getPosts_pageSizeBoundary_returnsOk,관리자 게시물 페이지 크기의 양쪽 경계값을 허용한다,웹 슬라이스,@ParameterizedTest,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,getPosts_validatingStatus_returnsBadRequest,내부 검증 중 상태로 관리자 게시물 목록을 요청하면 400을 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,getPosts_withAllFilters_passesQueryParameters,관리자 게시물 목록의 모든 필터와 정렬 및 페이지 조건을 서비스에 전달한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,getPosts_withoutFilters_returnsDefaultPage,관리자는 기본 조건으로 전체 게시물 목록을 조회한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_approvedRequest_returnsModerationResult,관리자는 대기 중인 게시물을 승인하고 처리 결과를 조회한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_approvedWithReason_returnsBadRequest,승인 요청에 거절 사유가 포함되면 400을 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_emptyBody_returnsBadRequest,검수 요청 본문이 비어 있으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_invalidPostId_returnsBadRequest,검수할 게시물 ID 형식이 올바르지 않으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_invalidStatus_returnsBadRequest,검수 상태가 누락되거나 올바르지 않으면 400을 반환한다,웹 슬라이스,@ParameterizedTest,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_nonDecisionStatus_returnsBadRequest,승인과 거절이 아닌 검수 상태를 요청하면 400을 반환한다,웹 슬라이스,@ParameterizedTest,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_nonPendingPost_returnsResourceStateChangedError,대기 상태가 아닌 게시물의 검수 요청은 현재 상태 재조회 오류를 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_rejectedRequest_returnsModerationResult,관리자는 대기 중인 게시물을 사유와 함께 거절하고 처리 결과를 조회한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_rejectedWithoutReason_returnsBadRequest,거절 사유가 누락되거나 비어 있으면 400을 반환한다,웹 슬라이스,@ParameterizedTest,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_rejectionReasonAtMaximum_returnsModerationResult,거절 사유가 최대 길이인 500자이면 요청을 허용한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_rejectionReasonOverMaximum_returnsBadRequest,거절 사유가 500자를 초과하면 400을 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminTopicControllerTest.java,createTopic_validRequest_returnsCreatedTopic,관리자는 새 주제를 등록한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminTopicControllerTest.java,deleteTopic_validReason_returnsNoContent,관리자는 사유와 함께 공개 전 주제를 삭제한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminTopicControllerTest.java,getTopic_existingTopic_returnsDetail,관리자는 주제 상세를 조회한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminTopicControllerTest.java,getTopics_withFilters_returnsTopicPage,관리자는 phase와 날짜·정렬·페이지 조건으로 주제 목록을 조회한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminTopicControllerTest.java,mutateTopic_blankRequiredValue_returnsBadRequest,빈 제목 또는 삭제 사유는 400으로 거절한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminTopicControllerTest.java,updateTopic_validRequest_returnsUpdatedTopic,관리자는 공개 전 주제를 수정한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminTopicPaginationTest.java,getTopics_offsetOverflow_returnsBusinessError,조회 범위를 넘는 페이지는 서버 오류 대신 기존 형식의 400 오류를 반환한다,통합(Spring+DB),@ParameterizedTest,,미이식
+admin,admin/api/v1/controller/AdminTopicPaginationTest.java,getTopics_validPage_returnsExistingPageContract,일반 페이지와 조회 가능한 마지막 페이지까지 기존 응답 형식을 유지한다,통합(Spring+DB),@ParameterizedTest,,미이식
+admin,admin/api/v1/controller/AdminUserControllerTest.java,getUser_unknownUser_returnsNotFound,존재하지 않는 관리자 사용자 상세는 404를 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminUserControllerTest.java,getUser_withdrawnUser_returnsDetailWithoutSignatureUrls,관리자는 탈퇴 사용자의 비식별 상세를 조회한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminUserControllerTest.java,getUsers_invalidQuery_returnsBadRequest,관리자 사용자 조회 조건이 잘못되면 400을 반환한다,웹 슬라이스,@ParameterizedTest,,미이식
+admin,admin/api/v1/controller/AdminUserControllerTest.java,getUsers_withFilters_passesQueryParameters,관리자 사용자 필터와 정렬·페이지 조건을 서비스에 전달한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminUserControllerTest.java,getUsers_withoutStatus_returnsActiveUsersByDefault,관리자는 상태를 생략하면 활성 사용자 목록을 조회한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminUserControllerTest.java,updateStatus_banned_returnsUpdatedStatus,관리자는 사유를 남겨 사용자를 차단한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminUserControllerTest.java,updateStatus_blankReason_returnsBadRequest,상태 변경 사유가 비어 있으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminUserControllerTest.java,updateStatus_sameStatus_returnsStateChanged,이미 같은 상태인 사용자 변경 요청은 상태 충돌 코드와 400을 반환한다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/controller/AdminUserControllerTest.java,updateStatus_withdrawnRequest_returnsBadRequest,탈퇴 상태는 관리자 변경 요청 값으로 사용할 수 없다,웹 슬라이스,@Test,,미이식
+admin,admin/api/v1/docs/AdminAuditLogOpenApiTest.java,adminApiDocs_exposesReadOnlyAuditLogContract,,통합(Spring+DB),@Test,,미이식
+admin,admin/api/v1/docs/AdminAuthOpenApiTest.java,adminApiDocs_documentsRefreshFailureAndKeepsLogoutIdempotent,"관리자 재발급 문서는 재로그인 필요 401을, 로그아웃 문서는 인증 실패 응답을 두지 않는다",통합(Spring+DB),@Test,,미이식
+admin,admin/api/v1/docs/AdminAuthOpenApiTest.java,adminApiDocs_exposesAdminSecurityAndRefreshTokenExceptions,관리자 문서는 리프레시 토큰 경로만 공개하고 나머지 관리자 API에 관리자 Bearer 인증을 요구한다,통합(Spring+DB),@Test,,미이식
+admin,admin/api/v1/docs/AdminFeedbackOpenApiTest.java,adminApiDocs_exposesReadOnlyFeedbackContract,admin-api 문서는 조회 전용 피드백 계약을 제공한다,통합(Spring+DB),@Test,,미이식
+admin,admin/api/v1/docs/AdminFeedbackOpenApiTest.java,userApiDocs_hidesAdminFeedbackPath,user-api 문서는 관리자 피드백 경로를 노출하지 않는다,통합(Spring+DB),@Test,,미이식
+admin,admin/api/v1/docs/AdminPostOpenApiTest.java,adminApiDocs_adminPostEndpoints_exposeDistinctListAndDetailSchemas,admin-api 문서는 관리자 게시물 목록과 상세 계약을 서로 다른 스키마로 제공한다,통합(Spring+DB),@Test,,미이식
+admin,admin/api/v1/docs/AdminTopicOpenApiTest.java,adminApiDocs_adminTopicEndpoints_exposeLifecycleContract,admin-api 문서에 주제 CRUD와 필터 계약을 노출하고 user-api에서는 제외한다,통합(Spring+DB),@Test,,미이식
+admin,admin/api/v1/docs/AdminUserOpenApiTest.java,adminApiDocs_adminUserEndpoints_exposeQueryAndDetailContracts,admin-api 문서에 관리자 사용자 목록·상세 계약만 노출한다,통합(Spring+DB),@Test,,미이식
+admin,admin/domain/AdminAuditLogTest.java,create_approvedActionWithRejectedTransition_throwsBusinessException,승인 작업에 거절 상태 전이를 기록할 수 없다,단위,@Test,,미이식
+admin,admin/domain/AdminAuditLogTest.java,create_approvedActionWithoutModerationMetadata_throwsBusinessException,승인 작업에는 검수 시각과 작업자가 모두 필요하다,단위,@Test,,미이식
+admin,admin/domain/AdminAuditLogTest.java,create_benignReason_createsAuditLog,민감값이 없는 일반 문장과 문서 URL은 사유로 저장한다,단위,@Test,,미이식
+admin,admin/domain/AdminAuditLogTest.java,create_blankReason_normalizesToNull,선택 사유가 비어 있으면 null로 정규화한다,단위,@Test,,미이식
+admin,admin/domain/AdminAuditLogTest.java,create_maxLengthReason_createsAuditLog,사유는 코드 포인트 기준 500자까지 저장한다,단위,@Test,,미이식
+admin,admin/domain/AdminAuditLogTest.java,create_mismatchedActionAndTarget_throwsBusinessException,,단위,@Test,,미이식
+admin,admin/domain/AdminAuditLogTest.java,create_mismatchedModerator_throwsBusinessException,검수 작업자는 감사 로그 작업자와 같아야 한다,단위,@Test,,미이식
+admin,admin/domain/AdminAuditLogTest.java,create_missingRequiredIdentifier_throwsBusinessException,필수 식별자가 없으면 감사 로그를 생성할 수 없다,단위,@Test,,미이식
+admin,admin/domain/AdminAuditLogTest.java,create_partialTopicUpdate_throwsBusinessException,주제 수정 작업에는 수정 전후의 전체 업무 상태가 필요하다,단위,@Test,,미이식
+admin,admin/domain/AdminAuditLogTest.java,create_reasonContainingSensitiveValue_throwsBusinessException,,단위,@ParameterizedTest,,미이식
+admin,admin/domain/AdminAuditLogTest.java,create_rejectionWithoutReason_throwsBusinessException,거절 작업에 사유가 없으면 감사 로그를 생성할 수 없다,단위,@Test,,미이식
+admin,admin/domain/AdminAuditLogTest.java,create_stateContainingBinaryValue_throwsBusinessException,바이너리 객체는 감사 로그 상태에 저장할 수 없다,단위,@Test,,미이식
+admin,admin/domain/AdminAuditLogTest.java,create_stateContainingCredential_throwsBusinessException,,단위,@Test,,미이식
+admin,admin/domain/AdminAuditLogTest.java,create_stateContainingImageReference_throwsBusinessException,,단위,@Test,,미이식
+admin,admin/domain/AdminAuditLogTest.java,create_stateFieldOutsideActionAllowlist_throwsBusinessException,,단위,@Test,,미이식
+admin,admin/domain/AdminAuditLogTest.java,create_tooLongReason_throwsBusinessException,사유가 500자를 초과하면 감사 로그를 생성할 수 없다,단위,@Test,,미이식
+admin,admin/domain/AdminAuditLogTest.java,create_userBanWithoutTransition_throwsBusinessException,회원 정지 작업에 같은 상태를 기록할 수 없다,단위,@Test,,미이식
+admin,admin/domain/AdminAuditLogTest.java,create_validActionStateChange_createsAuditLog,작업별 올바른 상태 전이를 감사 로그로 생성한다,단위,@ParameterizedTest,,미이식
+admin,admin/domain/AdminAuditLogTest.java,create_validAuditInformation_createsAuditLog,,단위,@Test,,미이식
+admin,admin/domain/AdminAuditLogTest.java,create_withoutChangedState_throwsBusinessException,,단위,@Test,,미이식
+admin,admin/domain/AdminAuditSnapshotTest.java,from_benignStringValue_createsSnapshot,민감값이 없는 일반 문장과 문서 URL은 상태 값으로 저장한다,단위,@Test,,미이식
+admin,admin/domain/AdminAuditSnapshotTest.java,from_immutableNumber_createsSnapshot,불변 숫자 값은 감사 로그 상태로 저장한다,단위,@Test,,미이식
+admin,admin/domain/AdminAuditSnapshotTest.java,from_maxLengthString_createsSnapshot,문자열 상태 값은 코드 포인트 기준 2000자까지 허용한다,단위,@Test,,미이식
+admin,admin/domain/AdminAuditSnapshotTest.java,from_mutableNumber_throwsBusinessException,생성 뒤 값이 바뀔 수 있는 숫자 객체는 저장할 수 없다,단위,@Test,,미이식
+admin,admin/domain/AdminAuditSnapshotTest.java,from_nestedValue_throwsBusinessException,중첩 객체나 목록은 감사 로그 상태에 저장할 수 없다,단위,@Test,,미이식
+admin,admin/domain/AdminAuditSnapshotTest.java,from_obfuscatedSensitiveKey_throwsBusinessException,대소문자와 구분자 형태가 달라도 민감 키를 차단한다,단위,@Test,,미이식
+admin,admin/domain/AdminAuditSnapshotTest.java,from_safeScalarValues_createsImmutableSnapshot,,단위,@Test,,미이식
+admin,admin/domain/AdminAuditSnapshotTest.java,from_sensitiveStringValue_throwsBusinessException,허용 필드의 문자열 값에 숨긴 민감정보도 차단한다,단위,@ParameterizedTest,,미이식
+admin,admin/domain/AdminAuditSnapshotTest.java,from_tooDeepState_throwsBusinessException,과도하게 중첩된 상태는 감사 로그에 저장할 수 없다,단위,@Test,,미이식
+admin,admin/domain/AdminAuditSnapshotTest.java,from_tooLongString_throwsBusinessException,문자열 상태 값이 2000자를 초과하면 저장할 수 없다,단위,@Test,,미이식
+admin,admin/domain/AdminTest.java,create_blankPasswordHash_throwsException,비밀번호 해시가 비어 있으면 관리자를 생성할 수 없다,단위,@ParameterizedTest,,미이식
+admin,admin/domain/AdminTest.java,create_blankUsername_throwsException,사용자명이 비어 있으면 관리자를 생성할 수 없다,단위,@ParameterizedTest,,미이식
+admin,admin/domain/AdminTest.java,create_maxLengthUsername_createsAdmin,사용자명이 100자이면 관리자를 생성할 수 있다,단위,@Test,,미이식
+admin,admin/domain/AdminTest.java,create_overlongPasswordHash_throwsException,비밀번호 해시가 255자를 초과하면 관리자를 생성할 수 없다,단위,@Test,,미이식
+admin,admin/domain/AdminTest.java,create_overlongUsername_throwsException,사용자명이 100자를 초과하면 관리자를 생성할 수 없다,단위,@Test,,미이식
+admin,admin/domain/AdminTest.java,create_plainPassword_throwsException,BCrypt 형식이 아닌 비밀번호 값으로 관리자를 생성할 수 없다,단위,@Test,,미이식
+admin,admin/domain/AdminTest.java,create_validAccount_createsAdmin,사용자명과 단방향 비밀번호 해시로 관리자를 생성한다,단위,@Test,,미이식
+admin,admin/infrastructure/bootstrap/AdminAccountBootstrapTest.java,run_existingConfiguredAdmin_keepsStoredAccount,설정한 관리자 계정이 이미 있으면 비밀번호 해시를 덮어쓰지 않는다,통합(Spring+DB),@Test,,미이식
+admin,admin/infrastructure/bootstrap/AdminAccountBootstrapTest.java,run_missingConfiguredAdmin_createsHashedAccount,설정한 관리자 계정이 없으면 BCrypt 해시만 저장한다,통합(Spring+DB),@Test,,미이식
+admin,admin/infrastructure/bootstrap/DevelopmentAdminBootstrapProfileTest.java,register_prodAndDevProfiles_doesNotRegisterDevelopmentAdminBootstrap,운영 프로필이 개발 프로필과 함께 활성화되어도 부트스트랩을 등록하지 않는다,단위,@Test,,미이식
+admin,admin/infrastructure/bootstrap/DevelopmentAdminBootstrapProfileTest.java,register_prodProfile_doesNotRegisterDevelopmentAdminBootstrap,운영 프로필에서는 개발 관리자 부트스트랩을 등록하지 않는다,단위,@Test,,미이식
+admin,admin/infrastructure/bootstrap/DevelopmentAdminBootstrapTest.java,run_missingDevelopmentAdmin_createsHashedAdmin,개발 관리자가 없으면 사용할 수 없는 임의 비밀번호의 BCrypt 해시로 생성한다,통합(Spring+DB),@Test,,미이식
+admin,admin/infrastructure/bootstrap/DevelopmentAdminBootstrapTest.java,run_repeatedExecution_keepsSingleDevelopmentAdmin,개발 부트스트랩을 반복 실행해도 관리자 한 명만 유지한다,통합(Spring+DB),@Test,,미이식
+admin,admin/infrastructure/infra/DevAdminActorResolverTest.java,resolve_developmentProfile_returnsPersistedDevelopmentAdmin,개발 환경에서는 저장된 dev-admin의 ID를 현재 작업자로 반환한다,통합(Spring+DB),@Test,,미이식
+admin,admin/infrastructure/infra/SecurityContextAdminActorResolverTest.java,resolve_adminJwt_returnsAuthenticatedAdmin,관리자 권한 JWT의 subject를 현재 관리자 식별자로 반환한다,단위,@Test,,미이식
+admin,admin/infrastructure/infra/SecurityContextAdminActorResolverTest.java,resolve_userJwt_throwsForbidden,일반 사용자 권한 JWT이면 403 예외를 반환한다,단위,@Test,,미이식
+admin,admin/infrastructure/infra/SecurityContextAdminActorResolverTest.java,resolve_withoutAuthentication_throwsUnauthorized,인증 정보가 없으면 401 예외를 반환한다,단위,@Test,,미이식
+admin,admin/infrastructure/persistence/audit/AdminAuditLogQueryRepositoryTest.java,deleteActor_withAuditHistory_isRejectedToPreserveActorIdentity,,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/audit/AdminAuditLogQueryRepositoryTest.java,findAuditLogs_combinedFiltersAndInclusiveBoundary_returnsMatchingDeletedTargetHistory,,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/audit/AdminAuditLogQueryRepositoryTest.java,findAuditLogs_sameOccurredAt_usesIdForStablePagination,,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/audit/AdminAuditLogRepositoryTest.java,migration_adminAuditLogs_hasQueryIndexes,,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/audit/AdminAuditLogRepositoryTest.java,repository_restrictedSurface_exposesOnlySaveAndQueryWithinPackage,JPA 감사 로그 저장소는 같은 패키지에 저장·조회 기능만 노출한다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/audit/AdminAuditLogRepositoryTest.java,save_sameRequestId_persistsMultipleAuditLogs,한 요청에서 여러 관리자 작업을 기록할 수 있다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/audit/AdminAuditLogRepositoryTest.java,save_unknownActorAdminId_throwsDataIntegrityViolationException,존재하지 않는 관리자는 감사 로그 작업자가 될 수 없다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/audit/AdminAuditLogRepositoryTest.java,save_validAuditLog_persistsPostgresTypes,감사 로그의 UUIDv7과 PostgreSQL enum·JSONB 필드를 저장한다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/auth/AdminRepositoryTest.java,findByUsername_savedAdmin_returnsAdmin,관리자를 저장하고 사용자명으로 조회한다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/auth/AdminRepositoryTest.java,save_duplicateUsername_throwsException,동일한 사용자명을 가진 관리자를 중복 저장할 수 없다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/feedback/AdminFeedbackQueryRepositoryTest.java,findFeedbacks_bannedAndWithdrawnAuthors_areIncluded,정지·탈퇴 회원이 남긴 피드백도 상태와 함께 조회한다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/feedback/AdminFeedbackQueryRepositoryTest.java,findFeedbacks_createdAtAsc_returnsOldestFirst,오래된 순 정렬을 선택할 수 있다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/feedback/AdminFeedbackQueryRepositoryTest.java,findFeedbacks_createdAtDesc_returnsNewestFirstWithAuthor,피드백 목록은 작성자 정보와 함께 최신순으로 조회한다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/feedback/AdminFeedbackQueryRepositoryTest.java,findFeedbacks_withMorePages_reportsHasNext,다음 페이지가 남으면 hasNext로 알린다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPostById_existingPost_returnsSingleRichProjection,상세 조회는 게시물 연관 정보와 사진·업로드 메타데이터 및 좋아요 수를 반환한다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPostById_moderatedPost_returnsModeratorAndReasonFromAuditLog,상세 조회는 관리자 검수 감사 로그에서 처리자와 사유를 함께 조회한다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPostById_softDeletedLegacyPost_returnsDeletedStateWithNullUpload,상세 조회는 삭제된 연관 정보와 업로드 연결이 없는 기존 게시물도 반환한다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPostById_unknownPost_returnsEmpty,존재하지 않는 게시물 상세 조회는 빈 결과를 반환한다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPostById_validatingPost_returnsEmpty,내부 검증 중 게시물은 관리자 상세에서 조회하지 않는다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPosts_combinedFilters_returnsOnlyMatchingPost,상태·주제·날짜·사용자·등록 시각 필터를 함께 적용한다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPosts_createdAtSortAndPagination_returnsStablePages,등록 시각 오름차순과 내림차순은 ID 보조 정렬로 페이지 경계를 유지한다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPosts_eachFilter_returnsMatchingPosts,각 목록 필터는 삭제 여부와 관계없이 해당 조건만 정확히 적용한다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPosts_noFilters_excludesValidatingAndIncludesSoftDeletedPost,관리자 목록은 내부 검증 중 게시물을 제외하고 삭제된 게시물을 함께 조회한다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/topic/AdminTopicQueryRepositoryTest.java,findActiveTopicById_activeOrDeleted_preservesVisibilityAndCounts,상세는 삭제된 주제를 제외하고 게시글이 없으면 집계가 0이다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/topic/AdminTopicQueryRepositoryTest.java,findTopics_dateBounds_returnsInclusiveRange,날짜 양 끝 경계를 포함하고 각각의 단독 조건도 적용한다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/topic/AdminTopicQueryRepositoryTest.java,findTopics_eachSort_returnsStablePages,네 정렬은 ID 보조 정렬과 다음 페이지 경계를 유지한다,JPA 슬라이스,@ParameterizedTest,,미이식
+admin,admin/infrastructure/persistence/topic/AdminTopicQueryRepositoryTest.java,findTopics_phaseAtBoundary_returnsMatchingTopic,시작 시각은 공개 중이고 종료 시각은 종료로 조회한다,JPA 슬라이스,@ParameterizedTest,,미이식
+admin,admin/infrastructure/persistence/user/AdminUserQueryRepositoryTest.java,findUserById_activeUser_returnsProviderSignatureAndVisiblePostCounts,활성 사용자 상세에 소셜 제공자와 관리자 공개 게시물 상태별 개수를 제공한다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/user/AdminUserQueryRepositoryTest.java,findUserById_withdrawnUser_returnsAnonymizedData,탈퇴 사용자 상세도 비식별 정보로 조회한다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/user/AdminUserQueryRepositoryTest.java,findUsers_eachStatus_returnsMatchingDerivedStatus,각 회원 상태 필터는 탈퇴 여부를 반영해 해당 회원만 조회한다,JPA 슬라이스,@ParameterizedTest,,미이식
+admin,admin/infrastructure/persistence/user/AdminUserQueryRepositoryTest.java,findUsers_statusAndEmailFilter_returnsMatchingUser,파생 상태와 대소문자를 무시한 이메일 부분 검색을 함께 적용한다,JPA 슬라이스,@Test,,미이식
+admin,admin/infrastructure/persistence/user/AdminUserQueryRepositoryTest.java,findUsers_withoutFilters_returnsEveryDerivedStatusInStableOrder,관리자 사용자 목록은 탈퇴자를 포함해 안정적인 최신순으로 조회한다,JPA 슬라이스,@Test,,미이식
+admin,admin/service/audit/AdminAuditLogQueryServiceTest.java,getAuditLogs_allFilters_returnsReadOnlyPage,,단위,@Test,,미이식
+admin,admin/service/audit/AdminAuditLogQueryServiceTest.java,getAuditLogs_excessiveOffset_throwsBusinessException,,단위,@Test,,미이식
+admin,admin/service/audit/AdminAuditLogQueryServiceTest.java,getAuditLogs_reversedPeriod_throwsBusinessException,,단위,@Test,,미이식
+admin,admin/service/audit/AdminAuditLogServiceTest.java,createAuditLog_auditPersistenceFailure_rollsBackBusinessChange,감사 로그 저장이 실패하면 앞선 업무 변경도 함께 롤백한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/audit/AdminAuditLogServiceTest.java,createAuditLog_businessFailure_rollsBackChangeAndAuditLog,,통합(Spring+DB),@Test,,미이식
+admin,admin/service/audit/AdminAuditLogServiceTest.java,createAuditLog_withinBusinessTransaction_persistsChangeAndAuditLog,업무 트랜잭션 안에서 변경과 감사 로그를 함께 저장하고 감사 로그에는 현재 요청의 requestId를 남긴다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/audit/AdminAuditLogServiceTest.java,createAuditLog_withoutBusinessTransaction_throwsIllegalTransactionStateException,업무 트랜잭션 없이 감사 로그만 저장할 수 없다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/auth/AdminAuthenticationServiceTest.java,getCurrentAdmin_existingAdmin_returnsCurrentAdmin,인증된 관리자 식별자로 DB의 관리자 정보를 조회한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/auth/AdminAuthenticationServiceTest.java,getCurrentAdmin_missingAdmin_throwsUnauthorized,존재하지 않는 관리자 식별자는 인증 실패로 거부한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/auth/AdminAuthenticationServiceTest.java,login_passwordExceedsByteLimit_throwsUnauthorized,BCrypt의 72바이트를 넘는 로그인 비밀번호는 500 대신 인증 실패로 거부한다,통합(Spring+DB),@ParameterizedTest,,미이식
+admin,admin/service/auth/AdminAuthenticationServiceTest.java,login_passwordWithinByteLimit_succeeds,BCrypt의 바이트 길이 한도 직전과 경계 비밀번호로 로그인할 수 있다,통합(Spring+DB),@ParameterizedTest,,미이식
+admin,admin/service/auth/AdminAuthenticationServiceTest.java,login_unknownUsername_hidesAccountExistence,없는 아이디도 BCrypt 비교를 수행하고 같은 인증 실패 응답으로 거부한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/auth/AdminAuthenticationServiceTest.java,login_validCredentials_opensRefreshTokenLineage,로그인에 성공하면 리프레시 토큰 계보를 열고 저장소에는 해시만 남긴다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/auth/AdminAuthenticationServiceTest.java,login_validCredentials_returnsAdminAccessToken,실제 저장된 계정의 비밀번호가 일치하면 검증 가능한 관리자 JWT를 발급한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/auth/AdminAuthenticationServiceTest.java,login_wrongPassword_throwsCommonUnauthorized,잘못된 비밀번호는 공통 인증 실패 응답으로 거부한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/auth/AdminRefreshTokenServiceTest.java,issue_newAdmin_storesHashOnlyAndReturnsPlainToken,리프레시 토큰을 발급하면 평문은 반환만 하고 저장소에는 해시만 남는다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/auth/AdminRefreshTokenServiceTest.java,logout_liveToken_revokesOnlyThatLineage,로그아웃하면 그 기기의 계보만 폐기하고 재발급을 막는다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/auth/AdminRefreshTokenServiceTest.java,logout_unknownOrRevokedToken_doesNothing,모르는 토큰이나 이미 폐기된 토큰으로 로그아웃해도 예외를 던지지 않는다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/auth/AdminRefreshTokenServiceTest.java,refresh_absoluteExpiredToken_revokesLineageAndRequiresReauthentication,회전을 이어가도 절대 만료 시각에 도달하면 재로그인을 요구한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/auth/AdminRefreshTokenServiceTest.java,refresh_inactivityExpiredToken_revokesLineageAndRequiresReauthentication,비활동 만료가 지난 토큰은 절대 만료가 남아 있어도 재로그인을 요구한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/auth/AdminRefreshTokenServiceTest.java,refresh_liveToken_rotatesTokenAndReissuesAdminAccessToken,살아 있는 토큰으로 재발급하면 관리자 scope의 액세스 토큰과 새 토큰을 함께 내준다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/auth/AdminRefreshTokenServiceTest.java,refresh_reusedLineageRevoked_keepsOtherDeviceLineageUsable,한 계보를 폐기해도 다른 기기의 계보는 그대로 재발급할 수 있다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/auth/AdminRefreshTokenServiceTest.java,refresh_revokedToken_keepsRevokedAtAndRequiresReauthentication,이미 폐기된 토큰으로 재발급하면 폐기 시각을 덮어쓰지 않고 재로그인을 요구한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/auth/AdminRefreshTokenServiceTest.java,refresh_rotatedToken_revokesWholeLineage,회전된 토큰을 다시 내면 계보 전체를 폐기하고 재로그인을 요구한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/auth/AdminRefreshTokenServiceTest.java,refresh_unknownToken_requiresReauthentication,존재하지 않는 토큰으로 재발급하면 재로그인을 요구한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/feedback/AdminFeedbackQueryServiceTest.java,getFeedbacks_bannedAuthor_derivesBannedStatus,정지된 작성자의 피드백은 BANNED 상태로 내려준다,단위,@Test,,미이식
+admin,admin/service/feedback/AdminFeedbackQueryServiceTest.java,getFeedbacks_invalidPagination_throwsBusinessException,페이지 조건이 범위를 벗어나면 조회하지 않는다,단위,@ParameterizedTest,,미이식
+admin,admin/service/feedback/AdminFeedbackQueryServiceTest.java,getFeedbacks_withdrawnAuthor_derivesWithdrawnStatus,탈퇴한 작성자의 피드백은 WITHDRAWN 상태로 내려준다,단위,@Test,,미이식
+admin,admin/service/post/AdminPostCommandDeletionTest.java,deletePost_allowedStatus_softDeletesAndPreservesMediaAndCreatesAudit,허용된 검수 상태의 게시물을 삭제하면 미디어를 보존하고 soft delete와 감사 로그를 저장한다,통합(Spring+DB),@ParameterizedTest,,미이식
+admin,admin/service/post/AdminPostCommandDeletionTest.java,deletePost_alreadyDeletedPost_keepsFirstDeletionAndAudit,삭제 요청을 다시 보내도 최초 삭제 시각과 감사 로그를 유지한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostCommandDeletionTest.java,deletePost_approvedPost_deletesPostLikes,관리자가 승인 게시물을 삭제하면 연결된 좋아요도 제거한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostCommandDeletionTest.java,deletePost_approvedPost_excludesEveryUserReadModel,삭제된 게시물은 사용자 상세·캘린더·피드 조회에서 즉시 제외한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostCommandDeletionTest.java,deletePost_auditActorForeignKeyFailure_rollsBackEveryChange,감사 로그 관리자 외래키 저장이 실패하면 게시물과 사진 삭제도 롤백한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostCommandDeletionTest.java,deletePost_unknownPost_throwsNotFoundException,존재하지 않는 게시물은 삭제할 수 없다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostCommandDeletionTest.java,deletePost_validatingPost_throwsBusinessException,이미지 처리 중인 게시물은 기본 비즈니스 오류로 삭제를 거부한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_approvedRequest_createsNotification,게시물을 승인하면 검수 감사 기록과 연결된 알림함 항목을 저장한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_approvedRequest_updatesPostAndCreatesAuditLog,대기 중인 게시물을 승인하면 상태와 처리 시각 및 감사 로그를 원자적으로 저장한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_deletedPendingPost_throwsNotFoundException,삭제된 대기 게시물은 검수 대상에서 제외한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_duplicateEventKey_rejectsDuplicateNotification,같은 검수 사건의 알림함 항목은 DB 제약으로 중복 저장할 수 없다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_nonPendingPost_throwsResourceStateChangedException,대기 상태가 아닌 게시물은 현재 상태 재조회 오류로 검수를 거부한다,통합(Spring+DB),@ParameterizedTest,,미이식
+admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_rejectedRequest_createsNotificationWithReason,게시물을 반려하면 정규화된 사유를 알림함에 보관한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_rejectedRequest_updatesPostAndCreatesAuditLogWithReason,대기 중인 게시물을 거절하면 정규화한 사유와 처리자를 감사 로그에 저장한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_unknownPost_throwsNotFoundException,존재하지 않는 게시물은 검수할 수 없다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostModerationConcurrencyTest.java,moderate_auditActorForeignKeyFailure_rollsBackPostTransition,감사 로그 작업자 외래키 저장이 실패하면 게시물 검수 상태도 함께 롤백한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostModerationConcurrencyTest.java,moderate_concurrentApproveAndReject_decidesExactlyOnce,두 관리자가 동시에 승인과 거절을 요청하면 하나만 확정하고 감사 로그도 하나만 남긴다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostModerationDeletionConcurrencyTest.java,moderateAndDelete_concurrentSamePendingPost_deletesConsistently,같은 대기 게시물의 승인과 삭제가 겹쳐도 교착 없이 삭제 상태로 수렴한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostModerationLogTest.java,moderate_approve_logsApprovedWithWaitSeconds,관리자가 승인하면 approved 로그에 대기 시간을 초 단위로 남긴다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostModerationLogTest.java,moderate_reject_logsRejected,관리자가 반려하면 rejected 로그를 한 건 남긴다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostNotificationTransactionTest.java,moderate_rolledBackTransaction_removesNotificationAndAudit,검수 트랜잭션이 롤백되면 게시물 변경과 감사 로그 및 알림이 모두 사라진다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostQueryServiceTest.java,getPost_deletedRejectedPost_returnsAdminDetail,"삭제된 거절 게시물도 작성자와 주제, 사진 메타데이터를 포함해 상세 조회한다",통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostQueryServiceTest.java,getPost_unknownPost_throwsNotFoundException,존재하지 않는 관리자 게시물 상세를 조회하면 찾을 수 없음 예외를 발생시킨다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostQueryServiceTest.java,getPosts_allFilters_returnsMatchingPost,"상태와 주제, 날짜, 작성자, 등록 시각 조건에 맞는 게시물만 조회한다",통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostQueryServiceTest.java,getPosts_createdAtFromAfterCreatedAtTo_throwsBusinessException,등록 시각 시작이 종료보다 늦으면 잘못된 요청 예외를 발생시킨다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostQueryServiceTest.java,getPosts_pageOffsetOverflow_throwsBusinessException,페이지 오프셋이 정수 범위를 넘으면 잘못된 요청 예외를 발생시킨다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostQueryServiceTest.java,getPosts_validatingStatus_throwsBusinessException,내부 검증 중 상태는 관리자 게시물 조회 조건으로 요청할 수 없다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/post/AdminPostQueryServiceTest.java,getPosts_withoutFilters_returnsVisibleStatusesIncludingDeleted,필터가 없으면 내부 검증 중을 제외하고 삭제된 게시물도 최신순으로 조회한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,createTopic_adjacentPeriod_savesTopic,이전 종료와 다음 시작이 같은 시각이면 주제를 생성한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,createTopic_duplicateDate_throwsBusinessException,활성 주제와 날짜가 중복되면 생성하지 않는다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,createTopic_overlappingDeletedTopic_savesTopic,삭제된 주제의 기간은 새 주제를 막지 않는다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,createTopic_overlappingPeriod_throwsBusinessException,날짜가 달라도 참여 기간이 겹치면 주제를 생성하지 않는다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,createTopic_validRequest_savesTopicAndAuditLog,주제를 생성하면 관리자 감사 로그를 남긴다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,deleteTopic_beforeOpen_softDeletesAndAudits,공개 전 주제를 사유와 함께 삭제하면 목록에서 제외하고 감사 로그를 남긴다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,insertTopic_overlappingPeriod_violatesDatabaseConstraint,DB는 날짜가 다른 주제라도 참여 기간이 겹치면 저장하지 않는다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,updateTopic_beforeOpen_updatesAndAudits,공개 전 주제를 수정하면 변경 전후 감사 로그를 남긴다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,updateTopic_openTopicWithOverlappingPeriod_throwsStateChanged,참여 중인 주제는 변경 기간이 다른 주제와 겹쳐도 상태 오류를 먼저 반환한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,updateTopic_openTopic_throwsStateChanged,참여 중인 주제는 수정할 수 없다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,updateTopic_overlappingPeriod_throwsBusinessException,공개 전 주제의 종료 시각을 늘려 다른 주제와 겹치면 수정하지 않는다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/topic/AdminTopicConcurrencyTest.java,createTopic_auditActorForeignKeyFailure_rollsBackTopic,감사 로그 관리자 외래키 저장이 실패하면 주제 생성도 롤백한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/topic/AdminTopicConcurrencyTest.java,createTopic_sameDateConcurrently_createsExactlyOnce,같은 날짜의 주제를 동시에 생성하면 하나만 저장하고 감사 로그도 하나만 남긴다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/topic/AdminTopicQueryServiceTest.java,getTopic_deletedTopic_throwsNotFoundException,삭제된 주제 상세은 찾을 수 없음으로 응답한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/topic/AdminTopicQueryServiceTest.java,getTopic_existingPosts_returnsModerationCounts,주제 상세은 게시물 검수 상태별 통계를 함께 반환한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/topic/AdminTopicQueryServiceTest.java,getTopic_phaseBoundaries_derivesFromClock,phase 경계에서 시작 시각은 OPEN이고 종료 시각은 CLOSED다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/topic/AdminTopicQueryServiceTest.java,getTopics_offsetExceedsIntegerRange_throwsBusinessException,페이지 offset이 정수 범위를 넘으면 잘못된 조회 조건으로 거절한다,통합(Spring+DB),@ParameterizedTest,,미이식
+admin,admin/service/topic/AdminTopicQueryServiceTest.java,getTopics_offsetWithinIntegerRange_returnsEmptyPage,허용되는 최대 페이지와 그 직전 페이지는 빈 목록을 반환한다,통합(Spring+DB),@ParameterizedTest,,미이식
+admin,admin/service/topic/AdminTopicQueryServiceTest.java,getTopics_phaseAndDateFilters_returnsMatchingActiveTopics,관리자 목록은 삭제 주제를 제외하고 Clock 기준 phase와 날짜 필터를 적용한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/user/AdminUserQueryServiceTest.java,getUser_activeUser_returnsSignatureImageUrls,활성 사용자 상세에 사인 이미지 URL을 조립한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/user/AdminUserQueryServiceTest.java,getUser_unknownUser_throwsNotFoundException,존재하지 않는 사용자 상세는 404 예외를 발생시킨다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/user/AdminUserQueryServiceTest.java,getUser_withdrawnUser_hidesRemovedSignature,탈퇴 사용자 상세에서 제거된 사인 저장 키를 URL로 노출하지 않는다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/user/AdminUserQueryServiceTest.java,getUsers_pageOffsetOverflow_throwsBusinessException,페이지 오프셋이 정수 범위를 넘으면 잘못된 요청이다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/user/AdminUserQueryServiceTest.java,getUsers_withdrawnFilter_returnsDerivedStatus,탈퇴 필터로 파생 WITHDRAWN 상태 사용자를 조회한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/user/AdminUserStatusConcurrencyTest.java,updateStatus_auditActorForeignKeyFailure_rollsBackUserTransition,감사 로그의 관리자 외래키 저장이 실패하면 사용자 차단도 롤백한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/user/AdminUserStatusConcurrencyTest.java,updateStatus_concurrentBan_changesExactlyOnce,동시에 같은 사용자를 차단하면 한 요청만 성공하고 감사 로그도 하나만 남긴다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/user/AdminUserStatusServiceTest.java,updateStatus_activeUserWithoutSocialAccount_updatesStatusAndAuditLog,소셜 계정이 없는 활성 사용자도 관리자가 차단하면 상태와 감사 로그를 저장한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/user/AdminUserStatusServiceTest.java,updateStatus_bannedUserWithoutSocialAccount_updatesStatusAndAuditLog,소셜 계정이 없는 차단 사용자도 관리자가 차단 해제하면 상태와 감사 로그를 갱신한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/user/AdminUserStatusServiceTest.java,updateStatus_blankReason_throwsBusinessException,상태 변경 사유가 비어 있으면 사용자를 변경하지 않는다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/user/AdminUserStatusServiceTest.java,updateStatus_sameStatus_throwsStateChanged,이미 같은 상태인 사용자는 상태를 다시 변경하지 않는다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/user/AdminUserStatusServiceTest.java,updateStatus_unknownUser_throwsNotFoundException,존재하지 않는 사용자의 상태 변경은 404로 거절한다,통합(Spring+DB),@Test,,미이식
+admin,admin/service/user/AdminUserStatusServiceTest.java,updateStatus_withdrawnUser_throwsBusinessException,탈퇴 사용자의 상태는 변경하지 않는다,통합(Spring+DB),@Test,,미이식
+architecture,architecture/ArchitectureConventionTest.java,check_productionClasses_followArchitectureConventions,운영 코드의 요청 DTO와 계층 의존 규칙을 검사한다,아키텍처,@Test,,미이식
+architecture,architecture/ArchitectureRulesTest.java,evaluate_invalidFixture_reportsViolation,각 규칙에 위반을 주입하면 실제 위반으로 판정한다,아키텍처,@ParameterizedTest,,미이식
+architecture,architecture/ArchitectureRulesTest.java,evaluate_validFixture_passesEveryRule,올바른 계층과 record 요청을 허용한다,아키텍처,@Test,,미이식
+auth,auth/api/support/AccessLogUserInterceptorTest.java,preHandle_adminToken_doesNotSetUserIdAttribute,관리자 토큰이면 요청 속성에 아무것도 담지 않는다,단위,@Test,,미이식
+auth,auth/api/support/AccessLogUserInterceptorTest.java,preHandle_memberToken_setsUserIdAttribute,회원 토큰이면 회원 식별자를 요청 속성에 담는다,단위,@Test,,미이식
+auth,auth/api/support/AuthenticatedUsersTest.java,find_jwtPrincipal_returnsAuthenticatedUser,검증된 회원 JWT에서 회원 식별자를 꺼낸다,단위,@Test,,미이식
+auth,auth/api/support/AuthenticationFailureLogTest.java,commence_invalidBearerToken_logsWarnWithoutToken,잘못된 Bearer 토큰은 401 WARN 1건을 남기고 토큰 문자열은 로그 어디에도 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/AuthenticationFailureLogTest.java,commence_withoutToken_logsWarnWithExceptionType,토큰 없이 보호 경로를 호출하면 401 WARN 1건에 예외 종류가 담긴다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/AuthenticationFailureLogTest.java,handle_adminTokenOnUserApi_logsWarn,관리자 토큰으로 회원 API를 호출하면 403 WARN 1건이 남고 전역 예외 처리기는 로그를 남기지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/CallbackBodySizeLimitFilterTest.java,normalBody_reachesAuthentication,상한 안의 본문은 필터를 통과해 인증 단계까지 간다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/CallbackBodySizeLimitFilterTest.java,oversizedBody_keepsRequestIdHeader,413 응답에도 앞 필터가 넣은 X-Request-Id 헤더가 유지된다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/CallbackBodySizeLimitFilterTest.java,oversizedBody_rejectedBeforeAuthentication,상한을 넘는 본문은 인증까지 가지 않고 413을 받는다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/ProcessingCallbackAuthenticatorTest.java,authenticate_differentInvalidUtf8Body_throwsUnauthorizedException,깨진 바이트가 서로 다르면 서명도 달라진다,단위,@Test,,미이식
+auth,auth/api/support/ProcessingCallbackAuthenticatorTest.java,authenticate_expiredTimestamp_throwsUnauthorizedException,5분이 지난 콜백 서명은 재사용 공격으로 보고 거부한다,단위,@Test,,미이식
+auth,auth/api/support/ProcessingCallbackAuthenticatorTest.java,authenticate_farFutureTimestamp_throwsUnauthorizedException,허용 폭을 넘어 미래로 앞선 타임스탬프는 거부한다,단위,@Test,,미이식
+auth,auth/api/support/ProcessingCallbackAuthenticatorTest.java,authenticate_invalidSignature_throwsUnauthorizedException,잘못된 HMAC 서명은 거부한다,단위,@Test,,미이식
+auth,auth/api/support/ProcessingCallbackAuthenticatorTest.java,authenticate_invalidUtf8Body_succeeds,유효한 UTF-8이 아닌 본문도 수신 바이트 그대로 검증한다,단위,@Test,,미이식
+auth,auth/api/support/ProcessingCallbackAuthenticatorTest.java,authenticate_jsonBody_succeeds,본문이 있는 콜백은 수신 원문의 해시로 검증한다,단위,@Test,,미이식
+auth,auth/api/support/ProcessingCallbackAuthenticatorTest.java,authenticate_justInsideClockSkew_succeeds,허용 시간 차 직전의 콜백 서명은 통과한다,단위,@Test,,미이식
+auth,auth/api/support/ProcessingCallbackAuthenticatorTest.java,authenticate_nullSignature_throwsUnauthorizedException,서명이 없으면 인증 실패로 거부한다,단위,@Test,,미이식
+auth,auth/api/support/ProcessingCallbackAuthenticatorTest.java,authenticate_nullTimestamp_throwsUnauthorizedException,timestamp가 없으면 인증 실패로 거부한다,단위,@Test,,미이식
+auth,auth/api/support/ProcessingCallbackAuthenticatorTest.java,authenticate_otherKindPath_throwsUnauthorizedException,종류가 다른 경로로 만든 서명은 거부한다,단위,@Test,,미이식
+auth,auth/api/support/ProcessingCallbackAuthenticatorTest.java,authenticate_reserializedBody_throwsUnauthorizedException,같은 값이어도 직렬화가 다른 본문의 서명은 거부한다,단위,@Test,,미이식
+auth,auth/api/support/ProcessingCallbackAuthenticatorTest.java,authenticate_signatureForAnotherEnvironment_throwsUnauthorizedException,다른 환경을 대상으로 만든 서명은 거부한다,단위,@Test,,미이식
+auth,auth/api/support/ProcessingCallbackAuthenticatorTest.java,authenticate_slightlyFutureTimestamp_succeeds,작은 시계 오차만큼 앞선 타임스탬프는 허용한다,단위,@Test,,미이식
+auth,auth/api/support/ProcessingCallbackAuthenticatorTest.java,authenticate_validSignature_succeeds,현재 시각의 올바른 HMAC 서명은 허용한다,단위,@Test,,미이식
+auth,auth/api/support/SuspendedUserAccessTest.java,createPostImageUpload_suspendedUser_returnsForbidden,정지 회원은 게시물 사진 업로드 URL을 발급받을 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/SuspendedUserAccessTest.java,createPost_suspendedUser_returnsForbidden,정지 회원은 게시물을 생성할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/SuspendedUserAccessTest.java,createSignatureUpload_suspendedUser_returnsForbidden,정지 회원은 사인 업로드 URL을 발급받을 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/SuspendedUserAccessTest.java,deletePost_suspendedUser_isNotForbidden,정지 회원도 본인 게시물을 삭제할 수 있다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/SuspendedUserAccessTest.java,getMyPostCalendarMonths_suspendedUser_returnsOk,정지 회원도 캘린더 기록 연월을 조회할 수 있다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/SuspendedUserAccessTest.java,getMyPostCalendar_suspendedUser_isNotForbidden,정지 회원도 내 게시물 캘린더를 조회할 수 있다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/SuspendedUserAccessTest.java,getPost_suspendedUser_isNotForbidden,정지 회원도 게시물 상세를 조회할 수 있다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/SuspendedUserAccessTest.java,getPosts_suspendedUser_isNotForbidden,정지 회원도 게시물 목록을 조회할 수 있다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/SuspendedUserAccessTest.java,getSignature_suspendedUser_isNotForbidden,정지 회원도 내 사인을 조회할 수 있다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/SuspendedUserAccessTest.java,likePost_suspendedUser_returnsForbidden,정지 회원은 좋아요를 등록할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/SuspendedUserAccessTest.java,submitFeedback_suspendedUser_isNotForbidden,정지 회원도 피드백을 제출할 수 있다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/SuspendedUserAccessTest.java,unlikePost_suspendedUser_isNotForbidden,정지 회원도 좋아요를 취소할 수 있다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/SuspendedUserAccessTest.java,updatePost_suspendedUser_returnsForbidden,정지 회원은 게시물 제목을 수정할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/SuspendedUserAccessTest.java,updateSignature_suspendedUser_returnsForbidden,정지 회원은 사인을 교체할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/SuspendedUserAccessTest.java,withdraw_suspendedUser_isNotForbidden,정지 회원도 탈퇴할 수 있다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/UsableUserPolicyTest.java,validateExisting_activeUser_returnsTrue,정상 회원은 통과시킨다,단위,@Test,,미이식
+auth,auth/api/support/UsableUserPolicyTest.java,validateExisting_suspendedUser_returnsTrue,정지된 회원도 통과시킨다,단위,@Test,,미이식
+auth,auth/api/support/UsableUserPolicyTest.java,validateExisting_unknownUser_throwsUnauthorizedException,저장소에 없는 회원은 거부한다,단위,@Test,,미이식
+auth,auth/api/support/UsableUserPolicyTest.java,validateExisting_withdrawnUser_throwsUnauthorizedException,탈퇴한 회원은 거부한다,단위,@Test,,미이식
+auth,auth/api/support/UsableUserPolicyTest.java,validateUsable_activeUser_returnsTrue,정상 회원은 통과시킨다,단위,@Test,,미이식
+auth,auth/api/support/UsableUserPolicyTest.java,validateUsable_noAuthentication_throwsForbiddenException,인증 주체가 없으면 거부한다,단위,@Test,,미이식
+auth,auth/api/support/UsableUserPolicyTest.java,validateUsable_nonJwtPrincipal_throwsForbiddenException,액세스 토큰으로 인증되지 않은 주체는 거부한다,단위,@Test,,미이식
+auth,auth/api/support/UsableUserPolicyTest.java,validateUsable_suspendedUser_throwsForbiddenException,정지된 회원은 거부한다,단위,@Test,,미이식
+auth,auth/api/support/UsableUserPolicyTest.java,validateUsable_unknownUser_throwsUnauthorizedException,저장소에 없는 회원은 거부한다,단위,@Test,,미이식
+auth,auth/api/support/UsableUserPolicyTest.java,validateUsable_withdrawnUser_throwsUnauthorizedException,탈퇴한 회원은 거부한다,단위,@Test,,미이식
+auth,auth/api/support/WithdrawnUserAccessTest.java,createPostImageUpload_withdrawnUser_returnsUnauthorized,탈퇴 회원은 게시물 사진 업로드 URL을 발급받을 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/WithdrawnUserAccessTest.java,createPost_withdrawnUser_returnsUnauthorized,탈퇴 회원은 게시물을 생성할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/WithdrawnUserAccessTest.java,createSignatureUpload_withdrawnUser_returnsUnauthorized,탈퇴 회원은 사인 업로드 URL을 발급받을 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/WithdrawnUserAccessTest.java,deletePost_withdrawnUser_returnsUnauthorized,탈퇴 회원은 게시물을 삭제할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/WithdrawnUserAccessTest.java,getMyPostCalendarMonths_withdrawnUser_returnsUnauthorized,탈퇴 회원은 캘린더 기록 연월을 조회할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/WithdrawnUserAccessTest.java,getMyPostCalendar_withdrawnUser_returnsUnauthorized,탈퇴 회원은 내 게시물 캘린더를 조회할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/WithdrawnUserAccessTest.java,getPost_withdrawnUser_returnsUnauthorized,탈퇴 회원은 게시물 상세를 조회할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/WithdrawnUserAccessTest.java,getPosts_withdrawnUser_returnsUnauthorized,탈퇴 회원은 게시물 목록도 조회할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/WithdrawnUserAccessTest.java,getSignature_withdrawnUser_returnsUnauthorized,탈퇴 회원은 내 사인을 조회할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/WithdrawnUserAccessTest.java,likePost_withdrawnUser_returnsUnauthorized,탈퇴 회원은 좋아요를 등록할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/WithdrawnUserAccessTest.java,submitFeedback_withdrawnUser_returnsUnauthorized,탈퇴 회원은 피드백을 제출할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/WithdrawnUserAccessTest.java,unlikePost_withdrawnUser_returnsUnauthorized,탈퇴 회원은 좋아요를 취소할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/WithdrawnUserAccessTest.java,updateSignature_withdrawnUser_returnsUnauthorized,탈퇴 회원은 사인을 교체할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/WithdrawnUserAccessTest.java,withdraw_withdrawnUser_returnsUnauthorized,탈퇴 회원은 다시 탈퇴할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,createSocialSignupSignatureUpload_blankIdToken_returnsBadRequest,서명 업로드 URL 요청의 ID Token이 비어 있으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,createSocialSignupSignatureUpload_blankOrMissingRawNonce_returnsBadRequest,서명 업로드 URL 요청의 rawNonce가 비어 있거나 없으면 400을 반환한다,웹 슬라이스,@ParameterizedTest,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,createSocialSignupSignatureUpload_validRequest_returnsUploadInformation,신규 회원이 유효한 ID Token을 전달하면 서명 업로드 정보를 반환한다,웹 슬라이스,@Test,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,logout_missingRefreshToken_returnsBadRequest,로그아웃 요청에 리프레시 토큰이 없으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,logout_unknownRefreshToken_returnsNoContent,알 수 없는 리프레시 토큰으로 로그아웃해도 204를 반환한다,웹 슬라이스,@Test,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,logout_validRefreshToken_returnsNoContent,리프레시 토큰으로 로그아웃하면 204를 반환한다,웹 슬라이스,@Test,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,refresh_blankRefreshToken_returnsBadRequest,재발급 요청의 리프레시 토큰이 비어 있으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,refresh_missingRefreshToken_returnsBadRequest,재발급 요청에 리프레시 토큰이 없으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,refresh_rejectedRefreshToken_returnsReauthenticationRequired,재발급에 실패하면 재로그인 필요 에러 코드와 함께 401을 반환한다,웹 슬라이스,@Test,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,refresh_validRefreshToken_returnsRotatedTokens,유효한 리프레시 토큰으로 재발급하면 회전된 토큰 쌍을 반환한다,웹 슬라이스,@Test,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,socialLogin_appleWithAuthorizationCode_returnsSignUpRequired,APPLE 로그인은 Authorization Code와 함께 공통 엔드포인트로 처리한다,웹 슬라이스,@Test,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,socialLogin_appleWithoutAuthorizationCode_returnsBadRequest,APPLE 로그인에 Authorization Code가 없으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,socialLogin_blankIdToken_returnsBadRequest,ID Token이 비어 있으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,socialLogin_blankOrMissingRawNonce_returnsBadRequest,소셜 로그인 요청의 rawNonce가 비어 있거나 없으면 400을 반환한다,웹 슬라이스,@ParameterizedTest,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,socialLogin_existingUser_returnsLoginSuccess,기존 회원이 소셜 로그인하면 로그인 성공 상태와 사용자 식별자를 반환한다,웹 슬라이스,@Test,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,socialLogin_kakaoProvider_returnsLoginResult,Kakao ID Token으로 소셜 로그인할 수 있다,웹 슬라이스,@Test,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,socialLogin_missingProvider_returnsBadRequest,제공자가 없으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,socialLogin_newUser_returnsSignUpRequired,신규 회원이 소셜 로그인하면 회원가입 필요 상태를 반환한다,웹 슬라이스,@Test,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,socialLogin_nonAppleWithAuthorizationCode_returnsBadRequest,APPLE이 아닌 제공자가 Authorization Code를 보내면 400을 반환한다,웹 슬라이스,@Test,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,socialSignup_blankSignupToken_returnsBadRequest,소셜 회원가입 요청의 회원가입 토큰이 비어 있으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,socialSignup_missingSignupToken_returnsBadRequest,소셜 회원가입 요청에 회원가입 토큰이 없으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,socialSignup_processingSignature_returnsProcessingPendingError,서명 이미지가 처리 중이면 재시도용 에러 코드를 반환한다,웹 슬라이스,@Test,,미이식
+auth,auth/api/v1/controller/AuthControllerTest.java,socialSignup_validRequest_returnsUserId,서명 이미지 처리가 완료된 신규 회원은 소셜 회원가입을 완료한다,웹 슬라이스,@Test,,미이식
+auth,auth/api/v1/docs/AuthOpenApiTest.java,userApiDocs_appleEndpoints_exposeNoDedicatedContract,사용자 문서는 Apple 전용 경로와 로그인 응답의 회원가입 토큰을 제공하지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/v1/docs/AuthOpenApiTest.java,userApiDocs_logout_exposesUnauthenticatedContract,user-api 문서는 로그아웃을 인증 없이 호출하는 계약으로 제공한다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/v1/docs/AuthOpenApiTest.java,userApiDocs_refresh_exposesUnauthenticatedContract,user-api 문서는 토큰 재발급을 인증 없이 호출하는 계약으로 제공한다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/v1/docs/AuthOpenApiTest.java,userApiDocs_signatureUpload_exposesApplePendingAuthorizationContract,사용자 문서는 업로드 URL 400에 Apple 임시 인증 정보 조건을 제공한다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/v1/docs/AuthOpenApiTest.java,userApiDocs_signatureUpload_exposesUploadUrlContract,사용자 문서는 서명 업로드 URL의 사용 조건과 만료 대상을 구분한다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/v1/docs/AuthOpenApiTest.java,userApiDocs_socialIdTokenRequests_exposeRawNonceContract,사용자 문서는 소셜 로그인과 회원가입 업로드 URL 요청의 rawNonce 필수 계약과 nonce 불일치 401을 제공한다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/v1/docs/AuthOpenApiTest.java,userApiDocs_socialLoginRequest_exposesAuthorizationCodeContract,사용자 문서는 로그인 요청에만 authorizationCode가 있는 계약을 제공한다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/v1/docs/AuthOpenApiTest.java,userApiDocs_socialLogin_exposesBannedUserContract,사용자 문서는 차단 회원의 로그인 성공과 탈퇴한 차단 계정의 거부를 구분한다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/v1/docs/AuthOpenApiTest.java,userApiDocs_socialSignup_exposesSignatureProcessingPendingErrorCode,사용자 문서는 가입 완료의 사인 이미지 처리 중 errorCode를 제공한다,통합(Spring+DB),@Test,,미이식
+auth,auth/domain/AppleAuthorizationTest.java,create_maximumLengthEncryptedRefreshToken_createsAuthorization,저장 가능한 최대 길이의 암호화된 RT를 허용한다,단위,@Test,,미이식
+auth,auth/domain/AppleAuthorizationTest.java,create_missingEncryptedRefreshToken_throwsException,암호화된 RT가 없으면 Apple 인증 정보를 생성할 수 없다,단위,@ParameterizedTest,,미이식
+auth,auth/domain/AppleAuthorizationTest.java,create_nonAppleAccount_throwsException,Apple이 아닌 소셜 계정에는 Apple 인증 정보를 연결할 수 없다,단위,@Test,,미이식
+auth,auth/domain/AppleAuthorizationTest.java,create_tooLongEncryptedRefreshToken_throwsException,암호화된 RT가 저장 길이를 넘으면 사용할 수 없다,단위,@Test,,미이식
+auth,auth/domain/AppleAuthorizationTest.java,create_validAuthorization_connectsAppleAccount,Apple 소셜 계정에 인증 정보를 연결한다,단위,@Test,,미이식
+auth,auth/domain/ConsumedSignupTokenTest.java,create_blankJti_throwsBusinessException,jti가 비어 있으면 생성할 수 없다,단위,@ParameterizedTest,,미이식
+auth,auth/domain/ConsumedSignupTokenTest.java,create_jtiAtMaxLength_createsToken,36자인 jti는 경계값으로 허용한다,단위,@Test,,미이식
+auth,auth/domain/ConsumedSignupTokenTest.java,create_jtiTooLong_throwsBusinessException,jti가 36자를 넘으면 생성할 수 없다,단위,@Test,,미이식
+auth,auth/domain/ConsumedSignupTokenTest.java,create_nullExpiresAt_throwsBusinessException,만료 시각이 없으면 생성할 수 없다,단위,@Test,,미이식
+auth,auth/domain/ConsumedSignupTokenTest.java,create_validArguments_createsToken,jti와 만료 시각으로 소진 기록을 만든다,단위,@Test,,미이식
+auth,auth/domain/PendingAppleAuthorizationTest.java,create_blankEncryptedRefreshToken_throwsBusinessException,암호화된 RT가 비어 있으면 임시 인증 정보를 만들 수 없다,단위,@ParameterizedTest,,미이식
+auth,auth/domain/PendingAppleAuthorizationTest.java,create_invalidSubjectHmac_throwsBusinessException,신원 지문이 64자리 소문자 hex가 아니면 임시 인증 정보를 만들 수 없다,단위,@ParameterizedTest,,미이식
+auth,auth/domain/PendingAppleAuthorizationTest.java,create_missingExpiry_throwsBusinessException,만료 시각이 없으면 임시 인증 정보를 만들 수 없다,단위,@Test,,미이식
+auth,auth/domain/PendingAppleAuthorizationTest.java,create_tooLongEncryptedRefreshToken_throwsBusinessException,암호화된 RT가 최대 길이를 넘으면 임시 인증 정보를 만들 수 없다,단위,@Test,,미이식
+auth,auth/domain/PendingAppleAuthorizationTest.java,create_validArguments_createsAuthorization,"신원 지문과 암호화된 RT, 만료 시각으로 임시 인증 정보를 만든다",단위,@Test,,미이식
+auth,auth/domain/PendingAppleAuthorizationTest.java,extendTo_atCurrentExpiry_movesOnlyForward,더 뒤인 만료 시각만 반영하고 앞당기지는 않는다,단위,@Test,,미이식
+auth,auth/domain/RefreshTokenPolicyTest.java,absoluteExpiresAt_now_returnsNowPlusAbsoluteExpiration,절대 만료 시각은 기준 시각에 절대 만료 기간을 더한 값이다,단위,@Test,,미이식
+auth,auth/domain/RefreshTokenPolicyTest.java,nextExpiresAt_afterAbsoluteExpiry_returnsAbsoluteExpiry,비활동 만료가 절대 만료를 넘으면 절대 만료로 자른다,단위,@Test,,미이식
+auth,auth/domain/RefreshTokenPolicyTest.java,nextExpiresAt_beforeAbsoluteExpiry_returnsInactivityExpiry,비활동 만료가 절대 만료보다 이르면 비활동 만료를 그대로 쓴다,단위,@Test,,미이식
+auth,auth/domain/RefreshTokenPolicyTest.java,nextExpiresAt_exactlyAtAbsoluteExpiry_returnsAbsoluteExpiry,비활동 만료가 절대 만료와 정확히 같으면 그 시각을 그대로 쓴다,단위,@Test,,미이식
+auth,auth/domain/RefreshTokenTest.java,createSuccessor_rotatedToken_inheritsSessionAndAbsoluteExpiry,후속 토큰은 세션과 절대 만료를 물려받고 비활동 만료만 갱신한다,단위,@Test,,미이식
+auth,auth/domain/RefreshTokenTest.java,isExpired_afterAbsoluteExpiry_returnsTrue,비활동 만료가 남아 있어도 절대 만료가 지나면 만료로 판정한다,단위,@Test,,미이식
+auth,auth/domain/RefreshTokenTest.java,isExpired_atInactivityExpiry_returnsTrue,절대 만료가 남아 있어도 비활동 만료가 지나면 만료로 판정한다,단위,@Test,,미이식
+auth,auth/domain/RefreshTokenTest.java,isExpired_beforeBothExpiries_returnsFalse,두 만료 시각이 모두 남아 있으면 만료로 판정하지 않는다,단위,@Test,,미이식
+auth,auth/domain/RefreshTokenTest.java,isReused_neverRotated_returnsFalse,회전된 적 없는 토큰은 재사용으로 판정하지 않는다,단위,@Test,,미이식
+auth,auth/domain/RefreshTokenTest.java,isReused_rotated_returnsTrue,회전된 토큰은 회전 직후라도 재사용으로 판정한다,단위,@Test,,미이식
+auth,auth/domain/RefreshTokenTest.java,revoke_alreadyRevoked_keepsFirstRevokedAt,이미 폐기된 토큰을 다시 폐기해도 최초 폐기 시각을 유지한다,단위,@Test,,미이식
+auth,auth/domain/RefreshTokenTest.java,rotate_alreadyRotated_keepsFirstRotatedAt,이미 회전된 토큰을 다시 회전해도 최초 회전 시각을 유지한다,단위,@Test,,미이식
+auth,auth/domain/SocialAccountTest.java,create_invalidSubjectHmac_throwsException,subject HMAC 형식이 올바르지 않으면 소셜 계정을 생성할 수 없다,단위,@ParameterizedTest,,미이식
+auth,auth/domain/SocialAccountTest.java,create_missingAssociation_throwsException,회원이나 제공자가 없으면 소셜 계정을 생성할 수 없다,단위,@Test,,미이식
+auth,auth/domain/SocialAccountTest.java,create_validSocialIdentity_connectsUser,소셜 제공자와 subject HMAC을 회원에게 연결한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/access/JwtAccessTokenProviderTest.java,decode_audienceMismatch_throwsJwtException,purpose가 같아도 audience가 다른 토큰은 검증할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/access/JwtAccessTokenProviderTest.java,decode_exactlyAtClockSkewBoundary_verifiesAccessToken,허용 오차와 정확히 같은 시각에 만료된 토큰은 검증할 수 있다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/access/JwtAccessTokenProviderTest.java,decode_expiredBeyondClockSkew_throwsJwtException,허용 오차를 넘겨 만료된 토큰은 검증할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/access/JwtAccessTokenProviderTest.java,decode_issuerMismatch_throwsJwtException,발급자가 다른 토큰은 검증할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/access/JwtAccessTokenProviderTest.java,decode_justPastExpiryWithinClockSkew_verifiesAccessToken,만료 시각을 막 지난 토큰은 허용 오차 안에서 검증할 수 있다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/access/JwtAccessTokenProviderTest.java,decode_missingExpiry_throwsJwtException,만료 시각이 없는 토큰은 검증할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/access/JwtAccessTokenProviderTest.java,decode_missingPurpose_throwsJwtException,purpose 클레임이 없는 토큰은 검증할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/access/JwtAccessTokenProviderTest.java,decode_nonUuidSubject_throwsJwtException,subject가 회원 식별자 형식이 아닌 토큰은 검증할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/access/JwtAccessTokenProviderTest.java,decode_purposeMismatch_throwsJwtException,audience가 같아도 purpose가 다른 토큰은 검증할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/access/JwtAccessTokenProviderTest.java,decode_socialSignupTokenSignedWithSameSecret_throwsJwtException,같은 비밀키로 서명됐어도 회원가입 토큰은 액세스 토큰으로 사용할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/access/JwtAccessTokenProviderTest.java,decode_tamperedToken_throwsJwtException,서명이 변조된 토큰은 검증할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/access/JwtAccessTokenProviderTest.java,issue_adminScope_issuesAdminAccessToken,관리자 식별자로 관리자 scope의 액세스 토큰을 발급한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/access/JwtAccessTokenProviderTest.java,issue_validUserId_issuesVerifiableAccessToken,회원 식별자로 액세스 토큰을 발급하고 검증한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/AesGcmAppleAuthorizationCipherTest.java,constructor_invalidEncryptionKey_throwsException,64자리 16진수가 아닌 암호화 키는 사용할 수 없다,단위,@ParameterizedTest,,미이식
+auth,auth/infrastructure/infra/apple/AesGcmAppleAuthorizationCipherTest.java,decrypt_encryptedRefreshToken_returnsOriginalRefreshToken,Refresh Token을 암호화한 뒤 복호화하면 원본을 반환한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/AesGcmAppleAuthorizationCipherTest.java,decrypt_invalidBase64_throwsException,Base64 형식이 아닌 암호문은 복호화할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/AesGcmAppleAuthorizationCipherTest.java,decrypt_missingEncryptedRefreshToken_throwsException,암호화된 Refresh Token이 없으면 복호화할 수 없다,단위,@ParameterizedTest,,미이식
+auth,auth/infrastructure/infra/apple/AesGcmAppleAuthorizationCipherTest.java,decrypt_tamperedCiphertext_throwsException,암호문이 변조되면 Refresh Token을 복호화할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/AesGcmAppleAuthorizationCipherTest.java,decrypt_withDifferentKey_throwsException,다른 암호화 키로 Refresh Token을 복호화할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/AesGcmAppleAuthorizationCipherTest.java,encrypt_missingRefreshToken_throwsException,Refresh Token이 없으면 암호화할 수 없다,단위,@ParameterizedTest,,미이식
+auth,auth/infrastructure/infra/apple/AesGcmAppleAuthorizationCipherTest.java,encrypt_sameRefreshToken_generatesDifferentCiphertext,같은 Refresh Token을 암호화해도 매번 다른 암호문을 생성한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/AppleAuthPropertiesTest.java,appleProperties_invalidEncryptionKey_rejectsStartup,Apple refresh token 암호화 키가 64자리 16진수가 아니면 시작을 거부한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/AppleClientSecretGeneratorTest.java,create_invalidBase64_throwsIllegalStateException,개인키가 Base64 형식이 아니면 생성기를 만드는 시점에 거부한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/AppleClientSecretGeneratorTest.java,create_invalidPem_throwsIllegalStateException,개인키에 PKCS8 PEM 형식이 없으면 생성기를 만드는 시점에 거부한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/AppleClientSecretGeneratorTest.java,create_nonEcPrivateKey_throwsIllegalStateException,EC 개인키가 아니면 생성기를 만드는 시점에 거부한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/AppleClientSecretGeneratorTest.java,generate_validPrivateKey_returnsSignedClientSecret,Apple 규격의 ES256 client_secret을 생성한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/AppleHttpTokenClientTest.java,exchangeAuthorizationCode_invalidClient_throwsIllegalStateException,잘못된 client_secret 응답은 서버 설정 오류로 처리한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/AppleHttpTokenClientTest.java,exchangeAuthorizationCode_invalidGrant_throwsUnauthorizedException,만료되었거나 이미 사용된 authorizationCode는 인증 실패로 처리한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/AppleHttpTokenClientTest.java,exchangeAuthorizationCode_invalidTokenResponse_throwsIllegalStateException,Apple 성공 응답에 필수 토큰 정보가 빠지면 응답 오류로 처리한다,단위,@ParameterizedTest,,미이식
+auth,auth/infrastructure/infra/apple/AppleHttpTokenClientTest.java,exchangeAuthorizationCode_missingCode_throwsUnauthorizedException,authorizationCode가 없으면 Apple 토큰 교환을 거부한다,단위,@ParameterizedTest,,미이식
+auth,auth/infrastructure/infra/apple/AppleHttpTokenClientTest.java,exchangeAuthorizationCode_networkError_throwsIllegalStateException,Apple 토큰 서버의 네트워크 오류는 통신 오류로 처리한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/AppleHttpTokenClientTest.java,exchangeAuthorizationCode_serverError_throwsIllegalStateException,Apple 토큰 서버의 5xx 응답은 통신 오류로 처리한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/AppleHttpTokenClientTest.java,exchangeAuthorizationCode_validCode_returnsAppleTokens,authorizationCode와 서버 자격증명을 Form으로 보내 Apple 토큰을 반환한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/AppleHttpTokenClientTest.java,revokeRefreshToken_badRequest_throwsIllegalStateException,잘못된 Apple 토큰 폐기 요청은 서버 설정 오류로 처리한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/AppleHttpTokenClientTest.java,revokeRefreshToken_invalidGrant_throwsIllegalStateException,이미 무효한 Refresh Token의 폐기 요청도 서버 설정 오류로 처리한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/AppleHttpTokenClientTest.java,revokeRefreshToken_missingRefreshToken_throwsIllegalArgumentException,Refresh Token이 없으면 Apple 토큰 폐기를 거부한다,단위,@ParameterizedTest,,미이식
+auth,auth/infrastructure/infra/apple/AppleHttpTokenClientTest.java,revokeRefreshToken_networkError_throwsIllegalStateException,Apple 토큰 폐기 서버의 네트워크 오류는 통신 오류로 처리한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/AppleHttpTokenClientTest.java,revokeRefreshToken_serverError_throwsIllegalStateException,Apple 토큰 폐기 서버의 5xx 응답은 통신 오류로 처리한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/AppleHttpTokenClientTest.java,revokeRefreshToken_unreadableBadRequestBody_throwsIllegalStateException,본문을 읽을 수 없는 Apple 토큰 폐기 실패는 서버 설정 오류로 처리한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/AppleHttpTokenClientTest.java,revokeRefreshToken_validRefreshToken_completesRevocation,설정된 Client ID와 서버 자격증명을 Form으로 보내 Apple 토큰을 폐기한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/apple/PendingAppleAuthorizationCleanupSchedulerTest.java,revokeAndDeleteExpiredAuthorizations_expiredRecords_revokesAndDeletes,만료된 임시 Apple RT를 트랜잭션 밖에서 폐기한 뒤 삭제한다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/infra/apple/PendingAppleAuthorizationCleanupSchedulerTest.java,revokeAndDeleteExpiredAuthorizations_liveRecord_doesNothing,유효한 임시 Apple 인증 정보만 있으면 복호화와 폐기를 요청하지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/infra/apple/PendingAppleAuthorizationCleanupSchedulerTest.java,revokeAndDeleteExpiredAuthorizations_revocationFailure_retainsAndContinues,한 RT의 폐기가 실패하면 해당 행을 남기고 나머지 RT는 계속 처리한다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcEmailPolicyTest.java,extractEmail_asProvidedWithoutEmail_returnsNull,받은 이메일을 그대로 쓰는 정책도 이메일이 없으면 이메일 없이 반환한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcEmailPolicyTest.java,extractEmail_asProvidedWithoutVerification_returnsEmail,받은 이메일을 그대로 쓰는 정책은 email_verified와 관계없이 이메일을 반환한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcEmailPolicyTest.java,extractEmail_verifiedOnlyWithBooleanTrue_returnsEmail,확인된 이메일만 받는 정책은 email_verified가 boolean true이면 이메일을 반환한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcEmailPolicyTest.java,extractEmail_verifiedOnlyWithFalseOrMissing_returnsNull,확인된 이메일만 받는 정책은 email_verified가 boolean false이거나 없으면 이메일을 버린다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcEmailPolicyTest.java,extractEmail_verifiedOnlyWithStringTrue_returnsEmail,확인된 이메일만 받는 정책은 email_verified가 문자열 true이면 이메일을 반환한다,단위,@ParameterizedTest,,미이식
+auth,auth/infrastructure/infra/oidc/OidcEmailPolicyTest.java,extractEmail_verifiedOnlyWithoutTrue_returnsNull,확인된 이메일만 받는 정책은 email_verified가 참이 아니면 이메일을 버린다,단위,@ParameterizedTest,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenAudienceValidatorTest.java,validate_emptyAudience_fails,audience 목록이 비어 있으면 검증에 실패한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenAudienceValidatorTest.java,validate_missingAudience_fails,audience가 없으면 검증에 실패한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenAudienceValidatorTest.java,validate_multipleAudiencesIncludingAllowed_fails,허용된 값이 포함돼도 audience가 여러 개이면 검증에 실패한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenAudienceValidatorTest.java,validate_singleAllowedAudience_succeeds,audience가 허용된 값 하나이면 검증에 성공한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenAudienceValidatorTest.java,validate_unknownAudience_describesProvider,검증 실패 메시지에 제공자 이름을 담는다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenAudienceValidatorTest.java,validate_unknownAudience_fails,audience가 허용된 값이 아니면 검증에 실패한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenClaimsValidatorTest.java,validate_issuedAtAtClockSkew_succeeds,iat가 현재보다 60초 미래이면 시계 오차로 허용한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenClaimsValidatorTest.java,validate_issuedAtBeyondClockSkew_fails,iat가 현재보다 60초를 초과해 미래이면 검증에 실패한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenClaimsValidatorTest.java,validate_missingExpiration_fails,exp가 없는 ID Token은 검증에 실패한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenClaimsValidatorTest.java,validate_missingIssuedAt_fails,iat가 없는 ID Token은 검증에 실패한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenConfigTest.java,create_missingRequiredProperty_failsToStart,제공자의 필수 OIDC 설정이 없으면 애플리케이션을 시작하지 않는다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenConfigTest.java,create_validProperties_registersDecodersAndVerifiers,세 제공자의 OIDC 설정으로 디코더와 ID Token 검증기를 등록한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenConfigTest.java,create_validProperties_registersProviderEmailPolicies,Google·Apple은 확인된 이메일만 받고 Kakao는 받은 이메일을 그대로 쓰도록 등록한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenDecoderFactoryTest.java,createDecoder_expiredBeyondClockSkew_rejects,허용 시계 오차 60초를 넘겨 만료된 ID Token은 거절한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenDecoderFactoryTest.java,createDecoder_expiredWithinClockSkew_decodes,만료됐어도 허용 시계 오차 60초 이내이면 디코딩한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenDecoderFactoryTest.java,createDecoder_hs256Signature_rejects,RS256이 아닌 HS256으로 서명한 ID Token은 거절한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenDecoderFactoryTest.java,createDecoder_jwkSetUri_fetchesJwkSetOverHttp,JWK Set 주소로 만든 디코더는 JSON Accept 헤더로 공개키 목록을 받아 ID Token을 검증한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenDecoderFactoryTest.java,createDecoder_missingAudience_rejects,aud가 없는 ID Token은 검증 실패로 거절한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenDecoderFactoryTest.java,createDecoder_missingIssuedAt_rejects,iat가 없는 ID Token은 거절한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenDecoderFactoryTest.java,createDecoder_refetchLimitReachedRepeatedly_logsWarningOncePerWindow,재조회 제한에 걸리면 제공자 이름과 함께 경고 로그를 구간마다 한 번만 남긴다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenDecoderFactoryTest.java,createDecoder_refetchLimitReached_decodesKnownKeyId,재조회 제한에 걸린 뒤에도 캐시에 있는 kid의 ID Token은 디코딩한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenDecoderFactoryTest.java,createDecoder_repeatedKnownKeyId_fetchesJwkSetOnce,캐시에 있는 kid의 ID Token이 반복되면 공개키 목록은 한 번만 조회한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenDecoderFactoryTest.java,createDecoder_repeatedUnknownKeyId_limitsJwkSetRefetch,캐시에 없는 kid의 ID Token이 반복돼도 30초 구간 안에서는 공개키 목록을 최대 2회만 조회한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenDecoderFactoryTest.java,createDecoder_retrievalFailsBeforeFirstSuccess_rejectsUntilRefetchWindowEnds,공개키 목록을 한 번도 받지 못한 채 재시도까지 실패하면 제공자가 회복돼도 남은 구간 동안 거절한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenDecoderFactoryTest.java,createDecoder_rotatedKeyId_refetchesJwkSetAndDecodes,제공자가 새 키를 추가하면 새 kid의 첫 ID Token에서 공개키 목록을 다시 받아 디코딩한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenDecoderFactoryTest.java,createDecoder_signedWithOtherKey_rejects,같은 kid라도 공개키 목록에 없는 키로 서명한 ID Token은 거절한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenDecoderFactoryTest.java,createDecoder_transientRetrievalFailure_retriesAndDecodes,공개키 목록 조회가 한 번 실패하면 같은 조회 안에서 다시 시도해 디코딩한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenDecoderFactoryTest.java,createDecoder_unknownAudience_rejects,aud가 우리 앱이 아닌 ID Token은 거절한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenDecoderFactoryTest.java,createDecoder_unknownIssuer_rejects,발급자가 설정과 다른 ID Token은 거절한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenDecoderFactoryTest.java,createDecoder_unknownKeyId_rejects,공개키 목록에 없는 kid의 ID Token은 거절한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenDecoderFactoryTest.java,createDecoder_validIdToken_decodes,공개키로 서명되고 발급자·aud·시각이 올바른 ID Token을 디코딩한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenDecoderFactoryTest.java,createJwkSource_malformedUri_throwsException,JWK Set URI 형식이 올바르지 않으면 디코더를 만들지 않는다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenDecoderFactoryTest.java,createJwkSource_refreshFailuresBeforeCacheExpiry_keepsServingPreviousJwkSet,캐시 만료 직전 재조회 실패로 제한을 소진해도 이전 목록을 다시 캐시해 만료 후 조회가 막히지 않는다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenVerifierTest.java,verify_blankIdToken_throwsUnauthorizedException,ID Token이 비어 있으면 인증을 거부한다,단위,@ParameterizedTest,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenVerifierTest.java,verify_decoderRejects_throwsUnauthorizedException,디코더 검증에 실패한 ID Token은 인증 실패로 변환한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenVerifierTest.java,verify_matchingNonce_returnsSocialIdentity,"nonce가 원본의 해시와 같으면 제공자와 subject, 이메일 정책에 맞는 이메일을 반환한다",단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenVerifierTest.java,verify_maxLengthSubject_returnsSocialIdentity,subject가 255자이면 소셜 식별 정보로 반환한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenVerifierTest.java,verify_mismatchedNonce_throwsUnauthorizedException,모든 제공자는 ID Token의 nonce가 원본의 해시와 다르면 인증을 거부한다,단위,@ParameterizedTest,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenVerifierTest.java,verify_missingNonceClaim_throwsUnauthorizedException,모든 제공자는 ID Token에 nonce가 없으면 인증을 거부한다,단위,@ParameterizedTest,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenVerifierTest.java,verify_missingRawNonce_throwsUnauthorizedException,원본 nonce가 없으면 ID Token을 디코딩하지 않고 인증을 거부한다,단위,@ParameterizedTest,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenVerifierTest.java,verify_missingSubject_throwsUnauthorizedException,subject가 없는 ID Token은 인증에 사용할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenVerifierTest.java,verify_overlongSubject_throwsUnauthorizedException,subject가 255자를 초과하는 ID Token은 인증에 사용할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenVerifierTest.java,verify_rawNonceInClaim_throwsUnauthorizedException,ID Token에 원본 nonce 자체가 담겨 있으면 해시가 아니므로 인증을 거부한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcIdTokenVerifierTest.java,verify_uppercaseHexNonce_throwsUnauthorizedException,nonce가 원본 해시의 대문자 hex이면 약속한 소문자 hex가 아니므로 인증을 거부한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/oidc/OidcJwkSetEventLoggerTest.java,logRateLimited_repeatedAcrossInterval_logsOncePerInterval,재조회 제한 알림은 구간 직전까지 다시 남기지 않고 구간이 지나면 다시 남긴다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/refresh/RefreshTokenCleanupSchedulerTest.java,deleteUnusableTokens_rotatedButNotAbsolutelyExpired_keepsReuseEvidence,회전됐지만 절대 만료 전인 회원 토큰은 비활동 만료가 지나도 남긴다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/infra/refresh/RefreshTokenCleanupSchedulerTest.java,deleteUnusableTokens_tokensExactlyOnBoundary_areKept,절대 만료와 폐기 유예의 경계에 정확히 걸친 회원 토큰은 남긴다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/infra/refresh/RefreshTokenCleanupSchedulerTest.java,deleteUnusableTokens_unusableAdminTokens_deletesOnlyThose,관리자 토큰도 같은 기준으로 지운다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/infra/refresh/RefreshTokenCleanupSchedulerTest.java,deleteUnusableTokens_unusableUserTokens_deletesOnlyThose,절대 만료가 지난 회원 토큰과 폐기된 지 오래된 회원 토큰만 지운다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/infra/refresh/SecureRandomRefreshTokenProviderTest.java,encode_differentTokens_returnsDifferentHashes,다른 토큰은 다른 해시로 변환한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/refresh/SecureRandomRefreshTokenProviderTest.java,encode_sameToken_returnsSameHash,같은 토큰은 항상 같은 해시로 변환한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/refresh/SecureRandomRefreshTokenProviderTest.java,generateToken_always_returnsBase64UrlValueWithoutPadding,생성한 토큰은 패딩 없는 43자 Base64URL 문자열이다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/refresh/SecureRandomRefreshTokenProviderTest.java,generateToken_always_returnsHashOfValue,생성한 토큰의 해시는 소문자 hex 64자이며 토큰 값의 해시와 일치한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/refresh/SecureRandomRefreshTokenProviderTest.java,generateToken_calledTwice_returnsDifferentValues,토큰을 생성할 때마다 서로 다른 값을 만든다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/restriction/HmacSocialIdentityFingerprintEncoderTest.java,encode_providerAndSubject_returnsHmacSha256Fingerprint,소셜 제공자와 subject를 HMAC-SHA256 지문으로 변환한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/signup/ConsumedSignupTokenCleanupSchedulerTest.java,deleteExpiredTokens_expiredRecord_deletesOnlyExpired,만료된 회원가입 토큰 기록만 지우고 아직 유효한 기록은 남긴다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/infra/signup/ConsumedSignupTokenCleanupSchedulerTest.java,deleteExpiredTokens_expiringExactlyNow_keepsRecord,만료 시각이 정확히 현재와 같은 기록은 아직 지우지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/infra/signup/JwtSocialSignupTokenProviderTest.java,issue_appleIdentity_containsNoRefreshToken,Apple 회원가입 토큰에는 공통 식별 정보만 포함한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/signup/JwtSocialSignupTokenProviderTest.java,issue_calledTwice_generatesDistinctTokenIds,발급할 때마다 서로 다른 토큰 식별자를 부여한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/signup/JwtSocialSignupTokenProviderTest.java,issue_nullEmail_verifiesSignupTokenWithoutEmail,소셜 제공자가 이메일을 제공하지 않아도 회원가입 토큰을 발급하고 검증한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/signup/JwtSocialSignupTokenProviderTest.java,issue_validIdentityAndUploadId_verifiesSignupToken,소셜 사용자와 업로드 식별자를 연결한 회원가입 토큰을 발급하고 검증한다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/signup/JwtSocialSignupTokenProviderTest.java,verify_expiredToken_throwsUnauthorizedException,만료된 회원가입 토큰은 검증할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/signup/JwtSocialSignupTokenProviderTest.java,verify_issuedAtBeyondClockSkew_throwsUnauthorizedException,허용 오차보다 미래에 발급된 회원가입 토큰은 검증할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/signup/JwtSocialSignupTokenProviderTest.java,verify_missingExpiresAt_throwsUnauthorizedException,만료 시각이 없는 회원가입 토큰은 검증할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/signup/JwtSocialSignupTokenProviderTest.java,verify_missingIssuedAt_throwsUnauthorizedException,발급 시각이 없는 회원가입 토큰은 검증할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/signup/JwtSocialSignupTokenProviderTest.java,verify_missingTokenId_throwsUnauthorizedException,토큰 식별자가 없는 회원가입 토큰은 검증할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/signup/JwtSocialSignupTokenProviderTest.java,verify_missingUploadId_throwsUnauthorizedException,업로드 식별자가 없는 회원가입 토큰은 검증할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/signup/JwtSocialSignupTokenProviderTest.java,verify_tamperedToken_throwsUnauthorizedException,서명이 변조된 회원가입 토큰은 검증할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/signup/JwtSocialSignupTokenProviderTest.java,verify_wrongAudience_throwsUnauthorizedException,다른 대상용 회원가입 토큰은 검증할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/signup/JwtSocialSignupTokenProviderTest.java,verify_wrongIssuer_throwsUnauthorizedException,다른 발급자가 생성한 회원가입 토큰은 검증할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/infra/signup/JwtSocialSignupTokenProviderTest.java,verify_wrongPurpose_throwsUnauthorizedException,소셜 회원가입 용도가 아닌 토큰은 검증할 수 없다,단위,@Test,,미이식
+auth,auth/infrastructure/persistence/AppleAuthorizationRepositoryTest.java,save_duplicateSocialAccount_throwsException,같은 소셜 계정에 인증 정보를 중복 저장할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/persistence/ConsumedSignupTokenRepositoryConcurrencyTest.java,consumeIfAbsent_concurrentSameJtiAfterCommit_returnsFalseWithoutException,같은 jti를 기록 중인 트랜잭션이 커밋되면 기다리던 트랜잭션은 예외 없이 실패를 반환한다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/persistence/ConsumedSignupTokenRepositoryConcurrencyTest.java,consumeIfAbsent_concurrentSameJtiAfterRollback_returnsTrue,같은 jti를 기록 중인 트랜잭션이 롤백되면 기다리던 트랜잭션이 기록에 성공한다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/persistence/ConsumedSignupTokenRepositoryTest.java,consumeIfAbsent_alreadyConsumedJti_keepsFirstExpiresAt,같은 jti를 다시 소진해도 처음 기록한 만료 시각을 바꾸지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/persistence/ConsumedSignupTokenRepositoryTest.java,consumeIfAbsent_alreadyConsumedJti_keepsTransactionUsable,이미 소진된 jti를 감지한 뒤에도 같은 트랜잭션에서 이어지는 쿼리를 실행할 수 있다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/persistence/ConsumedSignupTokenRepositoryTest.java,consumeIfAbsent_alreadyConsumedJti_returnsFalse,같은 jti를 다시 소진하려 하면 저장하지 않고 실패를 반환한다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/persistence/ConsumedSignupTokenRepositoryTest.java,consumeIfAbsent_newJti_returnsTrue,처음 소진하는 jti는 저장하고 성공을 반환한다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/persistence/ConsumedSignupTokenRepositoryTest.java,deleteAllExpiredBefore_mixedRecords_deletesOnlyExpiredOnes,만료된 소진 기록만 정리하고 아직 유효한 기록은 남긴다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/persistence/PendingAppleAuthorizationRepositoryTest.java,findLatestUnexpiredBySubjectHmacForUpdate_atExpiryBoundary_excludesExpired,만료 시각이 지난 행은 반환하지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/persistence/PendingAppleAuthorizationRepositoryTest.java,findLatestUnexpiredBySubjectHmacForUpdate_multipleRows_returnsLatest,한 신원에 만료 전 행이 여러 개면 가장 나중에 만든 행을 반환한다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/persistence/PendingAppleAuthorizationRepositoryTest.java,findLatestUnexpiredBySubjectHmacForUpdate_otherSubjectHmac_returnsEmpty,다른 신원의 임시 인증 정보는 반환하지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/persistence/SocialAccountRepositoryTest.java,findByProviderAndSubjectHmac_existingAccount_loadsUser,provider와 subject HMAC으로 소셜 계정과 회원을 함께 조회한다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/persistence/SocialAccountRepositoryTest.java,save_duplicateProviderAndSubjectHmac_throwsException,동일한 제공자의 동일한 subject HMAC을 여러 회원에게 연결할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/persistence/SocialAccountRepositoryTest.java,save_duplicateUser_throwsException,한 회원에게 여러 소셜 계정을 연결할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/persistence/UserRefreshTokenRepositoryTest.java,deleteUnusableBefore_expiredAndLongRevokedTokens_deletesOnlyThose,절대 만료가 지난 토큰과 폐기된 지 오래된 토큰만 삭제한다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/persistence/UserRefreshTokenRepositoryTest.java,findByTokenHash_existingToken_returnsToken,토큰 해시로 리프레시 토큰을 조회한다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/persistence/UserRefreshTokenRepositoryTest.java,findByTokenHash_unknownToken_returnsEmpty,존재하지 않는 토큰 해시로 조회하면 빈 값을 반환한다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/persistence/UserRefreshTokenRepositoryTest.java,revokeAllByOwnerId_multipleSessions_revokesOnlyThatOwner,한 회원의 모든 기기 세션을 폐기하고 다른 회원은 그대로 둔다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/persistence/UserRefreshTokenRepositoryTest.java,revokeSession_alreadyRevokedToken_isNotCounted,이미 폐기된 토큰은 다시 폐기 대상으로 세지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/infrastructure/persistence/UserRefreshTokenRepositoryTest.java,revokeSession_liveSession_revokesOnlyThatSession,한 회전 계보만 폐기하고 다른 계보는 그대로 둔다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/AppleAuthorizationFingerprintEncoderTest.java,encode_encryptedRefreshToken_returnsSha256Fingerprint,Apple 인증 정보 암호문을 SHA-256 지문으로 변환한다,단위,@Test,,미이식
+auth,auth/service/AppleAuthorizationServiceTest.java,findAuthorizationSnapshots_appleUser_returnsSnapshot,Apple 회원의 인증 정보 스냅샷을 조회한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/AppleAuthorizationServiceTest.java,findAuthorizationSnapshots_nonAppleUser_returnsEmpty,Apple이 아닌 소셜 회원은 폐기할 인증 정보가 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/AppleAuthorizationServiceTest.java,findAuthorizationSnapshots_notExistingUser_returnsEmpty,존재하지 않는 회원은 폐기할 인증 정보가 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/AppleAuthorizationServiceTest.java,findAuthorizationSnapshots_userWithoutSocialAccount_returnsEmpty,소셜 계정이 없는 회원은 폐기할 인증 정보가 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/ExistingSocialAccountLoginProcessorTest.java,processIfExists_activeUser_issuesAccessTokenAndRefreshToken,정상 회원이면 회원 식별자를 담은 액세스 토큰과 리프레시 토큰을 발급한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/ExistingSocialAccountLoginProcessorTest.java,processIfExists_bannedUser_returnsLoginSuccess,탈퇴하지 않은 차단 회원은 로그인에 성공한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/ExistingSocialAccountLoginProcessorTest.java,processIfExists_noSocialAccount_doesNotIssueRefreshToken,연결된 계정이 없으면 리프레시 토큰을 남기지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/ExistingSocialAccountLoginProcessorTest.java,processIfExists_noSocialAccount_returnsEmpty,연결된 소셜 계정이 없으면 빈 값을 반환한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/ExistingSocialAccountLoginProcessorTest.java,processIfExists_sameSubjectOtherProvider_returnsEmpty,같은 subject라도 다른 제공자에 연결된 계정은 찾지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/ExistingSocialAccountLoginProcessorTest.java,processIfExists_withdrawnBannedUser_doesNotIssueRefreshToken,탈퇴한 차단 회원의 로그인을 거부하면 리프레시 토큰을 남기지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/ExistingSocialAccountLoginProcessorTest.java,processIfExists_withdrawnBannedUser_throwsForbiddenException,탈퇴한 차단 회원의 소셜 계정이면 로그인을 거부한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/ExistingSocialAccountLoginProcessorTest.java,processIfExists_withdrawnUser_returnsEmpty,탈퇴한 일반 회원의 소셜 계정이 남아 있으면 빈 값을 반환한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialIdentityVerifierTest.java,create_duplicateProvider_throwsIllegalStateException,같은 제공자의 ID Token 검증기가 중복 등록되면 생성을 거부한다,단위,@Test,,미이식
+auth,auth/service/SocialIdentityVerifierTest.java,verify_kakaoProvider_returnsKakaoIdentity,Kakao 제공자로 검증하면 Kakao ID Token 검증 결과를 반환한다,단위,@Test,,미이식
+auth,auth/service/SocialIdentityVerifierTest.java,verify_unsupportedProvider_throwsBusinessException,등록되지 않은 제공자로 검증하면 지원하지 않는 제공자 예외를 발생시킨다,단위,@Test,,미이식
+auth,auth/service/SocialLoginServiceTest.java,login_appleTokenExchangeFailure_storesNoPendingAuthorization,신규 사용자의 Apple 토큰 교환이 실패하면 임시 인증 정보를 저장하지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialLoginServiceTest.java,login_bannedUser_issuesAccessToken,차단된 회원에 연결된 소셜 계정으로 로그인하면 액세스 토큰을 발급한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialLoginServiceTest.java,login_differentAppleTokenSubjects_throwsUnauthorizedException,클라이언트와 Apple 서버의 ID Token 사용자가 다르면 로그인을 거부한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialLoginServiceTest.java,login_existingAppleAccount_returnsLoginSuccessWithoutExchange,기존 Apple 회원은 authorizationCode를 교환하지 않고 로그인한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialLoginServiceTest.java,login_existingAppleAuthorization_keepsStoredRefreshToken,기존 Apple 회원이 다시 로그인해도 저장된 RT는 그대로 유지된다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialLoginServiceTest.java,login_existingSocialAccount_issuesAccessToken,등록된 소셜 계정으로 로그인하면 회원 식별자를 담은 액세스 토큰을 발급한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialLoginServiceTest.java,login_existingSocialAccount_issuesRefreshToken,로그인에 성공하면 리프레시 토큰 계보를 하나 남기고 평문은 저장하지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialLoginServiceTest.java,login_existingSocialAccount_returnsLoginSuccess,등록된 소셜 계정으로 로그인하면 기존 회원 식별자를 반환한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialLoginServiceTest.java,login_newAppleAccountWithExpiredPendingAuthorization_exchangesAgain,임시 인증 정보가 만료됐으면 다시 교환해 보관하고 이전 행은 남긴다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialLoginServiceTest.java,login_newAppleAccountWithPendingAuthorization_renewsExpiry,만료 전 임시 인증 정보가 있으면 만료를 재로그인 시점 기준으로 다시 민다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialLoginServiceTest.java,login_newAppleAccountWithPendingAuthorization_skipsExchange,만료 전 임시 인증 정보가 있으면 authorizationCode를 다시 교환하지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialLoginServiceTest.java,login_newAppleAccount_storesPendingAuthorizationWithConfiguredExpiry,신규 Apple 사용자의 암호화된 RT는 신원 지문으로 보관 기간만큼 임시 저장한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialLoginServiceTest.java,login_newSocialAccount_doesNotIssueAccessToken,회원가입이 필요한 소셜 계정에는 액세스 토큰을 발급하지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialLoginServiceTest.java,login_newSocialAccount_returnsSignUpRequired,등록되지 않은 소셜 계정으로 로그인하면 회원가입 필요 상태를 반환한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialLoginServiceTest.java,login_withdrawnBannedAppleAccount_throwsForbiddenExceptionBeforeExchange,탈퇴한 차단 Apple 회원은 authorizationCode를 교환하기 전에 로그인을 거부한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialLoginServiceTest.java,login_withdrawnBannedUser_throwsForbiddenException,차단 회원이 탈퇴한 뒤 동일한 소셜 계정으로 로그인하면 거부한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialLoginServiceTest.java,login_withdrawnUser_returnsSignUpRequired,탈퇴한 회원이 동일한 소셜 계정으로 로그인하면 회원가입 필요 상태를 반환한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupRetryTest.java,signup_retryAfterProcessingPending_completesWithSameToken,사인 이미지 처리 중으로 가입 완료가 실패하면 같은 회원가입 토큰으로 다시 시도해 가입할 수 있다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,createSignatureUpload_applePendingExpiresFirst_extendsPendingExpiry,임시 인증 정보가 회원가입 토큰보다 먼저 만료되면 회원가입 토큰 만료까지 연장한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,createSignatureUpload_applePendingExpiresLater_keepsPendingExpiry,임시 인증 정보가 회원가입 토큰보다 늦게 만료되면 만료를 당기지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,createSignatureUpload_appleWithExpiredPendingAuthorization_throwsBusinessException,임시 인증 정보가 만료된 Apple 요청은 업로드 URL을 발급하지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,createSignatureUpload_appleWithPendingAuthorization_issuesUploadUrl,임시 인증 정보가 있는 Apple 신규 회원은 공통 엔드포인트로 업로드 URL을 발급받는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,createSignatureUpload_appleWithoutPendingAuthorization_throwsBusinessException,임시 인증 정보가 없는 Apple 요청은 업로드 URL을 발급하지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,createSignatureUpload_bannedSocialAccount_throwsForbiddenException,차단 회원은 회원가입용 사인 업로드 발급으로 우회할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,createSignatureUpload_existingSocialAccount_throwsBusinessException,이미 가입된 소셜 계정은 회원가입용 서명 업로드 URL을 발급받을 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,createSignatureUpload_newSocialAccount_issuesUploadUrl,신규 소셜 계정이 요청하면 서명 이미지 업로드 URL을 발급한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,createSignatureUpload_withdrawnBannedUser_throwsForbiddenException,차단 회원이 탈퇴한 뒤에는 회원가입용 서명 업로드 URL을 발급하지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,createSignatureUpload_withdrawnUserWithSocialAccount_throwsBusinessException,탈퇴했지만 소셜 계정 행이 남아 있으면 회원가입용 서명 업로드 URL을 발급하지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,signup_appleSignupToken_savesAppleAuthorization,Apple 회원가입을 완료하면 암호화된 RT를 정식 인증 정보로 저장한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,signup_appleTokenReplayedAfterWithdrawal_doesNotResurrectAuthorization,탈퇴로 폐기된 Apple 인증 정보는 같은 토큰으로 재가입해도 되살아나지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,signup_bannedSocialAccount_throwsForbiddenException,차단 회원에 연결된 소셜 계정은 회원가입 재요청으로 우회할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,signup_completedSignature_issuesAccessToken,소셜 회원가입을 완료하면 새 회원 식별자를 담은 액세스 토큰을 발급한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,signup_completedSignature_savesUserAndSocialAccount,처리 완료된 서명 이미지로 소셜 회원가입하면 회원과 소셜 계정을 저장한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,signup_existingActiveSocialAccount_returnsExistingUserId,이미 가입된 활성 소셜 계정이 회원가입을 재요청하면 기존 회원 식별자를 반환한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,signup_invalidSignatureImage_throwsBusinessException,사용할 수 없는 서명 이미지로는 회원가입을 완료하지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,signup_missingPendingAppleAuthorization_throwsBusinessException,임시 Apple 인증 정보가 없으면 회원가입을 완료하지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,signup_missingSignatureImage_throwsNotFoundException,업로드한 서명 이미지를 찾을 수 없으면 회원가입을 완료하지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,signup_missingSignature_keepsPendingAppleAuthorization,Apple 회원가입이 완료되기 전에 실패하면 임시 인증 정보를 남긴다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,signup_nullEmail_savesUserWithoutEmail,소셜 제공자가 이메일을 제공하지 않아도 회원가입할 수 있다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,signup_processingSignature_throwsProcessingPendingError,서명 이미지가 처리 중이면 소셜 회원가입을 완료하지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,signup_replayedTokenAfterWithdrawal_throwsBusinessException,탈퇴 후 같은 회원가입 토큰을 다시 제시하면 새 회원을 만들지 못한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,signup_usedSignatureUploadId_throwsNotFoundException,다른 회원이 사용한 서명 업로드 ID로는 회원가입할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,signup_withdrawnBannedUser_throwsForbiddenException,차단 회원이 탈퇴한 뒤에는 기존 회원가입 토큰으로 재가입할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,signup_withdrawnSocialAccount_createsNewUser,탈퇴 후 동일한 소셜 계정으로 회원가입하면 새로운 회원을 생성한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/SocialSignupServiceTest.java,signup_withdrawnUserWithSocialAccount_throwsBusinessException,탈퇴한 일반 회원의 소셜 계정 행이 남아 있으면 회원가입을 완료하지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/UserRefreshTokenConcurrencyTest.java,refreshAndLogout_differentTokensOfSameLineage_leavesNoLiveToken,같은 계보의 다른 토큰으로 재발급과 로그아웃이 겹쳐도 살아남는 토큰이 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/UserRefreshTokenConcurrencyTest.java,refresh_concurrentReuseOfRotatedToken_revokesLineageForBothCallers,회전된 토큰을 동시에 재사용하면 둘 다 거절되고 계보가 폐기된다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/UserRefreshTokenConcurrencyTest.java,refresh_concurrentRotationOfSameToken_succeedsForOneCallerAndRevokesLineage,같은 토큰으로 동시에 재발급하면 하나만 성공하고 계보 전체가 폐기된다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/UserRefreshTokenConcurrencyTest.java,refresh_reuseDetectionRacesRotation_revokesWholeLineage,재사용 탐지와 회전이 겹쳐도 계보 전체가 폐기된다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/UserRefreshTokenServiceTest.java,issue_newUser_storesHashOnlyAndReturnsPlainToken,리프레시 토큰을 발급하면 평문은 반환만 하고 저장소에는 해시만 남는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/UserRefreshTokenServiceTest.java,logout_liveToken_revokesOnlyThatLineage,로그아웃하면 그 기기의 계보만 폐기하고 재발급을 막는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/UserRefreshTokenServiceTest.java,logout_unknownOrRevokedToken_doesNothing,모르는 토큰이나 이미 폐기된 토큰으로 로그아웃해도 예외를 던지지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/UserRefreshTokenServiceTest.java,refresh_absoluteExpiredToken_revokesLineageAndRequiresReauthentication,회전을 이어가도 절대 만료 시각에 도달하면 재로그인을 요구한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/UserRefreshTokenServiceTest.java,refresh_bannedUser_stillRotatesToken,차단된 회원도 회원 상태를 읽지 않고 재발급할 수 있다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/UserRefreshTokenServiceTest.java,refresh_inactivityExpiredToken_revokesLineageAndRequiresReauthentication,비활동 만료가 지난 토큰은 절대 만료가 남아 있어도 재로그인을 요구한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/UserRefreshTokenServiceTest.java,refresh_liveToken_rotatesConsumedTokenAndReissuesAccessToken,살아 있는 토큰으로 재발급하면 새 토큰을 내주고 기존 토큰은 회전 기록만 남긴다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/UserRefreshTokenServiceTest.java,refresh_reusedLineageRevoked_keepsOtherDeviceLineageUsable,한 계보를 폐기해도 다른 기기의 계보는 그대로 재발급할 수 있다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/UserRefreshTokenServiceTest.java,refresh_revokedToken_keepsRevokedAtAndRequiresReauthentication,이미 폐기된 토큰으로 재발급하면 폐기 시각을 덮어쓰지 않고 재로그인을 요구한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/UserRefreshTokenServiceTest.java,refresh_rotatedToken_revokesWholeLineage,회전된 토큰을 다시 내면 계보 전체를 폐기하고 재로그인을 요구한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/UserRefreshTokenServiceTest.java,refresh_rotationNearAbsoluteExpiry_clipsExpiresAtToAbsoluteExpiry,절대 만료 직전에 회전해도 새 토큰의 비활동 만료는 절대 만료를 넘지 않는다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/UserRefreshTokenServiceTest.java,refresh_unknownToken_requiresReauthentication,존재하지 않는 토큰으로 재발급하면 재로그인을 요구한다,통합(Spring+DB),@Test,,미이식
+auth,auth/service/UserRefreshTokenServiceTest.java,revokeAll_multipleDevices_revokesEveryLineage,회원의 모든 기기 계보를 한 번에 폐기한다,통합(Spring+DB),@Test,,미이식
+common,common/logging/AccessLogTest.java,accessLog_actuatorPath_logsNothing,actuator 경로는 접근 로그를 남기지 않는다,통합(Spring+DB),@Test,,미이식
+common,common/logging/AccessLogTest.java,accessLog_anonymousRequest_hasNoUserId,토큰이 없는 요청은 접근 로그에 userId 키가 없다,통합(Spring+DB),@Test,,미이식
+common,common/logging/AccessLogTest.java,accessLog_matchedRoute_logsTemplateWithRequestId,handler가 매칭된 요청은 UUID 형식 X-Request-Id 헤더와 route 템플릿이 담긴 접근 로그 1건을 남긴다,통합(Spring+DB),@Test,,미이식
+common,common/logging/AccessLogTest.java,accessLog_memberRequest_logsUserId,로그인한 회원의 요청은 접근 로그에 userId를 정확히 1개 남긴다,통합(Spring+DB),@Test,,미이식
+common,common/logging/AccessLogTest.java,accessLog_rejectedBySecurity_logsUnmatchedRoute,토큰 없이 보호 경로를 호출하면 401 접근 로그에 route는 UNMATCHED이고 응답에는 X-Request-Id가 있다,통합(Spring+DB),@Test,,미이식
+common,common/logging/AccessLogTest.java,requestId_twoRequests_areDifferent,요청마다 서로 다른 requestId를 발급한다,통합(Spring+DB),@Test,,미이식
+common,common/logging/CurrentRequestIdTest.java,resolve_malformedRequestIdInMdc_returnsNewUuid,MDC의 requestId가 UUID 형식이 아니면 그 값을 쓰지 않고 새 UUID를 만든다,단위,@Test,,미이식
+common,common/logging/CurrentRequestIdTest.java,resolve_noRequestIdInMdc_returnsNewUuid,MDC에 requestId가 없으면 요청마다 새 UUID를 만든다,단위,@Test,,미이식
+common,common/logging/CurrentRequestIdTest.java,resolve_validRequestIdInMdc_returnsSameUuid,MDC에 UUID 형식 requestId가 있으면 그 값을 그대로 돌려준다,단위,@Test,,미이식
+common,common/logging/JsonFileLogTest.java,initialize_devProfile_writesJsonLineToConfiguredFile,dev 프로필에서는 설정한 경로의 파일에 MDC와 key-value가 최상위 필드로 한 번씩 담긴 JSON 한 줄이 남는다,단위,@Test,,미이식
+common,common/logging/RequestIdFilterTest.java,doFilter_chainThrows_logsStatus500AndRethrowsAndClearsMdc,체인이 예외를 던지면 status 500으로 접근 로그를 남기고 예외를 다시 던지며 MDC를 정리한다,단위,@Test,,미이식
+common,common/logging/RequestIdFilterTest.java,doFilter_exactActuatorPath_logsNothing,정확히 /actuator 경로는 접근 로그를 남기지 않는다,단위,@Test,,미이식
+common,common/logging/RequestIdFilterTest.java,doFilter_pathLooksLikeActuator_logsAccess,actuator와 이름만 비슷한 경로는 접근 로그를 남긴다,단위,@Test,,미이식
+common,common/logging/RuntimeSnapshotLoggerTest.java,logSnapshot_absentValues_omitsKeys,측정하지 못한 값은 0으로 채우지 않고 key-value에서 뺀다,단위,@Test,,미이식
+common,common/logging/RuntimeSnapshotLoggerTest.java,logSnapshot_allValuesPresent_logsOneRuntimeEvent,스냅샷의 값을 type=runtime key-value로 담은 INFO 로그 1건을 남긴다,단위,@Test,,미이식
+common,common/logging/RuntimeSnapshotReaderTest.java,read_allSourcesPresent_sumsDefinedGcTimes,모든 원천이 있으면 GC 시간은 컬렉터별로 합산하되 정의되지 않은 값(-1)은 뺀 스냅샷을 만든다,단위,@Test,,미이식
+common,common/logging/RuntimeSnapshotReaderTest.java,read_noGarbageCollectors_leavesGcTimeAbsent,GC 빈이 없으면 GC 시간이 비어 있다,단위,@Test,,미이식
+common,common/logging/RuntimeSnapshotReaderTest.java,read_nonHikariDataSource_leavesHikariValuesAbsent,Hikari가 아닌 DataSource면 Hikari 값이 비어 있다,단위,@Test,,미이식
+common,common/logging/RuntimeSnapshotReaderTest.java,read_poolNotStarted_leavesHikariValuesAbsent,Hikari 풀이 아직 시작 전이면 Hikari 값이 비어 있다,단위,@Test,,미이식
+common,common/logging/RuntimeSnapshotReaderTest.java,read_undefinedHeapMax_leavesOnlyMaxAbsent,힙 상한이 정의되지 않으면(-1) 상한만 비어 있고 나머지는 채워진다,단위,@Test,,미이식
+common,common/logging/RuntimeSnapshotReaderTest.java,read_unwrapThrowsSqlException_leavesOnlyHikariValuesAbsent,Hikari 풀을 꺼내다 SQLException이 나면 Hikari 값만 비어 있고 나머지는 채워진다,단위,@Test,,미이식
+common,common/logging/RuntimeSnapshotTest.java,logFields_someValuesAbsent_keepsOrderAndOmitsNulls,로그 필드는 측정된 값만 선언 순서대로 담는다,단위,@Test,,미이식
+common,common/util/CanonicalUuidParserTest.java,parse_canonicalUuid_returnsUuid,표준 형식의 UUID 문자열을 UUID로 변환한다,단위,@Test,,미이식
+common,common/util/CanonicalUuidParserTest.java,parse_invalidUuid_throwsBusinessException,UUID가 아닌 문자열이면 공통 ID 형식 예외를 발생시킨다,단위,@Test,,미이식
+common,common/util/CanonicalUuidParserTest.java,parse_nonCanonicalUuid_throwsBusinessException,표준 형식이 아닌 UUID 문자열이면 공통 ID 형식 예외를 발생시킨다,단위,@Test,,미이식
+config,config/AdminDevelopmentBypassTest.java,developmentAdmin_deploymentProfiles_doesNotRegisterBypass,dev 또는 prod가 포함되면 개발 관리자 생성기와 Resolver를 등록하지 않는다,단위,@ParameterizedTest,,미이식
+config,config/AdminDevelopmentBypassTest.java,securityFilterChain_bypassOutsideLocalTest_rejectsStartup,배포 환경과 알 수 없는 프로필에서는 관리자 인증 우회 설정을 거부한다,단위,@ParameterizedTest,,미이식
+config,config/AdminLocalConfigurationTest.java,deploymentConfiguration_localBypassVariable_keepsRealAuthentication,dev와 prod에서는 로컬 전용 환경변수로 인증 우회를 켤 수 없다,단위,@ParameterizedTest,,미이식
+config,config/AdminLocalConfigurationTest.java,localConfiguration_bypassDisabled_usesConfiguredAccountAndAuthentication,로컬 환경변수로 인증 우회를 끄면 지정한 계정 생성기와 실제 관리자 Resolver를 사용한다,단위,@Test,,미이식
+config,config/AdminLocalConfigurationTest.java,localConfiguration_defaultSettings_usesDevelopmentIdentity,로컬 기본 설정은 실제 계정 없이 기존 개발 관리자 우회를 유지한다,단위,@Test,,미이식
+config,config/AdminLocalConfigurationTest.java,localConfiguration_invalidPasswordHash_rejectsStartup,로컬 실제 인증을 켜면 비어 있거나 평문 또는 예시인 비밀번호 해시를 거부한다,단위,@ParameterizedTest,,미이식
+config,config/AdminSecurityFilterChainTest.java,adminApi_adminToken_injectsCurrentAdmin,관리자 액세스 토큰으로 관리자 API를 호출하면 현재 관리자를 주입한다,통합(Spring+DB),@Test,,미이식
+config,config/AdminSecurityFilterChainTest.java,adminApi_userToken_returnsForbidden,일반 사용자 액세스 토큰으로 관리자 API를 호출하면 403을 반환한다,통합(Spring+DB),@Test,,미이식
+config,config/AdminSecurityFilterChainTest.java,adminApi_withoutToken_returnsUnauthorized,토큰 없이 관리자 API를 호출하면 401을 반환한다,통합(Spring+DB),@Test,,미이식
+config,config/AdminSecurityFilterChainTest.java,adminEndpoints_userToken_returnsForbidden,로그인 외 모든 실제 관리자 API는 회원 토큰을 403으로 거부한다,통합(Spring+DB),@ParameterizedTest,,미이식
+config,config/AdminSecurityFilterChainTest.java,adminEndpoints_withoutToken_returnsUnauthorized,로그인 외 모든 실제 관리자 API는 무인증 요청을 401로 거부한다,통합(Spring+DB),@ParameterizedTest,,미이식
+config,config/AdminSecurityFilterChainTest.java,login_persistedAdmin_accessesProtectedApis,실제 관리자 로그인 토큰으로 현재 관리자와 감사 로그를 조회한다,통합(Spring+DB),@Test,,미이식
+config,config/AdminSecurityFilterChainTest.java,login_withoutToken_reachesController,관리자 로그인은 액세스 토큰 없이 호출할 수 있다,통합(Spring+DB),@Test,,미이식
+config,config/AdminSecurityFilterChainTest.java,refreshAndLogout_withoutAccessToken_reachController,관리자 재발급과 로그아웃은 액세스 토큰 없이 리프레시 토큰만으로 호출한다,통합(Spring+DB),@Test,,미이식
+config,config/AdminSecurityFilterChainTest.java,refresh_unknownRefreshToken_returnsReauthenticationRequired,알 수 없는 리프레시 토큰으로 재발급해도 관리자 인증이 아니라 재로그인 필요로 거절한다,통합(Spring+DB),@Test,,미이식
+config,config/RequestIdFilterConfigTest.java,requestIdFilter_order_isBeforeCallbackAndSecurityFilters,requestId 필터는 콜백 필터와 Security 필터 체인보다 먼저 실행된다,통합(Spring+DB),@Test,,미이식
+config,config/SchedulingConfigurationTest.java,schedulingConfiguration_cleanupDisabled_keepsSchedulingEnabled,리프레시 토큰 정리 작업만 끄면 스케줄링 자체는 켜진 채로 남는다,단위,@Test,,미이식
+config,config/SchedulingConfigurationTest.java,schedulingConfiguration_defaultSettings_enablesBoth,기본 설정은 스케줄링과 리프레시 토큰 정리 작업을 모두 켠다,단위,@Test,,미이식
+config,config/SchedulingConfigurationTest.java,schedulingConfiguration_schedulingDisabled_keepsCleanupBean,스케줄링을 끄면 정리 작업 빈은 남고 스케줄링만 꺼진다,단위,@Test,,미이식
+config,config/SecurityFilterChainTest.java,authApi_withoutToken_reachesController,로그인 API는 토큰 없이 호출할 수 있다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,health_withoutToken_returnsOk,헬스체크는 토큰 없이 호출할 수 있다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,internalCallback_withoutAccessToken_reachesController,이미지 처리 내부 콜백은 액세스 토큰 없이 컨트롤러에 도달한다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,logoutApi_withoutToken_reachesController,로그아웃 API는 액세스 토큰 없이 호출할 수 있다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,postCalendarMonths_adminToken_returnsForbidden,관리자 토큰으로 회원의 연월 목록을 조회할 수 없다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,postCalendarMonths_validAccessToken_returnsOk,회원 토큰으로 연월 목록을 조회하면 200을 반환한다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,postCalendarMonths_withoutToken_returnsUnauthorized,연월 목록은 토큰 없이 조회할 수 없다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,postCalendar_adminToken_returnsForbidden,관리자 JWT를 일반 사용자 식별자로 해석해 캘린더를 조회할 수 없다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,postCalendar_validAccessToken_reachesController,유효한 토큰이면 내 게시물 캘린더를 조회할 수 있다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,postCalendar_withoutToken_isRejectedByFilter,내 게시물 캘린더는 필터가 인증을 요구한다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,postDetail_withoutToken_isRejectedByFilter,게시물 상세 조회는 필터가 인증을 요구한다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,posts_adminToken_returnsForbidden,선택적 회원 인증에서도 관리자 JWT를 일반 사용자로 해석하지 않는다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,posts_withoutToken_reachesController,게시물 목록은 토큰 없이 조회할 수 있다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,protectedApi_adminToken_returnsForbidden,관리자 JWT로는 좋아요를 남길 수 없다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,protectedApi_socialSignupToken_returnsUnauthorized,회원가입 토큰은 액세스 토큰으로 사용할 수 없다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,protectedApi_tamperedToken_returnsUnauthorized,서명이 변조된 토큰은 401을 반환한다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,protectedApi_tokenWithoutScope_returnsForbidden,scope가 없는 액세스 토큰은 회원 API에서 거부한다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,protectedApi_validAccessToken_reachesController,유효한 액세스 토큰이 있으면 보호된 API를 호출할 수 있다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,protectedApi_withoutToken_returnsUnauthorized,토큰 없이 보호된 API를 호출하면 401과 공통 에러 형식을 반환한다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,protectedApi_withoutToken_setsWwwAuthenticateHeader,필터가 막은 401에는 WWW-Authenticate 헤더가 붙는다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,publicPath_controllerRejection_doesNotSetWwwAuthenticateHeader,컨트롤러가 던진 401에는 WWW-Authenticate 헤더가 붙지 않는다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,publicPath_unhandledException_returnsInternalServerError,공개 경로에서 예외가 나면 익명 요청도 500을 받는다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,refreshApi_withoutToken_reachesController,토큰 재발급 API는 액세스 토큰 없이 호출할 수 있다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,topics_withoutToken_reachesController,주제 목록은 토큰 없이 조회할 수 있다,통합(Spring+DB),@Test,,미이식
+exception,exception/GlobalExceptionHandlerLogTest.java,handleApiNotFoundException_unknownPath_logsNothing,존재하지 않는 경로 404는 경고나 오류 로그를 남기지 않는다,통합(Spring+DB),@Test,,미이식
+exception,exception/GlobalExceptionHandlerLogTest.java,handleBaseException_businessException_logsWarnWithoutMessage,"도메인 예외는 errorCode, status, exception 종류만 담은 WARN 1건을 남기고 예외 메시지는 남기지 않는다",통합(Spring+DB),@Test,,미이식
+exception,exception/GlobalExceptionHandlerLogTest.java,handleHttpMessageNotReadableException_malformedJson_logsWarnWithoutMessage,"비즈니스 4xx 응답은 errorCode, status, exception 종류가 담긴 WARN 1건을 requestId와 함께 남긴다",통합(Spring+DB),@Test,,미이식
+exception,exception/GlobalExceptionHandlerLogTest.java,handleHttpMessageNotReadableException_requestWithSensitiveValues_logsWithoutThem,"Authorization, Cookie, 요청 본문과 파라미터 값이 있는 실패 요청도 로그에 그 값을 남기지 않는다",통합(Spring+DB),@Test,,미이식
+exception,exception/GlobalExceptionHandlerLogTest.java,handleUnexpectedException_methodNotAllowed_logsWarnOnly,Spring이 만든 4xx 예외(405)는 WARN 1건만 남기고 ERROR는 남기지 않는다,통합(Spring+DB),@Test,,미이식
+exception,exception/GlobalExceptionHandlerLogTest.java,handleUnexpectedException_unexpectedFailure_logsErrorWithThrowable,처리되지 않은 예외는 스택 트레이스가 담긴 ERROR를 requestId와 함께 남긴다,통합(Spring+DB),@Test,,미이식
+exception,exception/GlobalExceptionHandlerTest.java,apiNotFound,,웹 슬라이스,@Test,,미이식
+exception,exception/GlobalExceptionHandlerTest.java,businessException,,웹 슬라이스,@Test,,미이식
+exception,exception/GlobalExceptionHandlerTest.java,dtoValidationFailure,,웹 슬라이스,@Test,,미이식
+exception,exception/GlobalExceptionHandlerTest.java,emptyRequestBody,,웹 슬라이스,@Test,,미이식
+exception,exception/GlobalExceptionHandlerTest.java,forbiddenException,,웹 슬라이스,@Test,,미이식
+exception,exception/GlobalExceptionHandlerTest.java,handleUnexpectedException_dataIntegrityViolation_returnsSanitizedInternalError,DB 무결성 오류는 내부 정보를 노출하지 않고 일반 서버 오류로 응답한다,웹 슬라이스,@Test,,미이식
+exception,exception/GlobalExceptionHandlerTest.java,invalidJsonValue,,웹 슬라이스,@Test,,미이식
+exception,exception/GlobalExceptionHandlerTest.java,methodParameterValidationFailure,,웹 슬라이스,@Test,,미이식
+exception,exception/GlobalExceptionHandlerTest.java,notFoundException,,웹 슬라이스,@Test,,미이식
+exception,exception/GlobalExceptionHandlerTest.java,serverSideStandardException,,웹 슬라이스,@Test,,미이식
+exception,exception/GlobalExceptionHandlerTest.java,typeMismatchFailureKeepsFieldName,,웹 슬라이스,@Test,,미이식
+exception,exception/GlobalExceptionHandlerTest.java,unexpectedException,,웹 슬라이스,@Test,,미이식
+exception,exception/GlobalExceptionHandlerTest.java,unsupportedHttpMethod,,웹 슬라이스,@Test,,미이식
+exception,exception/GlobalExceptionHandlerTest.java,unsupportedMediaType,,웹 슬라이스,@Test,,미이식
+feedback,feedback/api/v1/controller/FeedbackControllerTest.java,submitFeedback_blankContent_returnsBadRequest,내용이 공백뿐이면 400을 반환한다,웹 슬라이스,@Test,,미이식
+feedback,feedback/api/v1/controller/FeedbackControllerTest.java,submitFeedback_contentOverMaxLength_returnsBadRequest,내용이 1000자를 넘으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+feedback,feedback/api/v1/controller/FeedbackControllerTest.java,submitFeedback_maxLengthAfterStrip_returnsCreated,앞뒤 공백을 제거해 1000자면 공백을 포함한 원문이 더 길어도 접수한다,웹 슬라이스,@Test,,미이식
+feedback,feedback/api/v1/controller/FeedbackControllerTest.java,submitFeedback_unauthenticated_returnsUnauthorized,인증 정보가 없으면 401을 반환한다,웹 슬라이스,@Test,,미이식
+feedback,feedback/api/v1/controller/FeedbackControllerTest.java,submitFeedback_validRequest_returnsCreated,피드백을 접수하고 201과 식별자를 반환한다,웹 슬라이스,@Test,,미이식
+feedback,feedback/api/v1/controller/FeedbackSubmissionIntegrationTest.java,submitFeedback_maxLengthSupplementaryCharacters_areStoredIntact,TEXT 컬럼은 허용 상한인 보조 평면 문자 1000자를 그대로 보관한다,통합(Spring+DB),@Test,,미이식
+feedback,feedback/api/v1/controller/FeedbackSubmissionIntegrationTest.java,submitFeedback_validRequest_returnsPersistedIdentifierAndCreatedAt,제출 응답은 실제로 채워진 식별자와 접수 시각을 담는다,통합(Spring+DB),@Test,,미이식
+feedback,feedback/api/v1/docs/FeedbackOpenApiTest.java,userApiDocs_feedback_exposesSubmissionOnly,피드백 제출은 조회·수정·삭제를 제공하지 않는다,통합(Spring+DB),@Test,,미이식
+feedback,feedback/api/v1/docs/FeedbackOpenApiTest.java,userApiDocs_submitFeedback_exposesContract,user-api 문서는 피드백 제출 계약을 제공한다,통합(Spring+DB),@Test,,미이식
+feedback,feedback/domain/FeedbackTest.java,create_blankContent_throwsBusinessException,내용이 비었거나 공백뿐이면 거절한다,단위,@ParameterizedTest,,미이식
+feedback,feedback/domain/FeedbackTest.java,create_contentAtMaxLength_storesContent,앞뒤 공백을 제거한 1000자는 허용한다,단위,@Test,,미이식
+feedback,feedback/domain/FeedbackTest.java,create_contentOverMaxLength_throwsBusinessException,앞뒤 공백을 제거한 1001자는 거절한다,단위,@Test,,미이식
+feedback,feedback/domain/FeedbackTest.java,create_contentWithSurroundingWhitespace_storesStrippedContent,피드백 내용의 앞뒤 공백을 제거해 보관한다,단위,@Test,,미이식
+feedback,feedback/domain/FeedbackTest.java,create_nullContent_throwsBusinessException,내용이 null이면 거절한다,단위,@Test,,미이식
+feedback,feedback/domain/FeedbackTest.java,create_supplementaryCharactersAtMaxLength_storesContent,보조 평면 문자는 code point 하나로 세어 1000자까지 허용한다,단위,@Test,,미이식
+feedback,feedback/infrastructure/persistence/FeedbackRepositoryTest.java,save_newFeedback_assignsIdentifierAndCreatedAt,저장한 피드백에 식별자와 접수 시각이 채워진다,JPA 슬라이스,@Test,,미이식
+feedback,feedback/infrastructure/persistence/FeedbackRepositoryTest.java,save_repeatedFeedback_storesEverySubmission,한 회원이 피드백을 여러 번 남길 수 있다,JPA 슬라이스,@Test,,미이식
+like,like/api/v1/controller/PostLikeControllerTest.java,likePost_invalidPostId_returnsBadRequest,게시물 ID 형식이 올바르지 않으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+like,like/api/v1/controller/PostLikeControllerTest.java,likePost_invisiblePost_returnsNotFound,공개 가능한 게시물이 아니면 404를 반환한다,웹 슬라이스,@Test,,미이식
+like,like/api/v1/controller/PostLikeControllerTest.java,likePost_unauthenticated_returnsUnauthorized,인증 정보가 없으면 401을 반환한다,웹 슬라이스,@Test,,미이식
+like,like/api/v1/controller/PostLikeControllerTest.java,likePost_validRequest_returnsLikedResponse,게시물 좋아요를 등록하고 현재 상태를 반환한다,웹 슬라이스,@Test,,미이식
+like,like/api/v1/controller/PostLikeControllerTest.java,unlikePost_validRequest_returnsUnlikedResponse,게시물 좋아요를 취소하고 현재 상태를 반환한다,웹 슬라이스,@Test,,미이식
+like,like/infrastructure/persistence/PostLikeRepositoryTest.java,countByPostIds_postIds_returnsLikeCounts,여러 게시물의 좋아요 개수를 한 번에 조회한다,JPA 슬라이스,@Test,,미이식
+like,like/infrastructure/persistence/PostLikeRepositoryTest.java,createIfAbsent_existingPostLike_doesNotCreateDuplicate,같은 사용자의 좋아요가 이미 있으면 새 좋아요를 생성하지 않는다,JPA 슬라이스,@Test,,미이식
+like,like/infrastructure/persistence/PostLikeRepositoryTest.java,createIfAbsent_newPostLike_createsPostLike,좋아요가 없으면 새 좋아요를 생성한다,JPA 슬라이스,@Test,,미이식
+like,like/infrastructure/persistence/PostLikeRepositoryTest.java,deleteByPostIdAndUserId_existingPostLike_deletesPostLike,등록된 좋아요를 삭제한다,JPA 슬라이스,@Test,,미이식
+like,like/infrastructure/persistence/PostLikeRepositoryTest.java,deleteByPostIdAndUserId_missingPostLike_deletesNothing,등록된 좋아요가 없어도 삭제 요청을 정상 처리한다,JPA 슬라이스,@Test,,미이식
+like,like/infrastructure/persistence/PostLikeRepositoryTest.java,deleteByPostId_existingPostLikes_deletesOnlyTargetPostLikes,게시물의 모든 좋아요만 일괄 삭제한다,JPA 슬라이스,@Test,,미이식
+like,like/infrastructure/persistence/PostLikeRepositoryTest.java,existsByPostIdAndUserId_existingPostLike_returnsTrue,사용자가 게시물에 좋아요했는지 확인한다,JPA 슬라이스,@Test,,미이식
+like,like/infrastructure/persistence/PostLikeRepositoryTest.java,findLikedPostIds_postIdsAndUserId_returnsLikedPostIds,사용자가 좋아요한 게시물 ID를 여러 게시물에서 한 번에 조회한다,JPA 슬라이스,@Test,,미이식
+like,like/service/PostLikeDeletionConcurrencyTest.java,deletePost_startedAfterLikeLock_waitsAndDeletesLike,좋아요 등록이 시작된 뒤의 게시물 삭제는 좋아요 커밋 후 좋아요까지 제거한다,통합(Spring+DB),@Test,,미이식
+like,like/service/PostLikeDeletionConcurrencyTest.java,findVisibleByIdForShare_concurrentRequests_acquireLocksTogether,같은 게시물의 공유 락은 두 트랜잭션이 동시에 획득한다,통합(Spring+DB),@Test,,미이식
+like,like/service/PostLikeDeletionConcurrencyTest.java,likePost_startedAfterDeletion_rejectsLikeAndLeavesNoLike,게시물 삭제가 시작된 뒤의 좋아요 등록은 삭제 완료 후 거부한다,통합(Spring+DB),@Test,,미이식
+like,like/service/PostLikeServiceTest.java,likePost_existingPostLike_returnsSameResult,이미 좋아요한 게시물에 다시 등록해도 같은 상태를 반환한다,통합(Spring+DB),@Test,,미이식
+like,like/service/PostLikeServiceTest.java,likePost_invisiblePost_throwsNotFoundException,공개 가능한 게시물이 아니면 찾을 수 없음 예외를 발생시킨다,통합(Spring+DB),@Test,,미이식
+like,like/service/PostLikeServiceTest.java,likePost_unknownUser_throwsUnauthorizedException,인증된 사용자를 찾을 수 없으면 인증 예외를 발생시킨다,통합(Spring+DB),@Test,,미이식
+like,like/service/PostLikeServiceTest.java,likePost_visiblePost_returnsLikedResult,공개 게시물에 좋아요를 등록하고 현재 상태를 반환한다,통합(Spring+DB),@Test,,미이식
+like,like/service/PostLikeServiceTest.java,unlikePost_existingPostLike_returnsUnlikedResult,등록된 좋아요를 취소하고 현재 상태를 반환한다,통합(Spring+DB),@Test,,미이식
+like,like/service/PostLikeServiceTest.java,unlikePost_missingPostLike_returnsSameResult,좋아요가 없는 게시물을 다시 취소해도 같은 상태를 반환한다,통합(Spring+DB),@Test,,미이식
+notification,notification/api/v1/controller/NotificationControllerTest.java,getNotification_otherUser_returnsNotFound,다른 회원의 알림 상세는 404를 반환한다,웹 슬라이스,@Test,,미이식
+notification,notification/api/v1/controller/NotificationControllerTest.java,getNotification_returnsOriginalAndRejectionReasonWithoutMarkingRead,알림 상세는 원본 사진과 반려 사유를 반환하고 조회만으로 읽음 처리하지 않는다,웹 슬라이스,@Test,,미이식
+notification,notification/api/v1/controller/NotificationControllerTest.java,getNotifications_invalidPageSize_returnsBadRequest,목록 페이지 크기가 범위를 벗어나면 400을 반환한다,웹 슬라이스,@Test,,미이식
+notification,notification/api/v1/controller/NotificationControllerTest.java,getNotifications_returnsPaginatedNotifications,알림 목록은 페이지 정보와 썸네일을 반환한다,웹 슬라이스,@Test,,미이식
+notification,notification/api/v1/controller/NotificationControllerTest.java,getNotifications_unauthenticated_returnsUnauthorized,인증 정보가 없으면 알림함 조회를 거부한다,웹 슬라이스,@Test,,미이식
+notification,notification/api/v1/controller/NotificationControllerTest.java,getUnreadStatus_returnsHasUnread,미읽음 상태는 hasUnread 필드로 반환한다,웹 슬라이스,@Test,,미이식
+notification,notification/api/v1/controller/NotificationControllerTest.java,markAllRead_returnsNoContent,모두 읽기 요청은 현재 회원에게 적용하고 204를 반환한다,웹 슬라이스,@Test,,미이식
+notification,notification/api/v1/controller/NotificationControllerTest.java,markRead_returnsNoContent,알림 읽음 요청은 본인 알림 ID로 처리하고 204를 반환한다,웹 슬라이스,@Test,,미이식
+notification,notification/api/v1/docs/NotificationOpenApiTest.java,userApiDocs_exposesNotificationInboxContract,사용자 API 문서에 알림함 조회와 읽음 계약을 제공한다,통합(Spring+DB),@Test,,미이식
+notification,notification/infrastructure/infra/NotificationCleanupSchedulerTest.java,deleteExpiredNotifications_activeUser_deletesOnlyOlderThanSixtyDays,일반 회원의 알림은 생성 후 60일이 지나면 삭제한다,통합(Spring+DB),@Test,,미이식
+notification,notification/infrastructure/infra/NotificationCleanupSchedulerTest.java,deleteExpiredNotifications_oldWithdrawal_deletesRecentNotification,탈퇴한 지 30일이 지나면 최근에 생성된 알림도 삭제한다,통합(Spring+DB),@Test,,미이식
+notification,notification/infrastructure/infra/NotificationCleanupSchedulerTest.java,deleteExpiredNotifications_recentWithdrawal_keepsOlderNotification,탈퇴 30일 경계에 있는 회원의 알림은 생성 후 60일이 지나도 보관한다,통합(Spring+DB),@Test,,미이식
+notification,notification/infrastructure/infra/NotificationConfigurationTest.java,create_deliveryDisabled_doesNotRegisterCommonNotificationBeans,알림 발송을 끄면 공통 알림 Bean을 등록하지 않는다,단위,@Test,,미이식
+notification,notification/infrastructure/infra/NotificationConfigurationTest.java,create_deliveryEnabled_registersCommonNotificationBeans,공통 알림 설정은 메시지 생성기와 이벤트 리스너를 등록한다,단위,@Test,,미이식
+notification,notification/infrastructure/infra/NotificationPropertiesTest.java,create_adminWebPath_throwsException,경로가 붙은 관리자 웹 주소를 거부한다,단위,@Test,,미이식
+notification,notification/infrastructure/infra/NotificationPropertiesTest.java,create_exactHttpsOrigin_succeeds,경로 없는 HTTPS 관리자 웹 Origin을 사용한다,단위,@Test,,미이식
+notification,notification/infrastructure/infra/slack/SlackIncomingWebhookNotificationSenderTest.java,send_networkError_returnsFalse,그 밖의 통신 실패도 발송 실패로 반환한다,단위,@Test,,미이식
+notification,notification/infrastructure/infra/slack/SlackIncomingWebhookNotificationSenderTest.java,send_successfulResponse_postsBlockKitAndReturnsSent,Block Kit JSON에 검수 내용과 정확한 링크를 담아 POST하고 2xx를 성공으로 반환한다,단위,@Test,,미이식
+notification,notification/infrastructure/infra/slack/SlackIncomingWebhookNotificationSenderTest.java,send_timeout_returnsFalse,응답 시간 초과는 발송 실패로 반환한다,단위,@Test,,미이식
+notification,notification/infrastructure/infra/slack/SlackIncomingWebhookNotificationSenderTest.java,send_unsuccessfulResponse_returnsFalse,2xx가 아닌 Slack 응답은 발송 실패로 반환한다,단위,@ParameterizedTest,,미이식
+notification,notification/infrastructure/infra/slack/SlackNotificationConfigurationTest.java,create_deliveryDisabled_doesNotRegisterSlackBeans,알림 발송을 끄면 Slack 관련 Bean을 등록하지 않는다,단위,@Test,,미이식
+notification,notification/infrastructure/infra/slack/SlackNotificationConfigurationTest.java,create_deliveryEnabled_registersSafeSlackClientAndSender,Slack 설정은 redirect를 따르지 않는 HTTP 클라이언트와 발송기를 등록한다,단위,@Test,,미이식
+notification,notification/infrastructure/infra/slack/SlackNotificationPropertiesTest.java,create_nonPositiveConnectTimeout_throwsException,0 이하인 Slack 연결 제한 시간을 거부한다,단위,@Test,,미이식
+notification,notification/infrastructure/infra/slack/SlackNotificationPropertiesTest.java,create_nonPositiveReadTimeout_throwsException,0 이하인 Slack 응답 제한 시간을 거부한다,단위,@Test,,미이식
+notification,notification/infrastructure/infra/slack/SlackNotificationPropertiesTest.java,create_nonSlackWebhook_throwsException,Slack 이외 호스트의 Webhook을 거부한다,단위,@Test,,미이식
+notification,notification/infrastructure/infra/slack/SlackNotificationPropertiesTest.java,create_safeWebhookAndTimeouts_succeeds,공식 Slack Webhook과 양수 제한 시간을 사용한다,단위,@Test,,미이식
+notification,notification/infrastructure/infra/slack/SlackNotificationPropertiesTest.java,create_slackWebhookWithTrailingSlash_throwsException,마지막 슬래시가 붙은 Slack Webhook을 거부한다,단위,@Test,,미이식
+notification,notification/service/NotificationInboxServiceTest.java,getNotification_rejectedNotification_returnsOriginalAndReasonForOwnerOnly,반려 알림 상세에는 원본 사진과 사유를 포함하고 다른 회원은 조회할 수 없다,통합(Spring+DB),@Test,,미이식
+notification,notification/service/NotificationInboxServiceTest.java,getNotifications_adminDeletedRejectedPost_hidesNotification,관리자가 반려 게시물을 삭제해도 알림함에서 제외한다,통합(Spring+DB),@Test,,미이식
+notification,notification/service/NotificationInboxServiceTest.java,getNotifications_authorDeletedApprovedPost_hidesNotificationButKeepsRecord,작성자가 승인 게시물을 삭제하면 알림함에서 제외하되 알림 기록은 보관한다,통합(Spring+DB),@Test,,미이식
+notification,notification/service/NotificationInboxServiceTest.java,getNotifications_ordersNewestFirstAndReturnsHasNext,알림 목록은 최신순으로 페이지를 나누고 다음 페이지 여부를 표시한다,통합(Spring+DB),@Test,,미이식
+notification,notification/service/NotificationInboxServiceTest.java,getNotifications_returnsOwnNotificationsWithThumbnail,내 알림 목록에는 썸네일 URL을 포함하고 다른 회원의 알림은 제외한다,통합(Spring+DB),@Test,,미이식
+notification,notification/service/NotificationInboxServiceTest.java,hasUnreadNotification_returnsOwnUnreadStatus,미읽음 여부는 로그인한 회원의 알림만 기준으로 판단한다,통합(Spring+DB),@Test,,미이식
+notification,notification/service/NotificationInboxServiceTest.java,markAllRead_marksEveryOwnUnreadNotification,모두 읽기는 내 미읽음 알림을 한 번에 처리한다,통합(Spring+DB),@Test,,미이식
+notification,notification/service/NotificationInboxServiceTest.java,markRead_isOwnerOnlyAndIdempotent,알림 읽음은 본인만 처리하며 반복 호출해도 처음 읽은 시각을 유지한다,통합(Spring+DB),@Test,,미이식
+notification,notification/service/NotificationMessageFactoryTest.java,create_baseUrlWithTrailingSlash_doesNotDuplicateSlash,관리자 웹 주소의 마지막 슬래시는 제거한 뒤 상세 경로를 붙인다,단위,@Test,,미이식
+notification,notification/service/NotificationMessageFactoryTest.java,create_postModerationPending_createsAdminPostDetailLink,게시물 검수 알림은 관리자 웹의 해당 게시물 상세 주소를 만든다,단위,@Test,,미이식
+notification,notification/service/PostModerationPendingNotificationListenerTest.java,sendPostModerationPending_afterCommit_sendsMessage,트랜잭션 커밋이 끝난 뒤 Slack 알림을 전송한다,단위,@Test,,미이식
+notification,notification/service/PostModerationPendingNotificationListenerTest.java,sendPostModerationPending_annotation_usesAfterCommitPhase,알림 리스너는 트랜잭션 커밋 이후 단계에서 실행된다,단위,@Test,,미이식
+notification,notification/service/PostModerationPendingNotificationListenerTest.java,sendPostModerationPending_senderReturnsFalse_doesNotThrow,Slack이 실패를 반환해도 게시물 처리 흐름으로 예외를 전파하지 않는다,단위,@Test,,미이식
+notification,notification/service/PostModerationPendingNotificationListenerTest.java,sendPostModerationPending_senderThrows_doesNotExposeSecret,Slack 발송 경계에서 런타임 예외가 나도 외부로 전파하지 않는다,단위,@Test,,미이식
+photo,photo/domain/PhotoTest.java,completeProcessing_nullMetadata_keepsEmptyMetadata,메타데이터가 없어도 이미지 처리를 완료할 수 있다,단위,@Test,,미이식
+photo,photo/domain/PhotoTest.java,completeProcessing_processedImage_fillsThumbnailKeyAndMetadata,이미지 처리를 완료하면 썸네일 키와 메타데이터를 채운다,단위,@Test,,미이식
+photo,photo/domain/PhotoTest.java,createPhoto_blankOriginalStorageKey_throwsBusinessException,원본 스토리지 키가 공백이면 사진을 생성할 수 없다,단위,@Test,,미이식
+photo,photo/domain/PhotoTest.java,createPhoto_originalStorageKey_createsUnprocessedPhoto,원본 스토리지 키로 처리 전 사진을 생성한다,단위,@Test,,미이식
+photo,photo/domain/PhotoTest.java,delete_activePhoto_recordsDeletedAt,사진을 삭제하면 soft delete 시각을 기록한다,단위,@Test,,미이식
+photo,photo/domain/PhotoTest.java,delete_alreadyDeletedPhoto_keepsFirstDeletionTime,이미 삭제된 사진을 다시 삭제해도 최초 삭제 시각을 유지한다,단위,@Test,,미이식
+photo,photo/infrastructure/infra/CloudFrontUrlProviderTest.java,getUrl_blankStorageKey_throwsIllegalArgumentException,스토리지 키가 비어 있으면 예외를 발생시킨다,단위,@Test,,미이식
+photo,photo/infrastructure/infra/CloudFrontUrlProviderTest.java,getUrl_koreanAndSpaceStorageKey_returnsEncodedUrl,한글과 공백이 포함된 스토리지 키를 URL 인코딩한다,단위,@Test,,미이식
+photo,photo/infrastructure/infra/CloudFrontUrlProviderTest.java,getUrl_nullStorageKey_returnsNull,스토리지 키가 null이면 null을 반환한다,단위,@Test,,미이식
+photo,photo/infrastructure/infra/CloudFrontUrlProviderTest.java,getUrl_storageKeyWithOriginPath_returnsCloudFrontUrl,스토리지 키의 원본 경로를 제거하고 CloudFront URL을 반환한다,단위,@Test,,미이식
+photo,photo/infrastructure/infra/CloudFrontUrlProviderTest.java,getUrl_storageKeyWithoutOriginPath_throwsIllegalArgumentException,원본 경로가 없는 스토리지 키면 예외를 발생시킨다,단위,@Test,,미이식
+post,post/api/internal/v1/controller/PostImageProcessingCallbackControllerTest.java,complete_authenticatedCallback_completesProcessing,인증된 완료 콜백은 이미지 메타데이터를 반영하고 204를 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/internal/v1/controller/PostImageProcessingCallbackControllerTest.java,complete_coordinateOutOfRange_returnsBadRequest,범위를 벗어난 좌표가 담긴 완료 콜백은 400을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/internal/v1/controller/PostImageProcessingCallbackControllerTest.java,complete_invalidSignature_returnsUnauthorized,서명이 유효하지 않으면 상태를 바꾸지 않고 401을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/internal/v1/controller/PostImageProcessingCallbackControllerTest.java,complete_missingHeaders_returnsUnauthorized,인증 헤더가 없으면 400이 아니라 401로 다룬다,웹 슬라이스,@Test,,미이식
+post,post/api/internal/v1/controller/PostImageProcessingCallbackControllerTest.java,complete_nonCanonicalUploadId_returnsBadRequest,정규 형식이 아닌 uploadId는 400을 반환하고 인증까지 가지 않는다,웹 슬라이스,@Test,,미이식
+post,post/api/internal/v1/controller/PostImageProcessingCallbackControllerTest.java,complete_oversizedCapturedAt_returnsBadRequest,한도를 넘는 촬영 시각이 담긴 완료 콜백은 400을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/internal/v1/controller/PostImageProcessingCallbackControllerTest.java,fail_authenticatedCallback_failsProcessing,인증된 실패 콜백은 거절 사유를 반영하고 204를 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/internal/v1/controller/PostImageProcessingCallbackControllerTest.java,fail_blankReason_returnsBadRequest,거절 사유가 비어 있는 실패 콜백은 400을 반환하고 상태를 바꾸지 않는다,웹 슬라이스,@Test,,미이식
+post,post/api/internal/v1/controller/PostImageProcessingCallbackControllerTest.java,issueUploadUrls_authenticatedRequest_returnsPresignedUrls,인증된 Lambda에 게시물 처리 결과용 presigned URL을 발급한다,웹 슬라이스,@Test,,미이식
+post,post/api/internal/v1/controller/PostImageProcessingCallbackControllerTest.java,issueUploadUrls_invalidSignature_returnsUnauthorized,업로드 URL 발급 서명이 유효하지 않으면 URL을 발급하지 않고 401을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,createPostImageUpload_authenticatedUser_returnsIssuedUpload,인증된 사용자가 업로드 URL을 발급받으면 200과 발급 정보를 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,createPostImageUpload_unauthenticated_returnsUnauthorized,인증 정보가 없으면 업로드 URL을 발급하지 않고 401을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,createPost_longBlankTitle_passesRequestValidation,긴 유니코드 공백 제목은 제목 없음으로 처리할 수 있도록 서비스에 전달한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,createPost_missingPhotoUploadId_returnsBadRequest,사진 업로드 ID가 없으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,createPost_missingTopicId_returnsBadRequest,주제 ID가 없으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,createPost_tenCharacterNormalizedTitle_returnsCreatedPost,게시물을 생성할 때 앞뒤 공백을 포함해 10자를 넘어도 제거 후 10자면 서비스로 전달한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,createPost_tenCodePointEmojiTitle_returnsCreatedPost,이모지 제목은 코드 포인트 기준 10자까지 서비스로 전달한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,createPost_tooLongNormalizedTitle_returnsBadRequest,게시물을 생성할 때 앞뒤 공백을 제거한 제목이 10자를 초과하면 400을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,createPost_tooLongTitle_returnsBadRequest,제목이 10자를 초과하면 400을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,createPost_unauthenticated_returnsUnauthorized,인증 정보가 없으면 401을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,createPost_validRequest_returnsCreatedPost,인증된 사용자가 게시물을 생성하면 201과 생성 정보를 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,deletePost_invalidPostId_returnsBadRequest,삭제할 게시물 ID 형식이 올바르지 않으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,deletePost_unauthenticated_returnsUnauthorized,인증 정보 없이 게시물을 삭제하면 401을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,deletePost_validRequest_returnsNoContent,인증된 사용자가 본인 게시물을 삭제하면 204를 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getMyPostCalendarMonths_noPosts_returnsEmptyArray,기록이 없으면 200과 빈 연월 배열을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getMyPostCalendarMonths_withoutYearMonth_returnsMonths,연월 입력 없이 캘린더 기록 연월을 숫자 필드로 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getMyPostCalendar_invalidMonth_returnsBadRequest,조회 월이 1부터 12 사이가 아니면 400을 반환한다,웹 슬라이스,@ParameterizedTest,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getMyPostCalendar_invalidYear_returnsBadRequest,조회 연도가 지원 범위를 벗어나면 400을 반환한다,웹 슬라이스,@ParameterizedTest,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getMyPostCalendar_missingYearMonth_returnsBadRequest,조회 연월이 누락되면 400을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getMyPostCalendar_noPosts_returnsEmptyResults,게시물이 없으면 빈 캘린더 결과를 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getMyPostCalendar_supportedStatus_returnsCalendar,내 게시물 캘린더는 승인 대기·승인 게시물의 사진과 실제 상태를 반환한다,웹 슬라이스,@ParameterizedTest,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getMyPostCalendar_unauthenticated_returnsUnauthorized,인증 정보가 없으면 401을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getMyTodayPostStatus_noOpenTopic_returnsNotFound,참여할 수 있는 주제가 없으면 404를 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getMyTodayPostStatus_notPosted_returnsNullPostFields,작성한 게시물이 없으면 게시물 정보를 비운 채 미작성을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getMyTodayPostStatus_posted_returnsPostedStatus,이미 작성한 게시물이 있으면 게시물 정보와 함께 작성함을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getMyTodayPostStatus_unauthenticated_returnsUnauthorized,인증 정보가 없으면 오늘 작성 여부를 조회할 수 없다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getPost_invalidPostId_returnsBadRequest,ID 형식이 올바르지 않으면 400 응답을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getPost_invisiblePost_returnsNotFound,공개 가능한 게시물이 없으면 404 응답을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getPost_nonCanonicalUuid_returnsBadRequest,표준 형식이 아닌 UUID이면 400 응답을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getPost_unauthenticated_returnsUnauthorized,게시물 상세 조회에 인증 정보가 없으면 401을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getPost_validPostId_returnsPostDetail,유효한 게시물 ID로 상세 게시물을 조회한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getPosts_authenticatedUser_returnsPersonalLikeStatus,로그인 사용자는 게시물 목록에서 자신의 좋아요 여부를 조회한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getPosts_invalidPagination_returnsBadRequest,페이지 조회 조건이 범위를 벗어나면 잘못된 요청을 반환한다,웹 슬라이스,@ParameterizedTest,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getPosts_invalidQueryParameter_returnsBadRequest,목록 조회 파라미터 형식이 올바르지 않으면 잘못된 요청을 반환한다,웹 슬라이스,@ParameterizedTest,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getPosts_invalidTopicDate_returnsBadRequest,주제 공개일 형식이 올바르지 않으면 잘못된 요청을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getPosts_missingTopicDate_returnsBadRequest,주제 공개일이 없으면 잘못된 요청을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getPosts_popularSort_bindsPostSortEnum,소문자 인기순 정렬 파라미터를 enum으로 변환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getPosts_randomNextPage_passesQueryParameters,랜덤 다음 페이지 조회 조건을 서비스에 전달한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getPosts_randomSort_bindsPostSortEnum,소문자 랜덤 정렬 파라미터를 enum으로 변환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getPosts_tooLongRandomSeed_returnsBadRequest,랜덤 시드가 최대 길이를 초과하면 잘못된 요청을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,getPosts_validTopicDate_returnsPostList,특정 날짜의 게시물 목록을 기본 조회 조건으로 조회한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,updatePost_invalidPostId_returnsBadRequest,수정할 게시물 ID 형식이 올바르지 않으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,updatePost_missingTitle_returnsBadRequest,제목 필드가 누락되면 400을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,updatePost_nullTitle_returnsDeletedTitle,제목에 명시적인 null을 보내면 제목 삭제 결과를 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,updatePost_tooLongNormalizedTitle_returnsBadRequest,앞뒤 공백을 제거한 제목이 10자를 초과하면 400을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,updatePost_unauthenticated_returnsUnauthorized,인증 정보 없이 게시물 제목을 수정하면 401을 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/controller/PostControllerTest.java,updatePost_validRequest_returnsUpdatedPost,인증된 사용자가 게시물 제목을 수정하면 200과 수정 정보를 반환한다,웹 슬라이스,@Test,,미이식
+post,post/api/v1/docs/PostOpenApiTest.java,userApiDocs_deletePost_exposesContract,user-api 문서는 본인 게시물 삭제 계약을 제공한다,통합(Spring+DB),@Test,,미이식
+post,post/api/v1/docs/PostOpenApiTest.java,userApiDocs_getMyPostCalendarMonths_exposesMonthsAndSecurity,연월 목록 문서는 입력 없이 숫자 연월 배열과 인증 계약을 제공한다,통합(Spring+DB),@Test,,미이식
+post,post/api/v1/docs/PostOpenApiTest.java,userApiDocs_getMyPostCalendar_exposesPendingAndApprovedStatuses,user-api 캘린더 문서는 기존 응답 구조에서 승인 대기·승인 상태만 제공한다,통합(Spring+DB),@Test,,미이식
+post,post/api/v1/docs/PostOpenApiTest.java,userApiDocs_getMyTodayPostStatus_exposesContract,user-api 문서는 오늘 게시물 작성 여부 조회 계약을 제공한다,통합(Spring+DB),@Test,,미이식
+post,post/api/v1/docs/PostOpenApiTest.java,userApiDocs_postListEndpoint_declaresOptionalAuth,게시물 목록 조회는 익명 호출과 accessToken 호출을 모두 허용하는 선택적 인증으로 문서화된다,통합(Spring+DB),@Test,,미이식
+post,post/api/v1/docs/PostOpenApiTest.java,userApiDocs_updatePost_exposesContract,user-api 문서는 게시물 제목 수정 계약을 제공한다,통합(Spring+DB),@Test,,미이식
+post,post/domain/PostImageUploadTest.java,claim_atExpiry_throwsBusinessException,만료 시각부터는 claim할 수 없다,단위,@Test,,미이식
+post,post/domain/PostImageUploadTest.java,claim_claimedUpload_throwsBusinessException,이미 claim된 업로드는 다시 claim할 수 없다,단위,@Test,,미이식
+post,post/domain/PostImageUploadTest.java,claim_justBeforeExpiry_succeeds,만료 시각 직전에는 claim할 수 있다,단위,@Test,,미이식
+post,post/domain/PostImageUploadTest.java,claim_rejectedUpload_throwsBusinessExceptionWithReasonMessage,처리 실패한 업로드는 거절 사유를 담아 claim을 막는다,단위,@Test,,미이식
+post,post/domain/PostImageUploadTest.java,claim_rejectedWithoutReason_throwsWithDefaultMessage,거절 사유가 없는 업로드를 claim하면 기본 안내 문구로 실패한다,단위,@Test,,미이식
+post,post/domain/PostImageUploadTest.java,claim_unclaimedUpload_recordsClaimedAt,claim하면 소비 시각을 기록한다,단위,@Test,,미이식
+post,post/domain/PostImageUploadTest.java,claim_unknownReason_throwsWithDefaultMessage,모르는 거절 사유는 기본 안내 문구로 실패한다,단위,@Test,,미이식
+post,post/domain/PostImageUploadTest.java,claim_unknownRejectionReason_throwsBusinessExceptionWithDefaultMessage,알 수 없는 거절 사유는 기본 안내 문구로 claim을 막는다,단위,@Test,,미이식
+post,post/domain/PostImageUploadTest.java,completeProcessing_issuedUpload_becomesReady,처리 완료하면 READY가 되고 메타데이터를 보관한다,단위,@Test,,미이식
+post,post/domain/PostImageUploadTest.java,completeProcessing_readyUpload_keepsFirstMetadata,완료 콜백을 다시 받아도 처음 메타데이터를 유지한다,단위,@Test,,미이식
+post,post/domain/PostImageUploadTest.java,completeProcessing_rejectedUpload_keepsRejected,이미 REJECTED면 완료 콜백이 상태를 바꾸지 않는다,단위,@Test,,미이식
+post,post/domain/PostImageUploadTest.java,createPostImageUpload_nullUser_throwsBusinessException,발급 정보가 없으면 업로드를 만들 수 없다,단위,@Test,,미이식
+post,post/domain/PostImageUploadTest.java,createPostImageUpload_validUser_startsIssued,발급한 업로드는 ISSUED 상태로 시작하고 claim 유효 시간 뒤에 만료된다,단위,@Test,,미이식
+post,post/domain/PostImageUploadTest.java,failProcessing_issuedUpload_becomesRejected,처리 실패하면 REJECTED가 되고 사유를 보관한다,단위,@Test,,미이식
+post,post/domain/PostImageUploadTest.java,failProcessing_readyUpload_keepsReady,이미 READY면 실패 콜백이 상태를 바꾸지 않는다,단위,@Test,,미이식
+post,post/domain/PostTest.java,approve_pendingPost_becomesApproved,관리자 검수 대기 게시물을 승인하면 APPROVED가 되고 검수 시각을 기록한다,단위,@Test,,미이식
+post,post/domain/PostTest.java,approve_rejectedPost_throwsBusinessException,이미 검수가 끝난 게시물은 상태를 다시 변경할 수 없다,단위,@Test,,미이식
+post,post/domain/PostTest.java,approve_validatingPost_throwsBusinessException,이미지 처리 중인 게시물은 관리자가 승인할 수 없다,단위,@Test,,미이식
+post,post/domain/PostTest.java,approve_withoutModeratedAt_throwsBusinessException,관리자 검수 시각이 없으면 승인할 수 없다,단위,@Test,,미이식
+post,post/domain/PostTest.java,createPost_blankTitle_normalizesTitleToNull,"null, 빈 문자열, 공백 제목은 제목 없는 게시물로 생성한다",단위,@ParameterizedTest,,미이식
+post,post/domain/PostTest.java,createPost_longBlankTitle_normalizesTitleToNull,10자를 넘는 유니코드 공백 제목도 제목 없는 게시물로 생성한다,단위,@Test,,미이식
+post,post/domain/PostTest.java,createPost_tenCharacterNormalizedTitle_createsPost,제목을 생성할 때 앞뒤 공백을 제거한 값이 10자면 허용한다,단위,@Test,,미이식
+post,post/domain/PostTest.java,createPost_tenCharacterTitle_createsPost,제목이 10자면 게시물을 생성한다,단위,@Test,,미이식
+post,post/domain/PostTest.java,createPost_tenCodePointEmojiTitle_createsPost,이모지 제목은 코드 포인트 기준으로 10자까지 허용한다,단위,@Test,,미이식
+post,post/domain/PostTest.java,createPost_titleWithSurroundingSpaces_normalizesTitle,제목을 생성할 때 앞뒤 공백은 제거하고 가운데 공백은 유지한다,단위,@Test,,미이식
+post,post/domain/PostTest.java,createPost_tooLongNormalizedTitle_throwsBusinessException,제목을 생성할 때 앞뒤 공백을 제거한 값이 Unicode code point 기준 10자를 초과하면 거부한다,단위,@Test,,미이식
+post,post/domain/PostTest.java,createPost_tooLongTitle_throwsBusinessException,제목이 10자를 초과하면 게시물을 생성할 수 없다,단위,@Test,,미이식
+post,post/domain/PostTest.java,createPost_validValues_createsValidatingPost,작성자와 주제와 사진으로 검수 중인 게시물을 생성한다,단위,@Test,,미이식
+post,post/domain/PostTest.java,deleteByAdmin_alreadyDeletedPost_keepsFirstDeletionTime,이미 삭제된 게시물을 다시 삭제해도 최초 삭제 시각을 유지한다,단위,@Test,,미이식
+post,post/domain/PostTest.java,deleteByAdmin_deletableStatus_softDeletesPostAndPhoto,관리자가 삭제할 수 있는 상태의 게시물은 사진과 함께 soft delete한다,단위,@ParameterizedTest,,미이식
+post,post/domain/PostTest.java,deleteByAdmin_validatingPost_throwsBusinessException,이미지 처리 중인 게시물은 기본 비즈니스 오류로 삭제를 거부한다,단위,@Test,,미이식
+post,post/domain/PostTest.java,deleteByAuthor_alreadyDeletedPost_keepsFirstDeletionTime,작성자가 삭제를 반복해도 최초 삭제 시각을 유지한다,단위,@Test,,미이식
+post,post/domain/PostTest.java,deleteByAuthor_approvedPost_softDeletesPostAndPhoto,작성자는 승인된 게시물을 사진과 함께 삭제할 수 있다,단위,@Test,,미이식
+post,post/domain/PostTest.java,deleteByAuthor_otherUser_throwsForbiddenException,작성자가 아닌 사용자는 게시물을 삭제할 수 없다,단위,@Test,,미이식
+post,post/domain/PostTest.java,deleteByAuthor_pendingPost_softDeletesPost,작성자는 검수 대기 게시물을 삭제할 수 있다,단위,@Test,,미이식
+post,post/domain/PostTest.java,deleteByAuthor_rejectedPost_throwsBusinessException,작성자는 거절된 게시물을 삭제할 수 없다,단위,@Test,,미이식
+post,post/domain/PostTest.java,deleteByAuthor_validatingPost_throwsBusinessException,작성자는 이미지 처리 중인 게시물을 삭제할 수 없다,단위,@Test,,미이식
+post,post/domain/PostTest.java,failImageProcessing_pendingPost_throwsBusinessException,관리자 검수 대기 이후에는 이미지 실패 상태로 바꿀 수 없다,단위,@Test,,미이식
+post,post/domain/PostTest.java,failImageProcessing_validatingPost_becomesRejectedWithoutModerationTime,이미지 처리에 실패하면 관리자 결정 시각 없이 REJECTED가 된다,단위,@Test,,미이식
+post,post/domain/PostTest.java,reject_pendingPost_becomesRejected,관리자 검수 대기 게시물을 거절하면 REJECTED가 되고 검수 시각을 기록한다,단위,@Test,,미이식
+post,post/domain/PostTest.java,reject_validatingPost_throwsBusinessException,이미지 처리 중인 게시물은 관리자가 거절할 수 없다,단위,@Test,,미이식
+post,post/domain/PostTest.java,reject_withoutModeratedAt_throwsBusinessException,관리자 검수 시각이 없으면 거절할 수 없다,단위,@Test,,미이식
+post,post/domain/PostTest.java,requestModeration_pendingPost_throwsBusinessException,이미 관리자 검수 대기인 게시물은 검수 요청을 반복할 수 없다,단위,@Test,,미이식
+post,post/domain/PostTest.java,requestModeration_validatingPost_becomesPending,이미지 처리가 끝나면 관리자 검수 대기 상태가 된다,단위,@Test,,미이식
+post,post/domain/PostTest.java,updateTitle_approvedPostDuringOpenPeriod_updatesTitle,작성자는 참여 기간 중인 승인 게시물의 제목을 수정한다,단위,@Test,,미이식
+post,post/domain/PostTest.java,updateTitle_closedTopic_throwsBusinessException,주제 참여 기간이 종료되면 게시물 제목을 수정할 수 없다,단위,@Test,,미이식
+post,post/domain/PostTest.java,updateTitle_emptyTitle_normalizesTitleToNull,"null, 빈 문자열, 공백 제목은 제목 없음으로 수정한다",단위,@ParameterizedTest,,미이식
+post,post/domain/PostTest.java,updateTitle_otherUser_throwsForbiddenException,작성자가 아닌 사용자는 게시물 제목을 수정할 수 없다,단위,@Test,,미이식
+post,post/domain/PostTest.java,updateTitle_pendingPostDuringOpenPeriod_updatesTitle,작성자는 참여 기간 중인 검수 대기 게시물의 제목을 수정한다,단위,@Test,,미이식
+post,post/domain/PostTest.java,updateTitle_tenCharacterNormalizedTitle_updatesTitle,제목을 수정할 때 앞뒤 공백을 제거한 값이 10자면 허용한다,단위,@Test,,미이식
+post,post/domain/PostTest.java,updateTitle_titleWithSurroundingSpaces_normalizesTitle,제목을 수정할 때 앞뒤 공백은 제거하고 가운데 공백은 유지한다,단위,@Test,,미이식
+post,post/domain/PostTest.java,updateTitle_tooLongNormalizedTitle_throwsBusinessException,제목을 수정할 때 Unicode code point 기준 10자를 초과하면 거부한다,단위,@Test,,미이식
+post,post/domain/PostTest.java,updateTitle_uneditableStatus_throwsBusinessException,수정할 수 없는 검수 상태의 게시물은 제목을 수정할 수 없다,단위,@ParameterizedTest,,미이식
+post,post/domain/PostTitleTest.java,constructor_blankTitle_throwsBusinessException,생성자를 직접 호출할 때 공백뿐인 제목은 거부한다,단위,@ParameterizedTest,,미이식
+post,post/domain/PostTitleTest.java,constructor_nullValue_throwsNullPointerException,값 없는 PostTitle은 만들 수 없다,단위,@Test,,미이식
+post,post/domain/PostTitleTest.java,constructor_titleWithSurroundingSpaces_stripsTitle,생성자를 직접 호출해도 앞뒤 공백을 제거한다,단위,@Test,,미이식
+post,post/domain/PostTitleTest.java,constructor_tooLongTitle_throwsBusinessException,생성자를 직접 호출할 때 10자를 초과하는 제목은 거부한다,단위,@Test,,미이식
+post,post/domain/PostTitleTest.java,from_blankTitle_returnsNull,"null, 빈 문자열, 공백뿐인 제목은 제목 없음으로 보고 null을 돌려준다",단위,@ParameterizedTest,,미이식
+post,post/domain/PostTitleTest.java,from_tenCharacterNormalizedTitle_createsPostTitle,앞뒤 공백을 제거한 값이 10자면 허용한다,단위,@Test,,미이식
+post,post/domain/PostTitleTest.java,from_tenCodePointEmojiTitle_createsPostTitle,이모지 제목은 code point 기준으로 10자까지 허용한다,단위,@Test,,미이식
+post,post/domain/PostTitleTest.java,from_titleWithSurroundingSpaces_stripsOnlySurroundingSpaces,앞뒤 공백은 제거하고 가운데 공백은 유지한다,단위,@Test,,미이식
+post,post/domain/PostTitleTest.java,from_tooLongNormalizedTitle_throwsBusinessException,앞뒤 공백을 제거한 값이 code point 기준 10자를 초과하면 거부한다,단위,@Test,,미이식
+post,post/domain/PostTitleTest.java,from_validTitle_createsPostTitle,제목을 그대로 보관한다,단위,@Test,,미이식
+post,post/domain/PostTitleTest.java,isValid_titleExceedingMaxLength_returnsFalse,공백 제거 후 10자를 초과하는 제목은 유효하지 않다고 판정한다,단위,@ParameterizedTest,,미이식
+post,post/domain/PostTitleTest.java,isValid_titleWithinMaxLength_returnsTrue,공백 제거 후 10자 이하인 제목은 유효하다고 판정한다,단위,@ParameterizedTest,,미이식
+post,post/infrastructure/infra/S3PostImageStorageTest.java,existsUploadedImage_accessDenied_returnsFalse,ListBucket 권한이 없어 403이 와도 업로드 이미지가 존재하지 않는다,단위,@Test,,미이식
+post,post/infrastructure/infra/S3PostImageStorageTest.java,existsUploadedImage_existingStagingObject_returnsTrue,staging 객체가 있으면 업로드 이미지가 존재한다,단위,@Test,,미이식
+post,post/infrastructure/infra/S3PostImageStorageTest.java,existsUploadedImage_noSuchKey_returnsFalse,staging 객체가 없으면 업로드 이미지가 존재하지 않는다,단위,@Test,,미이식
+post,post/infrastructure/infra/S3PostImageStorageTest.java,existsUploadedImage_notFound_returnsFalse,HeadObject가 404를 반환하면 업로드 이미지가 존재하지 않는다,단위,@Test,,미이식
+post,post/infrastructure/infra/S3PostImageStorageTest.java,existsUploadedImage_serverError_propagates,403과 404가 아닌 S3 오류는 전파한다,단위,@Test,,미이식
+post,post/infrastructure/infra/S3PostImageStorageTest.java,toOriginalStorageKey_uploadId_createsPostOriginalKey,업로드 ID로 게시물 원본 스토리지 키를 만든다,단위,@Test,,미이식
+post,post/infrastructure/infra/S3PostImageStorageTest.java,toStagingStorageKey_uploadId_createsPostStagingKey,업로드 ID로 게시물 staging 스토리지 키를 만든다,단위,@Test,,미이식
+post,post/infrastructure/infra/S3PostImageUploadIssuerTest.java,issueProcessingUpload_presignedUrlSignsRequiredHeaders,처리 결과 URL은 업로드에 필요한 헤더를 모두 서명한다,단위,@Test,,미이식
+post,post/infrastructure/infra/S3PostImageUploadIssuerTest.java,issueProcessingUpload_presignsOriginalAndThumbnailKeys,게시물 처리 결과의 원본과 썸네일 키에 덮어쓰기 방지 URL을 발급한다,단위,@Test,,미이식
+post,post/infrastructure/infra/S3PostImageUploadIssuerTest.java,issue_devEnvironment_presignsDevPostUpload,개발 환경 게시물 WebP 업로드 URL을 5분 동안 유효하게 발급한다,단위,@Test,,미이식
+post,post/infrastructure/infra/S3PostImageUploadIssuerTest.java,issue_prodEnvironment_presignsProdStagingKey,운영 환경 업로드 URL은 운영 staging 키에 서명한다,단위,@Test,,미이식
+post,post/infrastructure/persistence/PostCalendarRepositoryTest.java,findCalendarMonthsByAuthorId_deletedResource_returnsEmpty,게시물이나 연결 자원이 모두 삭제되면 연월 목록은 비어 있다,JPA 슬라이스,@ParameterizedTest,,미이식
+post,post/infrastructure/persistence/PostCalendarRepositoryTest.java,findCalendarMonthsByAuthorId_lastPostDeleted_removesOnlyThatMonth,같은 달의 기록이 남아 있으면 유지하고 마지막 기록 삭제 시 그 달을 제외한다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostCalendarRepositoryTest.java,findCalendarMonthsByAuthorId_moderationStatus_returnsOnlyVisibleMonths,캘린더에 표시되는 검수 상태의 연월만 포함한다,JPA 슬라이스,@ParameterizedTest,,미이식
+post,post/infrastructure/persistence/PostCalendarRepositoryTest.java,findCalendarMonthsByAuthorId_multipleYears_returnsDistinctMonthsDescending,주제 날짜 기준 전체 연월을 중복 없이 최신순으로 조회한다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostCalendarRepositoryTest.java,findCalendarMonthsByAuthorId_noPosts_returnsEmpty,기록이 없는 사용자의 연월 목록은 비어 있다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostCalendarRepositoryTest.java,findCalendarMonthsByAuthorId_otherUserMonth_excludesMonth,다른 사용자의 기록만 있는 달은 연월 목록에서 제외한다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostCalendarRepositoryTest.java,findCalendarPostsByAuthorIdAndTopicDateBetween_deletedResource_returnsEmpty,삭제된 게시물과 연결 자원은 캘린더에서 제외한다,JPA 슬라이스,@ParameterizedTest,,미이식
+post,post/infrastructure/persistence/PostCalendarRepositoryTest.java,findCalendarPostsByAuthorIdAndTopicDateBetween_matchingPosts_returnsOrderedPosts,본인의 해당 월 승인 대기·승인 게시물만 주제 날짜순으로 조회한다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostRepositoryImplTest.java,save_unknownIntegrityViolation_propagatesOriginalException,알 수 없는 무결성 오류는 중복 요청으로 변환하지 않고 전파한다,단위,@Test,,미이식
+post,post/infrastructure/persistence/PostRepositoryTest.java,findVisibleById_approvedPost_returnsPost,승인되고 삭제되지 않은 게시물을 관계와 함께 조회한다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostRepositoryTest.java,findVisibleById_deletedAuthor_returnsEmpty,삭제된 작성자의 게시물은 조회하지 않는다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostRepositoryTest.java,findVisibleById_deletedPhoto_returnsEmpty,삭제된 사진의 게시물은 조회하지 않는다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostRepositoryTest.java,findVisibleById_deletedPost_returnsEmpty,삭제된 게시물은 조회하지 않는다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostRepositoryTest.java,findVisibleById_deletedTopic_returnsEmpty,삭제된 주제의 게시물은 조회하지 않는다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostRepositoryTest.java,findVisibleById_postWithTitle_mapsTitleToString,제목이 있는 게시물은 문자열 제목으로 복원한다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostRepositoryTest.java,findVisibleById_postWithoutTitle_mapsTitleToNull,제목이 없는 게시물은 PostTitle 자체가 null로 복원된다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostRepositoryTest.java,findVisibleById_unapprovedPost_returnsEmpty,승인되지 않은 게시물은 상세 조회하지 않는다,JPA 슬라이스,@ParameterizedTest,,미이식
+post,post/infrastructure/persistence/PostRepositoryTest.java,findVisibleById_unknownPost_returnsEmpty,존재하지 않는 게시물은 조회하지 않는다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostRepositoryTest.java,findVisibleByTopicId_invisiblePost_returnsEmptySlice,공개 조건을 충족하지 않는 게시물은 목록에서 제외한다,JPA 슬라이스,@ParameterizedTest,,미이식
+post,post/infrastructure/persistence/PostRepositoryTest.java,findVisiblePopularByTopicId_multiplePages_returnsStablePages,인기순 조회를 페이지로 나누면 정렬 순서가 이어진다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostRepositoryTest.java,findVisiblePopularByTopicId_sameLikeCountAndCreatedAt_returnsIdAscendingSlice,좋아요 개수와 생성 시각이 같으면 게시물 ID 오름차순으로 조회한다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostRepositoryTest.java,findVisiblePopularByTopicId_sameLikeCount_returnsCreatedAtDescendingSlice,좋아요 개수가 같으면 생성 시각 내림차순으로 조회한다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostRepositoryTest.java,findVisiblePopularByTopicId_visiblePosts_returnsLikeCountDescendingSlice,공개 게시물을 좋아요 개수 내림차순으로 조회한다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostRepositoryTest.java,findVisibleRandomByTopicId_sameSeed_returnsSameOrder,같은 시드로 공개 게시물을 조회하면 동일한 랜덤 순서를 반환한다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostRepositoryTest.java,findVisibleRandomByTopicId_sameSeed_returnsStablePages,같은 시드로 페이지를 나누면 랜덤 정렬 순서가 이어진다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostRepositoryTest.java,findVisibleRecentByTopicId_sameCreatedAt_returnsIdDescendingSlice,생성 시각이 같으면 게시물 ID 내림차순으로 조회한다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostRepositoryTest.java,findVisibleRecentByTopicId_visiblePosts_returnsRecentSlice,공개 게시물을 최신순으로 슬라이스 조회한다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostRepositoryTest.java,save_duplicatePhotoStorageKey_throwsBusinessException,동시 생성으로 사진 스토리지 키 유니크 제약을 위반하면 비즈니스 예외로 변환한다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostRepositoryTest.java,save_duplicateUserAndTopic_throwsBusinessException,동시 생성으로 사용자와 주제 유니크 제약을 위반하면 비즈니스 예외로 변환한다,JPA 슬라이스,@Test,,미이식
+post,post/infrastructure/persistence/PostRepositoryTest.java,save_postConstraintViolation_rollsBackCascadedPhoto,게시물 저장 실패 시 cascade로 저장한 사진도 함께 롤백한다,JPA 슬라이스,@Test,,미이식
+post,post/service/PostCalendarServiceTest.java,getMyPostCalendarMonths_deletedUser_throwsUnauthorizedException,탈퇴한 사용자의 연월 조회는 빈 목록 대신 인증 예외를 발생시킨다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCalendarServiceTest.java,getMyPostCalendarMonths_noPosts_returnsEmpty,캘린더 기록이 없으면 현재 달을 추가하지 않고 빈 목록을 반환한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCalendarServiceTest.java,getMyPostCalendarMonths_unknownUser_throwsUnauthorizedException,존재하지 않는 사용자의 연월 조회는 인증 예외를 발생시킨다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCalendarServiceTest.java,getMyPostCalendarMonths_validUser_returnsRecordedMonths,본인의 캘린더 기록 연월을 조회한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCalendarServiceTest.java,getMyPostCalendar_noPosts_returnsEmptyResult,작성한 게시물이 없는 연월은 빈 캘린더 결과를 반환한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCalendarServiceTest.java,getMyPostCalendar_unknownUser_throwsUnauthorizedException,유효하지 않은 사용자의 캘린더 조회는 인증 예외를 발생시킨다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCalendarServiceTest.java,getMyPostCalendar_validYearMonth_returnsCalendarResult,본인의 월별 승인 대기·승인 게시물의 사진과 상태를 반환한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCreationServiceTest.java,createPost_afterRejection_createsNewPost,거절된 게시물이 있으면 같은 주제에 다시 작성할 수 있다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCreationServiceTest.java,createPost_beforeOpenTopic_throwsBusinessException,참여 시작 전 주제에는 게시물을 생성할 수 없다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCreationServiceTest.java,createPost_closedTopic_throwsBusinessException,참여가 끝난 주제에는 게시물을 생성할 수 없다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCreationServiceTest.java,createPost_deletedTopic_throwsNotFoundException,삭제된 주제에는 게시물을 생성할 수 없다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCreationServiceTest.java,createPost_duplicateUserAndTopic_throwsBusinessException,같은 사용자는 열린 주제에 게시물을 중복 생성할 수 없다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCreationServiceTest.java,createPost_expiredUpload_throwsBusinessException,claim 유효 시간이 지난 업로드로는 게시물을 생성할 수 없다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCreationServiceTest.java,createPost_missingUploadedImage_throwsNotFoundException,업로드한 사진이 없으면 게시물을 생성할 수 없다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCreationServiceTest.java,createPost_orphanPhotoWithSameStorageKey_throwsBusinessException,게시물에 연결되지 않은 사진이 같은 원본 키를 쓰고 있어도 사진 중복으로 막는다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCreationServiceTest.java,createPost_otherUsersUploadId_throwsNotFoundException,다른 회원이 발급받은 업로드 ID는 존재하지 않는 것과 같이 다룬다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCreationServiceTest.java,createPost_readyUpload_savesPendingPost,이미지 처리가 끝난 업로드로 만든 게시물도 관리자 검수 대기 상태가 된다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCreationServiceTest.java,createPost_recentValidatingPost_throwsBusinessException,처리 대기 시간 안의 검수 대기 게시물은 여전히 중복으로 막는다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCreationServiceTest.java,createPost_rejectedUpload_throwsBusinessException,이미지 처리에서 거절된 업로드는 사유를 담아 거부한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCreationServiceTest.java,createPost_reusedPhotoUpload_throwsBusinessException,같은 사진 업로드는 다른 게시물에도 다시 사용할 수 없다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCreationServiceTest.java,createPost_stalledValidatingPost_rejectsItAndAllowsNewPost,처리 대기 시간을 넘긴 검수 대기 게시물은 거절되고 같은 주제에 다시 작성할 수 있다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCreationServiceTest.java,createPost_tenCodePointEmojiTitle_savesTitle,이모지 제목은 코드 포인트 기준 10자까지 그대로 저장한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCreationServiceTest.java,createPost_tooLongTitle_throwsBusinessException,제목이 10자를 초과하면 게시물을 생성할 수 없다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCreationServiceTest.java,createPost_unknownUploadId_throwsNotFoundException,발급받지 않은 업로드 ID로는 게시물을 생성할 수 없다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCreationServiceTest.java,createPost_unknownUser_throwsUnauthorizedException,존재하지 않는 사용자의 게시물 생성은 인증 실패로 거부한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCreationServiceTest.java,createPost_validRequest_claimsUpload,게시물을 만들면 업로드 claim을 소비한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCreationServiceTest.java,createPost_validRequest_savesPhotoAndValidatingPost,활성 사용자가 열린 주제에 업로드한 사진으로 게시물을 생성한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostCreationServiceTest.java,createPost_validatingPost_isNotVisible,검수 중인 새 게시물은 공개 상세 조회에 노출되지 않는다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostDeletionServiceTest.java,deletePost_alreadyDeletedPost_keepsFirstDeletionTime,삭제 요청을 반복해도 게시물과 사진의 최초 삭제 시각을 유지한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostDeletionServiceTest.java,deletePost_approvedPost_softDeletesAndDeletesLikesAndExcludesReadModels,작성자가 승인 게시물을 삭제하면 게시물과 사진을 soft delete하고 좋아요와 조회 결과에서 제거한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostDeletionServiceTest.java,deletePost_openTopic_allowsNewPostSubmission,참여 기간이 남은 주제에서는 게시물을 삭제한 뒤 새 게시물을 제출할 수 있다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostDeletionServiceTest.java,deletePost_otherUser_throwsForbiddenExceptionAndKeepsEveryState,다른 사용자가 승인 게시물을 삭제하면 거부하고 게시물과 사진과 좋아요를 유지한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostDeletionServiceTest.java,deletePost_pendingPost_softDeletesPostAndPhotoAndPreservesStorageKeys,작성자가 검수 대기 게시물을 삭제하면 게시물과 사진을 soft delete하고 이미지 경로를 보존한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostDeletionServiceTest.java,deletePost_rejectedPost_throwsBusinessExceptionAndKeepsPostAndPhoto,검수 거절 게시물은 삭제를 거부하고 게시물과 사진 상태를 유지한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostDeletionServiceTest.java,deletePost_unknownPost_throwsNotFoundException,존재하지 않는 게시물은 삭제할 수 없다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostDeletionServiceTest.java,deletePost_validatingPost_throwsBusinessExceptionAndKeepsPostAndPhoto,이미지 처리 중인 게시물은 삭제를 거부하고 게시물과 사진 상태를 유지한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostImageProcessingServiceTest.java,completePostImageProcessing_changedStorageKeyRule_stillRequestsModeration,스토리지 키 규칙이 바뀌어도 완료 콜백이 게시물을 찾는다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostImageProcessingServiceTest.java,completePostImageProcessing_duplicateCallback_staysPending,완료 콜백을 중복으로 받아도 최초 메타데이터와 검수 대기 상태를 유지한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostImageProcessingServiceTest.java,completePostImageProcessing_issuedUpload_marksReady,완료 콜백은 업로드를 READY로 올리고 메타데이터를 기록한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostImageProcessingServiceTest.java,completePostImageProcessing_rejectedUpload_keepsPostRejected,이미 실패한 업로드에 완료 콜백이 오면 게시물을 승격하지 않는다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostImageProcessingServiceTest.java,completePostImageProcessing_unknownUploadId_doesNothing,존재하지 않는 업로드 ID의 콜백은 아무것도 바꾸지 않는다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostImageProcessingServiceTest.java,completePostImageProcessing_validatingPost_requestsModeration,검수 중인 게시물이 있으면 완료 콜백이 관리자 검수 대기로 전환한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostImageProcessingServiceTest.java,completePostImageProcessing_withoutPost_marksReadyOnly,게시물이 아직 없어도 완료 콜백은 업로드 상태만 바꾸고 끝난다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostImageProcessingServiceTest.java,failPostImageProcessing_duplicateCallback_staysImageRejected,실패 콜백을 중복으로 받아도 이미지 실패 거절 상태를 유지한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostImageProcessingServiceTest.java,failPostImageProcessing_issuedUpload_marksRejected,실패 콜백은 업로드를 REJECTED로 내리고 사유를 기록한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostImageProcessingServiceTest.java,failPostImageProcessing_readyUpload_keepsPostPending,완료 뒤 실패 콜백이 와도 업로드와 게시물은 검수 대기 상태를 유지한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostImageProcessingServiceTest.java,failPostImageProcessing_validatingPost_rejectsPost,검수 중인 게시물이 있으면 실패 콜백이 REJECTED로 내린다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostImageUploadConcurrencyTest.java,createPost_concurrentSameUpload_createsSinglePost,같은 업로드로 동시에 게시물을 만들면 하나만 성공한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostImageUploadConcurrencyTest.java,createPost_concurrentWithCompleteCallback_keepsStateConsistent,게시물 생성과 처리 완료 콜백이 겹쳐도 업로드가 한 번만 소비된다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostImageUploadConcurrencyTest.java,createPost_stalledRetryWithCompleteCallback_avoidsDeadlock,시간 초과 게시물 재시도와 완료 콜백이 겹쳐도 잠금 교착 없이 끝난다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostImageUploadConcurrencyTest.java,processImage_concurrentCompleteAndFail_keepsStatesConsistent,완료와 실패 콜백이 겹쳐도 업로드와 게시물 상태가 같은 결과로 수렴한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostImageUploadServiceTest.java,createPostImageUpload_activeUser_expiresAfterClaimTtl,발급한 업로드는 claim 유효 시간 뒤에 만료된다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostImageUploadServiceTest.java,createPostImageUpload_activeUser_issuesUrlForSavedUploadId,저장한 업로드 ID로 presigned URL을 발급한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostImageUploadServiceTest.java,createPostImageUpload_activeUser_savesIssuedUpload,활성 사용자에게 발급하면 ISSUED 업로드를 저장하고 발급 결과를 반환한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostImageUploadServiceTest.java,createPostImageUpload_unknownUser_throwsUnauthorized,존재하지 않는 회원의 업로드 발급은 인증 실패로 거부한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostImageUploadServiceTest.java,createPostImageUpload_withdrawnUser_throwsUnauthorized,탈퇴한 회원의 업로드 발급은 인증 실패로 거부한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostModerationNotificationTransactionTest.java,completePostImageProcessing_duplicateCallback_sendsOnce,이미지 완료 콜백이 중복으로 와도 관리자 알림은 한 번만 보낸다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostModerationNotificationTransactionTest.java,completePostImageProcessing_validatingPost_sendsAfterCommit,이미지 완료 콜백이 게시물을 PENDING으로 커밋하면 관리자 알림을 한 번 보낸다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostModerationNotificationTransactionTest.java,createPost_readyUpload_sendsAfterCommit,READY 업로드로 만든 게시물이 커밋되면 관리자 알림을 한 번 보낸다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostModerationNotificationTransactionTest.java,createPost_rolledBack_doesNotSendNotification,게시물 트랜잭션이 롤백되면 관리자 알림을 보내지 않는다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostModerationPendingLogTest.java,completePostImageProcessing_validatingPost_logsPending,이미지 완료 콜백이 게시물을 PENDING으로 전환하면 검수 대기 로그를 한 건 남긴다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostProcessingPolicyTest.java,constructor_nonPositiveTimeout_throwsIllegalArgumentException,0 이하의 대기 시간은 설정할 수 없다,단위,@Test,,미이식
+post,post/service/PostProcessingPolicyTest.java,isProcessingTimedOut_afterTimeout_returnsTrue,대기 시간을 넘기면 처리가 끝나지 않은 것으로 본다,단위,@Test,,미이식
+post,post/service/PostProcessingPolicyTest.java,isProcessingTimedOut_atTimeout_returnsFalse,대기 시간 경계에서는 아직 기다린다,단위,@Test,,미이식
+post,post/service/PostQueryServiceTest.java,getPost_invisiblePost_throwsNotFoundException,공개 가능한 게시물이 없으면 찾을 수 없음 예외를 발생시킨다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostQueryServiceTest.java,getPost_unknownUser_throwsUnauthorizedException,상세 조회 사용자를 찾을 수 없으면 인증 예외를 발생시킨다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostQueryServiceTest.java,getPost_visiblePost_returnsPostDetailWithImageUrls,공개 가능한 게시물을 조회하고 이미지 URL을 조립한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostQueryServiceTest.java,getPosts_anonymousUser_returnsLikeCountAndUnlikedStatus,비로그인 사용자의 게시물 목록에는 좋아요 개수와 false 상태를 반환한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostQueryServiceTest.java,getPosts_anonymousUser_returnsNoOwnedPost,비로그인 사용자의 게시물 목록에는 isMine이 모두 false다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostQueryServiceTest.java,getPosts_authenticatedUser_marksOwnPostAsMine,로그인 사용자의 게시물 목록에서 본인 게시물만 isMine이 true다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostQueryServiceTest.java,getPosts_authenticatedUser_returnsLikeInformation,로그인 사용자의 게시물 목록에 좋아요 개수와 여부를 반환한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostQueryServiceTest.java,getPosts_futureTopicDate_throwsBusinessException,KST 기준 미래 날짜를 조회하면 잘못된 요청 예외를 발생시킨다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostQueryServiceTest.java,getPosts_invalidRandomSeedCombination_throwsBusinessException,정렬과 랜덤 시드 조합이 유효하지 않으면 잘못된 요청 예외를 발생시킨다,통합(Spring+DB),@ParameterizedTest,,미이식
+post,post/service/PostQueryServiceTest.java,getPosts_popularSort_returnsPopularPostList,공개 게시물을 좋아요 개수가 많은 순서로 조회한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostQueryServiceTest.java,getPosts_randomFirstPageWithoutSeed_generatesRandomSeed,랜덤 첫 페이지에 시드가 없으면 새 시드를 생성해 반환한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostQueryServiceTest.java,getPosts_randomSortWithSeed_reusesRandomSeed,랜덤 시드를 전달하면 새 시드를 생성하지 않고 기존 시드를 사용한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostQueryServiceTest.java,getPosts_recentSort_returnsPostList,특정 날짜의 공개 게시물을 최신순으로 조회한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostQueryServiceTest.java,getPosts_unknownTopicDate_throwsNotFoundException,해당 날짜의 주제가 없으면 찾을 수 없음 예외를 발생시킨다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostQueryServiceTest.java,getPosts_withoutVisiblePosts_returnsEmptyList,주제는 있지만 공개 게시물이 없으면 빈 목록을 반환한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostTodayStatusConsistencyTest.java,getMyTodayPostStatus_existingPost_agreesWithCreatePost,기존 게시물이 있을 때 사전 확인과 게시물 생성이 같은 답을 낸다,통합(Spring+DB),@ParameterizedTest,,미이식
+post,post/service/PostTodayStatusConsistencyTest.java,getMyTodayPostStatus_noExistingPost_agreesWithCreatePost,기존 게시물이 없을 때 사전 확인과 게시물 생성이 같은 답을 낸다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostTodayStatusServiceTest.java,getMyTodayPostStatus_activePostExists_returnsPosted,참여할 수 있는 주제에 재작성을 막는 게시물이 있으면 작성함으로 판정한다,통합(Spring+DB),@ParameterizedTest,,미이식
+post,post/service/PostTodayStatusServiceTest.java,getMyTodayPostStatus_beforeOpenTopicOnly_throwsNotFoundException,아직 시작하지 않은 주제뿐이면 참여할 주제가 없다고 응답한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostTodayStatusServiceTest.java,getMyTodayPostStatus_closedTopicOnly_throwsNotFoundException,이미 끝난 주제뿐이면 참여할 주제가 없다고 응답한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostTodayStatusServiceTest.java,getMyTodayPostStatus_deletedOpenTopic_throwsNotFoundException,열린 주제가 삭제되면 참여할 주제가 없다고 응답한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostTodayStatusServiceTest.java,getMyTodayPostStatus_deletedPost_returnsNotPosted,삭제한 게시물만 있으면 미작성으로 판정한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostTodayStatusServiceTest.java,getMyTodayPostStatus_noTopic_throwsNotFoundException,주제가 하나도 없으면 참여할 주제가 없다고 응답한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostTodayStatusServiceTest.java,getMyTodayPostStatus_otherAuthorPost_returnsNotPosted,다른 회원이 같은 주제에 작성한 게시물은 판정에 영향을 주지 않는다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostTodayStatusServiceTest.java,getMyTodayPostStatus_postOnClosedTopic_returnsNotPosted,참여 기간이 지난 주제에 작성했어도 열린 주제 기준으로 판정한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostTodayStatusServiceTest.java,getMyTodayPostStatus_rejectedPost_returnsNotPosted,거절된 게시물만 있으면 미작성으로 판정한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostTodayStatusServiceTest.java,getMyTodayPostStatus_topicOpenedYesterday_returnsYesterdayTopicDate,참여 기간이 자정을 넘긴 주제는 어제 날짜로 응답한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostTodayStatusServiceTest.java,getMyTodayPostStatus_unknownUser_throwsUnauthorizedException,유효하지 않은 사용자의 조회는 인증 예외를 발생시킨다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostTodayStatusServiceTest.java,getMyTodayPostStatus_validatingPostTimedOut_returnsNotPosted,이미지 처리 대기 시간을 넘긴 게시물은 재작성할 수 있으므로 미작성으로 판정한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostUpdateConcurrencyTest.java,updateAndDelete_deletionLocksFirst_rejectsUpdateWithoutChangingTitle,삭제가 먼저 시작되면 제목 수정은 삭제 커밋을 기다린 뒤 거부된다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostUpdateConcurrencyTest.java,updateAndModerate_rejectionLocksFirst_rejectsUpdateWithoutChangingTitle,거절 검수가 먼저 시작되면 제목 수정은 검수 커밋을 기다린 뒤 거부된다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostUpdateConcurrencyTest.java,updateAndModerate_updateLocksFirst_serializesAndApprovesUpdatedPost,제목 수정이 먼저 시작되면 검수는 수정 커밋을 기다린 뒤 승인한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostUpdateConcurrencyTest.java,updateAndUpdate_firstUpdateLocksFirst_appliesSecondTitleLast,서로 다른 제목 수정은 게시물 락 순서대로 처리되어 마지막 제목을 저장한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostUpdateServiceTest.java,updatePost_approvedPost_updatesOnlyTitleAndUpdatedAt,승인 게시물 제목을 수정해도 검수 상태와 기존 시각 정보는 유지한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostUpdateServiceTest.java,updatePost_deletedPost_throwsNotFoundException,삭제된 게시물은 제목을 수정할 수 없다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostUpdateServiceTest.java,updatePost_emptyTitle_storesNullTitle,"null, 빈 문자열, 공백 제목으로 수정하면 DB에 NULL로 저장한다",통합(Spring+DB),@ParameterizedTest,,미이식
+post,post/service/PostUpdateServiceTest.java,updatePost_pendingPost_updatesNormalizedTitleAndKeepsStatus,작성자가 열린 주제의 검수 대기 게시물 제목을 수정한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostUpdateServiceTest.java,updatePost_sameNormalizedTitle_keepsUpdatedAt,정규화한 제목이 기존 제목과 같으면 DB 수정 시각을 유지한다,통합(Spring+DB),@Test,,미이식
+post,post/service/PostUpdateServiceTest.java,updatePost_withdrawnAuthor_throwsUnauthorizedException,탈퇴한 작성자의 인증 정보로 게시물 제목을 수정할 수 없다,통합(Spring+DB),@Test,,미이식
+post,post/service/RandomSeedGeneratorTest.java,generateRandomSeed_returnsEightCharacterHexString,8자리 소문자 16진수 랜덤 시드를 생성한다,단위,@Test,,미이식
+topic,topic/api/v1/controller/TopicControllerTest.java,getTopic_invalidDateFormat_returnsBadRequest,날짜 형식이 올바르지 않으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+topic,topic/api/v1/controller/TopicControllerTest.java,getTopic_openedTopic_returnsTopicDetail,공개일로 주제를 조회한다,웹 슬라이스,@Test,,미이식
+topic,topic/domain/ParticipationPeriodTest.java,create_invalidRange_throwsBusinessException,참여 종료 시각은 시작 시각보다 뒤여야 한다,단위,@Test,,미이식
+topic,topic/domain/ParticipationPeriodTest.java,create_nullBoundary_throwsBusinessException,참여 기간 시각은 필수다,단위,@Test,,미이식
+topic,topic/domain/ParticipationPeriodTest.java,phaseAt_afterEndsAt_returnsClosed,참여 기간이 지나면 참여 종료 상태다,단위,@Test,,미이식
+topic,topic/domain/ParticipationPeriodTest.java,phaseAt_beforeStartsAt_returnsBeforeOpen,참여 시작 전이면 공개 전 상태다,단위,@Test,,미이식
+topic,topic/domain/ParticipationPeriodTest.java,phaseAt_exactlyEndsAt_returnsClosed,참여 종료 시각이면 참여 종료 상태다,단위,@Test,,미이식
+topic,topic/domain/ParticipationPeriodTest.java,phaseAt_exactlyStartsAt_returnsOpen,참여 시작 시각이면 참여 가능 상태다,단위,@Test,,미이식
+topic,topic/domain/ParticipationPeriodTest.java,phaseAt_withinPeriod_returnsOpen,참여 기간 중이면 참여 가능 상태다,단위,@Test,,미이식
+topic,topic/domain/TopicTest.java,create_mismatchedTopicDate_throwsBusinessException,주제 날짜는 참여 시작일의 한국 날짜와 일치해야 한다,단위,@Test,,미이식
+topic,topic/domain/TopicTest.java,create_startedPeriod_throwsBusinessException,이미 공개가 시작된 기간으로 주제를 생성할 수 없다,단위,@Test,,미이식
+topic,topic/domain/TopicTest.java,create_validState_createsBeforeOpenTopic,공개 전 제목과 날짜·참여 기간으로 주제를 생성한다,단위,@Test,,미이식
+topic,topic/domain/TopicTest.java,delete_beforeOpen_recordsDeletedAt,공개 전 주제는 삭제 시각을 기록한다,단위,@Test,,미이식
+topic,topic/domain/TopicTest.java,delete_closedTopic_throwsStateChanged,공개가 끝난 주제는 삭제할 수 없다,단위,@Test,,미이식
+topic,topic/domain/TopicTest.java,update_beforeOpen_changesBusinessState,공개 전 주제의 제목과 날짜·기간을 수정한다,단위,@Test,,미이식
+topic,topic/domain/TopicTest.java,update_openTopic_throwsStateChanged,공개가 시작된 주제는 수정할 수 없다,단위,@Test,,미이식
+topic,topic/infrastructure/persistence/TopicRepositoryImplIntegrationTest.java,saveAndFlush_overlappingPeriodInDatabase_throwsBusinessException,실제 DB의 참여 기간 겹침 제약 위반을 관리자 안내 오류로 변환한다,통합(Spring+DB),@Test,,미이식
+topic,topic/infrastructure/persistence/TopicRepositoryImplTest.java,saveAndFlush_topicDateUniqueViolation_throwsBusinessException,활성 주제 날짜 유니크 인덱스 위반만 날짜 중복 오류로 변환한다,단위,@Test,,미이식
+topic,topic/infrastructure/persistence/TopicRepositoryImplTest.java,saveAndFlush_topicPeriodOverlap_throwsBusinessException,참여 기간 겹침 제약 위반을 관리자 안내 오류로 변환한다,단위,@Test,,미이식
+topic,topic/infrastructure/persistence/TopicRepositoryImplTest.java,saveAndFlush_unknownIntegrityViolation_propagatesOriginalException,알 수 없는 무결성 오류는 날짜 중복 오류로 변환하지 않고 전파한다,단위,@Test,,미이식
+topic,topic/infrastructure/persistence/TopicRepositoryTest.java,findActiveByTopicDate_deletedTopic_returnsEmpty,삭제된 주제는 조회하지 않는다,JPA 슬라이스,@Test,,미이식
+topic,topic/infrastructure/persistence/TopicRepositoryTest.java,findActiveByTopicDate_existingTopic_returnsTopic,공개일로 주제를 조회한다,JPA 슬라이스,@Test,,미이식
+topic,topic/infrastructure/persistence/TopicRepositoryTest.java,findActiveByTopicDate_noTopicOnDate_returnsEmpty,주제가 없는 날짜는 조회하지 않는다,JPA 슬라이스,@Test,,미이식
+topic,topic/service/TopicServiceTest.java,getTopic_futureDate_throwsBusinessException,오늘보다 미래의 주제는 조회할 수 없다,통합(Spring+DB),@Test,,미이식
+topic,topic/service/TopicServiceTest.java,getTopic_noTopicOnDate_throwsNotFoundException,주제가 없는 날짜는 조회할 수 없다,통합(Spring+DB),@Test,,미이식
+topic,topic/service/TopicServiceTest.java,getTopic_openedTopic_returnsTopicDetail,공개일로 주제를 조회한다,통합(Spring+DB),@Test,,미이식
+user,user/api/internal/v1/controller/SignatureProcessingCallbackControllerTest.java,complete_authenticatedCallback_completesProcessing,인증된 성공 콜백은 pending 사인을 승격하고 204를 반환한다,웹 슬라이스,@Test,,미이식
+user,user/api/internal/v1/controller/SignatureProcessingCallbackControllerTest.java,complete_invalidSignature_returnsUnauthorized,서명이 올바르지 않은 콜백은 401을 반환하고 상태를 변경하지 않는다,웹 슬라이스,@Test,,미이식
+user,user/api/internal/v1/controller/SignatureProcessingCallbackControllerTest.java,complete_missingSignatureHeader_returnsUnauthorized,서명 헤더가 없는 콜백은 401을 반환하고 상태를 변경하지 않는다,웹 슬라이스,@Test,,미이식
+user,user/api/internal/v1/controller/SignatureProcessingCallbackControllerTest.java,complete_missingTimestampHeader_returnsUnauthorized,timestamp 헤더가 없는 콜백은 401을 반환하고 상태를 변경하지 않는다,웹 슬라이스,@Test,,미이식
+user,user/api/internal/v1/controller/SignatureProcessingCallbackControllerTest.java,fail_authenticatedCallback_failsProcessing,인증된 실패 콜백은 pending 사인을 실패로 바꾸고 204를 반환한다,웹 슬라이스,@Test,,미이식
+user,user/api/internal/v1/controller/SignatureProcessingCallbackControllerTest.java,issueUploadUrls_authenticatedRequest_returnsPresignedUrls,인증된 Lambda에 사인 처리 결과용 presigned URL을 발급한다,웹 슬라이스,@Test,,미이식
+user,user/api/internal/v1/controller/SignatureProcessingCallbackControllerTest.java,issueUploadUrls_nonCanonicalUploadId_returnsBadRequest,정규 형식이 아닌 업로드 ID에는 사인 처리 결과 URL을 발급하지 않는다,웹 슬라이스,@Test,,미이식
+user,user/api/v1/controller/UserControllerTest.java,createSignatureUpload_missingUserIdHeader_returnsUnauthorized,사인 업로드 URL 발급에 사용자 식별 헤더가 없으면 401을 반환한다,웹 슬라이스,@Test,,미이식
+user,user/api/v1/controller/UserControllerTest.java,createSignatureUpload_notExistingUser_returnsUnauthorized,사인을 업로드할 회원이 없으면 401을 반환한다,웹 슬라이스,@Test,,미이식
+user,user/api/v1/controller/UserControllerTest.java,createSignatureUpload_validRequest_returnsUploadInformation,사인 업로드 URL 발급에 성공하면 업로드 정보를 반환한다,웹 슬라이스,@Test,,미이식
+user,user/api/v1/controller/UserControllerTest.java,getSignature_notExistingUser_returnsUnauthorized,사인을 조회할 회원이 없으면 401을 반환한다,웹 슬라이스,@Test,,미이식
+user,user/api/v1/controller/UserControllerTest.java,getSignature_processingFailed_returnsBadRequest,사인 처리가 실패했으면 재등록용 오류를 반환한다,웹 슬라이스,@Test,,미이식
+user,user/api/v1/controller/UserControllerTest.java,getSignature_unauthenticated_returnsUnauthorized,내 사인 조회에 인증 정보가 없으면 401을 반환한다,웹 슬라이스,@Test,,미이식
+user,user/api/v1/controller/UserControllerTest.java,getSignature_validRequest_returnsOriginalAndThumbnailImageUrls,내 사인 조회에 성공하면 현재 사인의 원본과 썸네일 이미지 URL을 반환한다,웹 슬라이스,@Test,,미이식
+user,user/api/v1/controller/UserControllerTest.java,updateSignature_disallowedImage_returnsBadRequest,사용할 수 없는 사인 이미지면 400을 반환한다,웹 슬라이스,@Test,,미이식
+user,user/api/v1/controller/UserControllerTest.java,updateSignature_failedUpload_returnsReuploadRequired,실패한 사인 업로드를 다시 요청하면 이미지 재업로드 오류를 반환한다,웹 슬라이스,@Test,,미이식
+user,user/api/v1/controller/UserControllerTest.java,updateSignature_invalidUploadId_returnsBadRequest,업로드 식별자가 UUID 형식이 아니면 400을 반환한다,웹 슬라이스,@Test,,미이식
+user,user/api/v1/controller/UserControllerTest.java,updateSignature_missingUploadId_returnsBadRequest,업로드 식별자가 없으면 400을 반환한다,웹 슬라이스,@Test,,미이식
+user,user/api/v1/controller/UserControllerTest.java,updateSignature_missingUserIdHeader_returnsUnauthorized,사인 교체에 사용자 식별 헤더가 없으면 401을 반환한다,웹 슬라이스,@Test,,미이식
+user,user/api/v1/controller/UserControllerTest.java,updateSignature_notUploadedImage_returnsNotFound,업로드한 사인 이미지를 찾을 수 없으면 404를 반환한다,웹 슬라이스,@Test,,미이식
+user,user/api/v1/controller/UserControllerTest.java,updateSignature_validRequest_returnsImageUrl,사인 교체에 성공하면 이미지 URL을 반환한다,웹 슬라이스,@Test,,미이식
+user,user/api/v1/controller/UserControllerTest.java,withdraw_bothHeaderAndQueryParameter_usesHeader,쿼리 파라미터를 함께 보내도 헤더의 식별자로 탈퇴한다,웹 슬라이스,@Test,,미이식
+user,user/api/v1/controller/UserControllerTest.java,withdraw_notExistingUser_returnsUnauthorized,탈퇴할 회원이 없으면 401을 반환한다,웹 슬라이스,@Test,,미이식
+user,user/api/v1/controller/UserControllerTest.java,withdraw_unauthenticated_returnsUnauthorized,인증 정보가 없으면 401을 반환한다,웹 슬라이스,@Test,,미이식
+user,user/api/v1/controller/UserControllerTest.java,withdraw_userIdAsQueryParameter_returnsUnauthorized,사용자 식별자를 쿼리 파라미터로 보내면 탈퇴를 시도하지 않는다,웹 슬라이스,@Test,,미이식
+user,user/api/v1/controller/UserControllerTest.java,withdraw_validRequest_returnsNoContent,탈퇴에 성공하면 204를 반환한다,웹 슬라이스,@Test,,미이식
+user,user/domain/SignatureImagePolicyTest.java,validate_allowedImage_doesNotThrow,허용 형식이고 크기 제한 이내면 통과한다,단위,@Test,,미이식
+user,user/domain/SignatureImagePolicyTest.java,validate_disallowedContentType_throwsException,허용하지 않는 형식이면 예외를 발생시킨다,단위,@Test,,미이식
+user,user/domain/SignatureImagePolicyTest.java,validate_tooLargeImage_throwsException,크기 제한을 넘으면 예외를 발생시킨다,단위,@Test,,미이식
+user,user/domain/SignatureImagePolicyTest.java,validate_unknownContentType_throwsException,형식을 알 수 없으면 예외를 발생시킨다,단위,@Test,,미이식
+user,user/domain/UserTest.java,ban_activeUser_changesStatusToBanned,활성 회원을 차단하면 BANNED 상태가 된다,단위,@Test,,미이식
+user,user/domain/UserTest.java,ban_bannedUser_throwsException,차단된 회원을 다시 차단할 수 없다,단위,@Test,,미이식
+user,user/domain/UserTest.java,ban_withdrawnUser_throwsException,탈퇴한 회원을 차단할 수 없다,단위,@Test,,미이식
+user,user/domain/UserTest.java,completeSignatureProcessing_matchingUpload_promotesAndClearsPending,처리 중인 업로드가 완료되면 활성 키를 승격하고 pending 정보를 지운다,단위,@Test,,미이식
+user,user/domain/UserTest.java,completeSignatureProcessing_staleUpload_ignoresCallback,현재 pending과 다른 업로드의 느린 완료 콜백은 무시한다,단위,@Test,,미이식
+user,user/domain/UserTest.java,create_missingOriginalStorageKey_throwsException,원본 사인 키가 없으면 회원을 생성할 수 없다,단위,@Test,,미이식
+user,user/domain/UserTest.java,create_withoutEmail_createsActiveUserWithSignature,이메일 없이 처리 완료된 사인으로 활성 회원을 생성한다,단위,@Test,,미이식
+user,user/domain/UserTest.java,failSignatureProcessing_matchingUpload_marksFailedAndPreservesActiveKeys,영구 실패 콜백은 기존 활성 사인을 유지하고 pending 상태를 실패로 바꾼다,단위,@Test,,미이식
+user,user/domain/UserTest.java,hasSignature_differentStorageKey_returnsFalse,현재 사인과 다른 원본 키를 가지고 있으면 거짓이다,단위,@Test,,미이식
+user,user/domain/UserTest.java,hasSignature_nullStorageKey_returnsFalse,null 원본 키를 조회하면 거짓이다,단위,@Test,,미이식
+user,user/domain/UserTest.java,hasSignature_sameStorageKey_returnsTrue,현재 사인과 같은 원본 키를 가지고 있으면 참이다,단위,@Test,,미이식
+user,user/domain/UserTest.java,isActive_activeUser_returnsTrue,탈퇴하지 않고 상태가 ACTIVE면 활성 회원이다,단위,@Test,,미이식
+user,user/domain/UserTest.java,isActive_bannedUser_returnsFalse,차단된 회원은 활성 회원이 아니다,단위,@Test,,미이식
+user,user/domain/UserTest.java,isActive_withdrawnUser_returnsFalse,탈퇴한 회원은 활성 회원이 아니다,단위,@Test,,미이식
+user,user/domain/UserTest.java,isDeleted_activeUser_returnsFalse,탈퇴 전에는 삭제된 회원이 아니다,단위,@Test,,미이식
+user,user/domain/UserTest.java,isSignatureProcessing_differentUpload_returnsFalse,현재 pending과 다른 업로드 ID이면 처리 중이 아니다,단위,@Test,,미이식
+user,user/domain/UserTest.java,isSignatureProcessing_failedUpload_returnsFalse,실패한 동일 업로드 ID는 처리 중이 아니라 실패로 판단한다,단위,@Test,,미이식
+user,user/domain/UserTest.java,isSignatureProcessing_processingUpload_returnsTrue,처리 중인 동일 업로드 ID는 처리 중으로 판단한다,단위,@Test,,미이식
+user,user/domain/UserTest.java,startSignatureProcessing_activeSignature_preservesActiveKeys,사인 처리를 시작해도 현재 활성 사인은 유지한다,단위,@Test,,미이식
+user,user/domain/UserTest.java,startSignatureProcessing_withdrawnUser_throwsException,탈퇴한 회원은 사인 처리를 시작할 수 없다,단위,@Test,,미이식
+user,user/domain/UserTest.java,unban_activeUser_throwsException,활성 회원을 차단 해제할 수 없다,단위,@Test,,미이식
+user,user/domain/UserTest.java,unban_bannedUser_changesStatusToActive,차단된 회원을 해제하면 ACTIVE 상태가 된다,단위,@Test,,미이식
+user,user/domain/UserTest.java,validateAccessible_activeUser_doesNotThrow,활성 회원은 사용자 기능을 이용할 수 있다,단위,@Test,,미이식
+user,user/domain/UserTest.java,validateAccessible_bannedUser_throwsForbiddenException,차단된 회원은 기존 FORBIDDEN 코드로 접근을 거절한다,단위,@Test,,미이식
+user,user/domain/UserTest.java,validateAccessible_withdrawnUser_throwsUnauthorizedException,탈퇴한 회원은 유효하지 않은 인증으로 거절한다,단위,@Test,,미이식
+user,user/domain/UserTest.java,withdraw_activeUser_anonymizesPersonalData,탈퇴하면 개인 식별 정보가 비식별화된다,단위,@Test,,미이식
+user,user/domain/UserTest.java,withdraw_activeUser_recordsDeletedAt,탈퇴하면 탈퇴 시각이 기록된다,단위,@Test,,미이식
+user,user/domain/UserTest.java,withdraw_alreadyWithdrawnUser_throwsException,이미 탈퇴한 회원은 다시 탈퇴할 수 없다,단위,@Test,,미이식
+user,user/infrastructure/infra/S3SignatureImageStorageTest.java,findUploadedImage_accessDenied_returnsEmpty,ListBucket 권한이 없어 403이 와도 빈 값을 반환한다,단위,@Test,,미이식
+user,user/infrastructure/infra/S3SignatureImageStorageTest.java,findUploadedImage_existingStagingImage_usesSignatureStagingPath,사인 업로드 이미지는 staging/dev/signatures 경로에서 조회한다,단위,@Test,,미이식
+user,user/infrastructure/infra/S3SignatureImageStorageTest.java,findUploadedImage_noSuchKey_returnsEmpty,객체가 없으면 빈 값을 반환한다,단위,@Test,,미이식
+user,user/infrastructure/infra/S3SignatureImageStorageTest.java,findUploadedImage_serverError_propagates,403과 404가 아닌 S3 오류는 전파한다,단위,@Test,,미이식
+user,user/infrastructure/infra/S3SignatureImageStorageTest.java,isProcessingCompleted_existingThumbnail_returnsTrue,썸네일 객체가 있으면 사인 처리가 완료된 것으로 판단한다,단위,@Test,,미이식
+user,user/infrastructure/infra/S3SignatureImageStorageTest.java,toImageUrl_originalStorageKey_excludesRootPrefix,이미지 URL은 CloudFront 오리진 경로인 root-prefix를 제외하고 만든다,단위,@Test,,미이식
+user,user/infrastructure/infra/S3SignatureImageStorageTest.java,toImageUrl_storageKeyWithoutRootPrefix_throwsIllegalArgumentException,root-prefix로 시작하지 않는 스토리지 키면 예외를 발생시킨다,단위,@Test,,미이식
+user,user/infrastructure/infra/S3SignatureImageStorageTest.java,toStorageKeys_prodEnvironment_createsProdKeys,운영 환경은 prod 경로에 원본과 썸네일 키를 만든다,단위,@Test,,미이식
+user,user/infrastructure/infra/S3SignatureImageStorageTest.java,toStorageKeys_uploadId_createsOriginalAndThumbnailKeys,업로드 ID로 원본과 썸네일의 결정적 스토리지 키를 만든다,단위,@Test,,미이식
+user,user/infrastructure/infra/S3SignatureImageUploadIssuerTest.java,issueProcessingUpload_presignsOriginalAndThumbnailKeys,사인 처리 결과의 원본과 썸네일 키에 덮어쓰기 방지 URL을 발급한다,단위,@Test,,미이식
+user,user/infrastructure/infra/S3SignatureImageUploadIssuerTest.java,issue_devEnvironment_presignsDevSignatureUpload,개발 환경 사인 PNG 업로드 URL을 5분 동안 유효하게 발급한다,단위,@Test,,미이식
+user,user/infrastructure/persistence/UserRepositoryTest.java,save_duplicateEmail_succeeds,동일한 이메일을 가진 여러 회원을 저장할 수 있다,통합(Spring+DB),@Test,,미이식
+user,user/service/SignatureProcessingPolicyTest.java,constructor_nonPositiveTimeout_throwsException,사인 처리 제한 시간은 0보다 커야 한다,단위,@Test,,미이식
+user,user/service/SignatureProcessingPolicyTest.java,isProcessingTimedOut_afterTimeout_returnsTrue,대기 시간을 넘기면 사인 처리가 타임아웃된 것으로 본다,단위,@Test,,미이식
+user,user/service/SignatureProcessingPolicyTest.java,isProcessingTimedOut_atTimeout_returnsFalse,대기 시간 경계에서는 사인 처리를 계속 기다린다,단위,@Test,,미이식
+user,user/service/SignatureProcessingPolicyTest.java,isProcessingTimedOut_beforeTimeout_returnsFalse,대기 시간 직전에는 사인 처리를 계속 기다린다,단위,@Test,,미이식
+user,user/service/UserServiceTest.java,completeSignatureProcessing_afterPermanentFailure_doesNotPromote,영구 실패가 확정된 뒤 도착한 성공 콜백은 승격하지 않는다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,completeSignatureProcessing_cancelledPending_doesNotOverwriteActive,취소된 pending의 뒤늦은 성공 콜백은 활성 사인을 바꾸지 못한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,completeSignatureProcessing_duplicateCallback_isIdempotent,같은 성공 콜백이 두 번 도착해도 첫 승격 결과를 유지한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,completeSignatureProcessing_matchingPending_promotesSignature,성공 콜백은 pending 사인을 활성 사인으로 승격한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,completeSignatureProcessing_staleUpload_ignoresCallback,현재 pending과 다른 업로드의 느린 성공 콜백은 무시한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,completeSignatureProcessing_timedOutPending_ignoresCallback,제한 시간을 넘겨 도착한 성공 콜백은 무시한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,createSignatureUpload_activeUser_issuesUploadUrl,활성 회원이 사인 업로드를 요청하면 새 업로드 URL을 발급한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,createSignatureUpload_notExistingUser_throwsUnauthorizedException,존재하지 않는 회원의 사인 업로드 URL 발급은 인증 실패로 거부한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,createSignatureUpload_withdrawnUser_throwsUnauthorizedException,탈퇴한 회원의 사인 업로드 URL 발급은 인증 실패로 거부한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,failSignatureProcessing_afterPromotion_keepsActiveSignature,승격이 끝난 뒤 도착한 실패 콜백은 활성 사인을 훼손하지 않는다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,failSignatureProcessing_matchingPending_preservesActiveSignature,실패 콜백은 기존 활성 사인을 유지하고 처리 상태만 실패로 바꾼다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,getSignature_failedPending_throwsBusinessException,이미 실패한 사인을 조회하면 재등록 오류를 발생시킨다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,getSignature_notExistingUser_throwsUnauthorizedException,사인을 조회할 회원이 없으면 인증 실패로 거부한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,getSignature_processingWithinTimeout_returnsActiveSignatureUrls,사인 처리 시작 후 7분이 지나지 않았으면 현재 활성 사인의 URL들을 반환한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,getSignature_timedOutPending_keepsProcessingAndThrowsBusinessException,사인 처리가 제한 시간을 넘으면 상태 변경 없이 재등록 오류를 발생시킨다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,getSignature_withoutPending_returnsActiveSignatureUrls,처리 중인 새 사인이 없으면 현재 활성 사인의 원본과 썸네일 URL을 반환한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,updateSignature_alreadyProcessedImage_promotesImmediately,Lambda가 등록 API보다 먼저 완료했으면 pending 저장 후 즉시 승격한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,updateSignature_alreadyUsedStorageKey_throwsNotFoundException,다른 회원이 이미 쓴 사인 키는 사용할 수 없다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,updateSignature_disallowedContentType_throwsBusinessException,허용하지 않는 형식의 사인 이미지는 사용할 수 없다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,updateSignature_newUploadAfterTimeout_startsNewProcessing,타임아웃 후 새로운 사인 업로드를 요청하면 새 처리를 시작한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,updateSignature_notExistingUser_throwsUnauthorizedException,존재하지 않는 회원의 사인 교체는 인증 실패로 거부한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,updateSignature_notUploadedImage_throwsNotFoundException,업로드되지 않은 사인 이미지는 사용할 수 없다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,updateSignature_revertToActiveSignature_cancelsPendingProcessing,현재 활성 사인으로 되돌리면 진행 중이던 pending을 취소한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,updateSignature_sameFailedUploadId_throwsReuploadRequiredException,실패한 사인 업로드를 다시 요청하면 새 업로드가 필요하다고 안내한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,updateSignature_samePendingUploadIdTwice_returnsSameActiveImageUrl,처리 중인 같은 사인 업로드를 다시 요청해도 같은 활성 이미지 URL을 반환한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,updateSignature_sameTimedOutUploadId_throwsReuploadRequiredException,타임아웃된 같은 사인 업로드를 다시 요청하면 새 업로드가 필요하다고 안내한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,updateSignature_storageKeyAlreadyOwnedByUser_keepsThumbnailKey,이미 반영된 사인을 다시 요청해도 썸네일 키를 유지한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,updateSignature_uploadedImage_startsProcessingAndPreservesActiveSignature,사인 수정을 요청하면 기존 활성 사인을 유지하고 pending 정보를 저장한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,updateSignature_withdrawnUser_throwsUnauthorizedException,탈퇴한 회원의 사인 교체는 인증 실패로 거부한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,withdraw_activeUser_anonymizesPersonalData,탈퇴하면 개인 식별 정보가 비식별화되고 탈퇴 시각이 기록된다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,withdraw_activeUser_blocksRefreshWithIssuedToken,탈퇴한 회원의 리프레시 토큰으로 재발급하면 재로그인을 요구한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,withdraw_activeUser_deletesSocialAccount,탈퇴하면 연결된 소셜 계정이 삭제된다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,withdraw_activeUser_excludesFromActiveQuery,탈퇴한 회원은 살아있는 회원 조회에서 제외된다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,withdraw_activeUser_revokesEveryRefreshTokenOfThatUser,탈퇴하면 모든 기기의 리프레시 토큰이 폐기되고 다른 회원의 토큰은 그대로 남는다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,withdraw_alreadyWithdrawnUser_throwsUnauthorizedException,이미 탈퇴한 회원은 존재하지 않는 회원과 동일하게 인증 실패로 거부한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,withdraw_appleUser_deletesAppleAuthorization,Apple 회원이 탈퇴하면 Apple 인증 정보가 삭제된다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,withdraw_authorizationSnapshotMismatch_throwsBusinessExceptionWithoutDeleting,스냅샷과 실제 저장된 인증 정보가 다르면 삭제 없이 예외가 발생한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,withdraw_bannedAppleUser_deletesAppleAuthorizationOnly,차단된 Apple 회원이 탈퇴하면 소셜 계정은 남기고 Apple 인증 정보만 삭제한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,withdraw_bannedUser_preservesSocialAccount,차단 회원이 탈퇴하면 재가입 차단을 위해 소셜 계정을 유지한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserServiceTest.java,withdraw_notExistingUser_throwsUnauthorizedException,존재하지 않는 회원의 탈퇴는 인증 실패로 거부한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserWithdrawalServiceTest.java,withdraw_alreadyWithdrawnUser_throwsUnauthorizedException,이미 탈퇴한 회원은 폐기 요청 없이 예외가 발생한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserWithdrawalServiceTest.java,withdraw_appleUser_revokesRefreshTokenAndDeletesAuthorization,Apple 회원이 탈퇴하면 Apple에 RT를 폐기하고 인증 정보를 삭제한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserWithdrawalServiceTest.java,withdraw_authorizationReplacedDuringRevocation_failsAndKeepsReplacedToken,폐기와 삭제 사이 인증이 다른 RT로 교체되면 탈퇴가 실패하고 교체된 RT를 유지한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserWithdrawalServiceTest.java,withdraw_bannedAppleUser_preservesSocialAccountAndDeletesAuthorization,차단된 Apple 회원이 탈퇴하면 소셜 계정은 남기고 인증 정보만 삭제한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserWithdrawalServiceTest.java,withdraw_nonAppleUser_withdrawsWithoutRevocation,Apple 회원이 아니면 폐기 요청 없이 탈퇴한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserWithdrawalServiceTest.java,withdraw_notExistingUser_throwsUnauthorizedException,탈퇴할 회원이 없으면 폐기 요청 없이 예외가 발생한다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserWithdrawalServiceTest.java,withdraw_revocationFailure_preservesUserAndAuthorization,Apple 폐기에 실패하면 회원과 인증 정보를 그대로 두고 탈퇴하지 않는다,통합(Spring+DB),@Test,,미이식
+user,user/service/UserWithdrawalTransactionTest.java,withdraw_activeUser_completesWithdrawalInTransaction,공개 탈퇴 진입점은 내부 완료 메서드의 트랜잭션으로 회원을 탈퇴 처리한다,통합(Spring+DB),@Test,,미이식
