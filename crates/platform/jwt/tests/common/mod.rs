@@ -61,6 +61,11 @@ pub fn b64url_decode(text: &str) -> Vec<u8> {
 
 /// RFC 7515 A.2 개인키로 RS256 토큰을 만든다. 헤더·페이로드는 호출자가 만든 JSON 그대로 쓴다.
 pub fn rfc_rsa_signer() -> SigningKey<Sha256> {
+    static KEY: std::sync::OnceLock<SigningKey<Sha256>> = std::sync::OnceLock::new();
+    KEY.get_or_init(build_rfc_rsa_signer).clone()
+}
+
+fn build_rfc_rsa_signer() -> SigningKey<Sha256> {
     let rfc = rfc();
     let rsa = &rfc["rs256"];
     let big = |name: &str| BigUint::from_bytes_be(&b64url_decode(s(&rsa[name])));

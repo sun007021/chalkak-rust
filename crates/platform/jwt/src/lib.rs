@@ -11,6 +11,7 @@ mod es256;
 mod hs256;
 mod json;
 mod jwks;
+mod jwks_cache;
 mod jws;
 pub mod original;
 mod validator;
@@ -21,4 +22,8 @@ pub use error::{JwksError, JwtError};
 pub use es256::{Es256PublicKey, Es256Signer, es256_sign, es256_verify};
 pub use hs256::{hs256_decode, hs256_encode};
 pub use jwks::{Jwk, Jwks, rs256_verify};
+pub use jwks_cache::{
+    Clock, JWKS_ACCEPT, JWKS_CONNECT_TIMEOUT, JWKS_READ_TIMEOUT, JwksCache, JwksCacheConfig,
+    JwksFetchError, JwksSource, SystemClock,
+};
 pub use validator::{ClaimError, Validator};

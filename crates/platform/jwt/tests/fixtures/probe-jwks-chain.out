@@ -1,0 +1,25 @@
+== 1) 원본 createJwkSource, 기본 설정
+kid=k1 -> key  (fetches 1)   <- 첫 조회
+kid=k1 -> key  (fetches 0)   <- 캐시
+kid=x1 -> no key  (fetches 1)   <- 모르는 kid, 재조회(구간 2회째)
+17:04:33.727 [main] WARN com.chalkak.backend.auth.infrastructure.infra.oidc.OidcJwkSetEventLogger -- GOOGLE 공개키 목록 재조회 제한에 걸려 조회 없이 ID Token 검증에 실패했습니다.
+kid=x2 -> RateLimitReachedException: null   <- 3회째는 제한
+kid=k1 -> key  (fetches 0)   <- 캐시된 kid는 제한과 무관
+17:04:33.940 [main] WARN com.chalkak.backend.auth.infrastructure.infra.oidc.OidcJwkSetEventLogger -- GOOGLE 공개키 목록 조회에 실패해 한 번 더 시도합니다. cause=Couldn't retrieve JWK set from URL: down
+kid=k1 -> key  (fetches 2)   <- 첫 조회에서 한 번 실패하면 재시도
+17:04:33.941 [main] WARN com.chalkak.backend.auth.infrastructure.infra.oidc.OidcJwkSetEventLogger -- GOOGLE 공개키 목록 조회에 실패해 한 번 더 시도합니다. cause=Couldn't retrieve JWK set from URL: down
+kid=k1 -> JWKSetRetrievalException: Couldn't retrieve JWK set from URL: down   <- 두 번 실패(기동 직후)
+17:04:33.941 [main] WARN com.chalkak.backend.auth.infrastructure.infra.oidc.OidcJwkSetEventLogger -- GOOGLE 공개키 목록 조회에 실패해 한 번 더 시도합니다. cause=Couldn't retrieve JWK set from URL: down
+kid=k1 -> JWKSetRetrievalException: Couldn't retrieve JWK set from URL: down   <- 두 번째 요청도 실패
+17:04:33.942 [main] WARN com.chalkak.backend.auth.infrastructure.infra.oidc.OidcJwkSetEventLogger -- GOOGLE 공개키 목록 재조회 제한에 걸려 조회 없이 ID Token 검증에 실패했습니다.
+kid=k1 -> RateLimitReachedException: null   <- 세 번째는 구간 소진으로 제한
+17:04:33.942 [main] WARN com.chalkak.backend.auth.infrastructure.infra.oidc.OidcJwkSetEventLogger -- GOOGLE 공개키 목록 조회에 실패해 한 번 더 시도합니다. cause=Unable to parse JWK set
+kid=k1 -> JWKSetParseException: Unable to parse JWK set   <- 본문 해석 실패도 재시도 대상
+== 2) 같은 체인, 시간 축소(캐시 3초, 구간 1초, 장애 허용 10초)
+t=0s    kid=k1 -> key  (fetches 1)
+t=3.2s  kid=k1 -> key  (fetches 2)   <- 만료 후 두 번 실패, 이전 목록 사용
+t=3.2s  kid=k1 -> key  (fetches 0)   <- 이전 목록이 캐시를 다시 채움
+t=3.2s  kid=k2 -> no key  (fetches 2)   <- 장애 중 모르는 kid
+t=6.4s  kid=k1 -> key  (fetches 2)
+t=9.6s  kid=k1 -> key  (fetches 2)
+t=12.8s kid=k1 -> JWKSetRetrievalException: Couldn't retrieve JWK set from URL: down   <- 마지막 성공(t=0)으로부터 10초 초과
