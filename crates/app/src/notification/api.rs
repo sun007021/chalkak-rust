@@ -239,10 +239,12 @@ fn parse_list_request(req: &Request) -> Result<(i32, i32), ApiError> {
     Ok((page, page_size))
 }
 
-/// `Integer` 쿼리 값 바인딩. 없거나 빈 문자열이면 `None`, 같은 이름이 여러 번이면 첫 값을 쓴다.
+/// `Integer` 쿼리 값 바인딩. 없거나 공백뿐이면 `None`(기본값을 쓴다), 같은 이름이 여러 번이면 첫 값을 쓴다.
+/// 공백뿐인 값도 기본값이 되는 것은 java-a에 직접 보내 확인한 동작이다.
 fn bind_integer(req: &Request, name: &str) -> Result<Option<i32>, ApiError> {
     match req.query_param(name) {
-        None | Some("") => Ok(None),
+        None => Ok(None),
+        Some(text) if text.chars().all(is_java_whitespace) => Ok(None),
         Some(text) => parse_spring_integer(text)
             .map(Some)
             .ok_or_else(|| ApiError::ArgumentTypeMismatch(name.to_owned())),
@@ -279,13 +281,51 @@ fn parse_digits(digits: &str, radix: u32, negative: bool) -> Option<i32> {
     }
     let mut value: i64 = 0;
     for c in digits.chars() {
-        value = value * i64::from(radix) + i64::from(c.to_digit(radix)?);
+        value = value * i64::from(radix) + i64::from(java_digit(c, radix)?);
         if value > i64::from(i32::MAX) + 1 {
             return None;
         }
     }
     let value = if negative { -value } else { value };
     i32::try_from(value).ok()
+}
+
+/// 유니코드 십진수(Nd) 글자 묶음의 첫 글자('0'에 해당). 각 묶음은 연속한 10글자다. JDK 25(유니코드 16)의 `Character.digit` 기준.
+const DECIMAL_DIGIT_ZEROS: [u32; 73] = [
+    0x30, 0x660, 0x6F0, 0x7C0, 0x966, 0x9E6, 0xA66, 0xAE6, 0xB66, 0xBE6, 0xC66, 0xCE6, 0xD66,
+    0xDE6, 0xE50, 0xED0, 0xF20, 0x1040, 0x1090, 0x17E0, 0x1810, 0x1946, 0x19D0, 0x1A80, 0x1A90,
+    0x1B50, 0x1BB0, 0x1C40, 0x1C50, 0xA620, 0xA8D0, 0xA900, 0xA9D0, 0xA9F0, 0xAA50, 0xABF0, 0xFF10,
+    0x104A0, 0x10D30, 0x10D40, 0x11066, 0x110F0, 0x11136, 0x111D0, 0x112F0, 0x11450, 0x114D0,
+    0x11650, 0x116C0, 0x11730, 0x118E0, 0x11950, 0x11BF0, 0x11C50, 0x11D50, 0x11DA0, 0x11F50,
+    0x16130, 0x16A60, 0x16AC0, 0x16B50, 0x16D70, 0x1D7CE, 0x1D7D8, 0x1D7E2, 0x1D7EC, 0x1D7F6,
+    0x1E140, 0x1E2F0, 0x1E4F0, 0x1E5F1, 0x1E950, 0x1FBF0,
+];
+
+/// Java `Character.digit(c, radix)`: 유니코드 십진수와 (16진수일 때) 전각 영문자도 받는다. `radix`는 10 또는 16.
+fn java_digit(c: char, radix: u32) -> Option<u32> {
+    let cp = u32::from(c);
+    if cp > 0xFFFF {
+        // Integer.parseInt는 char(UTF-16 코드 유닛) 단위라 보조 평면 숫자는 받지 못한다.
+        return None;
+    }
+    let value = if let Some(v) = c.to_digit(16) {
+        // ASCII 숫자와 영문자 a-f/A-F
+        v
+    } else if let Some(zero) = DECIMAL_DIGIT_ZEROS
+        .iter()
+        .rev()
+        .find(|&&zero| zero <= cp)
+        .filter(|&&zero| cp < zero + 10)
+    {
+        cp - zero
+    } else if (0xFF21..=0xFF26).contains(&cp) {
+        cp - 0xFF21 + 10
+    } else if (0xFF41..=0xFF46).contains(&cp) {
+        cp - 0xFF41 + 10
+    } else {
+        return None;
+    };
+    (value < radix).then_some(value)
 }
 
 #[cfg(test)]
@@ -310,6 +350,11 @@ mod tests {
     fn 목록_조건을_생략하면_기본값이다() {
         assert_eq!(list(&[]).unwrap(), (1, 20));
         assert_eq!(list(&[("page", ""), ("pageSize", "")]).unwrap(), (1, 20));
+        // 공백뿐인 값도 기본값이다(java-a 확인).
+        assert_eq!(
+            list(&[("page", " \t"), ("pageSize", "\u{3000}")]).unwrap(),
+            (1, 20)
+        );
     }
 
     // NotificationControllerTest#getNotifications_invalidPageSize_returnsBadRequest
@@ -344,6 +389,8 @@ mod tests {
             "pageSize: 요청 값의 형식이 올바르지 않습니다."
         );
         assert!(list(&[("page", "2147483648")]).is_err());
+        // 보조 평면 숫자(수학용 숫자)는 자바가 char 단위로 읽어 받지 못한다
+        assert!(list(&[("page", "\u{1D7E4}")]).is_err());
     }
 
     #[test]
@@ -371,7 +418,20 @@ mod tests {
         assert_eq!(parse_spring_integer("-2147483648"), Some(i32::MIN));
         assert_eq!(parse_spring_integer("2147483648"), None);
         assert_eq!(parse_spring_integer("0xFFFFFFFF"), None);
-        for bad in ["", " ", "-", "+", "0x", "--1", "1e3", "٣x"] {
+        assert_eq!(parse_spring_integer("٢"), Some(2), "아랍-인도 숫자");
+        assert_eq!(parse_spring_integer("２"), Some(2), "전각 숫자");
+        assert_eq!(parse_spring_integer("0x１Ｆ"), Some(31), "전각 16진수");
+        assert_eq!(
+            parse_spring_integer("\u{3000}2"),
+            Some(2),
+            "전각 공백은 공백이다"
+        );
+        assert_eq!(
+            parse_spring_integer("\u{a0}2"),
+            None,
+            "NBSP는 공백이 아니다"
+        );
+        for bad in ["", " ", "-", "+", "0x", "--1", "1e3", "٣x", "²", "Ⅳ"] {
             assert_eq!(parse_spring_integer(bad), None, "{bad:?}");
         }
     }
