@@ -23,6 +23,7 @@ use web::access::AccessLog;
 use web::actuator::{Actuator, DatabaseCheck};
 use web::authorize::Authorize;
 use web::bearer::BearerAuth;
+use web::callback_limit::CallbackBodyLimit;
 use web::cors::AdminCors;
 use web::dispatch::Dispatcher;
 use web::firewall::Firewall;
@@ -49,6 +50,7 @@ pub fn build_chain(
     Chain::new(Dispatcher::new(router, actuator))
         .layer(Tomcat::new(Arc::clone(&clock)))
         .layer(AccessLog::new(Arc::clone(&logger)))
+        .layer(CallbackBodyLimit::new(settings.app.callback.max_body_bytes))
         .layer(Firewall::new(Arc::clone(&clock)))
         .layer(SecurityHeaders)
         .layer(AdminCors::new(&settings.admin_cors_allowed_origins))
@@ -76,6 +78,7 @@ pub fn build_handler(
         pool: pool.clone(),
         clock: Arc::clone(&clock),
         logger: Arc::clone(&logger),
+        settings: Arc::new(settings.app.clone()),
     };
     let router = register_routes(Routes::new(Arc::clone(&logger)), &ctx).into_router();
     Arc::new(build_chain(

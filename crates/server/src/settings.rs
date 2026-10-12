@@ -11,6 +11,7 @@
 use std::path::PathBuf;
 use std::time::Duration;
 
+use chalkak_app::config::AppSettings;
 use chalkak_core::config::{ConfigError, Env};
 use chalkak_db::DbConfig;
 
@@ -61,6 +62,8 @@ pub struct Settings {
     pub admin_development_bypass: bool,
     pub admin_cors_allowed_origins: Vec<String>,
     pub log_file: PathBuf,
+    /// auth·user 도메인 설정(OIDC, Apple, 이미지 저장소, 콜백).
+    pub app: AppSettings,
 }
 
 impl Settings {
@@ -82,6 +85,17 @@ impl Settings {
             Profile::Dev | Profile::Prod => false,
         };
 
+        let app = AppSettings::from_env(
+            env,
+            match profile {
+                Profile::Local => "local",
+                Profile::Dev => "dev",
+                Profile::Prod => "prod",
+            },
+            access_token_key.clone(),
+            access_token_expiration,
+        )?;
+
         Ok(Settings {
             profile,
             port,
@@ -96,6 +110,7 @@ impl Settings {
             log_file: PathBuf::from(
                 env.string_or("CHALKAK_LOGGING_FILE", chalkak_core::log::DEFAULT_LOG_FILE),
             ),
+            app,
         })
     }
 }
@@ -166,6 +181,7 @@ mod tests {
             ("ACCESS_TOKEN_SECRET", "0011"),
             ("ACCESS_TOKEN_EXPIRATION", "15m"),
         ];
+        pairs.extend_from_slice(&chalkak_app::config::TEST_ENV);
         pairs.extend_from_slice(extra);
         Env::from_pairs(pairs)
     }
@@ -200,6 +216,7 @@ mod tests {
             ("SPRING_PROFILES_ACTIVE", "dev"),
             ("ADMIN_DEVELOPMENT_BYPASS_ENABLED", "true"),
             ("ADMIN_CORS_ALLOWED_ORIGIN", "https://admin.example.com"),
+            ("S3_PREFIX", "chalkak"),
             ("DB_NAME", "chalkak"),
             ("DB_USERNAME", "u"),
             ("DB_PASSWORD", "p"),
@@ -212,6 +229,7 @@ mod tests {
     fn dev와_prod의_cors_origin은_프로필마다_다르다() {
         let base = [
             ("ADMIN_CORS_ALLOWED_ORIGIN", "https://admin.example.com"),
+            ("S3_PREFIX", "chalkak"),
             ("DB_NAME", "chalkak"),
             ("DB_USERNAME", "u"),
             ("DB_PASSWORD", "p"),

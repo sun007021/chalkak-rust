@@ -412,11 +412,8 @@ mod tests {
 
     #[test]
     fn 원시_값을_그대로_꺼낼_수_있다() {
-        let body = read_json_object(&post(
-            Some("application/json"),
-            br#"{"a":1,"b":null}"#,
-        ))
-        .unwrap();
+        let body =
+            read_json_object(&post(Some("application/json"), br#"{"a":1,"b":null}"#)).unwrap();
         assert_eq!(body.value("a"), Some(&serde_json::json!(1)));
         assert_eq!(body.value("b"), Some(&Value::Null));
         assert_eq!(body.value("c"), None);

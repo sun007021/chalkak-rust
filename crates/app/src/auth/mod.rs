@@ -1,4 +1,16 @@
-//! 인증 도메인. 지금은 `@RequiresExistingUser`가 쓰는 판정만 둔다.
+//! 인증 도메인: 소셜 로그인·가입, 토큰 발급과 회전, 이미지 처리 콜백 인증, `@RequiresExistingUser`·
+//! `@RequiresUsableUser`가 쓰는 판정.
+
+pub mod api;
+pub mod apple;
+pub mod callback;
+pub mod domain;
+pub mod oidc;
+pub mod refresh;
+pub mod repository;
+pub mod revoker;
+pub mod service;
+pub mod tokens;
 
 use chalkak_core::error::{AppError, ErrorCode};
 use chalkak_db::Pool;
@@ -33,5 +45,20 @@ impl UsableUserPolicy {
                 AppError::unauthorized(ErrorCode::UNAUTHORIZED, "유효하지 않은 인증 정보입니다."),
             )),
         }
+    }
+
+    /// `validateUsable`: 회원이 있고 탈퇴하지 않았으며 차단되지 않아야 한다. 없거나 탈퇴했으면 401, 차단이면 403.
+    pub fn validate_usable(&self) -> Result<AuthenticatedUser, ApiError> {
+        let user = login_user()?;
+        let mut conn = self.pool.get()?;
+        let found = self.users.find_by_id(&mut *conn, user.user_id)?;
+        let Some(found) = found else {
+            return Err(ApiError::App(AppError::unauthorized(
+                ErrorCode::UNAUTHORIZED,
+                "유효하지 않은 인증 정보입니다.",
+            )));
+        };
+        found.validate_accessible()?;
+        Ok(user)
     }
 }

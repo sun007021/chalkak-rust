@@ -1,6 +1,45 @@
 //! 여러 도메인이 함께 쓰는 작은 도구.
 
+use chalkak_db::{DbError, Pool};
 use uuid::Uuid;
+
+use crate::web::ApiError;
+
+/// 트랜잭션 하나 안에서 `f`를 실행한다. `Ok`면 커밋, `Err`면 롤백한다(패닉이면 롤백).
+/// `@Transactional`의 기본 규칙이다.
+pub fn transact<T>(
+    pool: &Pool,
+    f: impl FnOnce(&mut postgres::Transaction<'_>) -> Result<T, ApiError>,
+) -> Result<T, ApiError> {
+    transact_unless(pool, |_| false, f)
+}
+
+/// [`transact`]와 같되, `Err`가 `commit_on_error`에 맞으면 롤백하지 않고 커밋한 뒤 오류를 돌려준다
+/// (`@Transactional(noRollbackFor = ...)`).
+pub fn transact_unless<T>(
+    pool: &Pool,
+    commit_on_error: impl Fn(&ApiError) -> bool,
+    f: impl FnOnce(&mut postgres::Transaction<'_>) -> Result<T, ApiError>,
+) -> Result<T, ApiError> {
+    let mut conn = pool.get()?;
+    let client: &mut postgres::Client = &mut conn;
+    let mut tx = client.transaction().map_err(DbError::from)?;
+    match f(&mut tx) {
+        Ok(value) => {
+            tx.commit().map_err(DbError::from)?;
+            Ok(value)
+        }
+        Err(error) => {
+            if commit_on_error(&error) {
+                tx.commit().map_err(DbError::from)?;
+            } else {
+                // 롤백 실패는 원래 오류를 가리지 않는다.
+                let _ = tx.rollback();
+            }
+            Err(error)
+        }
+    }
+}
 
 /// Java `UUID.fromString`이 받는 문자열을 `Uuid`로 바꾼다.
 ///
@@ -42,6 +81,11 @@ fn parse_long_radix16(part: &str) -> Option<u64> {
     u64::try_from(value).ok()
 }
 
+/// Java `String.length()`(UTF-16 코드 유닛 수).
+pub fn java_len(text: &str) -> usize {
+    text.encode_utf16().count()
+}
+
 /// 영문 소문자 16진수.
 pub fn hex_encode(bytes: &[u8]) -> String {
     const DIGITS: &[u8; 16] = b"0123456789abcdef";
@@ -76,7 +120,8 @@ pub fn sha256_hex(data: &[u8]) -> String {
 
 pub fn hmac_sha256(key: &[u8], data: &[u8]) -> Vec<u8> {
     use hmac::{Hmac, Mac};
-    let mut mac = Hmac::<sha2::Sha256>::new_from_slice(key).expect("HMAC은 어떤 길이의 키도 받는다");
+    let mut mac =
+        Hmac::<sha2::Sha256>::new_from_slice(key).expect("HMAC은 어떤 길이의 키도 받는다");
     mac.update(data);
     mac.finalize().into_bytes().to_vec()
 }

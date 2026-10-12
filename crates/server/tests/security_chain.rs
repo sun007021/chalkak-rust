@@ -51,14 +51,16 @@ struct Harness {
 }
 
 fn harness_with(bypass: bool, database_up: bool) -> Harness {
-    let env = Env::from_pairs([
+    let mut pairs = vec![
         ("ACCESS_TOKEN_SECRET", SECRET_HEX),
         ("ACCESS_TOKEN_EXPIRATION", "15m"),
         (
             "ADMIN_DEVELOPMENT_BYPASS_ENABLED",
             if bypass { "true" } else { "false" },
         ),
-    ]);
+    ];
+    pairs.extend_from_slice(&chalkak_app::config::TEST_ENV);
+    let env = Env::from_pairs(pairs);
     let settings = Settings::from_env(&env).unwrap();
     let clock: Arc<dyn Clock> = Arc::new(FixedClock::new(NOW.parse().unwrap()));
     let log = LogBuf::default();

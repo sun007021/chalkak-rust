@@ -17,11 +17,13 @@ const NOW_SECONDS: i64 = 1_791_774_000;
 const USER: &str = "01990000-0000-7000-8000-000000000001";
 
 fn handler(db: &TestDb) -> Arc<dyn Handler> {
-    let env = Env::from_pairs([
+    let mut pairs = vec![
         ("ACCESS_TOKEN_SECRET", SECRET_HEX),
         ("ACCESS_TOKEN_EXPIRATION", "15m"),
         ("ADMIN_DEVELOPMENT_BYPASS_ENABLED", "false"),
-    ]);
+    ];
+    pairs.extend_from_slice(&chalkak_app::config::TEST_ENV);
+    let env = Env::from_pairs(pairs);
     let settings = Settings::from_env(&env).unwrap();
     let clock: Arc<dyn Clock> = Arc::new(FixedClock::new(NOW.parse().unwrap()));
     let logger = Arc::new(Logger::new(
