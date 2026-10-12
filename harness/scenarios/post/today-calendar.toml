@@ -1,5 +1,5 @@
 name = "게시물: 오늘 상태와 캘린더"
-tags = ["post"]
+tags = ["p19", "post"]
 clock = "2026-10-12T09:00:00+09:00"
 
 [setup]

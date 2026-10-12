@@ -1,5 +1,5 @@
 name = "이미지 처리 콜백: 본문 읽기와 검증"
-tags = ["internal", "post"]
+tags = ["p19", "internal", "post"]
 clock = "2026-10-12T09:00:00+09:00"
 
 [setup]

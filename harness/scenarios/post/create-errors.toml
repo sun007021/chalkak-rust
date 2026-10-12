@@ -1,5 +1,5 @@
 name = "게시물: 작성 거절과 요청 본문 오류"
-tags = ["post"]
+tags = ["p19", "post"]
 clock = "2026-10-12T09:00:00+09:00"
 
 [setup]
@@ -106,6 +106,7 @@ auth = { user = "01990000-0000-7000-8000-000000000001" }
 body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"01990000-0000-7000-8000-0000000000a7"}'''
 [step.fakes.s3."chalkak/staging/local/posts/01990000-0000-7000-8000-0000000000a7.webp"]
 size = 1
+content_type = "image/webp"
 
 [[step]]
 name = "S3가 403이면 사진이 없는 것으로 본다"

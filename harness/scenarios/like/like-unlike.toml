@@ -1,5 +1,5 @@
 name = "좋아요: 등록·취소와 오류"
-tags = ["like", "post"]
+tags = ["p19", "like", "post"]
 clock = "2026-10-12T09:00:00+09:00"
 
 [setup]

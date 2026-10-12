@@ -1,5 +1,5 @@
 name = "게시물: 상세·수정·삭제"
-tags = ["post"]
+tags = ["p19", "post"]
 clock = "2026-10-12T09:00:00+09:00"
 
 [setup]

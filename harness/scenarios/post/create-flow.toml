@@ -1,5 +1,5 @@
 name = "게시물: 업로드 발급 - 작성 - 처리 콜백 - 반려 후 재작성"
-tags = ["post", "photo"]
+tags = ["p19", "post", "photo"]
 clock = "2026-10-12T09:00:00+09:00"
 
 [setup]
@@ -114,6 +114,7 @@ body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"${u
 capture = { postId3 = "postId" }
 [step.fakes.s3."chalkak/staging/local/posts/${uploadId3}.webp"]
 size = 10
+content_type = "image/webp"
 
 [[step]]
 name = "처리 실패 콜백이 게시물을 반려한다"
@@ -143,3 +144,4 @@ auth = { user = "01990000-0000-7000-8000-000000000003" }
 body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"${uploadId4}"}'''
 [step.fakes.s3."chalkak/staging/local/posts/${uploadId4}.webp"]
 size = 10
+content_type = "image/webp"
