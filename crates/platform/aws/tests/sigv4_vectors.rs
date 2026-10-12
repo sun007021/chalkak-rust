@@ -306,7 +306,6 @@ fn query_value_less_key_gets_empty_value() {
 
 // ---- S3 문서 예제 (Signature Calculations for the Authorization Header / Query String Auth) ----
 
-const S3_ACCESS_KEY: &str = "AKIAIOSFODNN7EXAMPLE";
 const S3_SECRET: &str = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY";
 
 fn s3_time() -> Timestamp {

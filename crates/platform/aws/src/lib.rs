@@ -6,6 +6,9 @@ pub mod error;
 pub mod s3;
 pub mod sigv4;
 
-pub use credentials::{Credentials, CredentialsProvider};
+pub use credentials::{
+    ChainCredentialsProvider, Credentials, CredentialsProvider, EnvCredentialsProvider,
+    HttpRequest, HttpResponse, HttpTransport, ImdsCredentialsProvider,
+};
 pub use error::AwsError;
 pub use s3::{PutObject, S3Endpoint, SignedRequest, presign_put, sign_head_object};
