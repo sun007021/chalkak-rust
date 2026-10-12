@@ -1,0 +1,133 @@
+# 로컬 개발·검증 환경. 대상마다 PostgreSQL 1개 + 앱 1개를 띄우고, 앱과 DB는 같은 시계 파일을 본다.
+#
+#   harness/scripts/up.sh                  # Java oracle(java-a) + Rust(rust)
+#   harness/scripts/up.sh selfcheck        # Java 대 Java (하네스 결정성 확인)
+#   docker compose up -d pg-rust           # Rust 개발용 DB만 (localhost:15434)
+#
+# 시계 파일(harness/out/clock-<대상>)은 up.sh가 "+0"으로 만든다. 내용이 "+0"이면 실제 시각과 같다.
+# 하네스는 이 파일에 오프셋을 써서 앱과 DB의 현재 시각을 옮긴다(libfaketime).
+
+name: chalkak
+
+x-faketime: &faketime
+  LD_PRELOAD: /opt/faketime/libfaketime.so.1
+  FAKETIME_NO_CACHE: "1"
+  FAKETIME_DONT_FAKE_MONOTONIC: "1"
+
+x-postgres: &postgres
+  image: chalkak/postgres-faketime:18.4
+  build:
+    context: docker
+    dockerfile: postgres.Dockerfile
+  # 공식 이미지의 root 진입점이 만든 세마포어를 postgres 사용자가 열지 못해 libfaketime이 실패한다.
+  user: postgres
+  volumes:
+    - ./harness/out:/clock:ro
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U chalkak -d chalkak"]
+    interval: 2s
+    timeout: 5s
+    retries: 30
+
+x-postgres-env: &postgres-env
+  POSTGRES_DB: chalkak
+  POSTGRES_USER: chalkak
+  POSTGRES_PASSWORD: test-password
+  TZ: Asia/Seoul
+  <<: *faketime
+
+x-java: &java
+  image: chalkak/java-oracle:${BASELINE:-0abc3f94161c4855a467eda140f08a770347e1f2}
+  build:
+    context: docker
+    dockerfile: java-oracle.Dockerfile
+    args:
+      BASELINE: ${BASELINE:-0abc3f94161c4855a467eda140f08a770347e1f2}
+  env_file: harness/env/oracle.env
+  volumes:
+    - ./harness/out:/clock:ro
+  healthcheck:
+    test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /actuator/health HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q UP <&3"]
+    interval: 5s
+    timeout: 5s
+    retries: 12
+    start_period: 600s
+
+x-java-env: &java-env
+  SPRING_DATASOURCE_USERNAME: chalkak
+  SPRING_DATASOURCE_PASSWORD: test-password
+  <<: *faketime
+
+services:
+  # Java oracle — 원본 Spring 서버(기준 커밋)
+  pg-java-a:
+    <<: *postgres
+    environment:
+      <<: *postgres-env
+      FAKETIME_TIMESTAMP_FILE: /clock/clock-java-a
+    ports: ["15432:5432"]
+
+  java-a:
+    <<: *java
+    environment:
+      <<: *java-env
+      SPRING_DATASOURCE_URL: jdbc:postgresql://pg-java-a:5432/chalkak
+      FAKETIME_TIMESTAMP_FILE: /clock/clock-java-a
+    ports: ["18080:8080"]
+    depends_on:
+      pg-java-a: { condition: service_healthy }
+
+  # 두 번째 Java — 하네스 자체의 결정성 확인용(Java 대 Java)
+  pg-java-b:
+    <<: *postgres
+    profiles: [selfcheck]
+    environment:
+      <<: *postgres-env
+      FAKETIME_TIMESTAMP_FILE: /clock/clock-java-b
+    ports: ["15433:5432"]
+
+  java-b:
+    <<: *java
+    profiles: [selfcheck]
+    environment:
+      <<: *java-env
+      SPRING_DATASOURCE_URL: jdbc:postgresql://pg-java-b:5432/chalkak
+      FAKETIME_TIMESTAMP_FILE: /clock/clock-java-b
+    ports: ["18081:8080"]
+    depends_on:
+      pg-java-b: { condition: service_healthy }
+
+  # Rust candidate. 개발 중에는 pg-rust만 띄우고 호스트에서 cargo run으로 붙어도 된다.
+  pg-rust:
+    <<: *postgres
+    environment:
+      <<: *postgres-env
+      FAKETIME_TIMESTAMP_FILE: /clock/clock-rust
+    ports: ["15434:5432"]
+
+  rust:
+    image: chalkak/rust-server:dev
+    profiles: [rust]
+    build:
+      context: .
+      dockerfile: docker/rust-server.Dockerfile
+    # 환경변수 계약은 원본과 같다(DB 접속은 원본 prod 프로필과 같은 DB_* 이름).
+    env_file: harness/env/oracle.env
+    environment:
+      DB_HOST: pg-rust
+      DB_PORT: "5432"
+      DB_NAME: chalkak
+      DB_USERNAME: chalkak
+      DB_PASSWORD: test-password
+      FAKETIME_TIMESTAMP_FILE: /clock/clock-rust
+      <<: *faketime
+    volumes:
+      - ./harness/out:/clock:ro
+    ports: ["18082:8080"]
+    depends_on:
+      pg-rust: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /actuator/health HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q UP <&3"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
