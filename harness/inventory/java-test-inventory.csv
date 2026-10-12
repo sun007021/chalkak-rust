@@ -599,19 +599,19 @@ auth,auth/service/UserRefreshTokenServiceTest.java,refresh_rotatedToken_revokesW
 auth,auth/service/UserRefreshTokenServiceTest.java,refresh_rotationNearAbsoluteExpiry_clipsExpiresAtToAbsoluteExpiry,절대 만료 직전에 회전해도 새 토큰의 비활동 만료는 절대 만료를 넘지 않는다,통합(Spring+DB),@Test,,미이식
 auth,auth/service/UserRefreshTokenServiceTest.java,refresh_unknownToken_requiresReauthentication,존재하지 않는 토큰으로 재발급하면 재로그인을 요구한다,통합(Spring+DB),@Test,,미이식
 auth,auth/service/UserRefreshTokenServiceTest.java,revokeAll_multipleDevices_revokesEveryLineage,회원의 모든 기기 계보를 한 번에 폐기한다,통합(Spring+DB),@Test,,미이식
-common,common/logging/AccessLogTest.java,accessLog_actuatorPath_logsNothing,actuator 경로는 접근 로그를 남기지 않는다,통합(Spring+DB),@Test,,미이식
-common,common/logging/AccessLogTest.java,accessLog_anonymousRequest_hasNoUserId,토큰이 없는 요청은 접근 로그에 userId 키가 없다,통합(Spring+DB),@Test,,미이식
-common,common/logging/AccessLogTest.java,accessLog_matchedRoute_logsTemplateWithRequestId,handler가 매칭된 요청은 UUID 형식 X-Request-Id 헤더와 route 템플릿이 담긴 접근 로그 1건을 남긴다,통합(Spring+DB),@Test,,미이식
-common,common/logging/AccessLogTest.java,accessLog_memberRequest_logsUserId,로그인한 회원의 요청은 접근 로그에 userId를 정확히 1개 남긴다,통합(Spring+DB),@Test,,미이식
-common,common/logging/AccessLogTest.java,accessLog_rejectedBySecurity_logsUnmatchedRoute,토큰 없이 보호 경로를 호출하면 401 접근 로그에 route는 UNMATCHED이고 응답에는 X-Request-Id가 있다,통합(Spring+DB),@Test,,미이식
-common,common/logging/AccessLogTest.java,requestId_twoRequests_areDifferent,요청마다 서로 다른 requestId를 발급한다,통합(Spring+DB),@Test,,미이식
+common,common/logging/AccessLogTest.java,accessLog_actuatorPath_logsNothing,actuator 경로는 접근 로그를 남기지 않는다,통합(Spring+DB),@Test,crates/server/src/web/access.rs::access_log_actuator_path_logs_nothing,이식
+common,common/logging/AccessLogTest.java,accessLog_anonymousRequest_hasNoUserId,토큰이 없는 요청은 접근 로그에 userId 키가 없다,통합(Spring+DB),@Test,crates/server/tests/security_chain.rs::access_log_records_route_template_status_and_user,이식
+common,common/logging/AccessLogTest.java,accessLog_matchedRoute_logsTemplateWithRequestId,handler가 매칭된 요청은 UUID 형식 X-Request-Id 헤더와 route 템플릿이 담긴 접근 로그 1건을 남긴다,통합(Spring+DB),@Test,crates/server/src/web/access.rs::access_log_matched_route_logs_template_with_request_id,이식
+common,common/logging/AccessLogTest.java,accessLog_memberRequest_logsUserId,로그인한 회원의 요청은 접근 로그에 userId를 정확히 1개 남긴다,통합(Spring+DB),@Test,crates/server/src/web/access.rs::access_log_member_request_logs_user_id,이식
+common,common/logging/AccessLogTest.java,accessLog_rejectedBySecurity_logsUnmatchedRoute,토큰 없이 보호 경로를 호출하면 401 접근 로그에 route는 UNMATCHED이고 응답에는 X-Request-Id가 있다,통합(Spring+DB),@Test,crates/server/src/web/access.rs::access_log_rejected_by_security_logs_unmatched_route,이식
+common,common/logging/AccessLogTest.java,requestId_twoRequests_areDifferent,요청마다 서로 다른 requestId를 발급한다,통합(Spring+DB),@Test,crates/server/src/web/access.rs::request_id_two_requests_are_different,이식
 common,common/logging/CurrentRequestIdTest.java,resolve_malformedRequestIdInMdc_returnsNewUuid,MDC의 requestId가 UUID 형식이 아니면 그 값을 쓰지 않고 새 UUID를 만든다,단위,@Test,,미이식
 common,common/logging/CurrentRequestIdTest.java,resolve_noRequestIdInMdc_returnsNewUuid,MDC에 requestId가 없으면 요청마다 새 UUID를 만든다,단위,@Test,,미이식
 common,common/logging/CurrentRequestIdTest.java,resolve_validRequestIdInMdc_returnsSameUuid,MDC에 UUID 형식 requestId가 있으면 그 값을 그대로 돌려준다,단위,@Test,,미이식
 common,common/logging/JsonFileLogTest.java,initialize_devProfile_writesJsonLineToConfiguredFile,dev 프로필에서는 설정한 경로의 파일에 MDC와 key-value가 최상위 필드로 한 번씩 담긴 JSON 한 줄이 남는다,단위,@Test,,미이식
-common,common/logging/RequestIdFilterTest.java,doFilter_chainThrows_logsStatus500AndRethrowsAndClearsMdc,체인이 예외를 던지면 status 500으로 접근 로그를 남기고 예외를 다시 던지며 MDC를 정리한다,단위,@Test,,미이식
-common,common/logging/RequestIdFilterTest.java,doFilter_exactActuatorPath_logsNothing,정확히 /actuator 경로는 접근 로그를 남기지 않는다,단위,@Test,,미이식
-common,common/logging/RequestIdFilterTest.java,doFilter_pathLooksLikeActuator_logsAccess,actuator와 이름만 비슷한 경로는 접근 로그를 남긴다,단위,@Test,,미이식
+common,common/logging/RequestIdFilterTest.java,doFilter_chainThrows_logsStatus500AndRethrowsAndClearsMdc,체인이 예외를 던지면 status 500으로 접근 로그를 남기고 예외를 다시 던지며 MDC를 정리한다,단위,@Test,crates/server/src/web/access.rs::패닉해도_접근_로그를_500으로_남기고_패닉을_다시_던진다,이식
+common,common/logging/RequestIdFilterTest.java,doFilter_exactActuatorPath_logsNothing,정확히 /actuator 경로는 접근 로그를 남기지 않는다,단위,@Test,crates/server/src/web/access.rs::access_log_actuator_path_logs_nothing,이식
+common,common/logging/RequestIdFilterTest.java,doFilter_pathLooksLikeActuator_logsAccess,actuator와 이름만 비슷한 경로는 접근 로그를 남긴다,단위,@Test,crates/server/src/web/access.rs::access_log_actuator_path_logs_nothing,이식
 common,common/logging/RuntimeSnapshotLoggerTest.java,logSnapshot_absentValues_omitsKeys,측정하지 못한 값은 0으로 채우지 않고 key-value에서 뺀다,단위,@Test,,미이식
 common,common/logging/RuntimeSnapshotLoggerTest.java,logSnapshot_allValuesPresent_logsOneRuntimeEvent,스냅샷의 값을 type=runtime key-value로 담은 INFO 로그 1건을 남긴다,단위,@Test,,미이식
 common,common/logging/RuntimeSnapshotReaderTest.java,read_allSourcesPresent_sumsDefinedGcTimes,모든 원천이 있으면 GC 시간은 컬렉터별로 합산하되 정의되지 않은 값(-1)은 뺀 스냅샷을 만든다,단위,@Test,,미이식
@@ -643,30 +643,30 @@ config,config/RequestIdFilterConfigTest.java,requestIdFilter_order_isBeforeCallb
 config,config/SchedulingConfigurationTest.java,schedulingConfiguration_cleanupDisabled_keepsSchedulingEnabled,리프레시 토큰 정리 작업만 끄면 스케줄링 자체는 켜진 채로 남는다,단위,@Test,,미이식
 config,config/SchedulingConfigurationTest.java,schedulingConfiguration_defaultSettings_enablesBoth,기본 설정은 스케줄링과 리프레시 토큰 정리 작업을 모두 켠다,단위,@Test,,미이식
 config,config/SchedulingConfigurationTest.java,schedulingConfiguration_schedulingDisabled_keepsCleanupBean,스케줄링을 끄면 정리 작업 빈은 남고 스케줄링만 꺼진다,단위,@Test,,미이식
-config,config/SecurityFilterChainTest.java,authApi_withoutToken_reachesController,로그인 API는 토큰 없이 호출할 수 있다,통합(Spring+DB),@Test,,미이식
-config,config/SecurityFilterChainTest.java,health_withoutToken_returnsOk,헬스체크는 토큰 없이 호출할 수 있다,통합(Spring+DB),@Test,,미이식
-config,config/SecurityFilterChainTest.java,internalCallback_withoutAccessToken_reachesController,이미지 처리 내부 콜백은 액세스 토큰 없이 컨트롤러에 도달한다,통합(Spring+DB),@Test,,미이식
-config,config/SecurityFilterChainTest.java,logoutApi_withoutToken_reachesController,로그아웃 API는 액세스 토큰 없이 호출할 수 있다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,authApi_withoutToken_reachesController,로그인 API는 토큰 없이 호출할 수 있다,통합(Spring+DB),@Test,crates/server/tests/security_chain.rs::auth_api_without_token_reaches_controller,이식
+config,config/SecurityFilterChainTest.java,health_withoutToken_returnsOk,헬스체크는 토큰 없이 호출할 수 있다,통합(Spring+DB),@Test,crates/server/tests/security_chain.rs::health_without_token_returns_ok,이식
+config,config/SecurityFilterChainTest.java,internalCallback_withoutAccessToken_reachesController,이미지 처리 내부 콜백은 액세스 토큰 없이 컨트롤러에 도달한다,통합(Spring+DB),@Test,crates/server/tests/security_chain.rs::internal_callback_without_access_token_reaches_controller,이식
+config,config/SecurityFilterChainTest.java,logoutApi_withoutToken_reachesController,로그아웃 API는 액세스 토큰 없이 호출할 수 있다,통합(Spring+DB),@Test,crates/server/tests/security_chain.rs::admin_login_refresh_logout_are_public,이식
 config,config/SecurityFilterChainTest.java,postCalendarMonths_adminToken_returnsForbidden,관리자 토큰으로 회원의 연월 목록을 조회할 수 없다,통합(Spring+DB),@Test,,미이식
 config,config/SecurityFilterChainTest.java,postCalendarMonths_validAccessToken_returnsOk,회원 토큰으로 연월 목록을 조회하면 200을 반환한다,통합(Spring+DB),@Test,,미이식
 config,config/SecurityFilterChainTest.java,postCalendarMonths_withoutToken_returnsUnauthorized,연월 목록은 토큰 없이 조회할 수 없다,통합(Spring+DB),@Test,,미이식
 config,config/SecurityFilterChainTest.java,postCalendar_adminToken_returnsForbidden,관리자 JWT를 일반 사용자 식별자로 해석해 캘린더를 조회할 수 없다,통합(Spring+DB),@Test,,미이식
 config,config/SecurityFilterChainTest.java,postCalendar_validAccessToken_reachesController,유효한 토큰이면 내 게시물 캘린더를 조회할 수 있다,통합(Spring+DB),@Test,,미이식
 config,config/SecurityFilterChainTest.java,postCalendar_withoutToken_isRejectedByFilter,내 게시물 캘린더는 필터가 인증을 요구한다,통합(Spring+DB),@Test,,미이식
-config,config/SecurityFilterChainTest.java,postDetail_withoutToken_isRejectedByFilter,게시물 상세 조회는 필터가 인증을 요구한다,통합(Spring+DB),@Test,,미이식
-config,config/SecurityFilterChainTest.java,posts_adminToken_returnsForbidden,선택적 회원 인증에서도 관리자 JWT를 일반 사용자로 해석하지 않는다,통합(Spring+DB),@Test,,미이식
-config,config/SecurityFilterChainTest.java,posts_withoutToken_reachesController,게시물 목록은 토큰 없이 조회할 수 있다,통합(Spring+DB),@Test,,미이식
-config,config/SecurityFilterChainTest.java,protectedApi_adminToken_returnsForbidden,관리자 JWT로는 좋아요를 남길 수 없다,통합(Spring+DB),@Test,,미이식
-config,config/SecurityFilterChainTest.java,protectedApi_socialSignupToken_returnsUnauthorized,회원가입 토큰은 액세스 토큰으로 사용할 수 없다,통합(Spring+DB),@Test,,미이식
-config,config/SecurityFilterChainTest.java,protectedApi_tamperedToken_returnsUnauthorized,서명이 변조된 토큰은 401을 반환한다,통합(Spring+DB),@Test,,미이식
-config,config/SecurityFilterChainTest.java,protectedApi_tokenWithoutScope_returnsForbidden,scope가 없는 액세스 토큰은 회원 API에서 거부한다,통합(Spring+DB),@Test,,미이식
-config,config/SecurityFilterChainTest.java,protectedApi_validAccessToken_reachesController,유효한 액세스 토큰이 있으면 보호된 API를 호출할 수 있다,통합(Spring+DB),@Test,,미이식
-config,config/SecurityFilterChainTest.java,protectedApi_withoutToken_returnsUnauthorized,토큰 없이 보호된 API를 호출하면 401과 공통 에러 형식을 반환한다,통합(Spring+DB),@Test,,미이식
-config,config/SecurityFilterChainTest.java,protectedApi_withoutToken_setsWwwAuthenticateHeader,필터가 막은 401에는 WWW-Authenticate 헤더가 붙는다,통합(Spring+DB),@Test,,미이식
-config,config/SecurityFilterChainTest.java,publicPath_controllerRejection_doesNotSetWwwAuthenticateHeader,컨트롤러가 던진 401에는 WWW-Authenticate 헤더가 붙지 않는다,통합(Spring+DB),@Test,,미이식
-config,config/SecurityFilterChainTest.java,publicPath_unhandledException_returnsInternalServerError,공개 경로에서 예외가 나면 익명 요청도 500을 받는다,통합(Spring+DB),@Test,,미이식
-config,config/SecurityFilterChainTest.java,refreshApi_withoutToken_reachesController,토큰 재발급 API는 액세스 토큰 없이 호출할 수 있다,통합(Spring+DB),@Test,,미이식
-config,config/SecurityFilterChainTest.java,topics_withoutToken_reachesController,주제 목록은 토큰 없이 조회할 수 있다,통합(Spring+DB),@Test,,미이식
+config,config/SecurityFilterChainTest.java,postDetail_withoutToken_isRejectedByFilter,게시물 상세 조회는 필터가 인증을 요구한다,통합(Spring+DB),@Test,crates/server/tests/security_chain.rs::post_detail_without_token_is_rejected_by_filter,이식
+config,config/SecurityFilterChainTest.java,posts_adminToken_returnsForbidden,선택적 회원 인증에서도 관리자 JWT를 일반 사용자로 해석하지 않는다,통합(Spring+DB),@Test,crates/server/tests/security_chain.rs::admin_token_is_forbidden_on_user_apis,이식
+config,config/SecurityFilterChainTest.java,posts_withoutToken_reachesController,게시물 목록은 토큰 없이 조회할 수 있다,통합(Spring+DB),@Test,crates/server/tests/security_chain.rs::public_lists_without_token_reach_controller,이식
+config,config/SecurityFilterChainTest.java,protectedApi_adminToken_returnsForbidden,관리자 JWT로는 좋아요를 남길 수 없다,통합(Spring+DB),@Test,crates/server/tests/security_chain.rs::admin_token_is_forbidden_on_user_apis,이식
+config,config/SecurityFilterChainTest.java,protectedApi_socialSignupToken_returnsUnauthorized,회원가입 토큰은 액세스 토큰으로 사용할 수 없다,통합(Spring+DB),@Test,crates/server/tests/security_chain.rs::protected_api_social_signup_token_returns_unauthorized,이식
+config,config/SecurityFilterChainTest.java,protectedApi_tamperedToken_returnsUnauthorized,서명이 변조된 토큰은 401을 반환한다,통합(Spring+DB),@Test,crates/server/tests/security_chain.rs::protected_api_tampered_token_returns_unauthorized,이식
+config,config/SecurityFilterChainTest.java,protectedApi_tokenWithoutScope_returnsForbidden,scope가 없는 액세스 토큰은 회원 API에서 거부한다,통합(Spring+DB),@Test,crates/server/tests/security_chain.rs::token_without_scope_is_forbidden_on_user_apis,이식
+config,config/SecurityFilterChainTest.java,protectedApi_validAccessToken_reachesController,유효한 액세스 토큰이 있으면 보호된 API를 호출할 수 있다,통합(Spring+DB),@Test,crates/server/tests/security_chain.rs::protected_api_valid_access_token_reaches_controller,이식
+config,config/SecurityFilterChainTest.java,protectedApi_withoutToken_returnsUnauthorized,토큰 없이 보호된 API를 호출하면 401과 공통 에러 형식을 반환한다,통합(Spring+DB),@Test,crates/server/tests/security_chain.rs::protected_api_without_token_returns_unauthorized,이식
+config,config/SecurityFilterChainTest.java,protectedApi_withoutToken_setsWwwAuthenticateHeader,필터가 막은 401에는 WWW-Authenticate 헤더가 붙는다,통합(Spring+DB),@Test,crates/server/tests/security_chain.rs::protected_api_without_token_returns_unauthorized,이식
+config,config/SecurityFilterChainTest.java,publicPath_controllerRejection_doesNotSetWwwAuthenticateHeader,컨트롤러가 던진 401에는 WWW-Authenticate 헤더가 붙지 않는다,통합(Spring+DB),@Test,crates/server/tests/security_chain.rs::public_path_controller_rejection_does_not_set_www_authenticate_header,이식
+config,config/SecurityFilterChainTest.java,publicPath_unhandledException_returnsInternalServerError,공개 경로에서 예외가 나면 익명 요청도 500을 받는다,통합(Spring+DB),@Test,crates/server/tests/security_chain.rs::public_path_unhandled_exception_returns_internal_server_error,이식
+config,config/SecurityFilterChainTest.java,refreshApi_withoutToken_reachesController,토큰 재발급 API는 액세스 토큰 없이 호출할 수 있다,통합(Spring+DB),@Test,crates/server/tests/security_chain.rs::admin_login_refresh_logout_are_public,이식
+config,config/SecurityFilterChainTest.java,topics_withoutToken_reachesController,주제 목록은 토큰 없이 조회할 수 있다,통합(Spring+DB),@Test,crates/server/tests/security_chain.rs::public_lists_without_token_reach_controller,이식
 exception,exception/GlobalExceptionHandlerLogTest.java,handleApiNotFoundException_unknownPath_logsNothing,존재하지 않는 경로 404는 경고나 오류 로그를 남기지 않는다,통합(Spring+DB),@Test,,미이식
 exception,exception/GlobalExceptionHandlerLogTest.java,handleBaseException_businessException_logsWarnWithoutMessage,"도메인 예외는 errorCode, status, exception 종류만 담은 WARN 1건을 남기고 예외 메시지는 남기지 않는다",통합(Spring+DB),@Test,,미이식
 exception,exception/GlobalExceptionHandlerLogTest.java,handleHttpMessageNotReadableException_malformedJson_logsWarnWithoutMessage,"비즈니스 4xx 응답은 errorCode, status, exception 종류가 담긴 WARN 1건을 requestId와 함께 남긴다",통합(Spring+DB),@Test,,미이식
@@ -1051,32 +1051,32 @@ post,post/service/PostUpdateServiceTest.java,updatePost_pendingPost_updatesNorma
 post,post/service/PostUpdateServiceTest.java,updatePost_sameNormalizedTitle_keepsUpdatedAt,정규화한 제목이 기존 제목과 같으면 DB 수정 시각을 유지한다,통합(Spring+DB),@Test,,미이식
 post,post/service/PostUpdateServiceTest.java,updatePost_withdrawnAuthor_throwsUnauthorizedException,탈퇴한 작성자의 인증 정보로 게시물 제목을 수정할 수 없다,통합(Spring+DB),@Test,,미이식
 post,post/service/RandomSeedGeneratorTest.java,generateRandomSeed_returnsEightCharacterHexString,8자리 소문자 16진수 랜덤 시드를 생성한다,단위,@Test,,미이식
-topic,topic/api/v1/controller/TopicControllerTest.java,getTopic_invalidDateFormat_returnsBadRequest,날짜 형식이 올바르지 않으면 400을 반환한다,웹 슬라이스,@Test,,미이식
-topic,topic/api/v1/controller/TopicControllerTest.java,getTopic_openedTopic_returnsTopicDetail,공개일로 주제를 조회한다,웹 슬라이스,@Test,,미이식
-topic,topic/domain/ParticipationPeriodTest.java,create_invalidRange_throwsBusinessException,참여 종료 시각은 시작 시각보다 뒤여야 한다,단위,@Test,,미이식
-topic,topic/domain/ParticipationPeriodTest.java,create_nullBoundary_throwsBusinessException,참여 기간 시각은 필수다,단위,@Test,,미이식
-topic,topic/domain/ParticipationPeriodTest.java,phaseAt_afterEndsAt_returnsClosed,참여 기간이 지나면 참여 종료 상태다,단위,@Test,,미이식
-topic,topic/domain/ParticipationPeriodTest.java,phaseAt_beforeStartsAt_returnsBeforeOpen,참여 시작 전이면 공개 전 상태다,단위,@Test,,미이식
-topic,topic/domain/ParticipationPeriodTest.java,phaseAt_exactlyEndsAt_returnsClosed,참여 종료 시각이면 참여 종료 상태다,단위,@Test,,미이식
-topic,topic/domain/ParticipationPeriodTest.java,phaseAt_exactlyStartsAt_returnsOpen,참여 시작 시각이면 참여 가능 상태다,단위,@Test,,미이식
-topic,topic/domain/ParticipationPeriodTest.java,phaseAt_withinPeriod_returnsOpen,참여 기간 중이면 참여 가능 상태다,단위,@Test,,미이식
-topic,topic/domain/TopicTest.java,create_mismatchedTopicDate_throwsBusinessException,주제 날짜는 참여 시작일의 한국 날짜와 일치해야 한다,단위,@Test,,미이식
-topic,topic/domain/TopicTest.java,create_startedPeriod_throwsBusinessException,이미 공개가 시작된 기간으로 주제를 생성할 수 없다,단위,@Test,,미이식
-topic,topic/domain/TopicTest.java,create_validState_createsBeforeOpenTopic,공개 전 제목과 날짜·참여 기간으로 주제를 생성한다,단위,@Test,,미이식
-topic,topic/domain/TopicTest.java,delete_beforeOpen_recordsDeletedAt,공개 전 주제는 삭제 시각을 기록한다,단위,@Test,,미이식
-topic,topic/domain/TopicTest.java,delete_closedTopic_throwsStateChanged,공개가 끝난 주제는 삭제할 수 없다,단위,@Test,,미이식
-topic,topic/domain/TopicTest.java,update_beforeOpen_changesBusinessState,공개 전 주제의 제목과 날짜·기간을 수정한다,단위,@Test,,미이식
-topic,topic/domain/TopicTest.java,update_openTopic_throwsStateChanged,공개가 시작된 주제는 수정할 수 없다,단위,@Test,,미이식
-topic,topic/infrastructure/persistence/TopicRepositoryImplIntegrationTest.java,saveAndFlush_overlappingPeriodInDatabase_throwsBusinessException,실제 DB의 참여 기간 겹침 제약 위반을 관리자 안내 오류로 변환한다,통합(Spring+DB),@Test,,미이식
-topic,topic/infrastructure/persistence/TopicRepositoryImplTest.java,saveAndFlush_topicDateUniqueViolation_throwsBusinessException,활성 주제 날짜 유니크 인덱스 위반만 날짜 중복 오류로 변환한다,단위,@Test,,미이식
-topic,topic/infrastructure/persistence/TopicRepositoryImplTest.java,saveAndFlush_topicPeriodOverlap_throwsBusinessException,참여 기간 겹침 제약 위반을 관리자 안내 오류로 변환한다,단위,@Test,,미이식
-topic,topic/infrastructure/persistence/TopicRepositoryImplTest.java,saveAndFlush_unknownIntegrityViolation_propagatesOriginalException,알 수 없는 무결성 오류는 날짜 중복 오류로 변환하지 않고 전파한다,단위,@Test,,미이식
-topic,topic/infrastructure/persistence/TopicRepositoryTest.java,findActiveByTopicDate_deletedTopic_returnsEmpty,삭제된 주제는 조회하지 않는다,JPA 슬라이스,@Test,,미이식
-topic,topic/infrastructure/persistence/TopicRepositoryTest.java,findActiveByTopicDate_existingTopic_returnsTopic,공개일로 주제를 조회한다,JPA 슬라이스,@Test,,미이식
-topic,topic/infrastructure/persistence/TopicRepositoryTest.java,findActiveByTopicDate_noTopicOnDate_returnsEmpty,주제가 없는 날짜는 조회하지 않는다,JPA 슬라이스,@Test,,미이식
-topic,topic/service/TopicServiceTest.java,getTopic_futureDate_throwsBusinessException,오늘보다 미래의 주제는 조회할 수 없다,통합(Spring+DB),@Test,,미이식
-topic,topic/service/TopicServiceTest.java,getTopic_noTopicOnDate_throwsNotFoundException,주제가 없는 날짜는 조회할 수 없다,통합(Spring+DB),@Test,,미이식
-topic,topic/service/TopicServiceTest.java,getTopic_openedTopic_returnsTopicDetail,공개일로 주제를 조회한다,통합(Spring+DB),@Test,,미이식
+topic,topic/api/v1/controller/TopicControllerTest.java,getTopic_invalidDateFormat_returnsBadRequest,날짜 형식이 올바르지 않으면 400을 반환한다,웹 슬라이스,@Test,crates/app/src/topic/api.rs::get_topic_invalid_date_format_returns_bad_request,이식
+topic,topic/api/v1/controller/TopicControllerTest.java,getTopic_openedTopic_returnsTopicDetail,공개일로 주제를 조회한다,웹 슬라이스,@Test,crates/app/src/topic/api.rs::get_topic_opened_topic_returns_topic_detail,이식
+topic,topic/domain/ParticipationPeriodTest.java,create_invalidRange_throwsBusinessException,참여 종료 시각은 시작 시각보다 뒤여야 한다,단위,@Test,crates/app/src/topic/domain.rs::create_invalid_range_throws_business_exception,이식
+topic,topic/domain/ParticipationPeriodTest.java,create_nullBoundary_throwsBusinessException,참여 기간 시각은 필수다,단위,@Test,crates/app/src/topic/domain.rs::create_null_boundary_throws_business_exception,이식
+topic,topic/domain/ParticipationPeriodTest.java,phaseAt_afterEndsAt_returnsClosed,참여 기간이 지나면 참여 종료 상태다,단위,@Test,crates/app/src/topic/domain.rs::phase_at_after_ends_at_returns_closed,이식
+topic,topic/domain/ParticipationPeriodTest.java,phaseAt_beforeStartsAt_returnsBeforeOpen,참여 시작 전이면 공개 전 상태다,단위,@Test,crates/app/src/topic/domain.rs::phase_at_before_starts_at_returns_before_open,이식
+topic,topic/domain/ParticipationPeriodTest.java,phaseAt_exactlyEndsAt_returnsClosed,참여 종료 시각이면 참여 종료 상태다,단위,@Test,crates/app/src/topic/domain.rs::phase_at_exactly_ends_at_returns_closed,이식
+topic,topic/domain/ParticipationPeriodTest.java,phaseAt_exactlyStartsAt_returnsOpen,참여 시작 시각이면 참여 가능 상태다,단위,@Test,crates/app/src/topic/domain.rs::phase_at_exactly_starts_at_returns_open,이식
+topic,topic/domain/ParticipationPeriodTest.java,phaseAt_withinPeriod_returnsOpen,참여 기간 중이면 참여 가능 상태다,단위,@Test,crates/app/src/topic/domain.rs::phase_at_within_period_returns_open,이식
+topic,topic/domain/TopicTest.java,create_mismatchedTopicDate_throwsBusinessException,주제 날짜는 참여 시작일의 한국 날짜와 일치해야 한다,단위,@Test,crates/app/src/topic/domain.rs::create_mismatched_topic_date_throws_business_exception,이식
+topic,topic/domain/TopicTest.java,create_startedPeriod_throwsBusinessException,이미 공개가 시작된 기간으로 주제를 생성할 수 없다,단위,@Test,crates/app/src/topic/domain.rs::create_started_period_throws_business_exception,이식
+topic,topic/domain/TopicTest.java,create_validState_createsBeforeOpenTopic,공개 전 제목과 날짜·참여 기간으로 주제를 생성한다,단위,@Test,crates/app/src/topic/domain.rs::create_valid_state_creates_before_open_topic,이식
+topic,topic/domain/TopicTest.java,delete_beforeOpen_recordsDeletedAt,공개 전 주제는 삭제 시각을 기록한다,단위,@Test,crates/app/src/topic/domain.rs::delete_before_open_records_deleted_at,이식
+topic,topic/domain/TopicTest.java,delete_closedTopic_throwsStateChanged,공개가 끝난 주제는 삭제할 수 없다,단위,@Test,crates/app/src/topic/domain.rs::delete_closed_topic_throws_state_changed,이식
+topic,topic/domain/TopicTest.java,update_beforeOpen_changesBusinessState,공개 전 주제의 제목과 날짜·기간을 수정한다,단위,@Test,crates/app/src/topic/domain.rs::update_before_open_changes_business_state,이식
+topic,topic/domain/TopicTest.java,update_openTopic_throwsStateChanged,공개가 시작된 주제는 수정할 수 없다,단위,@Test,crates/app/src/topic/domain.rs::update_open_topic_throws_state_changed,이식
+topic,topic/infrastructure/persistence/TopicRepositoryImplIntegrationTest.java,saveAndFlush_overlappingPeriodInDatabase_throwsBusinessException,실제 DB의 참여 기간 겹침 제약 위반을 관리자 안내 오류로 변환한다,통합(Spring+DB),@Test,crates/app/tests/topic_db.rs::save_and_flush_overlapping_period_in_database_throws_business_exception,이식
+topic,topic/infrastructure/persistence/TopicRepositoryImplTest.java,saveAndFlush_topicDateUniqueViolation_throwsBusinessException,활성 주제 날짜 유니크 인덱스 위반만 날짜 중복 오류로 변환한다,단위,@Test,crates/app/tests/topic_db.rs::save_and_flush_topic_date_unique_violation_throws_business_exception,이식
+topic,topic/infrastructure/persistence/TopicRepositoryImplTest.java,saveAndFlush_topicPeriodOverlap_throwsBusinessException,참여 기간 겹침 제약 위반을 관리자 안내 오류로 변환한다,단위,@Test,crates/app/tests/topic_db.rs::save_and_flush_overlapping_period_in_database_throws_business_exception,이식
+topic,topic/infrastructure/persistence/TopicRepositoryImplTest.java,saveAndFlush_unknownIntegrityViolation_propagatesOriginalException,알 수 없는 무결성 오류는 날짜 중복 오류로 변환하지 않고 전파한다,단위,@Test,crates/app/tests/topic_db.rs::save_and_flush_unknown_integrity_violation_propagates_original_exception,이식
+topic,topic/infrastructure/persistence/TopicRepositoryTest.java,findActiveByTopicDate_deletedTopic_returnsEmpty,삭제된 주제는 조회하지 않는다,JPA 슬라이스,@Test,crates/app/tests/topic_db.rs::find_active_by_topic_date_deleted_topic_returns_empty,이식
+topic,topic/infrastructure/persistence/TopicRepositoryTest.java,findActiveByTopicDate_existingTopic_returnsTopic,공개일로 주제를 조회한다,JPA 슬라이스,@Test,crates/app/tests/topic_db.rs::find_active_by_topic_date_existing_topic_returns_topic,이식
+topic,topic/infrastructure/persistence/TopicRepositoryTest.java,findActiveByTopicDate_noTopicOnDate_returnsEmpty,주제가 없는 날짜는 조회하지 않는다,JPA 슬라이스,@Test,crates/app/tests/topic_db.rs::find_active_by_topic_date_no_topic_on_date_returns_empty,이식
+topic,topic/service/TopicServiceTest.java,getTopic_futureDate_throwsBusinessException,오늘보다 미래의 주제는 조회할 수 없다,통합(Spring+DB),@Test,crates/app/tests/topic_db.rs::get_topic_future_date_throws_business_exception,이식
+topic,topic/service/TopicServiceTest.java,getTopic_noTopicOnDate_throwsNotFoundException,주제가 없는 날짜는 조회할 수 없다,통합(Spring+DB),@Test,crates/app/tests/topic_db.rs::get_topic_no_topic_on_date_throws_not_found_exception,이식
+topic,topic/service/TopicServiceTest.java,getTopic_openedTopic_returnsTopicDetail,공개일로 주제를 조회한다,통합(Spring+DB),@Test,crates/app/tests/topic_db.rs::get_topic_opened_topic_returns_topic_detail,이식
 user,user/api/internal/v1/controller/SignatureProcessingCallbackControllerTest.java,complete_authenticatedCallback_completesProcessing,인증된 성공 콜백은 pending 사인을 승격하고 204를 반환한다,웹 슬라이스,@Test,,미이식
 user,user/api/internal/v1/controller/SignatureProcessingCallbackControllerTest.java,complete_invalidSignature_returnsUnauthorized,서명이 올바르지 않은 콜백은 401을 반환하고 상태를 변경하지 않는다,웹 슬라이스,@Test,,미이식
 user,user/api/internal/v1/controller/SignatureProcessingCallbackControllerTest.java,complete_missingSignatureHeader_returnsUnauthorized,서명 헤더가 없는 콜백은 401을 반환하고 상태를 변경하지 않는다,웹 슬라이스,@Test,,미이식
