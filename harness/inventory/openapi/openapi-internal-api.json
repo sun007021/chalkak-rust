@@ -1,0 +1,594 @@
+{
+  "components": {
+    "schemas": {
+      "ErrorResponse": {
+        "properties": {
+          "errorCode": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Location": {
+        "properties": {
+          "latitude": {
+            "format": "double",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "type": "number"
+          },
+          "longitude": {
+            "format": "double",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "type": "number"
+          }
+        },
+        "required": [
+          "latitude",
+          "longitude"
+        ],
+        "type": "object"
+      },
+      "PostImageProcessingCompleteRequest": {
+        "properties": {
+          "byteSize": {
+            "description": "처리 후 원본 바이트 크기",
+            "example": 812345,
+            "format": "int64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "capturedAt": {
+            "description": "촬영 시각. EXIF에 없으면 null이고, offset이 없으면 offset 없이 전달된다",
+            "example": "2026-08-20T11:02:31+09:00",
+            "maxLength": 64,
+            "minLength": 0,
+            "type": "string"
+          },
+          "height": {
+            "description": "처리 후 원본 세로 픽셀",
+            "example": 3024,
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "location": {
+            "$ref": "#/components/schemas/Location",
+            "description": "촬영 위치. EXIF에 GPS가 없으면 null"
+          },
+          "metaAttributes": {
+            "additionalProperties": {},
+            "description": "기종 등 나머지 EXIF 태그. 없으면 빈 객체",
+            "type": "object"
+          },
+          "width": {
+            "description": "처리 후 원본 가로 픽셀",
+            "example": 4032,
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "PostImageProcessingFailRequest": {
+        "properties": {
+          "reason": {
+            "description": "거절 사유 코드",
+            "enum": [
+              "UNSUPPORTED_FORMAT",
+              "CORRUPTED_IMAGE",
+              "ANIMATED_IMAGE",
+              "TOO_LARGE",
+              "TOO_MANY_PIXELS",
+              "MISSING_OBJECT",
+              "PROCESSING_ERROR"
+            ],
+            "example": "UNSUPPORTED_FORMAT",
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "type": "object"
+      },
+      "PostProcessingUploadUrlsResponse": {
+        "properties": {
+          "cacheControl": {
+            "type": "string"
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "originalUploadUrl": {
+            "type": "string"
+          },
+          "thumbnailUploadUrl": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "SignatureProcessingUploadUrlsResponse": {
+        "properties": {
+          "cacheControl": {
+            "type": "string"
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "originalUploadUrl": {
+            "type": "string"
+          },
+          "thumbnailUploadUrl": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "accessToken": {
+        "bearerFormat": "JWT",
+        "description": "소셜 로그인 또는 회원가입 응답으로 받은 액세스 토큰",
+        "scheme": "bearer",
+        "type": "http"
+      },
+      "adminAccessToken": {
+        "bearerFormat": "JWT",
+        "description": "관리자 로그인 응답으로 받은 관리자 액세스 토큰",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "Chalkak 사용자, 운영자 및 내부 API 문서",
+    "title": "Chalkak API",
+    "version": "v1"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/internal/v1/post-image-processing/{uploadId}/complete": {
+      "post": {
+        "description": "Lambda의 게시물 이미지 변환 완료 결과를 멱등하게 반영합니다.\n업로드를 READY로 올리고, 이미 만들어진 게시물이 있으면 관리자 검수 대기 상태로 전환합니다.\n본문의 EXIF는 S3 객체에서 제거되고 DB에만 남습니다.\n",
+        "operationId": "complete_1",
+        "parameters": [
+          {
+            "description": "처리한 게시물 이미지 업로드 ID",
+            "example": "0198f6c1-62ba-7d30-8b12-0f733b6570d4",
+            "in": "path",
+            "name": "uploadId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "요청 시각의 Unix epoch 초. 서버 시각과 5분 이내여야 합니다.",
+            "example": 1787562000,
+            "in": "header",
+            "name": "X-Chalkak-Callback-Timestamp",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "timestamp, HTTP 메서드, 경로, 본문 해시를 서명한 v1 HMAC-SHA256 값",
+            "example": "v1=0123456789abcdef",
+            "in": "header",
+            "name": "X-Chalkak-Callback-Signature",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostImageProcessingCompleteRequest"
+              }
+            }
+          },
+          "description": "이미지 처리 결과와 추출한 EXIF",
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "완료 결과 반영 성공"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "읽을 수 없는 콜백 본문"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 콜백 서명"
+          }
+        },
+        "summary": "게시물 이미지 처리 완료 콜백",
+        "tags": [
+          "Internal Post Image Processing"
+        ]
+      }
+    },
+    "/internal/v1/post-image-processing/{uploadId}/failed": {
+      "post": {
+        "description": "Lambda의 게시물 이미지 변환 실패 결과를 멱등하게 반영합니다.\n업로드를 REJECTED로 내리고, 이미 만들어진 게시물이 있으면 이미지 처리 실패로 거절합니다.\n",
+        "operationId": "fail_1",
+        "parameters": [
+          {
+            "description": "처리한 게시물 이미지 업로드 ID",
+            "example": "0198f6c1-62ba-7d30-8b12-0f733b6570d4",
+            "in": "path",
+            "name": "uploadId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "요청 시각의 Unix epoch 초. 서버 시각과 5분 이내여야 합니다.",
+            "example": 1787562000,
+            "in": "header",
+            "name": "X-Chalkak-Callback-Timestamp",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "timestamp, HTTP 메서드, 경로, 본문 해시를 서명한 v1 HMAC-SHA256 값",
+            "example": "v1=0123456789abcdef",
+            "in": "header",
+            "name": "X-Chalkak-Callback-Signature",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostImageProcessingFailRequest"
+              }
+            }
+          },
+          "description": "거절 사유",
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "실패 결과 반영 성공"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "읽을 수 없는 콜백 본문"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 콜백 서명"
+          }
+        },
+        "summary": "게시물 이미지 처리 실패 콜백",
+        "tags": [
+          "Internal Post Image Processing"
+        ]
+      }
+    },
+    "/internal/v1/post-image-processing/{uploadId}/upload-urls": {
+      "post": {
+        "description": "Lambda가 원본과 썸네일을 저장할 S3 presigned PUT URL을 발급합니다.",
+        "operationId": "issueUploadUrls_1",
+        "parameters": [
+          {
+            "description": "처리할 게시물 이미지 업로드 ID",
+            "example": "0198f6c1-62ba-7d30-8b12-0f733b6570d4",
+            "in": "path",
+            "name": "uploadId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "요청 시각의 Unix epoch 초. 서버 시각과 5분 이내여야 합니다.",
+            "example": 1787562000,
+            "in": "header",
+            "name": "X-Chalkak-Callback-Timestamp",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "timestamp, HTTP 메서드, 경로, 본문 해시를 서명한 v1 HMAC-SHA256 값",
+            "example": "v1=0123456789abcdef",
+            "in": "header",
+            "name": "X-Chalkak-Callback-Signature",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostProcessingUploadUrlsResponse"
+                }
+              }
+            },
+            "description": "업로드 URL 발급 성공"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "비정규 업로드 ID"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 콜백 서명"
+          }
+        },
+        "summary": "게시물 이미지 처리 결과 업로드 URL 발급",
+        "tags": [
+          "Internal Post Image Processing"
+        ]
+      }
+    },
+    "/internal/v1/signature-processing/{uploadId}/complete": {
+      "post": {
+        "description": "Lambda의 사인 이미지 변환 완료 결과를 멱등하게 반영합니다.",
+        "operationId": "complete",
+        "parameters": [
+          {
+            "description": "처리할 사인 이미지 업로드 ID",
+            "example": "0198f6c1-62ba-7d30-8b12-0f733b6570d4",
+            "in": "path",
+            "name": "uploadId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "요청 시각의 Unix epoch 초. 서버 시각과 5분 이내여야 합니다.",
+            "example": 1787562000,
+            "in": "header",
+            "name": "X-Chalkak-Callback-Timestamp",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "timestamp, HTTP 메서드, 경로, 본문 해시를 서명한 v1 HMAC-SHA256 값",
+            "example": "v1=0123456789abcdef",
+            "in": "header",
+            "name": "X-Chalkak-Callback-Signature",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "완료 결과 반영 성공"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 콜백 서명"
+          }
+        },
+        "summary": "사인 이미지 처리 완료 콜백",
+        "tags": [
+          "Internal Signature Processing"
+        ]
+      }
+    },
+    "/internal/v1/signature-processing/{uploadId}/failed": {
+      "post": {
+        "description": "Lambda의 사인 이미지 변환 실패 결과를 멱등하게 반영합니다.",
+        "operationId": "fail",
+        "parameters": [
+          {
+            "description": "처리할 사인 이미지 업로드 ID",
+            "example": "0198f6c1-62ba-7d30-8b12-0f733b6570d4",
+            "in": "path",
+            "name": "uploadId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "요청 시각의 Unix epoch 초. 서버 시각과 5분 이내여야 합니다.",
+            "example": 1787562000,
+            "in": "header",
+            "name": "X-Chalkak-Callback-Timestamp",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "timestamp, HTTP 메서드, 경로, 본문 해시를 서명한 v1 HMAC-SHA256 값",
+            "example": "v1=0123456789abcdef",
+            "in": "header",
+            "name": "X-Chalkak-Callback-Signature",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "실패 결과 반영 성공"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 콜백 서명"
+          }
+        },
+        "summary": "사인 이미지 처리 실패 콜백",
+        "tags": [
+          "Internal Signature Processing"
+        ]
+      }
+    },
+    "/internal/v1/signature-processing/{uploadId}/upload-urls": {
+      "post": {
+        "description": "Lambda가 원본과 썸네일을 저장할 S3 presigned PUT URL을 발급합니다.",
+        "operationId": "issueUploadUrls",
+        "parameters": [
+          {
+            "description": "처리할 사인 이미지 업로드 ID",
+            "example": "0198f6c1-62ba-7d30-8b12-0f733b6570d4",
+            "in": "path",
+            "name": "uploadId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "요청 시각의 Unix epoch 초. 서버 시각과 5분 이내여야 합니다.",
+            "example": 1787562000,
+            "in": "header",
+            "name": "X-Chalkak-Callback-Timestamp",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "timestamp, HTTP 메서드, 경로, 본문 해시를 서명한 v1 HMAC-SHA256 값",
+            "example": "v1=0123456789abcdef",
+            "in": "header",
+            "name": "X-Chalkak-Callback-Signature",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignatureProcessingUploadUrlsResponse"
+                }
+              }
+            },
+            "description": "업로드 URL 발급 성공"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "비정규 업로드 ID"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 콜백 서명"
+          }
+        },
+        "summary": "사인 이미지 처리 결과 업로드 URL 발급",
+        "tags": [
+          "Internal Signature Processing"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "description": "게시물 이미지 처리 내부 콜백 API",
+      "name": "Internal Post Image Processing"
+    },
+    {
+      "description": "사인 이미지 처리 내부 콜백 API",
+      "name": "Internal Signature Processing"
+    }
+  ]
+}

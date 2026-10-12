@@ -1,0 +1,2534 @@
+{
+  "components": {
+    "schemas": {
+      "CalendarMonthResponse": {
+        "properties": {
+          "month": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "year": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "CalendarPostResponse": {
+        "properties": {
+          "postId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "PENDING",
+              "APPROVED"
+            ],
+            "type": "string"
+          },
+          "thumbnailImageUrl": {
+            "type": "string"
+          },
+          "topicDate": {
+            "format": "date",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "properties": {
+          "errorCode": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "FeedbackSubmissionRequest": {
+        "properties": {
+          "content": {
+            "description": "피드백 내용. 앞뒤 공백을 제거한 후 최대 1000자이며 앞뒤 공백을 제거해 저장합니다.",
+            "example": "사진 업로드 후 화면이 멈춰요.",
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "content"
+        ],
+        "type": "object"
+      },
+      "FeedbackSubmissionResponse": {
+        "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "feedbackId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "NotificationDetailResponse": {
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "originalImageUrl": {
+            "type": "string"
+          },
+          "readAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "rejectionReason": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "POST_APPROVED",
+              "POST_REJECTED"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "NotificationListResponse": {
+        "properties": {
+          "currentPage": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "hasNext": {
+            "type": "boolean"
+          },
+          "notifications": {
+            "items": {
+              "$ref": "#/components/schemas/NotificationSummaryResponse"
+            },
+            "type": "array"
+          },
+          "pageSize": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "NotificationSummaryResponse": {
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "readAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "thumbnailImageUrl": {
+            "description": "알림함에 표시할 사진 썸네일 URL",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "POST_APPROVED",
+              "POST_REJECTED"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "NotificationUnreadStatusResponse": {
+        "properties": {
+          "hasUnread": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "PostCalendarMonthsResponse": {
+        "properties": {
+          "months": {
+            "description": "게시물이 있는 연월 목록. 중복 없이 최신순이며, 기록이 없으면 빈 배열",
+            "items": {
+              "$ref": "#/components/schemas/CalendarMonthResponse"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "PostCalendarResponse": {
+        "properties": {
+          "month": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "posts": {
+            "items": {
+              "$ref": "#/components/schemas/CalendarPostResponse"
+            },
+            "type": "array"
+          },
+          "year": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "PostCreateRequest": {
+        "properties": {
+          "photoUploadId": {
+            "description": "사진 업로드 ID",
+            "example": "0198f6c1-62ba-7d30-8b12-0f733b6570d4",
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": {
+            "description": "작품 제목. 앞뒤 공백 제거 후 최대 10자입니다. 생략하거나 공백뿐이면 제목 없음으로 저장합니다.",
+            "example": "오늘의 기록",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "topicId": {
+            "description": "주제 ID",
+            "example": "0198f6c1-62ba-7d30-8b12-0f733b6570b2",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "photoUploadId",
+          "topicId"
+        ],
+        "type": "object"
+      },
+      "PostCreateResponse": {
+        "properties": {
+          "moderationStatus": {
+            "description": "이미지 처리 전 VALIDATING, 처리 완료 후 관리자 검수 대기이면 PENDING",
+            "enum": [
+              "VALIDATING",
+              "PENDING"
+            ],
+            "example": "VALIDATING",
+            "type": "string"
+          },
+          "postId": {
+            "description": "생성된 게시물 ID",
+            "example": "0198f6c1-62ba-7d30-8b12-0f733b6570d5",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "PostDetailResponse": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "isLiked": {
+            "type": "boolean"
+          },
+          "likeCount": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "originalImageUrl": {
+            "type": "string"
+          },
+          "signatureOriginalImageUrl": {
+            "type": "string"
+          },
+          "thumbnailImageUrl": {
+            "description": "변환된 게시물 썸네일 URL",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "topic": {
+            "$ref": "#/components/schemas/TopicResponse"
+          }
+        },
+        "type": "object"
+      },
+      "PostImageUploadResponse": {
+        "properties": {
+          "contentType": {
+            "description": "PUT 요청에 그대로 사용해야 하는 Content-Type",
+            "example": "image/webp",
+            "type": "string"
+          },
+          "expiresInSeconds": {
+            "description": "발급 시점부터의 URL 유효 시간",
+            "example": 300,
+            "format": "int64",
+            "type": "integer"
+          },
+          "maxBytes": {
+            "description": "허용 용량. 초과분은 업로드 후 이미지 처리 단계에서 거절된다",
+            "example": 5242880,
+            "format": "int64",
+            "type": "integer"
+          },
+          "uploadId": {
+            "description": "게시물 생성 요청에 그대로 전달할 업로드 ID",
+            "example": "0198f6c1-62ba-7d30-8b12-0f733b6570d4",
+            "format": "uuid",
+            "type": "string"
+          },
+          "uploadUrl": {
+            "description": "S3 presigned PUT URL",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "PostLikeResponse": {
+        "properties": {
+          "isLiked": {
+            "type": "boolean"
+          },
+          "likeCount": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "postId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "PostListResponse": {
+        "properties": {
+          "currentPage": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "hasNext": {
+            "type": "boolean"
+          },
+          "pageSize": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "posts": {
+            "items": {
+              "$ref": "#/components/schemas/PostResponse"
+            },
+            "type": "array"
+          },
+          "randomSeed": {
+            "description": "랜덤 정렬 결과를 유지하는 값으로 다음 페이지 요청에도 동일하게 전달",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "PostResponse": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "isLiked": {
+            "type": "boolean"
+          },
+          "isMine": {
+            "description": "조회자가 작성한 게시물인지 여부로, 인증 정보가 없으면 항상 false",
+            "type": "boolean"
+          },
+          "likeCount": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "originalImageUrl": {
+            "type": "string"
+          },
+          "signatureOriginalImageUrl": {
+            "type": "string"
+          },
+          "signatureThumbnailImageUrl": {
+            "description": "변환된 사인 이미지 썸네일 URL",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "submittedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "thumbnailImageUrl": {
+            "description": "변환된 게시물 썸네일 URL",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "PostUpdateRequest": {
+        "properties": {
+          "title": {
+            "description": "수정할 제목. 앞뒤 공백을 제거하며 null 또는 공백이면 제목을 삭제합니다.",
+            "example": "수정한 제목",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "type": "object"
+      },
+      "PostUpdateResponse": {
+        "properties": {
+          "postId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "RefreshTokenRequest": {
+        "properties": {
+          "refreshToken": {
+            "description": "로그인, 회원가입 또는 직전 재발급 응답에서 받은 리프레시 토큰",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "refreshToken"
+        ],
+        "type": "object"
+      },
+      "SocialLoginRequest": {
+        "properties": {
+          "authorizationCode": {
+            "description": "Apple 로그인에서 받은 일회용 Authorization Code. APPLE일 때만 보내며, 다른 제공자가 보내면 거절한다",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "idToken": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "provider": {
+            "description": "ID Token 발급 소셜 로그인 제공자",
+            "enum": [
+              "GOOGLE",
+              "KAKAO",
+              "APPLE"
+            ],
+            "type": "string"
+          },
+          "rawNonce": {
+            "description": "클라이언트가 소셜 로그인 요청 전에 생성한 원본 nonce. SDK에는 이 값의 SHA-256 소문자 hex를 전달한다",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "idToken",
+          "provider",
+          "rawNonce"
+        ],
+        "type": "object"
+      },
+      "SocialLoginResponse": {
+        "properties": {
+          "accessToken": {
+            "description": "LOGIN_SUCCESS일 때만 내려주는 액세스 토큰",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "expiresIn": {
+            "description": "발급 시점부터의 액세스 토큰 유효 시간(초). LOGIN_SUCCESS일 때만 내려준다",
+            "example": 900,
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "refreshToken": {
+            "description": "액세스 토큰 재발급에 사용하는 리프레시 토큰. LOGIN_SUCCESS일 때만 내려준다",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "refreshTokenExpiresIn": {
+            "description": "발급 시점부터의 리프레시 토큰 유효 시간(초). LOGIN_SUCCESS일 때만 내려준다",
+            "example": 2592000,
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "status": {
+            "enum": [
+              "LOGIN_SUCCESS",
+              "SIGN_UP_REQUIRED"
+            ],
+            "type": "string"
+          },
+          "userId": {
+            "description": "LOGIN_SUCCESS일 때만 내려준다",
+            "format": "uuid",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "SocialSignupRequest": {
+        "properties": {
+          "signupToken": {
+            "description": "서명 업로드 URL 발급 응답에서 받은 5분 유효 회원가입 토큰",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "signupToken"
+        ],
+        "type": "object"
+      },
+      "SocialSignupResponse": {
+        "properties": {
+          "accessToken": {
+            "description": "가입 직후 바로 사용할 수 있는 액세스 토큰",
+            "type": "string"
+          },
+          "expiresIn": {
+            "description": "발급 시점부터의 액세스 토큰 유효 시간(초)",
+            "example": 900,
+            "format": "int64",
+            "type": "integer"
+          },
+          "refreshToken": {
+            "description": "액세스 토큰 재발급에 사용하는 리프레시 토큰",
+            "type": "string"
+          },
+          "refreshTokenExpiresIn": {
+            "description": "발급 시점부터의 리프레시 토큰 유효 시간(초)",
+            "example": 2592000,
+            "format": "int64",
+            "type": "integer"
+          },
+          "userId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "SocialSignupSignatureUploadRequest": {
+        "properties": {
+          "idToken": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "provider": {
+            "description": "ID Token 발급 소셜 로그인 제공자",
+            "enum": [
+              "GOOGLE",
+              "KAKAO",
+              "APPLE"
+            ],
+            "type": "string"
+          },
+          "rawNonce": {
+            "description": "클라이언트가 소셜 로그인 요청 전에 생성한 원본 nonce. SDK에는 이 값의 SHA-256 소문자 hex를 전달한다",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "idToken",
+          "provider",
+          "rawNonce"
+        ],
+        "type": "object"
+      },
+      "SocialSignupSignatureUploadResponse": {
+        "properties": {
+          "expiresInSeconds": {
+            "description": "S3 Presigned URL 만료까지 남은 시간(초). signupToken의 만료 시간이 아님",
+            "example": 300,
+            "format": "int64",
+            "type": "integer"
+          },
+          "signupToken": {
+            "description": "검증된 소셜 계정과 업로드 식별자를 연결한 5분 유효 회원가입 토큰",
+            "type": "string"
+          },
+          "uploadId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "uploadUrl": {
+            "description": "서명 PNG 이미지를 업로드할 S3 Presigned PUT URL. Content-Type은 image/png이며 최대 크기는 1 MiB",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TodayPostStatusResponse": {
+        "properties": {
+          "isPosted": {
+            "description": "이 주제에 새 게시물을 작성할 수 없으면 true",
+            "example": true,
+            "type": "boolean"
+          },
+          "moderationStatus": {
+            "description": "이 주제에 작성한 게시물의 검수 상태. isPosted가 false이면 null",
+            "enum": [
+              "VALIDATING",
+              "PENDING",
+              "APPROVED"
+            ],
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "postId": {
+            "description": "이 주제에 작성한 게시물 ID. isPosted가 false이면 null",
+            "example": "0198f6c1-62ba-7d30-8b12-0f733b6570d4",
+            "format": "uuid",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "topicDate": {
+            "description": "참여할 수 있는 주제의 날짜. 참여 기간이 자정을 넘기면 어제 날짜일 수 있다",
+            "example": "2026-09-09",
+            "format": "date",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TokenRefreshResponse": {
+        "properties": {
+          "accessToken": {
+            "description": "재발급된 액세스 토큰",
+            "type": "string"
+          },
+          "expiresIn": {
+            "description": "발급 시점부터의 액세스 토큰 유효 시간(초)",
+            "example": 900,
+            "format": "int64",
+            "type": "integer"
+          },
+          "refreshToken": {
+            "description": "회전으로 새로 발급된 리프레시 토큰. 요청에 사용한 토큰은 더 이상 쓸 수 없으므로 이 값으로 교체한다",
+            "type": "string"
+          },
+          "refreshTokenExpiresIn": {
+            "description": "발급 시점부터의 리프레시 토큰 유효 시간(초)",
+            "example": 2592000,
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "TopicDetailResponse": {
+        "properties": {
+          "endsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "phase": {
+            "enum": [
+              "BEFORE_OPEN",
+              "OPEN",
+              "CLOSED"
+            ],
+            "type": "string"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "topicDate": {
+            "format": "date",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TopicResponse": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "topicDate": {
+            "format": "date",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "UserSignatureDetailResponse": {
+        "properties": {
+          "signatureOriginalImageUrl": {
+            "type": "string"
+          },
+          "signatureThumbnailImageUrl": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "UserSignatureResponse": {
+        "properties": {
+          "signatureOriginalImageUrl": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "UserSignatureUpdateRequest": {
+        "properties": {
+          "signatureOriginalUploadId": {
+            "description": "사인 원본 이미지 업로드 ID",
+            "example": "0198f6c1-62ba-7d30-8b12-0f733b6570d4",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "signatureOriginalUploadId"
+        ],
+        "type": "object"
+      },
+      "UserSignatureUploadResponse": {
+        "properties": {
+          "expiresInSeconds": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "uploadId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "uploadUrl": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "accessToken": {
+        "bearerFormat": "JWT",
+        "description": "소셜 로그인 또는 회원가입 응답으로 받은 액세스 토큰",
+        "scheme": "bearer",
+        "type": "http"
+      },
+      "adminAccessToken": {
+        "bearerFormat": "JWT",
+        "description": "관리자 로그인 응답으로 받은 관리자 액세스 토큰",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "Chalkak 사용자, 운영자 및 내부 API 문서",
+    "title": "Chalkak API",
+    "version": "v1"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/auth/logout": {
+      "post": {
+        "description": "리프레시 토큰이 가리키는 기기 세션 하나만 끊는다. 알 수 없거나 이미 폐기된 토큰에도 204를 반환한다. 실패를 알리면 토큰의 존재 여부가 새어 나가고, 재시도한 클라이언트가 로그아웃하지 못하고 막히기 때문이다",
+        "operationId": "logout",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "로그아웃 처리 완료"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "요청 본문이 없거나 리프레시 토큰이 비어 있음"
+          }
+        },
+        "summary": "로그아웃",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "description": "리프레시 토큰 자체가 자격증명이므로 액세스 토큰 없이 호출한다. 성공하면 리프레시 토큰도 함께 회전하므로 요청에 사용한 토큰은 버리고 응답의 리프레시 토큰으로 교체해야 한다.",
+        "operationId": "refresh",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenRefreshResponse"
+                }
+              }
+            },
+            "description": "재발급 성공"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "요청 본문이 없거나 리프레시 토큰이 비어 있음"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "재로그인 필요. 알 수 없거나 만료됐거나 이미 사용한 리프레시 토큰이며, errorCode는 REAUTHENTICATION_REQUIRED다. 저장한 토큰을 버리고 로그인 화면으로 보내야 한다"
+          }
+        },
+        "summary": "액세스 토큰 재발급",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/social-login": {
+      "post": {
+        "operationId": "socialLogin",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SocialLoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SocialLoginResponse"
+                }
+              }
+            },
+            "description": "로그인 성공(차단 회원 포함) 또는 회원가입 필요"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 요청 또는 Authorization Code 조건 위반(APPLE인데 없음, 다른 제공자가 보냄)"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 ID Token, nonce(원본 nonce의 SHA-256 소문자 hex와 ID Token의 nonce 불일치) 또는 Apple Authorization Code"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "탈퇴한 차단 소셜 계정"
+          }
+        },
+        "summary": "소셜 로그인",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/social-signup": {
+      "post": {
+        "operationId": "socialSignup",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SocialSignupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SocialSignupResponse"
+                }
+              }
+            },
+            "description": "회원가입 완료 또는 기존 회원가입 결과 반환"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 요청, 이미 가입된 소셜 계정(탈퇴 회원), 이미 사용된 회원가입 토큰, 만료되었거나 없는 Apple 임시 인증 정보, 처리 중인 서명 이미지 또는 사용할 수 없는 이미지. 서명 이미지 처리 중일 때만 errorCode가 SIGNATURE_PROCESSING_PENDING이며, 같은 회원가입 토큰으로 다시 요청한다. 나머지는 BUSINESS_ERROR다"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않거나 만료된 회원가입 토큰"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "차단된 소셜 계정"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "업로드한 서명 이미지를 찾을 수 없음"
+          }
+        },
+        "summary": "소셜 회원가입 완료",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/social-signup/signature/uploads": {
+      "post": {
+        "operationId": "createSocialSignupSignatureUpload",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SocialSignupSignatureUploadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SocialSignupSignatureUploadResponse"
+                }
+              }
+            },
+            "description": "업로드 URL 발급 성공"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 요청, 이미 가입된 소셜 계정 또는 만료되었거나 없는 Apple 임시 인증 정보(Apple은 로그인으로 임시 인증 정보를 먼저 만들어야 한다)"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 ID Token 또는 nonce(원본 nonce의 SHA-256 소문자 hex와 ID Token의 nonce 불일치)"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "차단된 소셜 계정"
+          }
+        },
+        "summary": "소셜 회원가입용 서명 이미지 업로드 URL 발급",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/feedbacks": {
+      "post": {
+        "description": "마이페이지에서 받은 자유 의견을 접수합니다. 이용이 정지된 회원도 제출할 수 있습니다.",
+        "operationId": "submitFeedback",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FeedbackSubmissionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackSubmissionResponse"
+                }
+              }
+            },
+            "description": "피드백 제출 성공"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "내용이 비었거나 1000자를 초과함"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 인증 정보 또는 탈퇴한 회원"
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "summary": "피드백 제출",
+        "tags": [
+          "Feedbacks"
+        ]
+      }
+    },
+    "/api/v1/notifications": {
+      "get": {
+        "description": "게시물이 삭제된 알림은 제외합니다.",
+        "operationId": "getNotifications",
+        "parameters": [
+          {
+            "description": "페이지 번호",
+            "example": 1,
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "description": "페이지 번호",
+              "example": 1,
+              "format": "int32",
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "페이지당 알림 수",
+            "example": 20,
+            "in": "query",
+            "name": "pageSize",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "description": "페이지당 알림 수",
+              "example": 20,
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationListResponse"
+                }
+              }
+            },
+            "description": "조회 성공"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 조회 조건"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 인증 정보"
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "summary": "내 알림 목록 조회",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/read-all": {
+      "patch": {
+        "description": "알림함에 표시되는 미읽음 알림만 처리합니다.",
+        "operationId": "markAllRead",
+        "responses": {
+          "204": {
+            "description": "읽음 처리 성공"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 인증 정보"
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "summary": "내 알림 모두 읽음 처리",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/unread-status": {
+      "get": {
+        "description": "알림함에 표시되는 알림을 기준으로 판단합니다.",
+        "operationId": "getUnreadStatus",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationUnreadStatusResponse"
+                }
+              }
+            },
+            "description": "조회 성공"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 인증 정보"
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "summary": "내 미읽음 알림 여부 조회",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/{notificationId}": {
+      "get": {
+        "description": "반려 알림에는 원본 사진과 반려 사유를 포함합니다. 삭제된 게시물의 알림은 조회할 수 없습니다. 조회만으로 읽음 처리하지 않습니다.",
+        "operationId": "getNotification",
+        "parameters": [
+          {
+            "description": "알림 ID",
+            "in": "path",
+            "name": "notificationId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationDetailResponse"
+                }
+              }
+            },
+            "description": "조회 성공"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 알림 ID"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 인증 정보"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "알림을 찾을 수 없음"
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "summary": "내 알림 상세 조회",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/{notificationId}/read": {
+      "patch": {
+        "description": "삭제된 게시물의 알림은 처리할 수 없습니다. 반복 호출해도 처음 읽은 시각을 유지합니다.",
+        "operationId": "markRead",
+        "parameters": [
+          {
+            "description": "알림 ID",
+            "in": "path",
+            "name": "notificationId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "읽음 처리 성공"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 알림 ID"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 인증 정보"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "알림을 찾을 수 없음"
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "summary": "내 알림 읽음 처리",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/posts": {
+      "get": {
+        "description": "인증 정보가 없으면 isLiked와 isMine은 false입니다. 랜덤 정렬의 다음 페이지 요청에는 최초 응답의 randomSeed를 사용합니다.",
+        "operationId": "getPosts",
+        "parameters": [
+          {
+            "description": "조회할 주제 날짜",
+            "example": "2026-08-12",
+            "in": "query",
+            "name": "topicDate",
+            "required": true,
+            "schema": {
+              "description": "조회할 주제 날짜",
+              "example": "2026-08-12",
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "정렬 방식",
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "default": "recent",
+              "description": "정렬 방식",
+              "enum": [
+                "recent",
+                "popular",
+                "random"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "랜덤 정렬 결과를 유지하는 값으로 다음 페이지 요청에도 동일하게 전달",
+            "example": "f4c3a091",
+            "in": "query",
+            "name": "randomSeed",
+            "required": false,
+            "schema": {
+              "description": "랜덤 정렬 결과를 유지하는 값으로 다음 페이지 요청에도 동일하게 전달",
+              "example": "f4c3a091",
+              "pattern": "[A-Za-z0-9_-]{1,64}",
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "description": "페이지 번호",
+            "example": 1,
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "description": "페이지 번호",
+              "example": 1,
+              "format": "int32",
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "페이지당 게시물 수",
+            "example": 20,
+            "in": "query",
+            "name": "pageSize",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "description": "페이지당 게시물 수",
+              "example": 20,
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostListResponse"
+                }
+              }
+            },
+            "description": "게시물 목록 조회 성공"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 조회 조건"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 인증 정보"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "해당 날짜의 주제를 찾을 수 없음"
+          }
+        },
+        "security": [
+          {},
+          {
+            "accessToken": []
+          }
+        ],
+        "summary": "게시물 목록 조회",
+        "tags": [
+          "Posts"
+        ]
+      },
+      "post": {
+        "description": "업로드된 사진과 선택 제목을 주제에 연결합니다. 이미지 처리가 끝나면 관리자 검수 대기 상태가 됩니다.",
+        "operationId": "createPost",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostCreateResponse"
+                }
+              }
+            },
+            "description": "게시물 생성 성공"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 요청 또는 게시물을 생성할 수 없는 상태"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 인증 정보"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "이용이 정지된 회원"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "주제 또는 업로드 사진을 찾을 수 없음"
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "summary": "게시물 생성",
+        "tags": [
+          "Posts"
+        ]
+      }
+    },
+    "/api/v1/posts/calendar": {
+      "get": {
+        "description": "조회 연월의 주제에 작성한 본인의 PENDING·APPROVED 게시물을 주제 날짜순으로 반환합니다.",
+        "operationId": "getMyPostCalendar",
+        "parameters": [
+          {
+            "description": "조회 연도",
+            "example": 2026,
+            "in": "query",
+            "name": "year",
+            "required": true,
+            "schema": {
+              "description": "조회 연도",
+              "example": 2026,
+              "format": "int32",
+              "maximum": 9999,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "조회 월",
+            "example": 8,
+            "in": "query",
+            "name": "month",
+            "required": true,
+            "schema": {
+              "description": "조회 월",
+              "example": 8,
+              "format": "int32",
+              "maximum": 12,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostCalendarResponse"
+                }
+              }
+            },
+            "description": "내 게시물 캘린더 조회 성공"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "조회 연월이 올바르지 않음"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 인증 정보"
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "summary": "내 게시물 캘린더 조회",
+        "tags": [
+          "Posts"
+        ]
+      }
+    },
+    "/api/v1/posts/calendar/months": {
+      "get": {
+        "description": "전체 기간에서 본인의 PENDING·APPROVED 게시물이 있는 연월을 주제 날짜 기준으로 반환합니다.\n삭제된 게시물·주제·사진은 제외하며, 연월은 중복 없이 최신순입니다.\n게시물이 없으면 months는 빈 배열이고, 기록이 없는 현재 달을 임의로 포함하지 않습니다.\n",
+        "operationId": "getMyPostCalendarMonths",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostCalendarMonthsResponse"
+                }
+              }
+            },
+            "description": "내 캘린더 기록 연월 조회 성공"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 인증 정보 또는 탈퇴한 회원"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "일반 사용자 API에 접근할 수 없는 토큰"
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "summary": "내 캘린더 게시물이 있는 연월 목록 조회",
+        "tags": [
+          "Posts"
+        ]
+      }
+    },
+    "/api/v1/posts/today": {
+      "get": {
+        "description": "지금 참여할 수 있는 주제에 이미 게시물을 썼는지 확인합니다.\n작성 화면에 들어가기 전 호출해 isPosted가 true이면 진입을 막고 안내합니다.\n주제는 날짜가 아니라 요청 시각의 참여 기간으로 고르므로,\n아직 열리지 않았거나 이미 닫힌 주제는 대상이 되지 않습니다.\n참여할 수 있는 주제가 없으면 404입니다.\n판정 기준은 게시물 생성의 중복 검사와 같습니다.\nVALIDATING, PENDING, APPROVED 게시물이 있으면 isPosted가 true입니다.\nREJECTED, 삭제된 게시물과 이미지 처리 대기 시간을 넘긴 VALIDATING 게시물은\n재작성할 수 있으므로 false입니다.\nisPosted가 false이면 postId와 moderationStatus는 null입니다.\n",
+        "operationId": "getMyTodayPostStatus",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodayPostStatusResponse"
+                }
+              }
+            },
+            "description": "오늘 게시물 작성 여부 조회 성공"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 인증 정보"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "이용이 정지된 회원"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "지금 참여할 수 있는 주제가 없음"
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "summary": "오늘 게시물 작성 여부 조회",
+        "tags": [
+          "Posts"
+        ]
+      }
+    },
+    "/api/v1/posts/uploads": {
+      "post": {
+        "description": "S3에 직접 업로드할 presigned PUT URL을 발급합니다.\nPUT 요청의 Content-Type은 응답의 `contentType`과 정확히 같아야 합니다.\n`maxBytes`를 넘는 이미지와 WebP가 아닌 이미지는 업로드 후 이미지 처리\n단계에서 거절되며, 그 업로드 ID로는 게시물을 만들 수 없습니다.\n발급받은 `uploadId`는 게시물 생성 요청의 `photoUploadId`로 사용합니다.\n",
+        "operationId": "createPostImageUpload",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostImageUploadResponse"
+                }
+              }
+            },
+            "description": "업로드 URL 발급 성공"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 인증 정보"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "이용이 정지된 회원"
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "summary": "게시물 이미지 업로드 URL 발급",
+        "tags": [
+          "Posts"
+        ]
+      }
+    },
+    "/api/v1/posts/{postId}": {
+      "delete": {
+        "description": "본인이 작성한 PENDING 또는 APPROVED 게시물을 삭제합니다.\n게시물과 사진은 soft delete되고 연결된 좋아요는 삭제됩니다.\n이미 삭제한 게시물에 다시 요청해도 성공으로 처리합니다.\n",
+        "operationId": "deletePost",
+        "parameters": [
+          {
+            "description": "게시물 ID",
+            "example": "0198f6c1-62ba-7d30-8b12-0f733b6570d4",
+            "in": "path",
+            "name": "postId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "게시물 삭제 성공"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 게시물 ID 또는 삭제할 수 없는 상태"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 인증 정보"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "본인이 작성한 게시물이 아님"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "게시물을 찾을 수 없음"
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "summary": "본인 게시물 삭제",
+        "tags": [
+          "Posts"
+        ]
+      },
+      "get": {
+        "operationId": "getPost",
+        "parameters": [
+          {
+            "description": "게시물 ID",
+            "example": "0198f6c1-62ba-7d30-8b12-0f733b6570d4",
+            "in": "path",
+            "name": "postId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDetailResponse"
+                }
+              }
+            },
+            "description": "게시물 상세 조회 성공"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 게시물 ID"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 인증 정보"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "게시물을 찾을 수 없음"
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "summary": "게시물 상세 조회",
+        "tags": [
+          "Posts"
+        ]
+      },
+      "put": {
+        "description": "본인이 작성한 PENDING 또는 APPROVED 게시물의 제목을 수정합니다.\n주제 참여 기간이 남아 있어야 하며, 기존 검수 상태와 제출 시각은 유지합니다.\n제목의 앞뒤 공백을 제거하고 null 또는 공백이면 제목을 삭제합니다.\n",
+        "operationId": "updatePost",
+        "parameters": [
+          {
+            "description": "게시물 ID",
+            "example": "0198f6c1-62ba-7d30-8b12-0f733b6570d4",
+            "in": "path",
+            "name": "postId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostUpdateResponse"
+                }
+              }
+            },
+            "description": "게시물 제목 수정 성공"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 요청 또는 수정할 수 없는 상태"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 인증 정보"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "본인의 게시물이 아니거나 이용이 정지된 회원"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "게시물을 찾을 수 없음"
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "summary": "게시물 제목 수정",
+        "tags": [
+          "Posts"
+        ]
+      }
+    },
+    "/api/v1/posts/{postId}/likes": {
+      "delete": {
+        "operationId": "unlikePost",
+        "parameters": [
+          {
+            "description": "게시물 ID",
+            "example": "0198f6c1-62ba-7d30-8b12-0f733b6570d4",
+            "in": "path",
+            "name": "postId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostLikeResponse"
+                }
+              }
+            },
+            "description": "게시물 좋아요 취소 성공"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 게시물 ID"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 인증 정보"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "게시물을 찾을 수 없음"
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "summary": "게시물 좋아요 취소",
+        "tags": [
+          "Post Likes"
+        ]
+      },
+      "put": {
+        "operationId": "likePost",
+        "parameters": [
+          {
+            "description": "게시물 ID",
+            "example": "0198f6c1-62ba-7d30-8b12-0f733b6570d4",
+            "in": "path",
+            "name": "postId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostLikeResponse"
+                }
+              }
+            },
+            "description": "게시물 좋아요 등록 성공"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 게시물 ID"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 인증 정보"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "이용이 정지된 회원"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "게시물을 찾을 수 없음"
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "summary": "게시물 좋아요 등록",
+        "tags": [
+          "Post Likes"
+        ]
+      }
+    },
+    "/api/v1/topics": {
+      "get": {
+        "operationId": "getTopic",
+        "parameters": [
+          {
+            "description": "조회할 주제 날짜",
+            "example": "2026-08-12",
+            "in": "query",
+            "name": "date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicDetailResponse"
+                }
+              }
+            },
+            "description": "주제 조회 성공"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 날짜 형식"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "주제를 찾을 수 없음"
+          }
+        },
+        "summary": "주제 조회",
+        "tags": [
+          "Topics"
+        ]
+      }
+    },
+    "/api/v1/users/me": {
+      "delete": {
+        "operationId": "withdraw",
+        "responses": {
+          "204": {
+            "description": "회원 탈퇴 성공"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 인증 정보"
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "summary": "회원 탈퇴",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/users/me/signature": {
+      "get": {
+        "operationId": "getSignature",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSignatureDetailResponse"
+                }
+              }
+            },
+            "description": "사인 조회 성공"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "사인 재등록 필요(SIGNATURE_REGISTRATION_REQUIRED): 사인 이미지 처리 실패 또는 설정된 처리 제한 시간 초과"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 인증 정보"
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "summary": "내 사인 조회",
+        "tags": [
+          "Users"
+        ]
+      },
+      "put": {
+        "operationId": "updateSignature",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSignatureUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSignatureResponse"
+                }
+              }
+            },
+            "description": "사인 이미지 수정 성공"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 이미지 업로드 정보 또는 이미지 재업로드 필요(SIGNATURE_REUPLOAD_REQUIRED)"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 인증 정보"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "이용이 정지된 회원"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "업로드 이미지를 찾을 수 없음"
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "summary": "사인 이미지 수정",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/users/me/signature/uploads": {
+      "post": {
+        "operationId": "createSignatureUpload",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSignatureUploadResponse"
+                }
+              }
+            },
+            "description": "업로드 URL 발급 성공"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "유효하지 않은 인증 정보"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "이용이 정지된 회원"
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "summary": "사인 이미지 업로드 URL 발급",
+        "tags": [
+          "Users"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "description": "주제 API",
+      "name": "Topics"
+    },
+    {
+      "description": "내 알림함 API",
+      "name": "Notifications"
+    },
+    {
+      "description": "게시물 좋아요 API",
+      "name": "Post Likes"
+    },
+    {
+      "description": "사용자 피드백 API",
+      "name": "Feedbacks"
+    },
+    {
+      "description": "사용자 API",
+      "name": "Users"
+    },
+    {
+      "description": "게시물 API",
+      "name": "Posts"
+    },
+    {
+      "description": "인증 API",
+      "name": "Auth"
+    }
+  ]
+}

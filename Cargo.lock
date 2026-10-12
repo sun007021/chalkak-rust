@@ -154,6 +154,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "chalkak-fakes"
+version = "0.0.0"
+dependencies = [
+ "serde_json",
+]
+
+[[package]]
 name = "chalkak-http"
 version = "0.0.0"
 dependencies = [
@@ -179,6 +186,7 @@ version = "0.0.0"
 dependencies = [
  "hmac 0.12.1",
  "postgres",
+ "rsa",
  "serde",
  "serde_json",
  "sha2 0.10.9",

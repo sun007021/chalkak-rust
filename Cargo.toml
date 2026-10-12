@@ -9,6 +9,7 @@ members = [
     "crates/app",
     "crates/server",
     "harness/parity",
+    "harness/fakes",
 ]
 
 [workspace.package]

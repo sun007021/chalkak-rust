@@ -1,0 +1,128 @@
+name = "인증: Apple 로그인(ID Token 검증 + authorizationCode 교환)과 교환 서버 오류"
+tags = ["auth", "oidc", "apple"]
+clock = "2026-10-12T09:00:00+09:00"
+# 교환한 Refresh Token은 AES-GCM 무작위 IV로 암호화해 저장하므로 암호문은 길이만 비교한다.
+db_opaque = ["encrypted_refresh_token"]
+
+# 신규 Apple 회원은 로그인에서 authorizationCode를 Apple 토큰 서버에서 교환해 폐기용 Refresh Token을 임시 보관한다.
+# 교환 응답에 든 ID Token은 처음 낸 ID Token과 같은 사용자(sub)여야 한다.
+
+[[id_token]]
+name = "apple1"
+provider = "apple"
+sub = "apple-sub-1"
+nonce = "apple-nonce-1"
+email = "apple1@example.com"
+email_verified = "true"
+
+[[id_token]]
+name = "exchanged1"
+provider = "apple"
+sub = "apple-sub-1"
+nonce = "apple-nonce-1"
+email = "apple1@example.com"
+email_verified = "true"
+
+[[id_token]]
+name = "apple2"
+provider = "apple"
+sub = "apple-sub-2"
+nonce = "apple-nonce-2"
+
+[[id_token]]
+name = "exchangedOther"
+provider = "apple"
+sub = "apple-sub-other"
+nonce = "apple-nonce-2"
+
+[[id_token]]
+name = "apple3"
+provider = "apple"
+sub = "apple-sub-3"
+nonce = "apple-nonce-3"
+
+[fakes.apple_token]
+status = 200
+body = '''{"access_token":"apple-access-1","token_type":"Bearer","expires_in":3600,"refresh_token":"apple-refresh-1","id_token":"${exchanged1}"}'''
+
+[[step]]
+name = "authorizationCode 없이 Apple 로그인"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"APPLE","idToken":"${apple1}","rawNonce":"apple-nonce-1"}'
+
+[[step]]
+name = "신규 Apple 회원은 code를 교환하고 미가입으로 응답"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"APPLE","idToken":"${apple1}","rawNonce":"apple-nonce-1","authorizationCode":"code-1"}'
+
+[[step]]
+name = "임시 보관분이 있으면 다시 교환하지 않는다"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"APPLE","idToken":"${apple1}","rawNonce":"apple-nonce-1","authorizationCode":"code-2"}'
+
+[[step]]
+name = "교환한 ID Token의 사용자가 다르면 거절"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"APPLE","idToken":"${apple2}","rawNonce":"apple-nonce-2","authorizationCode":"code-3"}'
+[step.fakes.apple_token]
+status = 200
+body = '''{"access_token":"a","token_type":"Bearer","expires_in":3600,"refresh_token":"r","id_token":"${exchangedOther}"}'''
+
+[[step]]
+name = "교환한 ID Token의 nonce가 다르면 거절"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"APPLE","idToken":"${apple2}","rawNonce":"apple-nonce-2","authorizationCode":"code-3b"}'
+[step.fakes.apple_token]
+status = 200
+body = '''{"access_token":"a","token_type":"Bearer","expires_in":3600,"refresh_token":"r","id_token":"${exchanged1}"}'''
+
+[[step]]
+name = "만료되었거나 사용된 code (invalid_grant)"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"APPLE","idToken":"${apple3}","rawNonce":"apple-nonce-3","authorizationCode":"code-4"}'
+[step.fakes.apple_token]
+status = 400
+body = '{"error":"invalid_grant"}'
+
+[[step]]
+name = "그 밖의 400 (invalid_client)"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"APPLE","idToken":"${apple3}","rawNonce":"apple-nonce-3","authorizationCode":"code-5"}'
+[step.fakes.apple_token]
+status = 400
+body = '{"error":"invalid_client"}'
+
+[[step]]
+name = "Apple 서버 오류"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"APPLE","idToken":"${apple3}","rawNonce":"apple-nonce-3","authorizationCode":"code-6"}'
+[step.fakes.apple_token]
+status = 503
+body = 'unavailable'
+content_type = "text/plain"
+
+[[step]]
+name = "교환 응답에 refresh_token이 없음"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"APPLE","idToken":"${apple3}","rawNonce":"apple-nonce-3","authorizationCode":"code-7"}'
+[step.fakes.apple_token]
+status = 200
+body = '''{"access_token":"a","token_type":"Bearer","expires_in":3600,"id_token":"${apple3}"}'''
+
+[[step]]
+name = "token_type이 bearer가 아님"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"APPLE","idToken":"${apple3}","rawNonce":"apple-nonce-3","authorizationCode":"code-8"}'
+[step.fakes.apple_token]
+status = 200
+body = '''{"access_token":"a","token_type":"mac","expires_in":3600,"refresh_token":"r","id_token":"${apple3}"}'''

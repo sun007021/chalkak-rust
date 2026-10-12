@@ -1,0 +1,89 @@
+name = "인증: 구글 가입 흐름(로그인 → 업로드 URL → 가입 → 재로그인 → 토큰 재발급) 과 S3 HeadObject"
+tags = ["auth", "oidc", "s3"]
+clock = "2026-10-12T09:00:00+09:00"
+# 리프레시 토큰은 무작위라 그 해시도 매번 다르다.
+db_opaque = ["token_hash"]
+
+# 사인 이미지는 클라이언트가 S3에 올리고 Lambda가 썸네일을 만든 뒤에야 가입이 끝난다.
+# 하네스는 업로드 대신 가짜 S3의 HeadObject 응답으로 "올라간 상태"를 만든다.
+
+[[id_token]]
+name = "g"
+provider = "google"
+sub = "google-sub-flow"
+nonce = "flow-nonce"
+email = "flow@example.com"
+email_verified = true
+
+[[step]]
+name = "미가입 회원 로그인"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":"flow-nonce"}'
+
+[[step]]
+name = "사인 업로드 URL 발급"
+method = "POST"
+path = "/api/v1/auth/social-signup/signature/uploads"
+body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":"flow-nonce"}'
+capture = { uploadId = "uploadId", signupToken = "signupToken" }
+
+[[step]]
+name = "이미지가 없으면 가입 불가"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+body = '{"signupToken":"${signupToken}"}'
+
+[[step]]
+name = "원본만 있고 썸네일 처리 전"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+body = '{"signupToken":"${signupToken}"}'
+[step.fakes.s3."chalkak/signatures/local/original/${uploadId}.png"]
+size = 2048
+content_type = "image/png"
+
+[[step]]
+name = "썸네일까지 있으면 가입 완료"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+body = '{"signupToken":"${signupToken}"}'
+opaque = ["refreshToken"]
+capture = { userId = "userId" }
+[step.fakes.s3."chalkak/signatures/local/thumbnail/${uploadId}.png"]
+size = 512
+content_type = "image/png"
+
+[[step]]
+name = "같은 가입 토큰 재전송"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+body = '{"signupToken":"${signupToken}"}'
+opaque = ["refreshToken"]
+
+[[step]]
+name = "가입한 회원 로그인"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":"flow-nonce"}'
+opaque = ["refreshToken"]
+capture = { refreshToken = "refreshToken" }
+
+[[step]]
+name = "이미 가입한 계정의 업로드 URL 발급"
+method = "POST"
+path = "/api/v1/auth/social-signup/signature/uploads"
+body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":"flow-nonce"}'
+
+[[step]]
+name = "리프레시 토큰으로 재발급"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":"${refreshToken}"}'
+opaque = ["refreshToken"]
+
+[[step]]
+name = "회전 전 리프레시 토큰 재사용"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":"${refreshToken}"}'

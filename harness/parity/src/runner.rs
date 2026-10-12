@@ -2,8 +2,10 @@
 
 use crate::http::{self, Request};
 use crate::normalize::Normalizer;
+use crate::scenario::FakesSpec;
 use crate::scenario::{Auth, Scenario};
 use crate::target::{self, Target};
+use crate::{fakes, idtoken};
 use crate::{time, token};
 use serde_json::{Value, json};
 use std::collections::HashMap;
@@ -36,13 +38,39 @@ fn check_app_clock(
     match time::parse_http_date(date) {
         Some(at) if (at - expected).abs() <= CLOCK_TOLERANCE_SECONDS => Ok(()),
         _ => Err(format!(
-            "[{}] {step}: 앱 시계가 시나리오 시각과 다릅니다(Date: {date}). 시계 파일이 반영되지 않았습니다",
+            "[{}] {step}: {CLOCK_ERROR_MARK}(Date: {date}). 시계 파일이 반영되지 않았습니다",
             target.name
         )),
     }
 }
 
+/// 앱 시계 오류 메시지의 표지. `check_app_clock`이 만든다.
+const CLOCK_ERROR_MARK: &str = "앱 시계가 시나리오 시각과 다릅니다";
+
+/// 응답을 한 바이트도 받지 못하고 연결이 닫힌 경우의 오류 표지. `http::read_response`가 만든다.
+const EMPTY_RESPONSE_MARK: &str = "잘못된 상태 줄: \"\"";
+
+/// 일시적 하네스 오류(시계 오류, 응답 없이 닫힌 연결)가 나면 시나리오를 처음부터(DB 초기화부터) 다시 돌린다.
+/// 시계 오류는 부하로 libfaketime이 시계 파일을 놓친 것이고, 빈 응답은 시각을 뒤로 되돌린 직후 JVM이
+/// 연결을 끊는 경우가 있었다(2026-10-12, 같은 단계에서 반복). 이미 틀린 상태가 쌓였을 수 있어 그 단계만
+/// 다시 보내지 않고 시나리오 전체를 다시 한다. 세 번 모두 같으면 그 오류를 그대로 낸다(구현이 실제로
+/// 응답 없이 연결을 닫는 경우를 가리지 않는다). 다른 오류는 바로 낸다.
 pub fn run(target: &Target, scenario: &Scenario) -> Result<Value, String> {
+    const ATTEMPTS: usize = 3;
+    let mut last = String::new();
+    for attempt in 1..=ATTEMPTS {
+        match run_once(target, scenario) {
+            Err(e) if e.contains(CLOCK_ERROR_MARK) || e.contains(EMPTY_RESPONSE_MARK) => {
+                eprintln!("경고: {e} (시나리오를 다시 실행합니다, {attempt}/{ATTEMPTS})");
+                last = e;
+            }
+            other => return other,
+        }
+    }
+    Err(last)
+}
+
+fn run_once(target: &Target, scenario: &Scenario) -> Result<Value, String> {
     let clock = time::parse(scenario.clock.as_deref().unwrap_or(DEFAULT_CLOCK))
         .ok_or("clock 형식이 올바르지 않습니다")?
         .epoch as i64;
@@ -53,12 +81,38 @@ pub fn run(target: &Target, scenario: &Scenario) -> Result<Value, String> {
 
     let mut norm = Normalizer::new(clock as f64);
     let mut vars: HashMap<String, String> = HashMap::new();
+
+    // 외부 연동: 가짜 서버를 비우고, ID Token을 서명해 변수로 만든다. 응답 지정은 단계마다 현재 변수로 다시 채워 보낸다.
+    let uses_fakes = scenario.fakes.is_some()
+        || !scenario.id_tokens.is_empty()
+        || scenario.steps.iter().any(|s| s.fakes.is_some());
+    let fakes_url = target.fakes_url.as_deref();
+    if uses_fakes && fakes_url.is_none() {
+        return Err(format!(
+            "[{}] {}: 외부 연동 시나리오인데 대상 설정에 fakes_url이 없습니다",
+            target.name,
+            scenario.path.display()
+        ));
+    }
+    if let Some(url) = fakes_url {
+        fakes::reset(url)?;
+    }
+    for spec in &scenario.id_tokens {
+        vars.insert(spec.name.clone(), idtoken::sign(spec, clock)?);
+    }
+    let mut fakes_spec: FakesSpec = scenario.fakes.clone().unwrap_or_default();
     let mut app_offset = 0i64;
     let mut steps = Vec::new();
 
     for step in &scenario.steps {
         // 단계마다 시계를 다시 맞춘다. 구현마다 앞 단계 처리 시간이 달라도 각 단계는 같은 시각에서 출발한다.
         target.set_clock(clock + app_offset)?;
+        if let Some(over) = &step.fakes {
+            fakes_spec.merge(over);
+        }
+        if let (true, Some(url)) = (uses_fakes, fakes_url) {
+            fakes::configure(url, &fakes_spec, &|s| subst(s, &vars))?;
+        }
         let mut headers: Vec<(String, String)> = step
             .headers
             .iter()
@@ -122,24 +176,40 @@ pub fn run(target: &Target, scenario: &Scenario) -> Result<Value, String> {
         app_offset += step.advance_seconds.unwrap_or(0);
     }
 
+    // 가짜 서버가 받은 요청. 응답에서 본 UUID 기호를 이어 쓰도록 DB 덤프보다 먼저 정규화한다.
+    let external_calls = fakes_url
+        .map(|url| fakes::records(url).map(|r| fakes::normalize(&r, &mut norm)))
+        .transpose()?;
+
     let db_state = if scenario.compare_db {
-        db_snapshot(&mut db, &mut norm)?
+        db_snapshot(&mut db, &mut norm, &scenario.db_opaque)?
     } else {
         Value::Null
     };
-    Ok(json!({ "steps": steps, "db": db_state }))
+    let mut outcome = json!({ "steps": steps, "db": db_state });
+    // 외부 연동을 쓰지 않고 받은 요청도 없는 시나리오는 결과 형식이 이전과 같다(기존 golden 호환).
+    if let Some(calls) =
+        external_calls.filter(|c| uses_fakes || c.as_array().is_some_and(|a| !a.is_empty()))
+    {
+        outcome["fakes"] = calls;
+    }
+    Ok(outcome)
 }
 
 /// 응답에서 본 UUID 기호를 이어서 쓰고, 처음 보는 UUID는 `$uuid?`로 둔 뒤 정렬한다.
 /// DB 행 순서와 처음 보는 UUID의 등장 순서는 구현마다 달라도 되기 때문이다.
-fn db_snapshot(db: &mut postgres::Client, norm: &mut Normalizer) -> Result<Value, String> {
+fn db_snapshot(
+    db: &mut postgres::Client,
+    norm: &mut Normalizer,
+    opaque: &[String],
+) -> Result<Value, String> {
     norm.freeze();
     norm.db_mode();
     let mut tables = serde_json::Map::new();
     for (table, rows) in target::dump(db)? {
         let mut rows: Vec<String> = rows
             .iter()
-            .map(|r| norm.value(r, &[], "").to_string())
+            .map(|r| norm.value(r, opaque, "").to_string())
             .collect();
         rows.sort();
         if !rows.is_empty() {
@@ -174,7 +244,7 @@ fn authorization(
     ))
 }
 
-fn subst(s: &str, vars: &HashMap<String, String>) -> String {
+pub fn subst(s: &str, vars: &HashMap<String, String>) -> String {
     let mut out = s.to_string();
     for (k, v) in vars {
         out = out.replace(&format!("${{{k}}}"), v);
