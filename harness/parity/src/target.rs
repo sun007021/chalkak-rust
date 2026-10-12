@@ -15,6 +15,8 @@ pub struct Target {
     pub clock_file: PathBuf,
     /// 액세스 토큰 HS256 비밀키(hex). 앱의 `ACCESS_TOKEN_SECRET`과 같아야 한다.
     pub access_token_secret: String,
+    /// 가짜 외부 서버(`harness/fakes`)의 관리 주소. 외부 연동을 쓰는 시나리오에 필요하다.
+    pub fakes_url: Option<String>,
 }
 
 impl Target {

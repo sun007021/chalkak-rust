@@ -13,7 +13,8 @@ serde_json.workspace = true
 toml.workspace = true
 postgres.workspace = true
 hmac.workspace = true
-sha2.workspace = true
+sha2 = { workspace = true, features = ["oid"] }
+rsa.workspace = true
 
 [lints]
 workspace = true

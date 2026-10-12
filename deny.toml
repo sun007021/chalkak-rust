@@ -7,6 +7,12 @@ all-features = true
 [advisories]
 version = 2
 yanked = "deny"
+ignore = [
+    # rsa의 개인키 연산은 타이밍 부채널이 있다. 하네스 러너가 테스트 전용 개인키(공개된 값)로 ID Token을
+    # 로컬에서 서명하는 데만 쓰고, 네트워크에서 공격자가 시간을 잴 수 없으므로 수용한다.
+    # 서버 코드가 개인키 연산에 쓰게 되면 이 예외를 다시 심사한다.
+    { id = "RUSTSEC-2023-0071", reason = "하네스 테스트 키 서명 전용, 로컬 실행" },
+]
 
 [licenses]
 version = 2

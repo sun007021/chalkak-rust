@@ -18,6 +18,38 @@
 //! capture = { topicId = "id" }        # 응답 본문 경로 → 변수, 이후 ${topicId}로 사용
 //! opaque = ["refreshToken"]           # 무작위 불투명 값: 길이만 비교
 //! ```
+//!
+//! 외부 연동(가짜 서버 `harness/fakes`)이 필요한 시나리오는 아래를 더 쓴다. 대상 설정에 `fakes_url`이 있어야 한다.
+//!
+//! ```toml
+//! # 소셜 로그인 ID Token. 시나리오 시작 시 테스트 개인키로 RS256 서명해 변수 ${googleNew}로 쓴다.
+//! [[id_token]]
+//! name = "googleNew"
+//! provider = "google"                  # google | kakao | apple (iss·aud 기본값이 정해진다)
+//! sub = "google-sub-1"
+//! nonce = "raw-nonce-1"                # 원본 nonce. 토큰의 nonce 클레임은 SHA-256 소문자 hex
+//! email = "a@example.com"
+//! email_verified = true
+//! issued_in = 0                        # iat = 시나리오 시계 + 이 초(기본 0)
+//! expires_in = 600                     # exp = 시나리오 시계 + 이 초(기본 600)
+//! # aud, iss, kid로 값을 바꾸고, claims로 클레임을 더하거나 덮고, omit로 클레임을 뺀다
+//! # tamper_signature = true            # 서명을 깨뜨린다
+//!
+//! # 가짜 서버 응답. 시나리오 시작 시 설정하며(이전 설정은 초기화), 단계마다 [step.fakes]로 덧씌울 수 있다.
+//! [fakes.apple_token]                  # POST /apple/auth/token. 지정하지 않으면 500
+//! status = 200
+//! body = '''{"access_token":"a","token_type":"Bearer","expires_in":3600,"refresh_token":"r","id_token":"${appleIdToken}"}'''
+//! [fakes.apple_revoke]                 # POST /apple/auth/revoke
+//! status = 200
+//! [fakes.slack]                        # Slack Webhook. 지정하지 않으면 200 ok
+//! status = 200
+//! [fakes.s3."chalkak/signatures/local/original/${uploadId}.png"]   # HeadObject. 지정하지 않은 키는 404
+//! size = 1024
+//! content_type = "image/png"
+//! ```
+//!
+//! 시나리오가 끝나면 가짜 서버가 받은 요청(JWKS 조회 제외)을 정규화해 결과의 `fakes`에 넣어 비교한다.
+//! `fakes`/`id_token`을 쓰지 않고 받은 요청도 없으면 `fakes` 항목은 생략한다.
 
 use serde::Deserialize;
 use std::collections::BTreeMap;
@@ -33,6 +65,11 @@ pub struct Scenario {
     pub clock: Option<String>,
     #[serde(default)]
     pub setup: Setup,
+    /// 시나리오 시작 시 서명해 변수로 만드는 소셜 로그인 ID Token.
+    #[serde(default, rename = "id_token")]
+    pub id_tokens: Vec<IdTokenSpec>,
+    /// 가짜 외부 서버의 시작 응답.
+    pub fakes: Option<FakesSpec>,
     #[serde(rename = "step")]
     pub steps: Vec<Step>,
     /// 시나리오 끝에 DB 상태를 비교할지. 기본은 비교한다.
@@ -65,6 +102,82 @@ pub struct Step {
     pub opaque: Vec<String>,
     /// 다음 단계 전에 앱 시각을 이 초만큼 앞으로 옮긴다.
     pub advance_seconds: Option<i64>,
+    /// 이 단계 요청을 보내기 전에 가짜 서버 응답을 덧씌운다(항목 단위로 덮고 s3 키는 합친다).
+    pub fakes: Option<FakesSpec>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct IdTokenSpec {
+    /// 변수 이름. 이후 `${이름}`으로 쓴다.
+    pub name: String,
+    pub provider: String,
+    pub sub: String,
+    /// 원본 nonce. 있으면 nonce 클레임에 SHA-256 소문자 hex를 넣는다.
+    pub nonce: Option<String>,
+    pub email: Option<String>,
+    /// bool 또는 문자열("true")로 쓴다. Apple은 두 표현을 모두 보낸다.
+    pub email_verified: Option<serde_json::Value>,
+    pub issued_in: Option<i64>,
+    pub expires_in: Option<i64>,
+    pub aud: Option<String>,
+    pub iss: Option<String>,
+    pub kid: Option<String>,
+    /// 클레임을 더하거나 덮어쓴다.
+    #[serde(default)]
+    pub claims: BTreeMap<String, serde_json::Value>,
+    /// 만든 뒤 지울 클레임 이름.
+    #[serde(default)]
+    pub omit: Vec<String>,
+    #[serde(default)]
+    pub tamper_signature: bool,
+}
+
+/// 가짜 서버 응답 지정. 필드를 생략하면 가짜 서버의 기본 동작이다.
+#[derive(Debug, Clone, Default, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct FakesSpec {
+    pub apple_token: Option<CannedSpec>,
+    pub apple_revoke: Option<CannedSpec>,
+    pub slack: Option<CannedSpec>,
+    /// 객체 키 → HeadObject 응답.
+    #[serde(default)]
+    pub s3: BTreeMap<String, S3Spec>,
+}
+
+#[derive(Debug, Clone, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct CannedSpec {
+    pub status: u16,
+    pub content_type: Option<String>,
+    pub body: Option<String>,
+}
+
+#[derive(Debug, Clone, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct S3Spec {
+    /// 기본 200. 404·403 등을 쓰면 본문 없는 오류 응답이다.
+    pub status: Option<u16>,
+    pub size: Option<u64>,
+    pub content_type: Option<String>,
+}
+
+impl FakesSpec {
+    /// 단계 지정을 덧씌운다. 같은 항목은 덮고, s3는 키별로 합친다.
+    pub fn merge(&mut self, over: &FakesSpec) {
+        if over.apple_token.is_some() {
+            self.apple_token.clone_from(&over.apple_token);
+        }
+        if over.apple_revoke.is_some() {
+            self.apple_revoke.clone_from(&over.apple_revoke);
+        }
+        if over.slack.is_some() {
+            self.slack.clone_from(&over.slack);
+        }
+        for (k, v) in &over.s3 {
+            self.s3.insert(k.clone(), v.clone());
+        }
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -112,4 +225,82 @@ fn collect(dir: &Path, out: &mut Vec<PathBuf>) -> Result<(), String> {
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const SAMPLE: &str = r#"
+name = "소셜"
+clock = "2026-10-12T09:00:00+09:00"
+
+[[id_token]]
+name = "g"
+provider = "google"
+sub = "s"
+nonce = "n"
+
+[fakes.apple_token]
+status = 400
+body = "x"
+[fakes.s3."a/b.png"]
+size = 3
+content_type = "image/png"
+
+[[step]]
+name = "s1"
+method = "GET"
+path = "/"
+[step.fakes.s3."c/d.png"]
+status = 404
+
+[[step]]
+name = "s2"
+method = "GET"
+path = "/"
+"#;
+
+    #[test]
+    fn 외부_연동_항목을_읽는다() {
+        let s: Scenario = toml::from_str(SAMPLE).unwrap();
+        assert_eq!(s.id_tokens.len(), 1);
+        assert_eq!(s.id_tokens[0].provider, "google");
+        let f = s.fakes.unwrap();
+        assert_eq!(f.apple_token.unwrap().status, 400);
+        assert_eq!(f.s3["a/b.png"].size, Some(3));
+        assert_eq!(
+            s.steps[0].fakes.as_ref().unwrap().s3["c/d.png"].status,
+            Some(404)
+        );
+        assert!(s.steps[1].fakes.is_none());
+    }
+
+    #[test]
+    fn 기존_시나리오는_외부_연동_없이_읽힌다() {
+        let s: Scenario = toml::from_str(
+            "name = \"x\"\n[[step]]\nname = \"a\"\nmethod = \"GET\"\npath = \"/\"\n",
+        )
+        .unwrap();
+        assert!(s.id_tokens.is_empty() && s.fakes.is_none());
+    }
+
+    #[test]
+    fn 단계_지정은_항목을_덮고_s3는_합친다() {
+        let mut base: FakesSpec = toml::from_str(
+            "[apple_token]\nstatus = 200\n[s3.\"a\"]\nsize = 1\n[s3.\"b\"]\nsize = 2\n",
+        )
+        .unwrap();
+        let over: FakesSpec =
+            toml::from_str("[apple_token]\nstatus = 400\n[s3.\"b\"]\nsize = 9\n").unwrap();
+        base.merge(&over);
+        assert_eq!(base.apple_token.unwrap().status, 400);
+        assert_eq!(base.s3["a"].size, Some(1));
+        assert_eq!(base.s3["b"].size, Some(9));
+    }
+
+    #[test]
+    fn 알_수_없는_fakes_항목은_거절한다() {
+        assert!(toml::from_str::<FakesSpec>("[nope]\nstatus = 1\n").is_err());
+    }
 }

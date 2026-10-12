@@ -2,8 +2,10 @@
 
 use crate::http::{self, Request};
 use crate::normalize::Normalizer;
+use crate::scenario::FakesSpec;
 use crate::scenario::{Auth, Scenario};
 use crate::target::{self, Target};
+use crate::{fakes, idtoken};
 use crate::{time, token};
 use serde_json::{Value, json};
 use std::collections::HashMap;
@@ -53,12 +55,38 @@ pub fn run(target: &Target, scenario: &Scenario) -> Result<Value, String> {
 
     let mut norm = Normalizer::new(clock as f64);
     let mut vars: HashMap<String, String> = HashMap::new();
+
+    // 외부 연동: 가짜 서버를 비우고, ID Token을 서명해 변수로 만든다. 응답 지정은 단계마다 현재 변수로 다시 채워 보낸다.
+    let uses_fakes = scenario.fakes.is_some()
+        || !scenario.id_tokens.is_empty()
+        || scenario.steps.iter().any(|s| s.fakes.is_some());
+    let fakes_url = target.fakes_url.as_deref();
+    if uses_fakes && fakes_url.is_none() {
+        return Err(format!(
+            "[{}] {}: 외부 연동 시나리오인데 대상 설정에 fakes_url이 없습니다",
+            target.name,
+            scenario.path.display()
+        ));
+    }
+    if let Some(url) = fakes_url {
+        fakes::reset(url)?;
+    }
+    for spec in &scenario.id_tokens {
+        vars.insert(spec.name.clone(), idtoken::sign(spec, clock)?);
+    }
+    let mut fakes_spec: FakesSpec = scenario.fakes.clone().unwrap_or_default();
     let mut app_offset = 0i64;
     let mut steps = Vec::new();
 
     for step in &scenario.steps {
         // 단계마다 시계를 다시 맞춘다. 구현마다 앞 단계 처리 시간이 달라도 각 단계는 같은 시각에서 출발한다.
         target.set_clock(clock + app_offset)?;
+        if let Some(over) = &step.fakes {
+            fakes_spec.merge(over);
+        }
+        if let (true, Some(url)) = (uses_fakes, fakes_url) {
+            fakes::configure(url, &fakes_spec, &|s| subst(s, &vars))?;
+        }
         let mut headers: Vec<(String, String)> = step
             .headers
             .iter()
@@ -122,12 +150,25 @@ pub fn run(target: &Target, scenario: &Scenario) -> Result<Value, String> {
         app_offset += step.advance_seconds.unwrap_or(0);
     }
 
+    // 가짜 서버가 받은 요청. 응답에서 본 UUID 기호를 이어 쓰도록 DB 덤프보다 먼저 정규화한다.
+    let external_calls = match fakes_url {
+        Some(url) => Some(fakes::normalize(&fakes::records(url)?, &mut norm)),
+        None => None,
+    };
+
     let db_state = if scenario.compare_db {
         db_snapshot(&mut db, &mut norm)?
     } else {
         Value::Null
     };
-    Ok(json!({ "steps": steps, "db": db_state }))
+    let mut outcome = json!({ "steps": steps, "db": db_state });
+    // 외부 연동을 쓰지 않고 받은 요청도 없는 시나리오는 결과 형식이 이전과 같다(기존 golden 호환).
+    if let Some(calls) =
+        external_calls.filter(|c| uses_fakes || c.as_array().is_some_and(|a| !a.is_empty()))
+    {
+        outcome["fakes"] = calls;
+    }
+    Ok(outcome)
 }
 
 /// 응답에서 본 UUID 기호를 이어서 쓰고, 처음 보는 UUID는 `$uuid?`로 둔 뒤 정렬한다.
@@ -174,7 +215,7 @@ fn authorization(
     ))
 }
 
-fn subst(s: &str, vars: &HashMap<String, String>) -> String {
+pub fn subst(s: &str, vars: &HashMap<String, String>) -> String {
     let mut out = s.to_string();
     for (k, v) in vars {
         out = out.replace(&format!("${{{k}}}"), v);

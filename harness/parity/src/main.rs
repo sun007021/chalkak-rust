@@ -9,7 +9,9 @@
 //! `compare`는 두 대상에 같은 시나리오를 차례로 실행해 정규화 결과를 비교한다. 결과는
 //! `harness/out/<시나리오>.{left,right}.json`에도 남는다. 하나라도 다르면 종료 코드 1.
 
+mod fakes;
 mod http;
+mod idtoken;
 mod normalize;
 mod runner;
 mod scenario;
