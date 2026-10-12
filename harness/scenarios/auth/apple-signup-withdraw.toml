@@ -1,0 +1,86 @@
+name = "인증: Apple 가입 후 탈퇴 시 Refresh Token 폐기 호출과 폐기 실패"
+tags = ["auth", "oidc", "apple", "s3"]
+clock = "2026-10-12T09:00:00+09:00"
+db_opaque = ["encrypted_refresh_token", "token_hash"]
+
+# 가입 때 보관한 Apple Refresh Token(복호화한 평문)이 탈퇴 시 폐기 엔드포인트로 나가는지,
+# 폐기가 실패하면 탈퇴가 끝나지 않는지를 확인한다.
+
+[[id_token]]
+name = "appleA"
+provider = "apple"
+sub = "apple-sub-a"
+nonce = "nonce-a"
+email = "a@example.com"
+email_verified = true
+
+[[id_token]]
+name = "exchangedA"
+provider = "apple"
+sub = "apple-sub-a"
+nonce = "nonce-a"
+
+[fakes.apple_token]
+status = 200
+body = '''{"access_token":"access-a","token_type":"Bearer","expires_in":3600,"refresh_token":"refresh-token-of-a","id_token":"${exchangedA}"}'''
+
+[fakes.apple_revoke]
+status = 200
+body = ''
+
+[[step]]
+name = "Apple 로그인(교환)"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"APPLE","idToken":"${appleA}","rawNonce":"nonce-a","authorizationCode":"code-a"}'
+
+[[step]]
+name = "업로드 URL 발급"
+method = "POST"
+path = "/api/v1/auth/social-signup/signature/uploads"
+body = '{"provider":"APPLE","idToken":"${appleA}","rawNonce":"nonce-a"}'
+capture = { uploadId = "uploadId", signupToken = "signupToken" }
+
+[[step]]
+name = "가입 완료"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+body = '{"signupToken":"${signupToken}"}'
+opaque = ["refreshToken"]
+capture = { accessToken = "accessToken" }
+[step.fakes.s3."chalkak/signatures/local/original/${uploadId}.png"]
+size = 4096
+content_type = "image/png"
+[step.fakes.s3."chalkak/signatures/local/thumbnail/${uploadId}.png"]
+size = 1024
+content_type = "image/png"
+
+[[step]]
+name = "폐기가 400이면 탈퇴 실패"
+method = "DELETE"
+path = "/api/v1/users/me"
+auth = { raw = "Bearer ${accessToken}" }
+[step.fakes.apple_revoke]
+status = 400
+body = '{"error":"invalid_request"}'
+
+[[step]]
+name = "폐기가 성공하면 탈퇴"
+method = "DELETE"
+path = "/api/v1/users/me"
+auth = { raw = "Bearer ${accessToken}" }
+[step.fakes.apple_revoke]
+status = 200
+body = ''
+
+[[step]]
+name = "탈퇴한 회원의 토큰으로 재탈퇴"
+method = "DELETE"
+path = "/api/v1/users/me"
+auth = { raw = "Bearer ${accessToken}" }
+
+[[step]]
+name = "탈퇴 후 같은 Apple 계정 로그인"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"APPLE","idToken":"${appleA}","rawNonce":"nonce-a","authorizationCode":"code-a2"}'
