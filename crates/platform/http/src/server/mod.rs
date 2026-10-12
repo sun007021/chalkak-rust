@@ -3,6 +3,7 @@
 mod headers;
 mod limits;
 mod method;
+mod parse;
 mod query;
 mod request;
 mod response;
