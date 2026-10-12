@@ -455,3 +455,263 @@ fn fail(callback: &Callback, req: &Request) -> ApiResult {
         .fail_post_image_processing(upload_id, Some(&reason))?;
     Ok(Response::new(204))
 }
+
+#[cfg(test)]
+mod tests {
+    use chalkak_core::FixedClock;
+    use jiff::Timestamp;
+
+    use super::*;
+
+    const AUDIENCE: &str = "dev";
+    const SECRET: &str = "test-callback-secret-with-enough-length";
+    const NOW: i64 = 1_791_774_000;
+    const UPLOAD: &str = "0198f6c1-62ba-7d30-8b12-0f733b6570d4";
+
+    fn authenticator_for(audience: &str) -> ProcessingCallbackAuthenticator {
+        let clock = Arc::new(FixedClock::new(Timestamp::from_second(NOW).unwrap()));
+        ProcessingCallbackAuthenticator::new(SECRET, audience, clock).unwrap()
+    }
+
+    fn authenticator() -> ProcessingCallbackAuthenticator {
+        authenticator_for(AUDIENCE)
+    }
+
+    fn signature_path(result: &str) -> String {
+        format!("/internal/v1/signature-processing/{UPLOAD}/{result}")
+    }
+
+    fn post_path(result: &str) -> String {
+        format!("{CALLBACK_PATH}/{UPLOAD}/{result}")
+    }
+
+    fn check(
+        path: &str,
+        body: Option<&[u8]>,
+        timestamp: Option<&str>,
+        signature: Option<&str>,
+    ) -> Result<(), ApiError> {
+        authenticator().authenticate(path, body, timestamp, signature)
+    }
+
+    fn signed(path: &str, body: Option<&[u8]>, offset: i64) -> (String, String) {
+        let timestamp = (NOW + offset).to_string();
+        let signature = authenticator().sign(&timestamp, path, body);
+        (timestamp, signature)
+    }
+
+    fn assert_unauthorized(result: Result<(), ApiError>) {
+        match result {
+            Err(ApiError::App(e)) => {
+                assert_eq!(e.status(), 401);
+                assert_eq!(e.message, "유효하지 않은 이미지 처리 콜백입니다.");
+            }
+            other => panic!("401이어야 합니다: {other:?}"),
+        }
+    }
+
+    // ProcessingCallbackAuthenticatorTest#authenticate_validSignature_succeeds
+    #[test]
+    fn authenticate_valid_signature_succeeds() {
+        let path = signature_path("complete");
+        let (ts, sig) = signed(&path, None, 0);
+        check(&path, None, Some(&ts), Some(&sig)).unwrap();
+    }
+
+    // ProcessingCallbackAuthenticatorTest#authenticate_invalidSignature_throwsUnauthorizedException
+    #[test]
+    fn authenticate_invalid_signature_throws_unauthorized_exception() {
+        let path = signature_path("complete");
+        assert_unauthorized(check(&path, None, Some(&NOW.to_string()), Some("invalid")));
+    }
+
+    // ProcessingCallbackAuthenticatorTest#authenticate_expiredTimestamp_throwsUnauthorizedException
+    #[test]
+    fn authenticate_expired_timestamp_throws_unauthorized_exception() {
+        let path = signature_path("complete");
+        let (ts, sig) = signed(&path, None, -301);
+        assert_unauthorized(check(&path, None, Some(&ts), Some(&sig)));
+    }
+
+    // ProcessingCallbackAuthenticatorTest#authenticate_nullTimestamp_throwsUnauthorizedException
+    #[test]
+    fn authenticate_null_timestamp_throws_unauthorized_exception() {
+        assert_unauthorized(check(
+            &signature_path("complete"),
+            None,
+            None,
+            Some("v1=00"),
+        ));
+    }
+
+    // ProcessingCallbackAuthenticatorTest#authenticate_nullSignature_throwsUnauthorizedException
+    #[test]
+    fn authenticate_null_signature_throws_unauthorized_exception() {
+        assert_unauthorized(check(
+            &signature_path("complete"),
+            None,
+            Some(&NOW.to_string()),
+            None,
+        ));
+    }
+
+    // ProcessingCallbackAuthenticatorTest#authenticate_justInsideClockSkew_succeeds
+    #[test]
+    fn authenticate_just_inside_clock_skew_succeeds() {
+        let path = signature_path("complete");
+        let (ts, sig) = signed(&path, None, -299);
+        check(&path, None, Some(&ts), Some(&sig)).unwrap();
+        let (ts, sig) = signed(&path, None, -300);
+        check(&path, None, Some(&ts), Some(&sig)).unwrap();
+    }
+
+    // ProcessingCallbackAuthenticatorTest#authenticate_jsonBody_succeeds
+    #[test]
+    fn authenticate_json_body_succeeds() {
+        let path = post_path("complete");
+        let body = br#"{"width":4032,"height":3024}"#;
+        let (ts, sig) = signed(&path, Some(body), 0);
+        check(&path, Some(body), Some(&ts), Some(&sig)).unwrap();
+    }
+
+    // ProcessingCallbackAuthenticatorTest#authenticate_reserializedBody_throwsUnauthorizedException
+    #[test]
+    fn authenticate_reserialized_body_throws_unauthorized_exception() {
+        let path = post_path("complete");
+        let (ts, sig) = signed(&path, Some(br#"{"width":4032,"height":3024}"#), 0);
+        let reserialized = br#"{"width": 4032, "height": 3024}"#;
+        assert_unauthorized(check(&path, Some(reserialized), Some(&ts), Some(&sig)));
+    }
+
+    // ProcessingCallbackAuthenticatorTest#authenticate_otherKindPath_throwsUnauthorizedException
+    #[test]
+    fn authenticate_other_kind_path_throws_unauthorized_exception() {
+        let (ts, sig) = signed(&signature_path("complete"), None, 0);
+        assert_unauthorized(check(&post_path("complete"), None, Some(&ts), Some(&sig)));
+    }
+
+    // ProcessingCallbackAuthenticatorTest#authenticate_invalidUtf8Body_succeeds
+    #[test]
+    fn authenticate_invalid_utf8_body_succeeds() {
+        let path = post_path("complete");
+        let body: &[u8] = &[0xC3, 0x28];
+        let (ts, sig) = signed(&path, Some(body), 0);
+        check(&path, Some(body), Some(&ts), Some(&sig)).unwrap();
+    }
+
+    // ProcessingCallbackAuthenticatorTest#authenticate_differentInvalidUtf8Body_throwsUnauthorizedException
+    #[test]
+    fn authenticate_different_invalid_utf8_body_throws_unauthorized_exception() {
+        let path = post_path("complete");
+        let (ts, sig) = signed(&path, Some(&[0xC3, 0x28]), 0);
+        assert_unauthorized(check(&path, Some(&[0xE0, 0x28]), Some(&ts), Some(&sig)));
+    }
+
+    // ProcessingCallbackAuthenticatorTest#authenticate_farFutureTimestamp_throwsUnauthorizedException
+    #[test]
+    fn authenticate_far_future_timestamp_throws_unauthorized_exception() {
+        let path = signature_path("complete");
+        let (ts, sig) = signed(&path, None, 60);
+        assert_unauthorized(check(&path, None, Some(&ts), Some(&sig)));
+        let (ts, sig) = signed(&path, None, 31);
+        assert_unauthorized(check(&path, None, Some(&ts), Some(&sig)));
+    }
+
+    // ProcessingCallbackAuthenticatorTest#authenticate_slightlyFutureTimestamp_succeeds
+    #[test]
+    fn authenticate_slightly_future_timestamp_succeeds() {
+        let path = signature_path("complete");
+        let (ts, sig) = signed(&path, None, 10);
+        check(&path, None, Some(&ts), Some(&sig)).unwrap();
+        let (ts, sig) = signed(&path, None, 30);
+        check(&path, None, Some(&ts), Some(&sig)).unwrap();
+    }
+
+    // ProcessingCallbackAuthenticatorTest#authenticate_signatureForAnotherEnvironment_throwsUnauthorizedException
+    #[test]
+    fn authenticate_signature_for_another_environment_throws_unauthorized_exception() {
+        let path = post_path("complete");
+        let timestamp = NOW.to_string();
+        let prod_signature = authenticator_for("prod").sign(&timestamp, &path, None);
+        assert_unauthorized(check(&path, None, Some(&timestamp), Some(&prod_signature)));
+    }
+
+    #[test]
+    fn 서명은_접두사와_짝수_길이_16진수여야_한다() {
+        let path = post_path("complete");
+        let (ts, sig) = signed(&path, None, 0);
+        let digits = sig.strip_prefix("v1=").unwrap();
+        assert_unauthorized(check(&path, None, Some(&ts), Some(digits)));
+        assert_unauthorized(check(
+            &path,
+            None,
+            Some(&ts),
+            Some(&format!("v1={}", &digits[1..])),
+        ));
+        assert_unauthorized(check(&path, None, Some(&ts), Some("v1=zz")));
+        check(
+            &path,
+            None,
+            Some(&ts),
+            Some(&format!("v1={}", digits.to_uppercase())),
+        )
+        .unwrap();
+    }
+
+    #[test]
+    fn 타임스탬프가_숫자가_아니면_거부한다() {
+        let path = post_path("complete");
+        let (_, sig) = signed(&path, None, 0);
+        assert_unauthorized(check(&path, None, Some("abc"), Some(&sig)));
+        assert_unauthorized(check(&path, None, Some(""), Some(&sig)));
+    }
+
+    #[test]
+    fn 비밀키는_32자_미만이면_만들_수_없다() {
+        let clock = Arc::new(FixedClock::new(Timestamp::from_second(NOW).unwrap()));
+        assert!(ProcessingCallbackAuthenticator::new("short", "dev", clock.clone()).is_err());
+        assert!(ProcessingCallbackAuthenticator::new(SECRET, "  ", clock).is_err());
+    }
+
+    // PostImageProcessingCallbackController: 본문 읽기와 검증
+    #[test]
+    fn 완료_본문은_값이_없어도_키를_남겨_메타데이터로_만든다() {
+        let request = CompleteRequest::read(br#"{"width":10,"height":20}"#).unwrap();
+        let metadata = Value::Object(request.to_metadata());
+        let expected: Value = serde_json::from_str(
+            r#"{"width":10,"height":20,"byteSize":null,"location":null,"capturedAt":null,"metaAttributes":{}}"#,
+        )
+        .unwrap();
+        assert_eq!(metadata, expected);
+    }
+
+    #[test]
+    fn 완료_본문의_범위_밖_값은_거절한다() {
+        for body in [
+            r#"{"width":0}"#,
+            r#"{"height":-1}"#,
+            r#"{"byteSize":-1}"#,
+            r#"{"location":{"latitude":91,"longitude":0}}"#,
+            r#"{"location":{"latitude":0,"longitude":-181}}"#,
+            r#"{"location":{"latitude":0}}"#,
+            r#"{"location":{}}"#,
+        ] {
+            assert!(CompleteRequest::read(body.as_bytes()).is_err(), "{body}");
+        }
+        assert!(
+            CompleteRequest::read(
+                br#"{"location":{"latitude":90,"longitude":-180},"capturedAt":"x"}"#
+            )
+            .is_ok()
+        );
+    }
+
+    #[test]
+    fn 실패_사유는_공백이_아니고_50자_이하여야_한다() {
+        assert_eq!(read_fail_reason(br#"{"reason":"BAD"}"#).unwrap(), "BAD");
+        assert!(read_fail_reason(b"{\"reason\":\"   \"}").is_err());
+        assert!(read_fail_reason(b"{}").is_err());
+        let long = format!(r#"{{"reason":"{}"}}"#, "r".repeat(51));
+        assert!(read_fail_reason(long.as_bytes()).is_err());
+    }
+}

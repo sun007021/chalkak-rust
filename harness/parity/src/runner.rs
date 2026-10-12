@@ -5,7 +5,7 @@ use crate::normalize::Normalizer;
 use crate::scenario::FakesSpec;
 use crate::scenario::{Auth, Scenario};
 use crate::target::{self, Target};
-use crate::{fakes, idtoken};
+use crate::{callback, fakes, idtoken};
 use crate::{time, token};
 use serde_json::{Value, json};
 use std::collections::HashMap;
@@ -124,11 +124,22 @@ fn run_once(target: &Target, scenario: &Scenario) -> Result<Value, String> {
                 authorization(target, auth, clock + app_offset, &vars)?,
             ));
         }
+        let path = subst(&step.path, &vars);
+        let body = step.body.as_ref().map(|b| subst(b, &vars).into_bytes());
+        if let Some(spec) = &step.callback {
+            let signed_path = path.split('?').next().unwrap_or(&path);
+            headers.extend(callback::headers(
+                spec,
+                signed_path,
+                body.as_deref().unwrap_or_default(),
+                clock + app_offset,
+            ));
+        }
         let req = Request {
             method: step.method.clone(),
-            path: subst(&step.path, &vars),
+            path,
             headers,
-            body: step.body.as_ref().map(|b| subst(b, &vars).into_bytes()),
+            body,
         };
         let res = http::send(&target.base_url, &req)
             .map_err(|e| format!("[{}] {}: {e}", target.name, step.name))?;

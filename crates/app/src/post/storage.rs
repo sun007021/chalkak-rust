@@ -158,8 +158,9 @@ impl PostImageStorage {
     }
 }
 
-#[cfg(test)]
-pub(crate) mod fake {
+/// 시험용 가짜 스토리지(통합 테스트에서도 쓴다).
+#[doc(hidden)]
+pub mod fake {
     use std::collections::HashSet;
     use std::sync::Mutex;
 
