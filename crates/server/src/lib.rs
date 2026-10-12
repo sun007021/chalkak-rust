@@ -10,6 +10,8 @@ pub mod web;
 use std::error::Error;
 use std::sync::Arc;
 
+use chalkak_app::admin::AdminConfig;
+use chalkak_app::admin::bootstrap::AdminAccount;
 use chalkak_app::web::Routes;
 use chalkak_app::{AppContext, register_routes};
 use chalkak_core::log::Logger;
@@ -65,6 +67,21 @@ pub fn build_chain(
         ))
 }
 
+/// 관리자 도메인이 쓰는 설정을 `Settings`에서 뽑는다.
+pub fn admin_config(settings: &Settings) -> AdminConfig {
+    AdminConfig {
+        access_token_key: settings.access_token_key.clone(),
+        access_token_issuer: ACCESS_TOKEN_ISSUER.to_owned(),
+        access_token_audience: ACCESS_TOKEN_AUDIENCE.to_owned(),
+        access_token_expiration: settings.access_token_expiration,
+        refresh_token_inactivity: settings.refresh_token_inactivity,
+        refresh_token_absolute: settings.refresh_token_absolute,
+        development_bypass: settings.admin_development_bypass,
+        cloudfront_base_url: settings.cloudfront_base_url.clone(),
+        cloudfront_origin_path: settings.cloudfront_origin_path.clone(),
+    }
+}
+
 /// 요청 하나를 처리하는 전체 핸들러(도메인 라우트 + 미들웨어 체인)를 만든다.
 pub fn build_handler(
     settings: &Settings,
@@ -76,6 +93,7 @@ pub fn build_handler(
         pool: pool.clone(),
         clock: Arc::clone(&clock),
         logger: Arc::clone(&logger),
+        admin: admin_config(settings),
     };
     let router = register_routes(Routes::new(Arc::clone(&logger)), &ctx).into_router();
     Arc::new(build_chain(
@@ -94,6 +112,7 @@ pub fn run(settings: &Settings, shutdown: ShutdownSignal) -> Result<(), Box<dyn 
 
     let pool = Pool::connect(&settings.db, settings.db_pool_size)?;
     migrate(settings, &pool, &logger)?;
+    ensure_admin_account(&pool, settings)?;
 
     let handler = build_handler(settings, pool.clone(), clock, Arc::clone(&logger));
     let server = Server::bind(
@@ -111,6 +130,23 @@ pub fn run(settings: &Settings, shutdown: ShutdownSignal) -> Result<(), Box<dyn 
         .info("com.chalkak.backend.BackendApplication")
         .log("서버를 종료했습니다");
     result.map_err(Into::into)
+}
+
+/// 시작할 때 관리자 계정을 보장한다(`AdminAccountBootstrap`, `DevelopmentAdminBootstrap`).
+fn ensure_admin_account(pool: &Pool, settings: &Settings) -> Result<(), Box<dyn Error>> {
+    let account = settings
+        .admin_account
+        .as_ref()
+        .map(|(username, password_hash)| AdminAccount {
+            username: username.clone(),
+            password_hash: password_hash.clone(),
+        });
+    chalkak_app::admin::bootstrap::ensure_admin_account(
+        pool,
+        &admin_config(settings),
+        account.as_ref(),
+    )
+    .map_err(Into::into)
 }
 
 fn migrate(settings: &Settings, pool: &Pool, logger: &Logger) -> Result<(), Box<dyn Error>> {

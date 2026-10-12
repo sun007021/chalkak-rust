@@ -31,11 +31,13 @@ pub struct AppContext {
     pub pool: Pool,
     pub clock: Arc<dyn Clock>,
     pub logger: Arc<Logger>,
+    /// 관리자 도메인 설정(토큰 키·수명, 이미지 주소, 개발 우회).
+    pub admin: admin::AdminConfig,
 }
 
 /// 모든 도메인의 라우트를 등록한다.
 pub fn register_routes(routes: web::Routes, ctx: &AppContext) -> web::Routes {
     let routes = topic::api::register(routes, ctx);
     let routes = feedback::api::register(routes, ctx);
-    admin::auth_api::register(routes)
+    admin::register(routes, ctx)
 }
