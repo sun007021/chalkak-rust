@@ -17,15 +17,17 @@ use std::sync::Arc;
 use chalkak_app::web::ApiError;
 use chalkak_core::Clock;
 use chalkak_core::log::Logger;
-use chalkak_db::Pool;
 use chalkak_http::{Method, Request, Response};
 
 use super::boot;
 
 const ACTUATOR_CONTENT_TYPE: &str = "application/vnd.spring-boot.actuator.v3+json";
 
+/// 데이터베이스에 닿는지 확인하는 함수(`DataSourceHealthIndicator`). 테스트에서는 바꿔 끼운다.
+pub type DatabaseCheck = Arc<dyn Fn() -> bool + Send + Sync>;
+
 pub struct Actuator {
-    pool: Pool,
+    database: DatabaseCheck,
     clock: Arc<dyn Clock>,
     logger: Arc<Logger>,
 }
@@ -35,9 +37,9 @@ pub fn is_actuator_path(path: &str) -> bool {
 }
 
 impl Actuator {
-    pub fn new(pool: Pool, clock: Arc<dyn Clock>, logger: Arc<Logger>) -> Self {
+    pub fn new(database: DatabaseCheck, clock: Arc<dyn Clock>, logger: Arc<Logger>) -> Self {
         Actuator {
-            pool,
+            database,
             clock,
             logger,
         }
@@ -80,12 +82,8 @@ impl Actuator {
         )
     }
 
-    /// 풀에서 연결을 빌려 `SELECT 1`이 되는지 본다(`DataSourceHealthIndicator`).
     fn database_is_up(&self) -> bool {
-        match self.pool.get() {
-            Ok(mut conn) => conn.simple_query("SELECT 1").is_ok(),
-            Err(_) => false,
-        }
+        (self.database)()
     }
 
     /// `/error`
