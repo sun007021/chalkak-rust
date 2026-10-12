@@ -1,0 +1,64 @@
+== access token
+baseline                           OK
+exp 10s ago, iat 900s ago          OK
+exp 29s ago, iat 900s ago          OK
+exp 31s ago, iat 900s ago          FAIL JwtValidationException: An error occurred while attempting to decode the Jwt: Jwt expired at 2026-10-12T16:55:31Z
+exp 10s ago, iat now (exp<iat)     FAIL BadJwtException: An error occurred while attempting to decode the Jwt: expiresAt must be after issuedAt
+exp == iat                         FAIL BadJwtException: An error occurred while attempting to decode the Jwt: expiresAt must be after issuedAt
+no exp                             FAIL JwtValidationException: An error occurred while attempting to decode the Jwt: exp is required
+no iat                             OK
+iat +29s                           OK
+iat +31s                           OK
+nbf +29s                           OK
+nbf +31s                           FAIL JwtValidationException: An error occurred while attempting to decode the Jwt: Jwt used before 2026-10-12T16:56:33Z
+no iss                             FAIL JwtValidationException: An error occurred while attempting to decode the Jwt: The iss claim is not valid
+iss other                          FAIL JwtValidationException: An error occurred while attempting to decode the Jwt: The iss claim is not valid
+no aud                             FAIL NullPointerException: Cannot invoke "java.util.List.contains(Object)" because the return value of "org.springframework.security.oauth2.jwt.Jwt.getAudience()" is null
+aud []                             FAIL NullPointerException: Cannot invoke "java.util.List.contains(Object)" because the return value of "org.springframework.security.oauth2.jwt.Jwt.getAudience()" is null
+aud other                          FAIL JwtValidationException: An error occurred while attempting to decode the Jwt: Invalid access token
+aud [expected, other]              OK
+no purpose                         FAIL JwtValidationException: An error occurred while attempting to decode the Jwt: Invalid access token
+purpose other                      FAIL JwtValidationException: An error occurred while attempting to decode the Jwt: Invalid access token
+no sub                             FAIL JwtValidationException: An error occurred while attempting to decode the Jwt: Invalid access token
+sub blank                          FAIL JwtValidationException: An error occurred while attempting to decode the Jwt: Invalid access token
+sub not uuid                       FAIL JwtValidationException: An error occurred while attempting to decode the Jwt: Invalid access token
+sub UUID uppercase                 OK
+sub 1-2-3-4-5                      OK
+no jti                             OK
+no provider                        OK
+no uploadId                        OK
+typ absent                         OK
+typ at+jwt                         OK
+alg HS384                          OK
+== social signup token
+baseline                           OK
+exp 10s ago, iat 900s ago          OK
+exp 29s ago, iat 900s ago          OK
+exp 31s ago, iat 900s ago          FAIL JwtValidationException: An error occurred while attempting to decode the Jwt: Jwt expired at 2026-10-12T16:55:31Z
+exp 10s ago, iat now (exp<iat)     FAIL BadJwtException: An error occurred while attempting to decode the Jwt: expiresAt must be after issuedAt
+exp == iat                         FAIL BadJwtException: An error occurred while attempting to decode the Jwt: expiresAt must be after issuedAt
+no exp                             FAIL JwtValidationException: An error occurred while attempting to decode the Jwt: Invalid social signup token
+no iat                             FAIL JwtValidationException: An error occurred while attempting to decode the Jwt: Invalid social signup token
+iat +29s                           OK
+iat +31s                           FAIL JwtValidationException: An error occurred while attempting to decode the Jwt: Invalid social signup token
+nbf +29s                           OK
+nbf +31s                           FAIL JwtValidationException: An error occurred while attempting to decode the Jwt: Jwt used before 2026-10-12T16:56:33Z
+no iss                             FAIL JwtValidationException: An error occurred while attempting to decode the Jwt: The iss claim is not valid
+iss other                          FAIL JwtValidationException: An error occurred while attempting to decode the Jwt: The iss claim is not valid
+no aud                             FAIL NullPointerException: Cannot invoke "java.util.List.contains(Object)" because the return value of "org.springframework.security.oauth2.jwt.Jwt.getAudience()" is null
+aud []                             FAIL NullPointerException: Cannot invoke "java.util.List.contains(Object)" because the return value of "org.springframework.security.oauth2.jwt.Jwt.getAudience()" is null
+aud other                          FAIL JwtValidationException: An error occurred while attempting to decode the Jwt: Invalid social signup token
+aud [expected, other]              OK
+no purpose                         FAIL JwtValidationException: An error occurred while attempting to decode the Jwt: Invalid social signup token
+purpose other                      FAIL JwtValidationException: An error occurred while attempting to decode the Jwt: Invalid social signup token
+no sub                             OK
+sub blank                          OK
+sub not uuid                       OK
+sub UUID uppercase                 OK
+sub 1-2-3-4-5                      OK
+no jti                             OK
+no provider                        OK
+no uploadId                        OK
+typ absent                         OK
+typ at+jwt                         OK
+alg HS384                          OK

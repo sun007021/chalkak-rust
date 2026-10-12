@@ -1,0 +1,64 @@
+OK    baseline
+OK    exp 0s ago
+OK    exp 59s ago
+FAIL  exp 60s ago  :: An error occurred while attempting to decode the Jwt: Jwt expired at 2026-10-12T16:55:05Z
+FAIL  exp 61s ago  :: An error occurred while attempting to decode the Jwt: Jwt expired at 2026-10-12T16:55:04Z
+FAIL  exp 65s ago  :: An error occurred while attempting to decode the Jwt: Jwt expired at 2026-10-12T16:55:00Z
+OK    nbf +30
+OK    nbf +59
+FAIL  nbf +61  :: An error occurred while attempting to decode the Jwt: Jwt used before 2026-10-12T16:57:06Z
+FAIL  nbf +65  :: An error occurred while attempting to decode the Jwt: Jwt used before 2026-10-12T16:57:10Z
+OK    iat +30
+OK    iat +59
+FAIL  iat +61  :: An error occurred while attempting to decode the Jwt: ID Token iat claim이 허용 범위보다 미래입니다.
+FAIL  iat +65  :: An error occurred while attempting to decode the Jwt: ID Token iat claim이 허용 범위보다 미래입니다.
+FAIL  no exp  :: An error occurred while attempting to decode the Jwt: ID Token exp claim이 없습니다.
+FAIL  no iat  :: An error occurred while attempting to decode the Jwt: ID Token iat claim이 허용 범위보다 미래입니다.
+FAIL  exp 10s ago iat now  :: An error occurred while attempting to decode the Jwt: expiresAt must be after issuedAt
+FAIL  iss mismatch  :: An error occurred while attempting to decode the Jwt: The iss claim is not valid
+FAIL  no iss  :: An error occurred while attempting to decode the Jwt: The iss claim is not valid
+FAIL  aud [A,B]  :: An error occurred while attempting to decode the Jwt: GOOGLE ID Token audience가 허용되지 않았습니다.
+OK    aud [A]
+FAIL  aud B  :: An error occurred while attempting to decode the Jwt: GOOGLE ID Token audience가 허용되지 않았습니다.
+FAIL  no aud  :: An error occurred while attempting to decode the Jwt: GOOGLE ID Token audience가 허용되지 않았습니다.
+OK    no kid
+FAIL  unknown kid  :: An error occurred while attempting to decode the Jwt: Signed JWT rejected: Another algorithm expected, or no matching key(s) found
+FAIL  typ foo  :: An error occurred while attempting to decode the Jwt: the given typ value needs to be one of [JWT]
+FAIL  crit  :: An error occurred while attempting to decode the Jwt: Signed JWT rejected: Invalid signature
+FAIL  RS384 :: An error occurred while attempting to decode the Jwt: Signed JWT rejected: Another algorithm expected, or no matching key(s) found
+matcher: kty=RSA use=[sig, null] alg=[RS256, null] kid=k1
+OK    typ jwt
+OK    typ JWT
+OK    typ Jwt
+FAIL  typ at+jwt  :: An error occurred while attempting to decode the Jwt: the given typ value needs to be one of [JWT]
+FAIL  typ JOSE  :: An error occurred while attempting to decode the Jwt: the given typ value needs to be one of [JWT]
+FAIL  exp as string  :: An error occurred while attempting to decode the Jwt: Malformed payload
+OK    exp float
+OK    iat float
+FAIL  nbf string  :: An error occurred while attempting to decode the Jwt: Malformed payload
+FAIL  aud number  :: An error occurred while attempting to decode the Jwt: GOOGLE ID Token audience가 허용되지 않았습니다.
+FAIL  aud [5]  :: An error occurred while attempting to decode the Jwt: GOOGLE ID Token audience가 허용되지 않았습니다.
+FAIL  iss number  :: An error occurred while attempting to decode the Jwt: Malformed payload
+OK    sub number
+FAIL  exp==iat  :: An error occurred while attempting to decode the Jwt: expiresAt must be after issuedAt
+FAIL  exp<iat  :: An error occurred while attempting to decode the Jwt: expiresAt must be after issuedAt
+OK    nbf+5
+FAIL  exp null  :: An error occurred while attempting to decode the Jwt: ID Token exp claim이 없습니다.
+FAIL  iat null  :: An error occurred while attempting to decode the Jwt: ID Token iat claim이 허용 범위보다 미래입니다.
+FAIL  aud null  :: An error occurred while attempting to decode the Jwt: GOOGLE ID Token audience가 허용되지 않았습니다.
+FAIL  aud []  :: An error occurred while attempting to decode the Jwt: GOOGLE ID Token audience가 허용되지 않았습니다.
+FAIL  aud [A,A]  :: An error occurred while attempting to decode the Jwt: GOOGLE ID Token audience가 허용되지 않았습니다.
+parse OK keys=1 :: {"keys":[{"kty":"oct","k":"AAAA","kid":"o"}]}
+parse OK keys=0 :: {"keys":[{"kty":"FOO","kid":"o"}]}
+parse FAIL Invalid JWK at position 0: The modulus value must not be null :: {"keys":[{"kty":"RSA","kid":"o"}]}
+parse FAIL Invalid JWK at position 0: Missing key type "kty" parameter :: {"keys":[{"kid":"o"}]}
+parse OK keys=0 :: {"keys":[]}
+parse FAIL Missing required "keys" member :: {}
+parse FAIL Missing required "keys" member :: []
+parse FAIL Unexpected type of JSON object member keys :: {"keys":{}}
+parse FAIL Invalid JWK at position 1: Invalid EC JWK: The 'x' and 'y' public coordinates are not on the P-256 curve :: {"keys":[{"kty":"RSA","kid":"o","n":"AQAB","e":"AQAB"}, {"kty":"EC","crv":"P-256","x":"AAAA","y":"AAAA","kid":"e"}]}
+FAIL  jwk use=enc :: An error occurred while attempting to decode the Jwt: Signed JWT rejected: Another algorithm expected, or no matching key(s) found
+FAIL  jwk alg=RS384 :: An error occurred while attempting to decode the Jwt: Signed JWT rejected: Another algorithm expected, or no matching key(s) found
+OK    jwk alg=RS256
+OK    jwk key_ops=verify
+OK    jwk key_ops=sign
