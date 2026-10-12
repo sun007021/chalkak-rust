@@ -11,40 +11,44 @@
 | `scenarios/` | 시나리오(TOML). 형식은 `parity/src/scenario.rs` 상단 주석 참고 |
 | `golden/` | Java oracle에서 녹화한 정규화 결과 |
 | `env/` | 대상별 설정(`java-a`, `java-b`, `rust`)과 앱 공통 환경변수(`oracle.env`) |
-| `scripts/up.sh`, `down.sh` | 대상(PostgreSQL 컨테이너 + 앱 프로세스 + 시계 파일) 기동·정리 |
+| `scripts/up.sh`, `down.sh` | docker compose로 대상(PostgreSQL + 앱 + 시계 파일) 기동·정리. 서비스 정의는 저장소 루트 `compose.yaml` |
 | `inventory/` | 원본에서 뽑은 API 목록(`endpoints.csv`), Java 테스트 이식 추적표(`java-test-inventory.csv`), 추출 스크립트 |
 | `BASELINE` | oracle로 쓰는 원본 커밋 |
 
 ## 실행
 
-필요한 것: Docker, libfaketime(`apt install libfaketime`), Java 25, `BASELINE` 커밋으로 빌드한 원본 JAR.
+필요한 것: Docker(Compose v2). 원본 Java 이미지는 처음 한 번 `BASELINE` 커밋을 받아 컨테이너 안에서 빌드한다.
 
 ```bash
-# 원본 JAR (2026-Chalkak/backend에서)
-./gradlew bootJar -x test
-
+# Java oracle(java-a) + Rust 개발용 DB(pg-rust)
+harness/scripts/up.sh
+# Rust 서버 컨테이너까지
+harness/scripts/up.sh rust
 # Java 대 Java: 하네스 자체의 결정성 확인 (Phase 0 완료 조건)
-harness/scripts/up.sh java-a java-b
+harness/scripts/up.sh selfcheck
 cargo run -p chalkak-parity -- compare --left harness/env/java-a.toml --right harness/env/java-b.toml
 
 # Java 대 Rust
-cargo build --release -p chalkak-server
-harness/scripts/up.sh java-a rust
 cargo run -p chalkak-parity -- compare --left harness/env/java-a.toml --right harness/env/rust.toml
 
-# golden 녹화와 검증 (oracle 하나만 띄워 둘 때)
+# golden 녹화와 검증
 cargo run -p chalkak-parity -- record --target harness/env/java-a.toml --out harness/golden
 cargo run -p chalkak-parity -- verify --target harness/env/rust.toml --golden harness/golden
 
 harness/scripts/down.sh
 ```
 
-`--filter <태그 또는 경로 일부>`로 시나리오를 고를 수 있다. 실패하면 첫 차이 20개를 경로와 함께 보여주고,
-양쪽 전체 결과는 `harness/out/<시나리오>.{left,right}.json`에 남는다.
+| 서비스 | 호스트 포트 | 내용 |
+| --- | --- | --- |
+| `java-a` / `pg-java-a` | 18080 / 15432 | 원본 Spring 서버(oracle)와 DB |
+| `java-b` / `pg-java-b` | 18081 / 15433 | 결정성 확인용 두 번째 Java (`selfcheck` 프로필) |
+| `rust` / `pg-rust` | 18082 / 15434 | Rust 서버(`rust` 프로필)와 DB. 개발 중에는 `pg-rust`만 띄우고 `cargo run`으로 붙어도 된다 |
+
+모든 앱·DB 컨테이너는 libfaketime이 들어간 이미지(`docker/*.Dockerfile`)로 뜨고, `harness/out/clock-<대상>` 파일의 오프셋을 현재 시각에 더한다.
 
 ## 결정성을 만드는 장치
 
-- **시계:** 앱과 DB 프로세스를 libfaketime으로 띄우고, 러너가 단계마다 `harness/out/clock-<대상>` 파일에
+- **시계:** 앱과 DB 컨테이너를 libfaketime으로 띄우고, 러너가 단계마다 `harness/out/clock-<대상>` 파일에
   오프셋을 써서 각 단계가 시나리오 시각에서 출발하게 한다. 원본이 `Clock`을 쓰지 않고 `Instant.now()`를 부르는
   곳(주제 단계 판단, 콜백 인증 등)까지 같은 시각을 본다.
 - **DB:** 시나리오마다 `flyway_schema_history`를 뺀 모든 테이블을 비우고 `setup.sql`을 실행한다.
