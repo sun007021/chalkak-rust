@@ -9,6 +9,7 @@ members = [
     "crates/app",
     "crates/server",
     "harness/parity",
+    "harness/fakes",
 ]
 
 [workspace.package]
@@ -25,6 +26,7 @@ toml = "0.9"
 postgres = "0.19"
 hmac = "0.12"
 sha2 = "0.10"
+rsa = "0.9"
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
