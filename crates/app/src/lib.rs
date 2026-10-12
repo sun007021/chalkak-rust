@@ -9,11 +9,15 @@
 //! - [`feedback`], [`user`], [`auth`], [`admin`]: 하네스 platform 시나리오가 건드리는 최소 조각.
 //!   (`POST /api/v1/feedbacks`, 회원 존재 확인, 관리자 로그아웃 요청 검증.) 해당 도메인 이슈에서 확장한다.
 
+pub mod admin;
+pub mod auth;
 pub mod common;
+pub mod feedback;
 pub mod security;
 #[doc(hidden)]
 pub mod testing;
 pub mod topic;
+pub mod user;
 pub mod web;
 
 use std::sync::Arc;
@@ -31,5 +35,7 @@ pub struct AppContext {
 
 /// 모든 도메인의 라우트를 등록한다.
 pub fn register_routes(routes: web::Routes, ctx: &AppContext) -> web::Routes {
-    topic::api::register(routes, ctx)
+    let routes = topic::api::register(routes, ctx);
+    let routes = feedback::api::register(routes, ctx);
+    admin::auth_api::register(routes)
 }
