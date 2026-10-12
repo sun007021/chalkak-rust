@@ -4,6 +4,8 @@ pub mod clock;
 pub mod config;
 pub mod duration;
 pub mod error;
+pub mod log;
+pub mod request_id;
 
 pub use clock::{Clock, FixedClock, SystemClock};
 pub use config::{ConfigError, Env};
