@@ -8,6 +8,7 @@
 //!
 //! `compare`는 두 대상에 같은 시나리오를 차례로 실행해 정규화 결과를 비교한다. 결과는
 //! `harness/out/<시나리오>.{left,right}.json`에도 남는다. 하나라도 다르면 종료 코드 1.
+//! 끝나면 대상의 시계 파일을 "+0"으로 되돌린다(과거로 옮겨 둔 채 두면 JVM이 유휴 상태에서 CPU를 쓴다).
 
 mod fakes;
 mod http;
@@ -54,48 +55,61 @@ fn run(args: &[String]) -> Result<bool, String> {
             let right = Target::load(Path::new(
                 opt(args, "--right").ok_or("--right가 필요합니다")?,
             ))?;
-            let mut failed = 0;
-            for s in &scenarios {
-                let l = runner::run(&left, s)?;
-                let r = runner::run(&right, s)?;
-                let key = file_key(&s.path, &scenarios_dir);
-                write_json(&out_dir.join(format!("{key}.left.json")), &l)?;
-                write_json(&out_dir.join(format!("{key}.right.json")), &r)?;
-                report(&s.name, &key, runner::diff(&l, &r), &mut failed);
-            }
-            summary(scenarios.len(), failed)
+            let result = (|| {
+                let mut failed = 0;
+                for s in &scenarios {
+                    let l = runner::run(&left, s)?;
+                    let r = runner::run(&right, s)?;
+                    let key = file_key(&s.path, &scenarios_dir);
+                    write_json(&out_dir.join(format!("{key}.left.json")), &l)?;
+                    write_json(&out_dir.join(format!("{key}.right.json")), &r)?;
+                    report(&s.name, &key, runner::diff(&l, &r), &mut failed);
+                }
+                summary(scenarios.len(), failed)
+            })();
+            left.reset_clock();
+            right.reset_clock();
+            result
         }
         "record" => {
             let target = Target::load(Path::new(
                 opt(args, "--target").ok_or("--target이 필요합니다")?,
             ))?;
             let golden = PathBuf::from(opt(args, "--out").unwrap_or("harness/golden"));
-            for s in &scenarios {
-                let v = runner::run(&target, s)?;
-                let key = file_key(&s.path, &scenarios_dir);
-                write_json(&golden.join(format!("{key}.json")), &v)?;
-                println!("녹화  {key}");
-            }
-            Ok(true)
+            let result = (|| {
+                for s in &scenarios {
+                    let v = runner::run(&target, s)?;
+                    let key = file_key(&s.path, &scenarios_dir);
+                    write_json(&golden.join(format!("{key}.json")), &v)?;
+                    println!("녹화  {key}");
+                }
+                Ok(true)
+            })();
+            target.reset_clock();
+            result
         }
         "verify" => {
             let target = Target::load(Path::new(
                 opt(args, "--target").ok_or("--target이 필요합니다")?,
             ))?;
             let golden = PathBuf::from(opt(args, "--golden").unwrap_or("harness/golden"));
-            let mut failed = 0;
-            for s in &scenarios {
-                let key = file_key(&s.path, &scenarios_dir);
-                let path = golden.join(format!("{key}.json"));
-                let text = std::fs::read_to_string(&path)
-                    .map_err(|e| format!("{}: {e}", path.display()))?;
-                let expected: serde_json::Value =
-                    serde_json::from_str(&text).map_err(|e| e.to_string())?;
-                let actual = runner::run(&target, s)?;
-                write_json(&out_dir.join(format!("{key}.actual.json")), &actual)?;
-                report(&s.name, &key, runner::diff(&expected, &actual), &mut failed);
-            }
-            summary(scenarios.len(), failed)
+            let result = (|| {
+                let mut failed = 0;
+                for s in &scenarios {
+                    let key = file_key(&s.path, &scenarios_dir);
+                    let path = golden.join(format!("{key}.json"));
+                    let text = std::fs::read_to_string(&path)
+                        .map_err(|e| format!("{}: {e}", path.display()))?;
+                    let expected: serde_json::Value =
+                        serde_json::from_str(&text).map_err(|e| e.to_string())?;
+                    let actual = runner::run(&target, s)?;
+                    write_json(&out_dir.join(format!("{key}.actual.json")), &actual)?;
+                    report(&s.name, &key, runner::diff(&expected, &actual), &mut failed);
+                }
+                summary(scenarios.len(), failed)
+            })();
+            target.reset_clock();
+            result
         }
         _ => Err("사용법: parity <compare|record|verify> ... (src/main.rs 주석 참고)".into()),
     }

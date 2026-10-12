@@ -43,6 +43,12 @@ impl Target {
         Ok(())
     }
 
+    /// 시계 파일을 "+0"(실제 시각)으로 되돌린다. 과거로 크게 옮겨 둔 채 두면 JVM 내부 스레드의 시간 제한 대기가
+    /// 곧바로 반환돼 유휴 상태에서도 CPU를 쓴다. 실패해도 검증 결과와 무관하므로 무시한다.
+    pub fn reset_clock(&self) {
+        let _ = std::fs::write(&self.clock_file, "+0\n");
+    }
+
     pub fn db(&self) -> Result<postgres::Client, String> {
         postgres::Client::connect(&self.db_url, postgres::NoTls)
             .map_err(|e| format!("[{}] DB 연결 실패: {e}", self.name))

@@ -38,13 +38,34 @@ fn check_app_clock(
     match time::parse_http_date(date) {
         Some(at) if (at - expected).abs() <= CLOCK_TOLERANCE_SECONDS => Ok(()),
         _ => Err(format!(
-            "[{}] {step}: 앱 시계가 시나리오 시각과 다릅니다(Date: {date}). 시계 파일이 반영되지 않았습니다",
+            "[{}] {step}: {CLOCK_ERROR_MARK}(Date: {date}). 시계 파일이 반영되지 않았습니다",
             target.name
         )),
     }
 }
 
+/// 앱 시계 오류 메시지의 표지. `check_app_clock`이 만든다.
+const CLOCK_ERROR_MARK: &str = "앱 시계가 시나리오 시각과 다릅니다";
+
+/// 시계 오류가 나면 시나리오를 처음부터(DB 초기화부터) 다시 돌린다. 시계 오류는 동작 차이가 아니라
+/// 부하로 libfaketime이 시계 파일을 놓친 하네스 문제이고, 이미 틀린 시각으로 상태가 바뀌었으므로
+/// 그 단계만 다시 보내지 않고 시나리오 전체를 다시 한다. 다른 오류는 그대로 낸다.
 pub fn run(target: &Target, scenario: &Scenario) -> Result<Value, String> {
+    const ATTEMPTS: usize = 3;
+    let mut last = String::new();
+    for attempt in 1..=ATTEMPTS {
+        match run_once(target, scenario) {
+            Err(e) if e.contains(CLOCK_ERROR_MARK) => {
+                eprintln!("경고: {e} (시나리오를 다시 실행합니다, {attempt}/{ATTEMPTS})");
+                last = e;
+            }
+            other => return other,
+        }
+    }
+    Err(last)
+}
+
+fn run_once(target: &Target, scenario: &Scenario) -> Result<Value, String> {
     let clock = time::parse(scenario.clock.as_deref().unwrap_or(DEFAULT_CLOCK))
         .ok_or("clock 형식이 올바르지 않습니다")?
         .epoch as i64;
