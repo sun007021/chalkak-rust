@@ -6,6 +6,8 @@
 use std::sync::Arc;
 
 use chalkak_app::auth::UsableUserPolicy;
+use chalkak_app::feedback::domain::Feedback;
+use chalkak_app::feedback::repository::FeedbackRepository;
 use chalkak_app::feedback::service::FeedbackService;
 use chalkak_app::security::{self, AUTHORITY_USER, Principal};
 use chalkak_app::testing::TestDb;
@@ -106,4 +108,95 @@ fn validate_existing_requires_a_present_user() {
         assert_eq!(err.status(), 401, "{id}");
         assert_eq!(err.message(), "유효하지 않은 인증 정보입니다.");
     }
+}
+
+// FeedbackRepositoryTest#save_newFeedback_assignsIdentifierAndCreatedAt
+#[test]
+fn save_assigns_identifier_and_created_at() {
+    let Some(db) = TestDb::create() else { return };
+    insert_user(&db, USER_ID, false);
+    let mut feedback =
+        Feedback::create(USER_ID.parse().unwrap(), Some("사진 업로드가 느려요.")).unwrap();
+    let mut client = db.client();
+
+    FeedbackRepository
+        .save(&mut client, &mut feedback, now())
+        .unwrap();
+
+    assert!(feedback.id.is_some());
+    assert_eq!(feedback.created_at, Some(now()));
+    let row = client
+        .query_one(
+            "SELECT user_id, content FROM feedbacks WHERE id = $1",
+            &[&feedback.id],
+        )
+        .unwrap();
+    assert_eq!(
+        row.get::<_, Uuid>("user_id"),
+        USER_ID.parse::<Uuid>().unwrap()
+    );
+    assert_eq!(row.get::<_, String>("content"), "사진 업로드가 느려요.");
+}
+
+// FeedbackRepositoryTest#save_repeatedFeedback_storesEverySubmission
+#[test]
+fn a_user_can_submit_feedback_repeatedly() {
+    let Some(db) = TestDb::create() else { return };
+    insert_user(&db, USER_ID, false);
+    let service = FeedbackService::new(db.pool(2), Arc::new(FixedClock::new(now())));
+
+    let first = service
+        .submit(USER_ID.parse().unwrap(), Some("첫 번째 의견"))
+        .unwrap();
+    let second = service
+        .submit(USER_ID.parse().unwrap(), Some("두 번째 의견"))
+        .unwrap();
+
+    assert_ne!(first.feedback_id, second.feedback_id);
+    let count: i64 = db
+        .client()
+        .query_one(
+            "SELECT COUNT(*) FROM feedbacks WHERE user_id = $1",
+            &[&USER_ID.parse::<Uuid>().unwrap()],
+        )
+        .unwrap()
+        .get(0);
+    assert_eq!(count, 2);
+}
+
+// FeedbackSubmissionIntegrationTest#submitFeedback_maxLengthSupplementaryCharacters_areStoredIntact
+#[test]
+fn max_length_supplementary_characters_are_stored_intact() {
+    let Some(db) = TestDb::create() else { return };
+    insert_user(&db, USER_ID, false);
+    let service = FeedbackService::new(db.pool(2), Arc::new(FixedClock::new(now())));
+    let content = "😀".repeat(1000);
+
+    let result = service
+        .submit(USER_ID.parse().unwrap(), Some(&content))
+        .unwrap();
+
+    let stored: String = db
+        .client()
+        .query_one(
+            "SELECT content FROM feedbacks WHERE id = $1",
+            &[&result.feedback_id],
+        )
+        .unwrap()
+        .get(0);
+    assert_eq!(stored, content);
+}
+
+// SuspendedUserAccessTest#submitFeedback_suspendedUser_isNotForbidden:
+// 정지(BANNED) 회원도 `validateExisting`을 통과해 피드백을 낼 수 있다.
+#[test]
+fn a_banned_user_still_passes_the_existing_user_check() {
+    let Some(db) = TestDb::create() else { return };
+    insert_user(&db, USER_ID, false);
+    db.client()
+        .batch_execute("UPDATE users SET status = 'BANNED'")
+        .unwrap();
+    let policy = UsableUserPolicy::new(db.pool(2));
+    let _guard = as_user(USER_ID);
+    assert!(policy.validate_existing().is_ok());
 }
