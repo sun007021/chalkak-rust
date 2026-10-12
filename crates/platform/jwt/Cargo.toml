@@ -6,5 +6,15 @@ rust-version.workspace = true
 license.workspace = true
 publish.workspace = true
 
+[dependencies]
+# 헤더·클레임 JSON 순서를 호출자가 만든 그대로 보존해야 원본과 바이트가 같다(preserve_order).
+serde_json = { workspace = true, features = ["preserve_order"] }
+hmac.workspace = true
+sha2.workspace = true
+# ES256: PKCS#8 PEM 개인키, 결정적(RFC 6979) ECDSA 서명과 공개키 검증.
+p256 = { workspace = true, features = ["std", "ecdsa", "pkcs8", "pem"] }
+# RS256은 검증만 쓴다(개인키 연산 없음).
+rsa = { workspace = true, features = ["std", "sha2"] }
+
 [lints]
 workspace = true
