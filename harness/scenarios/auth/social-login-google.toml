@@ -1,0 +1,196 @@
+name = "인증: 구글 ID Token 검증(서명·발급자·aud·시각·nonce)과 요청 형식"
+tags = ["auth", "oidc"]
+clock = "2026-10-12T09:00:00+09:00"
+
+# 원본이 ID Token에 적용하는 규칙을 하나씩 어긋나게 한 토큰으로 확인한다. 통과하면 미가입 회원이라 SIGN_UP_REQUIRED.
+
+[[id_token]]
+name = "ok"
+provider = "google"
+sub = "google-sub-login"
+nonce = "nonce-ok"
+email = "login@example.com"
+email_verified = true
+
+[[id_token]]
+name = "expired"
+provider = "google"
+sub = "google-sub-login"
+nonce = "nonce-ok"
+issued_in = -3600
+expires_in = -120
+
+[[id_token]]
+name = "wrongAudience"
+provider = "google"
+sub = "google-sub-login"
+nonce = "nonce-ok"
+aud = "someone-else"
+
+[[id_token]]
+name = "twoAudiences"
+provider = "google"
+sub = "google-sub-login"
+nonce = "nonce-ok"
+claims = { aud = ["test-google-client-id", "someone-else"] }
+
+[[id_token]]
+name = "wrongIssuer"
+provider = "google"
+sub = "google-sub-login"
+nonce = "nonce-ok"
+iss = "https://evil.example"
+
+[[id_token]]
+name = "issuedInFuture"
+provider = "google"
+sub = "google-sub-login"
+nonce = "nonce-ok"
+issued_in = 3600
+expires_in = 7200
+
+[[id_token]]
+name = "noExpiry"
+provider = "google"
+sub = "google-sub-login"
+nonce = "nonce-ok"
+omit = ["exp"]
+
+[[id_token]]
+name = "noSubject"
+provider = "google"
+sub = "x"
+nonce = "nonce-ok"
+omit = ["sub"]
+
+[[id_token]]
+name = "longSubject"
+provider = "google"
+sub = "s123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+nonce = "nonce-ok"
+
+[[id_token]]
+name = "tampered"
+provider = "google"
+sub = "google-sub-login"
+nonce = "nonce-ok"
+tamper_signature = true
+
+[[id_token]]
+name = "noNonce"
+provider = "google"
+sub = "google-sub-login"
+
+[[step]]
+name = "정상 토큰은 미가입 회원으로 응답"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${ok}","rawNonce":"nonce-ok"}'
+
+[[step]]
+name = "다른 rawNonce"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${ok}","rawNonce":"nonce-other"}'
+
+[[step]]
+name = "nonce 클레임이 없는 토큰"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${noNonce}","rawNonce":"nonce-ok"}'
+
+[[step]]
+name = "만료된 토큰"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${expired}","rawNonce":"nonce-ok"}'
+
+[[step]]
+name = "다른 aud"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${wrongAudience}","rawNonce":"nonce-ok"}'
+
+[[step]]
+name = "aud가 둘"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${twoAudiences}","rawNonce":"nonce-ok"}'
+
+[[step]]
+name = "다른 발급자"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${wrongIssuer}","rawNonce":"nonce-ok"}'
+
+[[step]]
+name = "발급 시각이 미래"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${issuedInFuture}","rawNonce":"nonce-ok"}'
+
+[[step]]
+name = "exp가 없는 토큰"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${noExpiry}","rawNonce":"nonce-ok"}'
+
+[[step]]
+name = "sub가 없는 토큰"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${noSubject}","rawNonce":"nonce-ok"}'
+
+[[step]]
+name = "sub가 255자 초과"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${longSubject}","rawNonce":"nonce-ok"}'
+
+[[step]]
+name = "서명이 깨진 토큰"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${tampered}","rawNonce":"nonce-ok"}'
+
+[[step]]
+name = "구글 토큰을 카카오로 제출"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"KAKAO","idToken":"${ok}","rawNonce":"nonce-ok"}'
+
+[[step]]
+name = "JWT 형식이 아닌 토큰"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"not-a-jwt","rawNonce":"nonce-ok"}'
+
+[[step]]
+name = "구글에 authorizationCode"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${ok}","rawNonce":"nonce-ok","authorizationCode":"code"}'
+
+[[step]]
+name = "빈 rawNonce"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${ok}","rawNonce":" "}'
+
+[[step]]
+name = "빈 idToken"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"","rawNonce":"nonce-ok"}'
+
+[[step]]
+name = "알 수 없는 제공자"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"NAVER","idToken":"${ok}","rawNonce":"nonce-ok"}'
+
+[[step]]
+name = "제공자 누락"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"idToken":"${ok}","rawNonce":"nonce-ok"}'

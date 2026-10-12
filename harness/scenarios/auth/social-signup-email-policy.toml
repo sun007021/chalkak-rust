@@ -1,0 +1,175 @@
+name = "인증: 제공자별 이메일 채택 규칙(카카오 그대로, 구글·Apple은 email_verified일 때만)과 사인 이미지 정책"
+tags = ["auth", "oidc", "s3"]
+clock = "2026-10-12T09:00:00+09:00"
+db_opaque = ["token_hash"]
+
+[[id_token]]
+name = "kakao"
+provider = "kakao"
+sub = "kakao-sub-1"
+nonce = "nonce-k"
+email = "kakao@example.com"
+
+[[id_token]]
+name = "googleUnverified"
+provider = "google"
+sub = "google-sub-unverified"
+nonce = "nonce-g"
+email = "unverified@example.com"
+email_verified = false
+
+[[id_token]]
+name = "googleVerifiedString"
+provider = "google"
+sub = "google-sub-verified-string"
+nonce = "nonce-s"
+email = "verified-string@example.com"
+email_verified = "TRUE"
+
+[[id_token]]
+name = "googleBigImage"
+provider = "google"
+sub = "google-sub-big"
+nonce = "nonce-b"
+email = "big@example.com"
+email_verified = true
+
+[[id_token]]
+name = "googleJpeg"
+provider = "google"
+sub = "google-sub-jpeg"
+nonce = "nonce-j"
+email = "jpeg@example.com"
+email_verified = true
+
+# 카카오: 이메일을 확인 여부와 관계없이 그대로 쓴다.
+[[step]]
+name = "카카오 업로드 URL"
+method = "POST"
+path = "/api/v1/auth/social-signup/signature/uploads"
+body = '{"provider":"KAKAO","idToken":"${kakao}","rawNonce":"nonce-k"}'
+capture = { kakaoUpload = "uploadId", kakaoSignup = "signupToken" }
+
+[[step]]
+name = "카카오 가입"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+body = '{"signupToken":"${kakaoSignup}"}'
+opaque = ["refreshToken"]
+[step.fakes.s3."chalkak/signatures/local/original/${kakaoUpload}.png"]
+size = 1000
+content_type = "image/png"
+[step.fakes.s3."chalkak/signatures/local/thumbnail/${kakaoUpload}.png"]
+size = 100
+content_type = "image/png"
+
+# 구글: email_verified가 false면 이메일을 버린다.
+[[step]]
+name = "구글(이메일 미확인) 업로드 URL"
+method = "POST"
+path = "/api/v1/auth/social-signup/signature/uploads"
+body = '{"provider":"GOOGLE","idToken":"${googleUnverified}","rawNonce":"nonce-g"}'
+capture = { gUpload = "uploadId", gSignup = "signupToken" }
+
+[[step]]
+name = "구글(이메일 미확인) 가입"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+body = '{"signupToken":"${gSignup}"}'
+opaque = ["refreshToken"]
+[step.fakes.s3."chalkak/signatures/local/original/${gUpload}.png"]
+size = 1000
+content_type = "image/png"
+[step.fakes.s3."chalkak/signatures/local/thumbnail/${gUpload}.png"]
+size = 100
+content_type = "image/png"
+
+# email_verified를 문자열 "TRUE"로 보내도 참으로 본다.
+[[step]]
+name = "구글(email_verified 문자열) 업로드 URL"
+method = "POST"
+path = "/api/v1/auth/social-signup/signature/uploads"
+body = '{"provider":"GOOGLE","idToken":"${googleVerifiedString}","rawNonce":"nonce-s"}'
+capture = { sUpload = "uploadId", sSignup = "signupToken" }
+
+[[step]]
+name = "구글(email_verified 문자열) 가입"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+body = '{"signupToken":"${sSignup}"}'
+opaque = ["refreshToken"]
+[step.fakes.s3."chalkak/signatures/local/original/${sUpload}.png"]
+size = 1000
+content_type = "image/png"
+[step.fakes.s3."chalkak/signatures/local/thumbnail/${sUpload}.png"]
+size = 100
+content_type = "image/png"
+
+# 사인 이미지 정책: 1 MiB(1048576) 이하, image/png만.
+[[step]]
+name = "큰 이미지 업로드 URL"
+method = "POST"
+path = "/api/v1/auth/social-signup/signature/uploads"
+body = '{"provider":"GOOGLE","idToken":"${googleBigImage}","rawNonce":"nonce-b"}'
+capture = { bUpload = "uploadId", bSignup = "signupToken" }
+
+[[step]]
+name = "1 MiB를 넘는 사인 이미지"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+body = '{"signupToken":"${bSignup}"}'
+[step.fakes.s3."chalkak/signatures/local/original/${bUpload}.png"]
+size = 1048577
+content_type = "image/png"
+[step.fakes.s3."chalkak/signatures/local/thumbnail/${bUpload}.png"]
+size = 100
+content_type = "image/png"
+
+[[step]]
+name = "정확히 1 MiB인 사인 이미지"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+body = '{"signupToken":"${bSignup}"}'
+opaque = ["refreshToken"]
+[step.fakes.s3."chalkak/signatures/local/original/${bUpload}.png"]
+size = 1048576
+content_type = "image/png"
+
+[[step]]
+name = "JPEG 업로드 URL"
+method = "POST"
+path = "/api/v1/auth/social-signup/signature/uploads"
+body = '{"provider":"GOOGLE","idToken":"${googleJpeg}","rawNonce":"nonce-j"}'
+capture = { jUpload = "uploadId", jSignup = "signupToken" }
+
+[[step]]
+name = "허용되지 않는 Content-Type"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+body = '{"signupToken":"${jSignup}"}'
+[step.fakes.s3."chalkak/signatures/local/original/${jUpload}.png"]
+size = 1000
+content_type = "image/jpeg"
+[step.fakes.s3."chalkak/signatures/local/thumbnail/${jUpload}.png"]
+size = 100
+content_type = "image/png"
+
+[[step]]
+name = "S3가 403이면 없는 것으로 본다"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+body = '{"signupToken":"${jSignup}"}'
+[step.fakes.s3."chalkak/signatures/local/original/${jUpload}.png"]
+status = 403
+[step.fakes.s3."chalkak/staging/local/signatures/${jUpload}.png"]
+status = 403
+
+[[step]]
+name = "S3가 500이면 서버 오류"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+body = '{"signupToken":"${jSignup}"}'
+[step.fakes.s3."chalkak/signatures/local/original/${jUpload}.png"]
+status = 500
+[step.fakes.s3."chalkak/staging/local/signatures/${jUpload}.png"]
+status = 500

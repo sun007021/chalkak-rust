@@ -21,6 +21,15 @@ x-postgres: &postgres
     dockerfile: postgres.Dockerfile
   # 공식 이미지의 root 진입점이 만든 세마포어를 postgres 사용자가 열지 못해 libfaketime이 실패한다.
   user: postgres
+  # SQL 목록 수집(harness/scripts/collect-sql.sh)용. 확장은 컨테이너를 새로 만들 때부터 적재된다.
+  command:
+    - postgres
+    - -c
+    - shared_preload_libraries=pg_stat_statements
+    - -c
+    - pg_stat_statements.track=all
+    - -c
+    - pg_stat_statements.max=10000
   volumes:
     - ./harness/out:/clock:ro
   healthcheck:
@@ -59,6 +68,28 @@ x-java-env: &java-env
   <<: *faketime
 
 services:
+  # 가짜 외부 서버(OIDC JWKS, Apple 토큰 교환·철회, S3 HeadObject, Slack Webhook). 세 대상이 함께 쓴다.
+  # 시나리오는 하나씩 순서대로 돌므로 시나리오마다 초기화하는 한 프로세스를 공유해도 섞이지 않는다.
+  # 호스트에서 cargo build 한 바이너리를 쓰려면 harness/compose.fakes-local.yaml을 겹친다(up.sh의 FAKES_LOCAL=1).
+  fakes:
+    image: chalkak/fakes:dev
+    build:
+      context: .
+      dockerfile: docker/fakes.Dockerfile
+    environment:
+      FAKES_ADDR: 0.0.0.0:9000
+      FAKES_S3_BUCKET: test-bucket
+    ports: ["19000:9000"]
+    networks:
+      default:
+        # S3 가상 호스트 방식 주소(<버킷>.<엔드포인트 호스트>)가 이 컨테이너로 풀리게 한다.
+        aliases: [test-bucket.fakes]
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /__admin/health HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q UP <&3"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
   # Java oracle — 원본 Spring 서버(기준 커밋)
   pg-java-a:
     <<: *postgres
@@ -76,6 +107,7 @@ services:
     ports: ["18080:8080"]
     depends_on:
       pg-java-a: { condition: service_healthy }
+      fakes: { condition: service_healthy }
 
   # 두 번째 Java — 하네스 자체의 결정성 확인용(Java 대 Java)
   pg-java-b:
@@ -96,6 +128,7 @@ services:
     ports: ["18081:8080"]
     depends_on:
       pg-java-b: { condition: service_healthy }
+      fakes: { condition: service_healthy }
 
   # Rust candidate. 개발 중에는 pg-rust만 띄우고 호스트에서 cargo run으로 붙어도 된다.
   pg-rust:
@@ -126,6 +159,7 @@ services:
     ports: ["18082:8080"]
     depends_on:
       pg-rust: { condition: service_healthy }
+      fakes: { condition: service_healthy }
     healthcheck:
       test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /actuator/health HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q UP <&3"]
       interval: 2s

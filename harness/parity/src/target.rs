@@ -15,6 +15,8 @@ pub struct Target {
     pub clock_file: PathBuf,
     /// 액세스 토큰 HS256 비밀키(hex). 앱의 `ACCESS_TOKEN_SECRET`과 같아야 한다.
     pub access_token_secret: String,
+    /// 가짜 외부 서버(`harness/fakes`)의 관리 주소. 외부 연동을 쓰는 시나리오에 필요하다.
+    pub fakes_url: Option<String>,
 }
 
 impl Target {
@@ -39,6 +41,12 @@ impl Target {
         std::fs::rename(&tmp, &self.clock_file).map_err(|e| e.to_string())?;
         settle();
         Ok(())
+    }
+
+    /// 시계 파일을 "+0"(실제 시각)으로 되돌린다. 시나리오 시각으로 옮긴 채 두면 이후 DB를 직접 조회하는 사람이나
+    /// 도구가 `now()`를 과거 시각으로 보게 된다. 실패해도 검증 결과와 무관하므로 무시한다.
+    pub fn reset_clock(&self) {
+        let _ = std::fs::write(&self.clock_file, "+0\n");
     }
 
     pub fn db(&self) -> Result<postgres::Client, String> {

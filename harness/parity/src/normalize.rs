@@ -89,7 +89,33 @@ impl Normalizer {
         if let Some(jwt) = self.jwt(s) {
             return jwt;
         }
-        self.replace_uuids(s)
+        let s = self.presigned(s);
+        self.replace_uuids(&s)
+    }
+
+    /// presigned URL(SigV4 쿼리 서명)의 `X-Amz-Date`와 `X-Amz-Signature`를 바꾼다. 서명 시각은 앱이 응답을 만든 순간이라
+    /// 단계 처리 시간에 따라 초 단위로 달라지고, 서명은 그 시각에 따라 달라진다. 시각은 시나리오 시계 기준 60초 칸의
+    /// 상대값으로, 서명은 길이만 남긴다. 호스트·경로·자격증명 범위·서명 헤더·만료 같은 나머지는 그대로 비교한다.
+    /// 서명 계산 자체는 AWS 공식 테스트 벡터로 따로 검증한다.
+    fn presigned(&self, s: &str) -> String {
+        const DATE: &str = "X-Amz-Date=";
+        const SIG: &str = "X-Amz-Signature=";
+        let mut out = s.to_string();
+        if let Some(at) = out.find(DATE) {
+            let (start, end) = (at + DATE.len(), at + DATE.len() + 16);
+            if let Some(epoch) = out.get(start..end).and_then(amz_date_epoch) {
+                let delta = ((epoch - self.clock) / 60.0).floor() as i64 * 60;
+                out.replace_range(start..end, &format!("<t{delta:+}s amzdate>"));
+            }
+        }
+        if let Some(at) = out.find(SIG) {
+            let start = at + SIG.len();
+            let len = out[start..]
+                .find(|c: char| !c.is_ascii_hexdigit())
+                .unwrap_or(out.len() - start);
+            out.replace_range(start..start + len, &format!("<sigv4 len={len}>"));
+        }
+        out
     }
 
     /// 시나리오 시계와의 차이를 5초 단위로 내림한다. 두 구현이 같은 단계를 처리하는 데 걸린 시간 차(수백 ms)는
@@ -157,6 +183,17 @@ fn fraction_style(s: &str, digits: usize) -> String {
     } else {
         format!("f{digits}")
     }
+}
+
+/// `20261012T000005Z` 형식(SigV4 날짜)을 epoch 초로 바꾼다.
+fn amz_date_epoch(s: &str) -> Option<f64> {
+    let b = s.as_bytes();
+    if b.len() != 16 || b[8] != b'T' || b[15] != b'Z' {
+        return None;
+    }
+    let num = |r: std::ops::Range<usize>| s.get(r)?.parse::<i64>().ok();
+    let days = time::days_from_civil(num(0..4)?, num(4..6)? as u32, num(6..8)? as u32);
+    Some((days * 86_400 + num(9..11)? * 3600 + num(11..13)? * 60 + num(13..15)?) as f64)
 }
 
 fn is_epoch_claim(k: &str) -> bool {
@@ -280,6 +317,21 @@ mod tests {
             n.string("2026-10-12T09:00:00.12345+09:00"),
             "<t+0s db +09:00>"
         );
+    }
+
+    #[test]
+    fn presigned_url의_서명_시각과_서명을_바꾼다() {
+        let mut n = Normalizer::new(CLOCK);
+        let url = "http://b.fakes:9000/k/0199aaaa-0000-7000-8000-000000000001.png?X-Amz-Algorithm=AWS4-HMAC-SHA256\
+                   &X-Amz-Date=20261012T000005Z&X-Amz-Expires=300&X-Amz-Signature=a17659c6d5c876bf";
+        assert_eq!(
+            n.string(url),
+            "http://b.fakes:9000/k/$uuid1.png?X-Amz-Algorithm=AWS4-HMAC-SHA256\
+             &X-Amz-Date=<t+0s amzdate>&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=16>"
+        );
+        // 60초 칸이 바뀌면 드러난다.
+        let later = url.replace("T000005Z", "T000105Z");
+        assert!(n.string(&later).contains("<t+60s amzdate>"));
     }
 
     #[test]

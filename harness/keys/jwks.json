@@ -1,0 +1,12 @@
+{
+  "keys": [
+    {
+      "kty": "RSA",
+      "use": "sig",
+      "alg": "RS256",
+      "kid": "harness-test-key",
+      "n": "nowWd6JbrQiPiW2kseRNR-MiMiu2SpV14PPcYXy0nUiEpwR2SA3nlB2CcAMHEUIEhsMDpUu9ZhnzS7_H3HyvBh1eDNV5QMq09JBzhmLSidAxHIk0hdc5eNGPdN73CwaDUqZAkYtISVxtIeOghqW5svgg3WbnmKHdCCzU-liTE2SuGQgwrXGFUZBJRBMCNg4e_IpwLNLkMO_q-67spMuc1Ug8iyOPZ70RhQyEVGGPYxBmipkBR2Le-hLExsGf99iwBveRWOCqkim7sGDHeHP1R9YoWrBtvQi8Q0m8G4CMscypV0zLJmfU8pBfiXXvwN5NNaCeVoKJwMgBKqFeUCD4AQ",
+      "e": "AQAB"
+    }
+  ]
+}

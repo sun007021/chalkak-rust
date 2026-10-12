@@ -1,0 +1,14 @@
+# compose.yaml에 겹쳐 쓰는 설정: fakes 이미지를 빌드하지 않고, 호스트에서 만든 바이너리를 기존 이미지에 마운트해 실행한다.
+# 컨테이너 안에서 apt·cargo 네트워크를 쓸 수 없는 환경을 위한 경로다.
+#
+#   cargo build --release -p chalkak-fakes
+#   FAKES_LOCAL=1 harness/scripts/up.sh          # 또는 docker compose -f compose.yaml -f harness/compose.fakes-local.yaml ...
+#
+# 상대 경로는 첫 번째 파일(compose.yaml)이 있는 저장소 루트 기준이다.
+services:
+  fakes:
+    image: ${FAKES_BASE_IMAGE:-debian:trixie-slim}
+    pull_policy: never
+    entrypoint: ["/usr/local/bin/chalkak-fakes"]
+    volumes:
+      - ./target/release/chalkak-fakes:/usr/local/bin/chalkak-fakes:ro
