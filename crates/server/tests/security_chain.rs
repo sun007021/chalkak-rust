@@ -307,6 +307,23 @@ fn internal_callback_without_access_token_reaches_controller() {
     assert_eq!(r.status, 200);
 }
 
+// CallbackBodySizeLimitFilterTest#oversizedBody_keepsRequestIdHeader
+#[test]
+fn oversized_body_keeps_request_id_header() {
+    let h = harness();
+    let mut req = Request::new(Method::Post, "/internal/v1/post-images/callback");
+    req.headers.append("Host", "127.0.0.1:18082");
+    req.headers.append("Content-Length", "65537");
+    req.body = vec![b'x'; 65_537];
+    let r = h.chain.handle(req);
+    assert_eq!(r.status, 413);
+    assert_eq!(
+        body(&r),
+        json!({"errorCode": "BUSINESS_ERROR", "message": "이미지 처리 콜백 본문이 너무 큽니다."})
+    );
+    assert!(uuid::Uuid::parse_str(r.headers.get("x-request-id").unwrap()).is_ok());
+}
+
 // SecurityFilterChainTest#health_withoutToken_returnsOk
 #[test]
 fn health_without_token_returns_ok() {

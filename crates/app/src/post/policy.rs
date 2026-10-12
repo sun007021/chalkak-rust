@@ -48,20 +48,20 @@ mod tests {
     }
 
     #[test]
-    fn 제한_시간을_넘기면_시간_초과다() {
+    fn is_processing_timed_out_after_timeout_returns_true() {
         let started = ts("2026-08-20T00:00:00Z");
         assert!(policy().is_processing_timed_out(started, ts("2026-08-20T00:07:01Z")));
     }
 
     #[test]
-    fn 정확히_제한_시간이면_아직_시간_안이다() {
+    fn is_processing_timed_out_at_timeout_returns_false() {
         let started = ts("2026-08-20T00:00:00Z");
         assert!(!policy().is_processing_timed_out(started, ts("2026-08-20T00:07:00Z")));
         assert!(!policy().is_processing_timed_out(started, ts("2026-08-20T00:03:00Z")));
     }
 
     #[test]
-    fn 영_기간은_만들_수_없다() {
+    fn constructor_non_positive_timeout_throws_illegal_argument_exception() {
         assert!(PostProcessingPolicy::new(Duration::ZERO).is_err());
     }
 }

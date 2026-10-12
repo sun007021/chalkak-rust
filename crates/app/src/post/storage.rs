@@ -242,6 +242,39 @@ mod tests {
         );
     }
 
+    // S3PostImageStorageTest#toStagingStorageKey_uploadId_createsPostStagingKey
+    #[test]
+    fn to_staging_storage_key_upload_id_creates_post_staging_key() {
+        assert_eq!(
+            storage(Arc::default()).to_staging_storage_key(UPLOAD_ID),
+            "chalkak/staging/dev/posts/0198f6c1-62ba-7d30-8b12-0f733b6570d4.webp"
+        );
+    }
+
+    // S3PostImageStorageTest#toOriginalStorageKey_uploadId_createsPostOriginalKey
+    #[test]
+    fn to_original_storage_key_upload_id_creates_post_original_key() {
+        assert_eq!(
+            storage(Arc::default()).to_original_storage_key(UPLOAD_ID),
+            "chalkak/posts/dev/original/0198f6c1-62ba-7d30-8b12-0f733b6570d4.webp"
+        );
+    }
+
+    // S3PostImageUploadIssuerTest#issue_prodEnvironment_presignsProdStagingKey
+    #[test]
+    fn issue_prod_environment_presigns_prod_staging_key() {
+        let store = Arc::new(FakeObjectStore::default());
+        let mut settings = image();
+        settings.environment = "prod".to_owned();
+        PostImageStorage::new(store.clone(), settings)
+            .issue(UPLOAD_ID)
+            .unwrap();
+        assert_eq!(
+            store.presigns.lock().unwrap()[0].key,
+            "chalkak/staging/prod/posts/0198f6c1-62ba-7d30-8b12-0f733b6570d4.webp"
+        );
+    }
+
     // S3PostImageStorageTest#existsUploadedImage_*
     #[test]
     fn exists_uploaded_image_reads_the_staging_key() {
@@ -272,7 +305,7 @@ mod tests {
 
     // S3PostImageUploadIssuerTest#issue_*
     #[test]
-    fn issue_signs_a_five_minute_webp_put_for_the_staging_key() {
+    fn issue_dev_environment_presigns_dev_post_upload() {
         let store = Arc::new(FakeObjectStore::default());
         let issued = storage(store.clone()).issue(UPLOAD_ID).unwrap();
         assert_eq!(issued.expires_in_seconds, 300);
@@ -294,7 +327,7 @@ mod tests {
 
     // S3PostImageUploadIssuerTest#issueProcessingUpload_*
     #[test]
-    fn issue_processing_upload_signs_original_and_thumbnail_without_overwrite() {
+    fn issue_processing_upload_presigns_original_and_thumbnail_keys() {
         let store = Arc::new(FakeObjectStore::default());
         let issued = storage(store.clone())
             .issue_processing_upload(UPLOAD_ID)

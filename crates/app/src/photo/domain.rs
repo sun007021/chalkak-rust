@@ -81,6 +81,15 @@ mod tests {
         assert!(photo.metadata.is_empty());
     }
 
+    // PhotoTest#createPhoto_originalStorageKey_createsUnprocessedPhoto
+    #[test]
+    fn create_photo_original_storage_key_creates_unprocessed_photo() {
+        let photo = Photo::create(Some("chalkak/posts/test/original/photo.webp")).unwrap();
+        assert_eq!(photo.thumbnail_storage_key, None);
+        assert!(photo.metadata.is_empty());
+        assert_eq!(photo.deleted_at, None);
+    }
+
     // PhotoTest#createPhoto_blankOriginalStorageKey_throwsBusinessException
     #[test]
     fn create_photo_blank_original_storage_key_throws_business_exception() {

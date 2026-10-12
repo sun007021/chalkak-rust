@@ -422,7 +422,7 @@ mod tests {
 
     // RandomSeedGeneratorTest
     #[test]
-    fn generate_random_seed_returns_eight_lowercase_hex_chars() {
+    fn generate_random_seed_returns_eight_character_hex_string() {
         let seed = generate_random_seed();
         assert_eq!(seed.len(), 8);
         assert!(
