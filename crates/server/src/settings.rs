@@ -11,6 +11,7 @@
 use std::path::PathBuf;
 use std::time::Duration;
 
+use chalkak_app::post::PostSettings;
 use chalkak_core::config::{ConfigError, Env};
 use chalkak_db::DbConfig;
 
@@ -41,6 +42,15 @@ impl Profile {
         }
     }
 
+    /// 프로필 이름(`application-{name}.yml`).
+    pub fn name(self) -> &'static str {
+        match self {
+            Profile::Local => "local",
+            Profile::Dev => "dev",
+            Profile::Prod => "prod",
+        }
+    }
+
     /// JSON 파일 로그를 남기는 프로필(`logback-spring.xml`의 `dev | prod`).
     pub fn writes_json_log_file(self) -> bool {
         matches!(self, Profile::Dev | Profile::Prod)
@@ -61,6 +71,7 @@ pub struct Settings {
     pub admin_development_bypass: bool,
     pub admin_cors_allowed_origins: Vec<String>,
     pub log_file: PathBuf,
+    pub post: PostSettings,
 }
 
 impl Settings {
@@ -82,6 +93,8 @@ impl Settings {
             Profile::Dev | Profile::Prod => false,
         };
 
+        let post = PostSettings::from_env(env, profile.name())?;
+
         Ok(Settings {
             profile,
             port,
@@ -96,6 +109,7 @@ impl Settings {
             log_file: PathBuf::from(
                 env.string_or("CHALKAK_LOGGING_FILE", chalkak_core::log::DEFAULT_LOG_FILE),
             ),
+            post,
         })
     }
 }
@@ -165,6 +179,16 @@ mod tests {
         let mut pairs = vec![
             ("ACCESS_TOKEN_SECRET", "0011"),
             ("ACCESS_TOKEN_EXPIRATION", "15m"),
+            ("CLOUDFRONT_ORIGIN_PATH", "/chalkak"),
+            (
+                "IMAGE_PROCESSOR_CALLBACK_SECRET",
+                "test-callback-secret-with-enough-length",
+            ),
+            ("CALLBACK_MAX_BODY_BYTES", "65536"),
+            ("POST_IMAGE_PROCESSING_TIMEOUT", "7m"),
+            ("S3_BUCKET", "bucket"),
+            ("S3_PREFIX", "chalkak"),
+            ("CLOUDFRONT_BASE_URL", "https://cdn.example.com"),
         ];
         pairs.extend_from_slice(extra);
         Env::from_pairs(pairs)

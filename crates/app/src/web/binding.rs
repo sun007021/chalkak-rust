@@ -174,6 +174,11 @@ pub fn required_date_query(req: &Request, name: &str) -> Result<LocalDate, ApiEr
 pub struct JsonObject(Map<String, Value>);
 
 impl JsonObject {
+    /// 필드의 원본 JSON 값. 문자열 말고 UUID·숫자 필드를 직접 해석해야 하는 DTO가 쓴다.
+    pub fn value(&self, name: &str) -> Option<&Value> {
+        self.0.get(name)
+    }
+
     /// 문자열 필드. 없거나 `null`이면 `None`, 숫자·불리언은 문자열로 바꾸고, 배열·객체는 본문 오류(400).
     pub fn string(&self, name: &str) -> Result<Option<String>, ApiError> {
         match self.0.get(name) {

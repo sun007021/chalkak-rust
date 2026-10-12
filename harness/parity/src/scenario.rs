@@ -110,6 +110,25 @@ pub struct Step {
     pub advance_seconds: Option<i64>,
     /// 이 단계 요청을 보내기 전에 가짜 서버 응답을 덧씌운다(항목 단위로 덮고 s3 키는 합친다).
     pub fakes: Option<FakesSpec>,
+    /// 이미지 처리 콜백 서명 헤더를 붙인다(`/internal/v1/...`). 시각은 단계 시작 시 앱 시각이다.
+    pub callback: Option<CallbackSpec>,
+}
+
+/// 콜백 서명 지정. 필드를 생략하면 올바른 서명(비밀키·audience는 하네스 기본값)이다.
+#[derive(Debug, Clone, Default, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct CallbackSpec {
+    /// 타임스탬프를 앱 시각에서 이 초만큼 옮긴다(음수면 과거).
+    pub timestamp_offset: Option<i64>,
+    pub secret: Option<String>,
+    pub audience: Option<String>,
+    /// 서명 대상 본문을 실제 본문 대신 이 문자열로 한다(본문 변조 시나리오).
+    pub sign_body: Option<String>,
+    /// 서명 헤더 값을 통째로 덮는다.
+    pub signature: Option<String>,
+    /// 보내지 않을 헤더(`timestamp`, `signature`).
+    #[serde(default)]
+    pub omit: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]

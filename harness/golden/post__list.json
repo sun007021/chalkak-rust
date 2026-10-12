@@ -1,0 +1,1601 @@
+{
+  "steps": [
+    {
+      "step": "익명 기본(최신순)",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 최신순 명시",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid2"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 인기순",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid3"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 다른 날짜",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid4"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "randomSeed": null,
+        "posts": [
+          {
+            "id": "$uuid5",
+            "originalImageUrl": "https://cdn.test.chalkak/posts/local/original/p10.webp",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/local/thumbnail/p10.webp",
+            "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/u2/original.png",
+            "signatureThumbnailImageUrl": "https://cdn.test.chalkak/signatures/u2/thumbnail.png",
+            "title": "어제2",
+            "submittedAt": "<t-79200s iso Z>",
+            "likeCount": 0,
+            "isLiked": false,
+            "isMine": false
+          },
+          {
+            "id": "$uuid6",
+            "originalImageUrl": "https://cdn.test.chalkak/posts/local/original/p9.webp",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/local/thumbnail/p9.webp",
+            "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/u1/original.png",
+            "signatureThumbnailImageUrl": "https://cdn.test.chalkak/signatures/u1/thumbnail.png",
+            "title": "어제",
+            "submittedAt": "<t-82800s iso Z>",
+            "likeCount": 1,
+            "isLiked": false,
+            "isMine": false
+          }
+        ]
+      }
+    },
+    {
+      "step": "익명 페이지 크기 2, 첫 페이지",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid7"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 페이지 크기 2, 둘째 페이지",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid8"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 범위를 넘는 페이지",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid9"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 인기순 페이지 크기 1",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid10"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 무작위 시드 고정",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid11"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 무작위 둘째 페이지",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid12"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 시드 길이 부족",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid13"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 시드 허용되지 않는 문자",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid14"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 시드는 무작위순에서만",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid15"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 페이지 크기 0",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid16"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 페이지 크기 101",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid17"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 페이지 크기 100",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid18"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 음수 페이지",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid19"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 정수가 아닌 페이지",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid20"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 정수 앞뒤 공백",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid21"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 16진수 페이지",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid22"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 정수 범위를 넘는 페이지",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid23"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 빈 페이지",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid24"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 잘못된 정렬",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid25"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "sort: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 대문자 정렬",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid26"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 빈 정렬",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid27"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 잘못된 날짜",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid28"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "topicDate: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 미래 날짜",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid29"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "미래 날짜의 게시물은 조회할 수 없습니다."
+      }
+    },
+    {
+      "step": "익명 주제가 없는 날",
+      "status": 404,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid30"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "해당 날짜의 주제를 찾을 수 없습니다."
+      }
+    },
+    {
+      "step": "익명 여러 오류는 첫 필드",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid31"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "topicDate: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "익명 바인딩 오류가 검증보다 먼저",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid32"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "로그인(좋아요 여부 포함) 최신",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid33"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "로그인 인기순",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid34"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "차단된 회원",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid35"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "없는 회원",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid36"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "로그인 무작위",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid37"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "토큰 형식 오류",
+      "status": 401,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "www-authenticate",
+          "Bearer"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid38"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      }
+    }
+  ],
+  "db": {
+    "photos": [
+      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p1.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p1.webp\"}",
+      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p10.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p10.webp\"}",
+      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p11.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p11.webp\"}",
+      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p12.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p12.webp\"}",
+      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p2.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p2.webp\"}",
+      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p3.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p3.webp\"}",
+      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p4.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p4.webp\"}",
+      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p5.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p5.webp\"}",
+      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p6.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p6.webp\"}",
+      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p7.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p7.webp\"}",
+      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p8.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p8.webp\"}",
+      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p9.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p9.webp\"}"
+    ],
+    "post_likes": [
+      "{\"id\":\"$uuid?\",\"post_id\":\"$uuid6\",\"user_id\":\"$uuid?\",\"created_at\":\"<t-60s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"post_id\":\"$uuid?\",\"user_id\":\"$uuid?\",\"created_at\":\"<t-60s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"post_id\":\"$uuid?\",\"user_id\":\"$uuid?\",\"created_at\":\"<t-60s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"post_id\":\"$uuid?\",\"user_id\":\"$uuid?\",\"created_at\":\"<t-60s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"post_id\":\"$uuid?\",\"user_id\":\"$uuid?\",\"created_at\":\"<t-60s db +09:00>\"}"
+    ],
+    "posts": [
+      "{\"id\":\"$uuid5\",\"title\":\"어제2\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-79200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-79200s db +09:00>\",\"moderated_at\":\"<t-79200s db +09:00>\",\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid6\",\"title\":\"어제\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-82800s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-82800s db +09:00>\",\"moderated_at\":\"<t-82800s db +09:00>\",\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid?\",\"title\":\"검증\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-300s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-300s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"VALIDATING\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid?\",\"title\":\"그제\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-169200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-169200s db +09:00>\",\"moderated_at\":\"<t-169200s db +09:00>\",\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid?\",\"title\":\"대기\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-1200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-1200s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid?\",\"title\":\"반려\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-600s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-600s db +09:00>\",\"moderated_at\":\"<t-600s db +09:00>\",\"moderation_status\":\"REJECTED\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid?\",\"title\":\"삭제\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-240s db +09:00>\",\"deleted_at\":\"<t-240s db +09:00>\",\"updated_at\":\"<t-240s db +09:00>\",\"moderated_at\":\"<t-240s db +09:00>\",\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid?\",\"title\":\"셋\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-2400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-2400s db +09:00>\",\"moderated_at\":\"<t-2400s db +09:00>\",\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid?\",\"title\":\"지난달\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-1033200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-1033200s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid?\",\"title\":\"차단\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-1800s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-1800s db +09:00>\",\"moderated_at\":\"<t-1800s db +09:00>\",\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid?\",\"title\":\"하나\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-3600s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-3600s db +09:00>\",\"moderated_at\":\"<t-3600s db +09:00>\",\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid?\",\"title\":null,\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-3000s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-3000s db +09:00>\",\"moderated_at\":\"<t-3000s db +09:00>\",\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}"
+    ],
+    "topics": [
+      "{\"id\":\"$uuid?\",\"title\":\"그제\",\"ends_at\":\"<t-118800s db +09:00>\",\"starts_at\":\"<t-205200s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-10\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"title\":\"어제\",\"ends_at\":\"<t-32400s db +09:00>\",\"starts_at\":\"<t-118800s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-11\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"title\":\"오늘\",\"ends_at\":\"<t+54000s db +09:00>\",\"starts_at\":\"<t-32400s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"title\":\"지난달\",\"ends_at\":\"<t-982800s db +09:00>\",\"starts_at\":\"<t-1069200s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-09-30\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ],
+    "users": [
+      "{\"id\":\"$uuid?\",\"email\":\"u1@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u1/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u1/thumbnail.png\"}",
+      "{\"id\":\"$uuid?\",\"email\":\"u2@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u2/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u2/thumbnail.png\"}",
+      "{\"id\":\"$uuid?\",\"email\":\"u3@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u3/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u3/thumbnail.png\"}",
+      "{\"id\":\"$uuid?\",\"email\":\"u4@test.chalkak\",\"status\":\"BANNED\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u4/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u4/thumbnail.png\"}",
+      "{\"id\":\"$uuid?\",\"email\":\"u5@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u5/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u5/thumbnail.png\"}",
+      "{\"id\":\"$uuid?\",\"email\":\"u6@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u6/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u6/thumbnail.png\"}",
+      "{\"id\":\"$uuid?\",\"email\":\"u7@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u7/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u7/thumbnail.png\"}",
+      "{\"id\":\"$uuid?\",\"email\":\"u8@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u8/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u8/thumbnail.png\"}"
+    ]
+  }
+}
