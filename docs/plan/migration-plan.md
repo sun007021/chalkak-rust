@@ -27,7 +27,7 @@
 
 ---
 
-## 2. 결정 필요: "프레임워크 없이 vanilla Rust"의 범위
+## 2. 결정: "프레임워크 없이 vanilla Rust"의 범위 (2026-10-12 B안 확정)
 
 원본이 실제로 필요로 하는 것은 TLS 1.2/1.3 클라이언트(Apple·Google·Kakao·Slack·S3·RDS), PostgreSQL 와이어 프로토콜과 SCRAM 인증, ECDSA P-256 서명·RSA 검증·AES-GCM·HMAC·BCrypt, JSON입니다. 표준 라이브러리에는 이 중 아무것도 없습니다.
 
@@ -55,7 +55,7 @@ B안 허용 목록 초안 (모두 `cargo-deny`로 고정·감사):
 
 `unsafe` 정책: 우리 crate 전부 `#![forbid(unsafe_code)]`. 의존성 내부 `unsafe`는 `cargo-geiger` 보고서로 추적하고 허용 목록 심사 때 함께 본다.
 
-> 이 문서는 답을 받기 전까지 **B안 기준**으로 작성했다.
+> **2026-10-12 sunwook이 B안(기초 crate만 허용)으로 확정했다.** 허용 목록에 crate를 더하려면 이 표를 먼저 갱신한다.
 
 ---
 
@@ -290,7 +290,7 @@ PR마다: `cargo fmt`/`clippy -D warnings`, `forbid(unsafe_code)` 확인, `cargo
 
 ## 9. 바로 다음 작업
 
-1. 2장 의존성 정책 확정.
+1. ~~2장 의존성 정책 확정~~ (B안 확정).
 2. Phase 0 시작: `chalkak-rust`에 workspace·compose·하네스 골격을 만들고, Java oracle을 띄워 topic·플랫폼 공통 시나리오를 녹화.
 3. 테스트 추적표(`java-test-inventory.csv`)를 저장소의 `harness/inventory/`로 옮겨 진척을 CI에서 집계.
 
