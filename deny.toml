@@ -1,0 +1,32 @@
+# cargo-deny 설정. 의존성 정책(B안)의 "금지" 쪽을 기계적으로 막는다.
+# 허용 목록 전체는 docs/plan/migration-plan.md 2장에 있다. 새 직접 의존성은 그 표를 먼저 갱신한다.
+
+[graph]
+all-features = true
+
+[advisories]
+version = 2
+yanked = "deny"
+
+[licenses]
+version = 2
+allow = ["MIT", "Apache-2.0", "Apache-2.0 WITH LLVM-exception", "BSD-2-Clause", "BSD-3-Clause", "ISC", "Unicode-3.0", "Zlib", "CDLA-Permissive-2.0"]
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+deny = [
+    # 웹 프레임워크
+    { crate = "axum" }, { crate = "actix-web" }, { crate = "rocket" }, { crate = "warp" }, { crate = "poem" }, { crate = "tide" },
+    { crate = "salvo" }, { crate = "tower-http" },
+    # 고수준 HTTP 라이브러리 (C안에서만 허용)
+    { crate = "hyper" }, { crate = "reqwest" }, { crate = "ureq" },
+    # ORM·쿼리 매크로
+    { crate = "diesel" }, { crate = "sea-orm" }, { crate = "sqlx" },
+    # AWS SDK (SigV4·IMDSv2는 직접 구현)
+    { crate = "aws-config" }, { crate = "aws-sdk-s3" }, { crate = "aws-smithy-runtime" },
+]
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"

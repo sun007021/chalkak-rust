@@ -1,0 +1,80 @@
+name = "인증 매트릭스: 공개 GET, 회원 전용, 관리자 전용"
+tags = ["platform", "auth"]
+
+# 공개 GET: 익명 또는 회원 토큰만 통과, 관리자 토큰은 거절
+[[step]]
+name = "공개 GET 익명"
+method = "GET"
+path = "/api/v1/topics?date=2026-10-12"
+
+[[step]]
+name = "공개 GET 회원"
+method = "GET"
+path = "/api/v1/topics?date=2026-10-12"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "공개 GET 관리자"
+method = "GET"
+path = "/api/v1/topics?date=2026-10-12"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "공개 GET 만료 토큰"
+method = "GET"
+path = "/api/v1/topics?date=2026-10-12"
+auth = { user = "01990000-0000-7000-8000-000000000001", expires_in = -60 }
+
+[[step]]
+name = "공개 GET 만료 10초 지남(원본 허용 오차 30초, iat보다 exp가 앞섬)"
+method = "GET"
+path = "/api/v1/topics?date=2026-10-12"
+auth = { user = "01990000-0000-7000-8000-000000000001", expires_in = -10 }
+
+[[step]]
+name = "공개 GET 형식 오류 토큰"
+method = "GET"
+path = "/api/v1/topics?date=2026-10-12"
+auth = { raw = "Bearer not-a-jwt" }
+
+[[step]]
+name = "공개 GET Bearer 아닌 스킴"
+method = "GET"
+path = "/api/v1/topics?date=2026-10-12"
+auth = { raw = "Basic dXNlcjpwYXNz" }
+
+[[step]]
+name = "공개 GET 서명 위조"
+method = "GET"
+path = "/api/v1/topics?date=2026-10-12"
+auth = { raw = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ4In0.AAAA" }
+
+# 회원 전용
+[[step]]
+name = "회원 전용 익명"
+method = "GET"
+path = "/api/v1/notifications/unread-status"
+
+[[step]]
+name = "회원 전용 관리자 토큰"
+method = "GET"
+path = "/api/v1/notifications/unread-status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+# 관리자 전용
+[[step]]
+name = "관리자 전용 익명"
+method = "GET"
+path = "/api/v1/admin/feedbacks"
+
+[[step]]
+name = "관리자 전용 회원 토큰"
+method = "GET"
+path = "/api/v1/admin/feedbacks"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "관리자 공개 경로(로그아웃) 익명"
+method = "POST"
+path = "/api/v1/admin/auth/logout"
+body = '{}'

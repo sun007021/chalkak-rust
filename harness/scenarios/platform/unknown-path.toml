@@ -1,0 +1,28 @@
+name = "없는 경로: 인증 전후 응답과 끝 슬래시"
+tags = ["platform"]
+
+[[step]]
+name = "토큰 없이 없는 경로"
+method = "GET"
+path = "/api/v1/does-not-exist"
+
+[[step]]
+name = "회원 토큰으로 없는 경로"
+method = "GET"
+path = "/api/v1/does-not-exist"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "공개 목록 경로 끝 슬래시"
+method = "GET"
+path = "/api/v1/topics/?date=2026-10-12"
+
+[[step]]
+name = "대소문자가 다른 경로"
+method = "GET"
+path = "/API/v1/topics?date=2026-10-12"
+
+[[step]]
+name = "actuator 비공개 경로"
+method = "GET"
+path = "/actuator/env"

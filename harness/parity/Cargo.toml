@@ -1,0 +1,19 @@
+[package]
+name = "chalkak-parity"
+version = "0.0.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+description = "Java(oracle)와 Rust(candidate)에 같은 시나리오를 보내 응답·DB 상태를 비교하는 차등 검증 러너"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+toml.workspace = true
+postgres.workspace = true
+hmac.workspace = true
+sha2.workspace = true
+
+[lints]
+workspace = true

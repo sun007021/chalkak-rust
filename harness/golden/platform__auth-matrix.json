@@ -1,0 +1,611 @@
+{
+  "db": {},
+  "steps": [
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제를 찾을 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 404,
+      "step": "공개 GET 익명"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제를 찾을 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid2"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 404,
+      "step": "공개 GET 회원"
+    },
+    {
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "접근 권한이 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid3"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 403,
+      "step": "공개 GET 관리자"
+    },
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "www-authenticate",
+          "Bearer"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid4"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "공개 GET 만료 토큰"
+    },
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "www-authenticate",
+          "Bearer"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid5"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "공개 GET 만료 10초 지남(원본 허용 오차 30초, iat보다 exp가 앞섬)"
+    },
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "www-authenticate",
+          "Bearer"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid6"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "공개 GET 형식 오류 토큰"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제를 찾을 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid7"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 404,
+      "step": "공개 GET Bearer 아닌 스킴"
+    },
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "www-authenticate",
+          "Bearer"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid8"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "공개 GET 서명 위조"
+    },
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "www-authenticate",
+          "Bearer"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid9"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "회원 전용 익명"
+    },
+    {
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "접근 권한이 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid10"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 403,
+      "step": "회원 전용 관리자 토큰"
+    },
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "www-authenticate",
+          "Bearer"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid11"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "관리자 전용 익명"
+    },
+    {
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "접근 권한이 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid12"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 403,
+      "step": "관리자 전용 회원 토큰"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "리프레시 토큰은 필수입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid13"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "관리자 공개 경로(로그아웃) 익명"
+    }
+  ]
+}

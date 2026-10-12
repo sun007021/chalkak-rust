@@ -1,0 +1,26 @@
+name = "관리자 웹 CORS"
+tags = ["platform", "admin"]
+
+[[step]]
+name = "허용 Origin preflight"
+method = "OPTIONS"
+path = "/api/v1/admin/topics"
+headers = { "Origin" = "http://localhost:3000", "Access-Control-Request-Method" = "PUT", "Access-Control-Request-Headers" = "authorization,content-type" }
+
+[[step]]
+name = "허용하지 않는 Origin preflight"
+method = "OPTIONS"
+path = "/api/v1/admin/topics"
+headers = { "Origin" = "https://evil.example", "Access-Control-Request-Method" = "GET" }
+
+[[step]]
+name = "허용 Origin 실제 요청(인증 실패)"
+method = "GET"
+path = "/api/v1/admin/topics"
+headers = { "Origin" = "http://localhost:3000" }
+
+[[step]]
+name = "회원 API에 Origin"
+method = "GET"
+path = "/api/v1/topics?date=2026-10-12"
+headers = { "Origin" = "http://localhost:3000" }

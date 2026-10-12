@@ -1,0 +1,182 @@
+{
+  "db": {},
+  "steps": [
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "www-authenticate",
+          "Bearer"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "토큰 없이 DELETE 공개 경로"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "지원하지 않는 요청 방식이거나 형식입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid2"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 405,
+      "step": "회원 토큰으로 DELETE 공개 경로"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "www-authenticate",
+          "Bearer"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid3"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "HEAD 공개 경로"
+    },
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "www-authenticate",
+          "Bearer"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid4"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "OPTIONS 공개 경로(Origin 없음)"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+name = "헬스체크와 info"
+tags = ["platform"]
+
+[[step]]
+name = "health"
+method = "GET"
+path = "/actuator/health"
+
+[[step]]
+name = "info"
+method = "GET"
+path = "/actuator/info"

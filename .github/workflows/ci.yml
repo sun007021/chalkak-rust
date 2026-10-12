@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.97.0
+        with:
+          components: rustfmt, clippy
+      - run: cargo fmt --all --check
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+      - run: cargo test --workspace
+      - name: 원본 마이그레이션 SQL과 바이트 동일성
+        run: |
+          git clone --filter=blob:none --no-checkout https://github.com/woowacourse-teams/2026-Chalkak.git /tmp/origin
+          git -C /tmp/origin checkout "$(cat harness/BASELINE)" -- backend/src/main/resources/db/migration
+          diff -r /tmp/origin/backend/src/main/resources/db/migration migrations
+      - uses: EmbarkStudios/cargo-deny-action@v2

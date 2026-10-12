@@ -1,0 +1,14 @@
+name = "주제: 삭제된 주제는 조회되지 않는다"
+tags = ["topic"]
+clock = "2026-10-12T09:00:00+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO topics (id, title, topic_date, starts_at, ends_at, deleted_at) VALUES
+  ('01990000-0000-7000-8000-0000000000f1', '삭제된 주제', '2026-10-12', '2026-10-12T00:00:00+09:00', '2026-10-13T00:00:00+09:00', '2026-10-12T08:00:00+09:00')
+"""]
+
+[[step]]
+name = "삭제된 주제의 날짜"
+method = "GET"
+path = "/api/v1/topics?date=2026-10-12"

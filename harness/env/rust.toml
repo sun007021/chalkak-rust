@@ -1,0 +1,5 @@
+name = "rust"
+base_url = "http://127.0.0.1:18082"
+db_url = "host=127.0.0.1 port=15434 user=chalkak password=test-password dbname=chalkak"
+clock_file = "harness/out/clock-rust"
+access_token_secret = "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210"

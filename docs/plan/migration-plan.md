@@ -14,7 +14,7 @@
 | 스택 | Java 25, Spring Boot 4.1, Spring MVC(Tomcat), JPA/Hibernate, Flyway, Spring Security(OAuth2 Resource Server), AWS SDK v2(S3), Jackson 3 | `backend/build.gradle.kts` |
 | 운영 코드 | Java 456개 파일, 약 20,600줄 | `src/main` |
 | 테스트 코드 | 192개 파일, 약 36,100줄, 테스트 메서드 1,200개 | `src/test` |
-| HTTP API | 51개 (+ `/actuator/health`, `/actuator/info`, dev 전용 Swagger) | [endpoints.csv](endpoints.csv) |
+| HTTP API | 51개 (+ `/actuator/health`, `/actuator/info`, dev 전용 Swagger) | [endpoints.csv](../../harness/inventory/endpoints.csv) |
 | 도메인 | auth, user(사인), topic, post(이미지 업로드·콜백), like, feedback, notification(알림함·Slack), admin, photo | 패키지 구조 |
 | DB | PostgreSQL 18.4, Flyway 마이그레이션 28개, JPQL `@Query` 60개, 비관적 락 9곳, advisory lock 1곳 | `db/migration`, `*JpaRepository` |
 | 주기 작업 | 리프레시 토큰 정리(04:30), 가입 토큰 정리(04:40), 알림 정리(04:50), Apple 임시 인증 정리(매시), 런타임 스냅샷 로그(1분) — 모두 Asia/Seoul | `@Scheduled` 5곳 |
@@ -24,7 +24,7 @@
 | 배포(이 프로젝트) | 학습용. 원본 서비스를 교체하지 않고 로컬과 별도 AWS 계정에 private하게 배포 | 2026-10-12 sunwook |
 | 로그 | dev·prod는 logstash 형식 JSON 파일 → CloudWatch Agent, 대시보드가 필드명에 의존 | `logback-spring.xml`, `deploy/monitoring` |
 
-테스트 1,200개의 구성: Spring+DB 통합 476, 단위 438, 웹 슬라이스(MockMvc) 209, JPA 슬라이스 74, 아키텍처 3. 대부분 Spring에 묶여 있어 그대로 옮길 수 없으므로, **테스트 케이스(검증 의도)를 이식하고 Spring 결합부는 블랙박스 시나리오로 대체**한다([java-test-inventory.csv](java-test-inventory.csv)).
+테스트 1,200개의 구성: Spring+DB 통합 476, 단위 438, 웹 슬라이스(MockMvc) 209, JPA 슬라이스 74, 아키텍처 3. 대부분 Spring에 묶여 있어 그대로 옮길 수 없으므로, **테스트 케이스(검증 의도)를 이식하고 Spring 결합부는 블랙박스 시나리오로 대체**한다([java-test-inventory.csv](../../harness/inventory/java-test-inventory.csv)).
 
 ---
 
@@ -165,7 +165,7 @@ chalkak-rust/
 
 | 출처 | 내용 | 기대 규모 |
 | --- | --- | --- |
-| ① Java 테스트 이식 | 1,200개 테스트의 의도를 옮긴다. 웹·통합 테스트(685개)는 블랙박스 시나리오로, 도메인·단위 테스트(438개)는 Rust 단위 테스트로, JPA 슬라이스(74개)는 리포지토리 통합 테스트로. Spring 내부 구현만 검사하는 것은 근거를 남기고 제외 | [java-test-inventory.csv](java-test-inventory.csv)의 모든 행이 `rust_target`과 `status`를 갖는다 |
+| ① Java 테스트 이식 | 1,200개 테스트의 의도를 옮긴다. 웹·통합 테스트(685개)는 블랙박스 시나리오로, 도메인·단위 테스트(438개)는 Rust 단위 테스트로, JPA 슬라이스(74개)는 리포지토리 통합 테스트로. Spring 내부 구현만 검사하는 것은 근거를 남기고 제외 | [java-test-inventory.csv](../../harness/inventory/java-test-inventory.csv)의 모든 행이 `rust_target`과 `status`를 갖는다 |
 | ② 비즈니스 규칙 문서 | `docs/business-rules/rules/*.md` 8개 도메인의 규칙 ID마다 최소 1개 시나리오 | 규칙 ID → 시나리오 추적표 |
 | ③ 엔드포인트 매트릭스 | 51개 API × (토큰 없음 / 회원 / 관리자 / 만료 / 위조 / 다른 용도 토큰) × (정상 / 각 필드 누락·빈 값·형식 오류·경계값) | 자동 생성 |
 | ④ 생성형 차등 퍼징 | OpenAPI 스키마로 무작위 요청을 만들어 Java와 Rust에 동시에 보내 차이를 찾는다. 차이가 나면 최소 재현 케이스로 줄여 시나리오로 승격 | CI 야간 실행 |
@@ -225,6 +225,7 @@ PR마다: `cargo fmt`/`clippy -D warnings`, `forbid(unsafe_code)` 확인, `cargo
 - Java oracle에서 SQL 목록과 OpenAPI 문서 수집.
 - 시나리오 1차분: 플랫폼 공통(404/405/잘못된 JSON/인증 매트릭스/CORS/헬스) + topic.
 - **완료 조건:** Java를 Java와 비교했을 때 모든 시나리오가 통과한다(정규화 규칙의 거짓 양성 0). 같은 시나리오를 두 번 돌려 결과가 같다(결정성 확인).
+- **진행 상황(2026-10-12):** 러너·정규화·비교기, 시계 고정 기동 스크립트, 플랫폼 공통 6개·topic 4개 시나리오 완료. Java 대 Java 2회 연속 10/10 통과, golden 녹화 완료. 남은 것: 가짜 외부 서버(OIDC·Apple·Slack·S3), SQL 목록·OpenAPI 수집, 시나리오 확대. 세부는 `harness/README.md`.
 
 ### Phase 1. 플랫폼 계층
 - HTTP 서버·라우터·미들웨어, JSON, 오류 모델, 설정 로더, JSON 로그·requestId, DB 풀·트랜잭션, Flyway 호환 마이그레이터, Clock, 스케줄러, 보안 헤더, CORS, 인증 미들웨어, 본문 상한, graceful shutdown, 헬스·info.
@@ -298,5 +299,5 @@ PR마다: `cargo fmt`/`clippy -D warnings`, `forbid(unsafe_code)` 확인, `cargo
 
 ## 부록
 
-- [endpoints.csv](endpoints.csv): 51개 API의 도메인, 메서드, 경로, 핸들러, 인증 수준 (원본 소스에서 자동 추출)
-- [java-test-inventory.csv](java-test-inventory.csv): Java 테스트 1,200개의 파일, 메서드, `@DisplayName`, 계층, 이식 대상·상태 (원본 소스에서 자동 추출)
+- [endpoints.csv](../../harness/inventory/endpoints.csv): 51개 API의 도메인, 메서드, 경로, 핸들러, 인증 수준 (원본 소스에서 자동 추출)
+- [java-test-inventory.csv](../../harness/inventory/java-test-inventory.csv): Java 테스트 1,200개의 파일, 메서드, `@DisplayName`, 계층, 이식 대상·상태 (원본 소스에서 자동 추출)

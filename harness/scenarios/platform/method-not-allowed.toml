@@ -1,0 +1,23 @@
+name = "지원하지 않는 메서드"
+tags = ["platform"]
+
+[[step]]
+name = "토큰 없이 DELETE 공개 경로"
+method = "DELETE"
+path = "/api/v1/topics"
+
+[[step]]
+name = "회원 토큰으로 DELETE 공개 경로"
+method = "DELETE"
+path = "/api/v1/topics"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "HEAD 공개 경로"
+method = "HEAD"
+path = "/api/v1/topics?date=2026-10-12"
+
+[[step]]
+name = "OPTIONS 공개 경로(Origin 없음)"
+method = "OPTIONS"
+path = "/api/v1/topics"

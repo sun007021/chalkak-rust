@@ -1,0 +1,51 @@
+name = "주제: 날짜로 조회와 진행 단계"
+tags = ["topic"]
+clock = "2026-10-12T09:00:00+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO topics (id, title, topic_date, starts_at, ends_at) VALUES
+  ('01990000-0000-7000-8000-0000000000f1', '가을 하늘', '2026-10-12', '2026-10-12T00:00:00+09:00', '2026-10-13T00:00:00+09:00'),
+  ('01990000-0000-7000-8000-0000000000f2', '어제의 주제', '2026-10-11', '2026-10-11T00:00:00+09:00', '2026-10-12T00:00:00+09:00'),
+  ('01990000-0000-7000-8000-0000000000f3', '오후에 열리는 주제', '2026-10-10', '2026-10-10T12:00:00+09:00', '2026-10-10T18:00:00+09:00')
+"""]
+
+[[step]]
+name = "오늘(진행 중)"
+method = "GET"
+path = "/api/v1/topics?date=2026-10-12"
+
+[[step]]
+name = "어제(마감)"
+method = "GET"
+path = "/api/v1/topics?date=2026-10-11"
+
+[[step]]
+name = "주제 없는 날"
+method = "GET"
+path = "/api/v1/topics?date=2026-10-01"
+
+[[step]]
+name = "미래 날짜"
+method = "GET"
+path = "/api/v1/topics?date=2026-10-13"
+
+[[step]]
+name = "날짜 누락"
+method = "GET"
+path = "/api/v1/topics"
+
+[[step]]
+name = "잘못된 날짜 형식"
+method = "GET"
+path = "/api/v1/topics?date=20261012"
+
+[[step]]
+name = "없는 날짜"
+method = "GET"
+path = "/api/v1/topics?date=2026-02-30"
+
+[[step]]
+name = "빈 날짜"
+method = "GET"
+path = "/api/v1/topics?date="

@@ -1,0 +1,26 @@
+name = "주제: 열리기 전 단계와 시각 이동"
+tags = ["topic", "time"]
+clock = "2026-10-12T08:59:50+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO topics (id, title, topic_date, starts_at, ends_at) VALUES
+  ('01990000-0000-7000-8000-0000000000f1', '9시에 열리는 주제', '2026-10-12', '2026-10-12T09:00:00+09:00', '2026-10-12T21:00:00+09:00')
+"""]
+
+[[step]]
+name = "열리기 전"
+method = "GET"
+path = "/api/v1/topics?date=2026-10-12"
+advance_seconds = 20
+
+[[step]]
+name = "20초 뒤 열림"
+method = "GET"
+path = "/api/v1/topics?date=2026-10-12"
+advance_seconds = 43200
+
+[[step]]
+name = "12시간 뒤 마감"
+method = "GET"
+path = "/api/v1/topics?date=2026-10-12"

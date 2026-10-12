@@ -1,0 +1,227 @@
+{
+  "db": {},
+  "steps": [
+    {
+      "body": "",
+      "headers": [
+        [
+          "access-control-allow-headers",
+          "authorization, content-type"
+        ],
+        [
+          "access-control-allow-methods",
+          "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+        ],
+        [
+          "access-control-allow-origin",
+          "http://localhost:3000"
+        ],
+        [
+          "access-control-expose-headers",
+          "X-Request-Id"
+        ],
+        [
+          "access-control-max-age",
+          "3600"
+        ],
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "허용 Origin preflight"
+    },
+    {
+      "body": "Invalid CORS request",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid2"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 403,
+      "step": "허용하지 않는 Origin preflight"
+    },
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "access-control-allow-origin",
+          "http://localhost:3000"
+        ],
+        [
+          "access-control-expose-headers",
+          "X-Request-Id"
+        ],
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "www-authenticate",
+          "Bearer"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid3"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "허용 Origin 실제 요청(인증 실패)"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제를 찾을 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid4"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 404,
+      "step": "회원 API에 Origin"
+    }
+  ]
+}
