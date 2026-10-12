@@ -1,0 +1,27 @@
+query,calls,rows
+delete from apple_authorizations where id=$1,1,1
+delete from pending_apple_authorizations where id=$1,1,1
+delete from social_accounts where id=$1,1,1
+"insert into apple_authorizations (created_at,encrypted_refresh_token,social_account_id,updated_at) values ($1,$2,$3,$4) returning id",1,1
+"INSERT INTO consumed_signup_tokens (jti, expires_at) VALUES ($1, $2) ON CONFLICT (jti) DO NOTHING",12,12
+"insert into feedbacks (content,created_at,user_id) values ($1,$2,$3) returning id",2,2
+"insert into pending_apple_authorizations (created_at,encrypted_refresh_token,expires_at,subject_hmac) values ($1,$2,$3,$4) returning id",3,3
+"insert into social_accounts (created_at,provider,subject_hmac,user_id) values ($1,$2,$3,$4) returning id",6,6
+"insert into user_refresh_tokens (absolute_expires_at,created_at,expires_at,revoked_at,rotated_at,session_id,token_hash,user_id) values ($1,$2,$3,$4,$5,$6,$7,$8) returning id",9,9
+"insert into users (app_version,created_at,deleted_at,email,pending_signature_upload_id,signature_original_storage_key,signature_processing_started_at,signature_processing_status,signature_thumbnail_storage_key,status,updated_at) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) returning id",6,6
+"select aa1_0.id,aa1_0.created_at,aa1_0.encrypted_refresh_token,aa1_0.social_account_id,aa1_0.updated_at from apple_authorizations aa1_0 where aa1_0.social_account_id=$1",4,4
+select distinct urt1_0.session_id from user_refresh_tokens urt1_0 where urt1_0.user_id=$1 and urt1_0.revoked_at is null order by urt1_0.session_id,1,1
+"select paa1_0.id,paa1_0.created_at,paa1_0.encrypted_refresh_token,paa1_0.expires_at,paa1_0.subject_hmac from pending_apple_authorizations paa1_0 where paa1_0.subject_hmac=$1 and paa1_0.expires_at>$2 order by paa1_0.created_at desc,paa1_0.id desc fetch first $3 rows only for no key update of paa1_0",13,3
+SELECT pg_advisory_xact_lock(hashtext(CAST($1 AS text))),3,3
+"select sa1_0.id,sa1_0.created_at,sa1_0.provider,sa1_0.subject_hmac,sa1_0.user_id from social_accounts sa1_0 where sa1_0.user_id=$1",4,4
+"select sa1_0.id,sa1_0.created_at,sa1_0.provider,sa1_0.subject_hmac,sa1_0.user_id,u1_0.id,u1_0.app_version,u1_0.created_at,u1_0.deleted_at,u1_0.email,u1_0.pending_signature_upload_id,u1_0.signature_original_storage_key,u1_0.signature_processing_started_at,u1_0.signature_processing_status,u1_0.signature_thumbnail_storage_key,u1_0.status,u1_0.updated_at from social_accounts sa1_0 join users u1_0 on u1_0.id=sa1_0.user_id where sa1_0.provider=$1 and sa1_0.subject_hmac=$2",35,3
+"select t1_0.id,t1_0.created_at,t1_0.deleted_at,t1_0.ends_at,t1_0.starts_at,t1_0.title,t1_0.topic_date,t1_0.updated_at from topics t1_0 where t1_0.topic_date=$1 and t1_0.deleted_at is null",13,7
+select u1_0.id from users u1_0 where u1_0.signature_original_storage_key=$1 fetch first $2 rows only,12,0
+"select u1_0.id,u1_0.app_version,u1_0.created_at,u1_0.deleted_at,u1_0.email,u1_0.pending_signature_upload_id,u1_0.signature_original_storage_key,u1_0.signature_processing_started_at,u1_0.signature_processing_status,u1_0.signature_thumbnail_storage_key,u1_0.status,u1_0.updated_at from users u1_0 where u1_0.id=$1",5,5
+"select u1_0.id,u1_0.app_version,u1_0.created_at,u1_0.deleted_at,u1_0.email,u1_0.pending_signature_upload_id,u1_0.signature_original_storage_key,u1_0.signature_processing_started_at,u1_0.signature_processing_status,u1_0.signature_thumbnail_storage_key,u1_0.status,u1_0.updated_at from users u1_0 where u1_0.id=$1 and u1_0.deleted_at is null",1,1
+"select urt1_0.id,urt1_0.absolute_expires_at,urt1_0.created_at,urt1_0.expires_at,urt1_0.revoked_at,urt1_0.rotated_at,urt1_0.session_id,urt1_0.token_hash,urt1_0.user_id from user_refresh_tokens urt1_0 where urt1_0.token_hash=$1",2,2
+select urt1_0.session_id from user_refresh_tokens urt1_0 where urt1_0.token_hash=$1,2,2
+"update user_refresh_tokens set revoked_at=$1,rotated_at=$2 where id=$3",1,1
+update user_refresh_tokens urt1_0 set revoked_at=$1 where urt1_0.session_id=$2 and urt1_0.revoked_at is null,1,2
+update user_refresh_tokens urt1_0 set revoked_at=$1 where urt1_0.user_id=$2 and urt1_0.revoked_at is null,1,1
+"update users set app_version=$1,deleted_at=$2,email=$3,pending_signature_upload_id=$4,signature_original_storage_key=$5,signature_processing_started_at=$6,signature_processing_status=$7,signature_thumbnail_storage_key=$8,status=$9,updated_at=$10 where id=$11",1,1
