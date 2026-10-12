@@ -158,6 +158,47 @@ impl User {
         Ok(())
     }
 
+    /// 활성 회원을 차단한다(`ban`).
+    pub fn ban(&mut self) -> Result<(), AppError> {
+        self.validate_status_change_allowed()?;
+        if self.status == UserStatus::Banned {
+            return Err(AppError::business(
+                ErrorCode::RESOURCE_STATE_CHANGED,
+                "이미 차단된 회원입니다.",
+            ));
+        }
+        self.status = UserStatus::Banned;
+        Ok(())
+    }
+
+    /// 차단된 회원을 해제한다(`unban`).
+    pub fn unban(&mut self) -> Result<(), AppError> {
+        self.validate_status_change_allowed()?;
+        if self.status == UserStatus::Active {
+            return Err(AppError::business(
+                ErrorCode::RESOURCE_STATE_CHANGED,
+                "이미 활성 상태인 회원입니다.",
+            ));
+        }
+        self.status = UserStatus::Active;
+        Ok(())
+    }
+
+    /// 탈퇴하지 않았고 정지되지도 않아 서비스를 정상적으로 이용할 수 있는가(`isActive`).
+    pub fn is_active(&self) -> bool {
+        !self.is_deleted() && self.status == UserStatus::Active
+    }
+
+    fn validate_status_change_allowed(&self) -> Result<(), AppError> {
+        if self.is_deleted() {
+            return Err(AppError::business(
+                ErrorCode::BUSINESS_ERROR,
+                "탈퇴한 회원의 상태를 변경할 수 없습니다.",
+            ));
+        }
+        Ok(())
+    }
+
     pub fn start_signature_processing(
         &mut self,
         upload_id: Uuid,
@@ -249,44 +290,62 @@ impl User {
 mod tests {
     use super::*;
 
-    fn keys() -> SignatureStorageKeys {
-        SignatureStorageKeys {
-            original: "chalkak/signatures/test/original/a.png".into(),
-            thumbnail: "chalkak/signatures/test/thumbnail/a.png".into(),
-        }
+    // UserFixture.create(id): 저장 없이 검증하는 도메인 테스트는 id를 직접 넣는다.
+    fn fixture(id: Uuid) -> User {
+        let unique = id.to_string();
+        let mut user = User::create(
+            Some(format!("user-{unique}@chalkak.test")),
+            &SignatureStorageKeys {
+                original: format!("signatures/{unique}"),
+                thumbnail: format!("thumbnails/{unique}"),
+            },
+        )
+        .unwrap();
+        user.id = id;
+        user
     }
 
-    fn user() -> User {
-        let mut u = User::create(Some("a@b.c".into()), &keys()).unwrap();
-        u.id = Uuid::parse_str("0190f3a2-7b1c-7d2e-8f4a-123456789abc").unwrap();
-        u
+    fn fixture_banned(id: Uuid) -> User {
+        let mut user = fixture(id);
+        user.status = UserStatus::Banned;
+        user
     }
 
-    fn ts(s: &str) -> Timestamp {
-        s.parse().unwrap()
+    fn now() -> Timestamp {
+        "2026-08-24T10:00:00Z".parse().unwrap()
     }
 
-    // UserTest#create
+    // UserTest
     #[test]
-    fn 회원을_만들면_활성이고_썸네일이_있다() {
-        let u = user();
-        assert_eq!(u.status, UserStatus::Active);
+    fn create_without_email_creates_active_user_with_signature() {
+        let keys = SignatureStorageKeys {
+            original: "chalkak/signatures/dev/original/signature.png".into(),
+            thumbnail: "chalkak/signatures/dev/thumbnail/signature.png".into(),
+        };
+
+        let user = User::create(None, &keys).unwrap();
+
+        assert_eq!(user.email, None);
+        assert_eq!(user.status, UserStatus::Active);
+        assert_eq!(user.signature_original_storage_key, keys.original);
         assert_eq!(
-            u.signature_thumbnail_storage_key.as_deref(),
-            Some("chalkak/signatures/test/thumbnail/a.png")
+            user.signature_thumbnail_storage_key.as_deref(),
+            Some(keys.thumbnail.as_str())
         );
-        assert!(u.signature_processing_status.is_none());
-        assert!(!u.is_deleted());
+        assert_eq!(user.pending_signature_upload_id, None);
+        assert_eq!(user.signature_processing_status, None);
+        assert_eq!(user.signature_processing_started_at, None);
     }
 
     #[test]
-    fn 저장_키가_비어_있으면_만들_수_없다() {
-        for (o, t) in [("", "t"), ("o", " "), ("\n", "t")] {
+    fn create_missing_original_storage_key_throws_exception() {
+        // 원본은 null 키도 막지만 Rust에서는 빈 문자열과 공백으로 같은 분기를 확인한다.
+        for original in ["", "  ", "\n"] {
             let err = User::create(
-                None,
+                Some("user@chalkak.test".into()),
                 &SignatureStorageKeys {
-                    original: o.into(),
-                    thumbnail: t.into(),
+                    original: original.into(),
+                    thumbnail: "chalkak/signatures/dev/thumbnail/signature.png".into(),
                 },
             )
             .unwrap_err();
@@ -294,143 +353,392 @@ mod tests {
         }
     }
 
-    // UserTest#withdraw
     #[test]
-    fn 탈퇴하면_개인_정보를_지우고_처리_상태를_비운다() {
-        let mut u = user();
-        u.start_signature_processing(Uuid::new_v4(), ts("2026-01-01T00:00:00Z"))
+    fn withdraw_active_user_anonymizes_personal_data() {
+        let id = Uuid::new_v4();
+        let mut user = fixture(id);
+        user.start_signature_processing(Uuid::new_v4(), now())
             .unwrap();
-        u.withdraw(ts("2026-02-01T00:00:00Z")).unwrap();
+
+        user.withdraw(now()).unwrap();
+
         assert_eq!(
-            u.email.as_deref(),
-            Some("withdrawn+0190f3a2-7b1c-7d2e-8f4a-123456789abc@chalkak.invalid")
+            user.email.as_deref(),
+            Some(format!("withdrawn+{id}@chalkak.invalid").as_str())
         );
         assert_eq!(
-            u.signature_original_storage_key,
-            "withdrawn/0190f3a2-7b1c-7d2e-8f4a-123456789abc"
+            user.signature_original_storage_key,
+            format!("withdrawn/{id}")
         );
-        assert_eq!(u.signature_thumbnail_storage_key, None);
-        assert_eq!(u.pending_signature_upload_id, None);
-        assert_eq!(u.signature_processing_status, None);
-        assert_eq!(u.signature_processing_started_at, None);
-        assert_eq!(u.deleted_at, Some(ts("2026-02-01T00:00:00Z")));
-        let err = u.withdraw(ts("2026-03-01T00:00:00Z")).unwrap_err();
+        assert_eq!(user.signature_thumbnail_storage_key, None);
+        assert_eq!(user.pending_signature_upload_id, None);
+        assert_eq!(user.signature_processing_status, None);
+        assert_eq!(user.signature_processing_started_at, None);
+    }
+
+    #[test]
+    fn withdraw_active_user_records_deleted_at() {
+        let mut user = fixture(Uuid::new_v4());
+
+        user.withdraw(now()).unwrap();
+
+        assert!(user.is_deleted());
+        assert_eq!(user.deleted_at, Some(now()));
+    }
+
+    #[test]
+    fn withdraw_already_withdrawn_user_throws_exception() {
+        let mut user = fixture(Uuid::new_v4());
+        user.withdraw(now()).unwrap();
+
+        let err = user.withdraw(now()).unwrap_err();
+
         assert_eq!(err.message, "이미 탈퇴한 회원입니다.");
     }
 
-    // UserTest#startSignatureProcessing 등
     #[test]
-    fn 사인_처리는_시작_완료_실패_취소를_따른다() {
-        let upload = Uuid::new_v4();
-        let other = Uuid::new_v4();
-        let new_keys = SignatureStorageKeys {
-            original: "n/o.png".into(),
-            thumbnail: "n/t.png".into(),
-        };
-        let mut u = user();
-        u.start_signature_processing(upload, ts("2026-01-01T00:00:00Z"))
-            .unwrap();
-        assert!(u.is_signature_processing(upload));
-        assert!(!u.is_signature_processing(other));
-        assert!(!u.fail_signature_processing(other));
-        assert!(!u.complete_signature_processing(other, &new_keys).unwrap());
-
-        assert!(u.complete_signature_processing(upload, &new_keys).unwrap());
-        assert_eq!(u.signature_original_storage_key, "n/o.png");
-        assert_eq!(
-            u.signature_thumbnail_storage_key.as_deref(),
-            Some("n/t.png")
-        );
-        assert_eq!(u.pending_signature_upload_id, None);
-
-        u.start_signature_processing(upload, ts("2026-01-01T00:00:00Z"))
-            .unwrap();
-        assert!(u.fail_signature_processing(upload));
-        assert!(u.is_signature_processing_failed(upload));
-        assert!(!u.is_signature_processing(upload));
-        assert!(
-            !u.fail_signature_processing(upload),
-            "실패한 처리는 다시 실패시키지 않는다"
-        );
-
-        u.cancel_signature_processing();
-        assert!(!u.is_signature_processing_failed(upload));
+    fn is_deleted_active_user_returns_false() {
+        assert!(!fixture(Uuid::new_v4()).is_deleted());
     }
 
     #[test]
-    fn 탈퇴한_회원은_처리를_시작할_수_없다() {
-        let mut u = user();
-        u.withdraw(ts("2026-02-01T00:00:00Z")).unwrap();
-        let err = u
-            .start_signature_processing(Uuid::new_v4(), ts("2026-02-02T00:00:00Z"))
+    fn is_active_active_user_returns_true() {
+        assert!(fixture(Uuid::new_v4()).is_active());
+    }
+
+    #[test]
+    fn is_active_banned_user_returns_false() {
+        assert!(!fixture_banned(Uuid::new_v4()).is_active());
+    }
+
+    #[test]
+    fn is_active_withdrawn_user_returns_false() {
+        let mut user = fixture(Uuid::new_v4());
+        user.withdraw(now()).unwrap();
+
+        assert!(!user.is_active());
+    }
+
+    #[test]
+    fn ban_active_user_changes_status_to_banned() {
+        let mut user = fixture(Uuid::new_v4());
+
+        user.ban().unwrap();
+
+        assert_eq!(user.status, UserStatus::Banned);
+        assert!(!user.is_active());
+    }
+
+    #[test]
+    fn ban_banned_user_throws_exception() {
+        let mut user = fixture_banned(Uuid::new_v4());
+
+        let err = user.ban().unwrap_err();
+
+        assert_eq!(err.message, "이미 차단된 회원입니다.");
+    }
+
+    #[test]
+    fn ban_withdrawn_user_throws_exception() {
+        let mut user = fixture(Uuid::new_v4());
+        user.withdraw(now()).unwrap();
+
+        let err = user.ban().unwrap_err();
+
+        assert_eq!(err.message, "탈퇴한 회원의 상태를 변경할 수 없습니다.");
+    }
+
+    #[test]
+    fn unban_banned_user_changes_status_to_active() {
+        let mut user = fixture_banned(Uuid::new_v4());
+
+        user.unban().unwrap();
+
+        assert_eq!(user.status, UserStatus::Active);
+        assert!(user.is_active());
+    }
+
+    #[test]
+    fn unban_active_user_throws_exception() {
+        let mut user = fixture(Uuid::new_v4());
+
+        let err = user.unban().unwrap_err();
+
+        assert_eq!(err.message, "이미 활성 상태인 회원입니다.");
+    }
+
+    #[test]
+    fn validate_accessible_active_user_does_not_throw() {
+        assert!(fixture(Uuid::new_v4()).validate_accessible().is_ok());
+    }
+
+    #[test]
+    fn validate_accessible_banned_user_throws_forbidden_exception() {
+        let err = fixture_banned(Uuid::new_v4())
+            .validate_accessible()
             .unwrap_err();
+
+        assert_eq!(err.kind, chalkak_core::error::ErrorKind::Forbidden);
+        assert_eq!(err.code, ErrorCode::FORBIDDEN);
+    }
+
+    #[test]
+    fn validate_accessible_withdrawn_user_throws_unauthorized_exception() {
+        let mut user = fixture(Uuid::new_v4());
+        user.withdraw(now()).unwrap();
+
+        let err = user.validate_accessible().unwrap_err();
+
+        assert_eq!(err.kind, chalkak_core::error::ErrorKind::Unauthorized);
+        assert_eq!(err.code, ErrorCode::UNAUTHORIZED);
+    }
+
+    #[test]
+    fn start_signature_processing_active_signature_preserves_active_keys() {
+        let mut user = fixture(Uuid::new_v4());
+        let upload_id = Uuid::new_v4();
+        let original = user.signature_original_storage_key.clone();
+        let thumbnail = user.signature_thumbnail_storage_key.clone();
+
+        user.start_signature_processing(upload_id, now()).unwrap();
+
+        assert_eq!(user.signature_original_storage_key, original);
+        assert_eq!(user.signature_thumbnail_storage_key, thumbnail);
+        assert_eq!(user.pending_signature_upload_id, Some(upload_id));
+        assert_eq!(
+            user.signature_processing_status,
+            Some(SignatureProcessingStatus::Processing)
+        );
+        assert_eq!(user.signature_processing_started_at, Some(now()));
+    }
+
+    #[test]
+    fn complete_signature_processing_matching_upload_promotes_and_clears_pending() {
+        let mut user = fixture(Uuid::new_v4());
+        let upload_id = Uuid::new_v4();
+        let keys = SignatureStorageKeys {
+            original: format!("chalkak/signatures/dev/original/{upload_id}.png"),
+            thumbnail: format!("chalkak/signatures/dev/thumbnail/{upload_id}.png"),
+        };
+        user.start_signature_processing(upload_id, now()).unwrap();
+
+        let completed = user
+            .complete_signature_processing(upload_id, &keys)
+            .unwrap();
+
+        assert!(completed);
+        assert_eq!(user.signature_original_storage_key, keys.original);
+        assert_eq!(
+            user.signature_thumbnail_storage_key.as_deref(),
+            Some(keys.thumbnail.as_str())
+        );
+        assert_eq!(user.pending_signature_upload_id, None);
+        assert_eq!(user.signature_processing_status, None);
+        assert_eq!(user.signature_processing_started_at, None);
+    }
+
+    #[test]
+    fn complete_signature_processing_stale_upload_ignores_callback() {
+        let mut user = fixture(Uuid::new_v4());
+        let pending_upload_id = Uuid::new_v4();
+        let original = user.signature_original_storage_key.clone();
+        user.start_signature_processing(pending_upload_id, now())
+            .unwrap();
+        let stale = SignatureStorageKeys {
+            original: "chalkak/signatures/dev/original/stale.png".into(),
+            thumbnail: "chalkak/signatures/dev/thumbnail/stale.png".into(),
+        };
+
+        let completed = user
+            .complete_signature_processing(Uuid::new_v4(), &stale)
+            .unwrap();
+
+        assert!(!completed);
+        assert_eq!(user.signature_original_storage_key, original);
+        assert_eq!(user.pending_signature_upload_id, Some(pending_upload_id));
+    }
+
+    #[test]
+    fn has_signature_same_storage_key_returns_true() {
+        let id = Uuid::new_v4();
+        let user = fixture(id);
+
+        assert!(user.has_signature(&format!("signatures/{id}")));
+    }
+
+    #[test]
+    fn has_signature_different_storage_key_returns_false() {
+        let user = fixture(Uuid::new_v4());
+
+        assert!(!user.has_signature(&format!(
+            "chalkak/signatures/dev/original/{}.png",
+            Uuid::new_v4()
+        )));
+    }
+
+    #[test]
+    fn is_signature_processing_processing_upload_returns_true() {
+        let mut user = fixture(Uuid::new_v4());
+        let upload_id = Uuid::new_v4();
+        user.start_signature_processing(upload_id, now()).unwrap();
+
+        assert!(user.is_signature_processing(upload_id));
+    }
+
+    #[test]
+    fn is_signature_processing_failed_upload_returns_false() {
+        let mut user = fixture(Uuid::new_v4());
+        let upload_id = Uuid::new_v4();
+        user.start_signature_processing(upload_id, now()).unwrap();
+        user.fail_signature_processing(upload_id);
+
+        assert!(!user.is_signature_processing(upload_id));
+        assert!(user.is_signature_processing_failed(upload_id));
+    }
+
+    #[test]
+    fn is_signature_processing_different_upload_returns_false() {
+        let mut user = fixture(Uuid::new_v4());
+        user.start_signature_processing(Uuid::new_v4(), now())
+            .unwrap();
+
+        assert!(!user.is_signature_processing(Uuid::new_v4()));
+    }
+
+    #[test]
+    fn fail_signature_processing_matching_upload_marks_failed_and_preserves_active_keys() {
+        let mut user = fixture(Uuid::new_v4());
+        let upload_id = Uuid::new_v4();
+        let original = user.signature_original_storage_key.clone();
+        user.start_signature_processing(upload_id, now()).unwrap();
+
+        let failed = user.fail_signature_processing(upload_id);
+
+        assert!(failed);
+        assert_eq!(user.signature_original_storage_key, original);
+        assert_eq!(user.pending_signature_upload_id, Some(upload_id));
+        assert_eq!(
+            user.signature_processing_status,
+            Some(SignatureProcessingStatus::Failed)
+        );
+    }
+
+    #[test]
+    fn start_signature_processing_withdrawn_user_throws_exception() {
+        let mut user = fixture(Uuid::new_v4());
+        user.withdraw(now()).unwrap();
+
+        let err = user
+            .start_signature_processing(Uuid::new_v4(), now())
+            .unwrap_err();
+
         assert_eq!(err.message, "이미 탈퇴한 회원입니다.");
     }
 
+    // 구현의 세부 규칙(원본 분기): 완료 시 새 키 검증, 취소, 이름 변환.
     #[test]
     fn 완료할_때_새_키가_비어_있으면_거절한다() {
-        let upload = Uuid::new_v4();
-        let mut u = user();
-        u.start_signature_processing(upload, ts("2026-01-01T00:00:00Z"))
-            .unwrap();
-        let err = u
+        let upload_id = Uuid::new_v4();
+        let mut user = fixture(Uuid::new_v4());
+        user.start_signature_processing(upload_id, now()).unwrap();
+
+        let err = user
             .complete_signature_processing(
-                upload,
+                upload_id,
                 &SignatureStorageKeys {
                     original: " ".into(),
                     thumbnail: "t".into(),
                 },
             )
             .unwrap_err();
+
         assert_eq!(err.message, "사인 이미지 업로드 정보가 올바르지 않습니다.");
     }
 
-    // User#validateAccessible / validateNotWithdrawn
     #[test]
-    fn 접근_가능_판정은_탈퇴_401_차단_403이다() {
-        let mut u = user();
-        assert!(u.validate_accessible().is_ok());
-        u.status = UserStatus::Banned;
-        let err = u.validate_accessible().unwrap_err();
-        assert_eq!(
-            (err.status(), err.message.as_str()),
-            (403, "차단된 회원입니다.")
-        );
-        assert!(u.validate_not_withdrawn().is_ok(), "정지는 통과");
-        u.withdraw(ts("2026-02-01T00:00:00Z")).unwrap();
-        let err = u.validate_accessible().unwrap_err();
-        assert_eq!(
-            (err.status(), err.message.as_str()),
-            (401, "유효하지 않은 인증 정보입니다.")
-        );
+    fn 처리를_취소하면_대기_정보를_지운다() {
+        let upload_id = Uuid::new_v4();
+        let mut user = fixture(Uuid::new_v4());
+        user.start_signature_processing(upload_id, now()).unwrap();
+        user.cancel_signature_processing();
+
+        assert!(!user.is_signature_processing(upload_id));
+        assert_eq!(user.pending_signature_upload_id, None);
+        assert_eq!(user.signature_processing_started_at, None);
+    }
+
+    #[test]
+    fn 정지_회원은_탈퇴_검증을_통과한다() {
+        let user = fixture_banned(Uuid::new_v4());
+
+        assert!(user.validate_not_withdrawn().is_ok());
+    }
+
+    #[test]
+    fn 열거형_이름_변환() {
+        for status in [UserStatus::Active, UserStatus::Banned] {
+            assert_eq!(UserStatus::from_name(status.name()), Some(status));
+        }
+        for status in [
+            SignatureProcessingStatus::Processing,
+            SignatureProcessingStatus::Failed,
+        ] {
+            assert_eq!(
+                SignatureProcessingStatus::from_name(status.name()),
+                Some(status)
+            );
+        }
+        assert_eq!(UserStatus::from_name("active"), None);
     }
 
     // SignatureImagePolicyTest
-    #[test]
-    fn 이미지_정책은_타입과_크기를_본다() {
-        let policy = SignatureImagePolicy {
-            max_bytes: 1_048_576,
+    const MAX_BYTES: i64 = 1024;
+
+    fn policy() -> SignatureImagePolicy {
+        SignatureImagePolicy {
+            max_bytes: MAX_BYTES,
             allowed_content_types: vec!["image/png".into()],
-        };
-        let image = |t: Option<&str>, n: i64| StoredImageMetadata {
-            content_type: t.map(str::to_owned),
-            byte_size: n,
-        };
+        }
+    }
+
+    fn image(content_type: Option<&str>, byte_size: i64) -> StoredImageMetadata {
+        StoredImageMetadata {
+            content_type: content_type.map(str::to_owned),
+            byte_size,
+        }
+    }
+
+    #[test]
+    fn validate_allowed_image_does_not_throw() {
         assert!(
-            policy
-                .validate(&image(Some("image/png"), 1_048_576))
+            policy()
+                .validate(&image(Some("image/png"), MAX_BYTES))
                 .is_ok()
         );
-        for bad in [
-            image(Some("image/png"), 1_048_577),
-            image(Some("image/jpeg"), 10),
-            image(None, 10),
-            image(Some("IMAGE/PNG"), 10),
-        ] {
-            assert_eq!(
-                policy.validate(&bad).unwrap_err().message,
-                "사용할 수 없는 사인 이미지입니다."
-            );
-        }
+    }
+
+    #[test]
+    fn validate_disallowed_content_type_throws_exception() {
+        let err = policy()
+            .validate(&image(Some("image/jpeg"), MAX_BYTES))
+            .unwrap_err();
+
+        assert_eq!(err.message, "사용할 수 없는 사인 이미지입니다.");
+    }
+
+    #[test]
+    fn validate_unknown_content_type_throws_exception() {
+        let err = policy().validate(&image(None, MAX_BYTES)).unwrap_err();
+
+        assert_eq!(err.message, "사용할 수 없는 사인 이미지입니다.");
+    }
+
+    #[test]
+    fn validate_too_large_image_throws_exception() {
+        let err = policy()
+            .validate(&image(Some("image/png"), MAX_BYTES + 1))
+            .unwrap_err();
+
+        assert_eq!(err.message, "사용할 수 없는 사인 이미지입니다.");
     }
 }

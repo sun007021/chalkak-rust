@@ -22,7 +22,7 @@ use crate::auth::tokens::{
 };
 use crate::config::{ACCESS_TOKEN_AUDIENCE, SIGNUP_TOKEN_AUDIENCE, SIGNUP_TOKEN_LIFETIME};
 use crate::user::domain::SignatureImagePolicy;
-use crate::user::service::{UserService, UserWithdrawalService};
+use crate::user::service::{SignatureProcessingPolicy, UserService, UserWithdrawalService};
 use crate::user::storage::{
     HeadObjects, HttpHeadObjects, S3SignatureImageStorage, S3SignatureImageUploadIssuer,
     SignatureImageStorage, SignatureImageUploadIssuer, credentials_for,
@@ -144,7 +144,7 @@ impl Components {
             storage,
             upload_issuer,
             image_policy,
-            settings.signature_processing_timeout,
+            SignatureProcessingPolicy::new(settings.signature_processing_timeout)?,
         );
         let revoker = Arc::new(AppleSocialConnectionRevoker::new(
             pool.clone(),

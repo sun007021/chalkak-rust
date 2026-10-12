@@ -71,7 +71,32 @@ pub struct UserService {
     storage: Arc<dyn SignatureImageStorage>,
     upload_issuer: Arc<dyn SignatureImageUploadIssuer>,
     image_policy: SignatureImagePolicy,
-    processing_timeout: SignedDuration,
+    processing_policy: SignatureProcessingPolicy,
+}
+
+/// `SignatureProcessingPolicy`: 사인 처리를 얼마나 기다릴지.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct SignatureProcessingPolicy {
+    timeout: SignedDuration,
+}
+
+impl SignatureProcessingPolicy {
+    /// 제한 시간은 0보다 커야 한다(원본은 `IllegalArgumentException`).
+    pub fn new(timeout: Duration) -> Result<SignatureProcessingPolicy, String> {
+        if timeout.is_zero() {
+            return Err("사인 처리 제한 시간은 0보다 커야 합니다.".to_owned());
+        }
+        Ok(SignatureProcessingPolicy {
+            timeout: SignedDuration::try_from(timeout).unwrap_or(SignedDuration::MAX),
+        })
+    }
+
+    /// `isProcessingTimedOut`: `startedAt + timeout < now`(경계는 아직 유효).
+    pub fn is_processing_timed_out(&self, started_at: Timestamp, now: Timestamp) -> bool {
+        started_at
+            .saturating_add(self.timeout)
+            .is_ok_and(|deadline| deadline < now)
+    }
 }
 
 impl UserService {
@@ -82,7 +107,7 @@ impl UserService {
         storage: Arc<dyn SignatureImageStorage>,
         upload_issuer: Arc<dyn SignatureImageUploadIssuer>,
         image_policy: SignatureImagePolicy,
-        processing_timeout: Duration,
+        processing_policy: SignatureProcessingPolicy,
     ) -> UserService {
         UserService {
             pool,
@@ -94,16 +119,8 @@ impl UserService {
             storage,
             upload_issuer,
             image_policy,
-            processing_timeout: SignedDuration::try_from(processing_timeout)
-                .unwrap_or(SignedDuration::MAX),
+            processing_policy,
         }
-    }
-
-    /// `SignatureProcessingPolicy#isProcessingTimedOut`: `startedAt + timeout < now`(경계는 아직 유효).
-    fn is_processing_timed_out(&self, started_at: Timestamp, now: Timestamp) -> bool {
-        started_at
-            .saturating_add(self.processing_timeout)
-            .is_ok_and(|deadline| deadline < now)
     }
 
     fn is_signature_processing_timed_out(&self, user: &User, now: Timestamp) -> bool {
@@ -111,7 +128,7 @@ impl UserService {
             return false;
         }
         user.signature_processing_started_at
-            .is_some_and(|started| self.is_processing_timed_out(started, now))
+            .is_some_and(|started| self.processing_policy.is_processing_timed_out(started, now))
     }
 
     fn active_user(&self, user_id: Uuid) -> Result<User, ApiError> {
@@ -357,5 +374,41 @@ mod tests {
         assert!(!matches_revoked(&[], &[snap(1, "a")]));
         assert!(!matches_revoked(&[snap(1, "a")], &[snap(1, "b")]));
         assert!(!matches_revoked(&[snap(1, "a")], &[snap(2, "a")]));
+    }
+
+    // SignatureProcessingPolicyTest
+    fn started_at() -> Timestamp {
+        "2026-08-26T00:00:00Z".parse().unwrap()
+    }
+
+    fn seven_minutes() -> SignatureProcessingPolicy {
+        SignatureProcessingPolicy::new(Duration::from_secs(7 * 60)).unwrap()
+    }
+
+    fn after(seconds: i64) -> Timestamp {
+        started_at()
+            .checked_add(SignedDuration::from_secs(seconds))
+            .unwrap()
+    }
+
+    #[test]
+    fn is_processing_timed_out_after_timeout_returns_true() {
+        assert!(seven_minutes().is_processing_timed_out(started_at(), after(421)));
+    }
+
+    #[test]
+    fn is_processing_timed_out_at_timeout_returns_false() {
+        assert!(!seven_minutes().is_processing_timed_out(started_at(), after(420)));
+    }
+
+    #[test]
+    fn is_processing_timed_out_before_timeout_returns_false() {
+        assert!(!seven_minutes().is_processing_timed_out(started_at(), after(419)));
+    }
+
+    #[test]
+    fn constructor_non_positive_timeout_throws_exception() {
+        // 음수 Duration은 표현할 수 없으므로 0만 확인한다.
+        assert!(SignatureProcessingPolicy::new(Duration::ZERO).is_err());
     }
 }

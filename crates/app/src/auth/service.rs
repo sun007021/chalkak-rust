@@ -16,7 +16,8 @@ use uuid::Uuid;
 use super::apple::AppleTokenClient;
 use super::domain::{
     IssuedAccessToken, IssuedRefreshToken, IssuedSocialSignupToken, SocialProvider,
-    VerifiedSocialIdentity, VerifiedSocialSignupToken,
+    VerifiedSocialIdentity, VerifiedSocialSignupToken, validate_apple_authorization,
+    validate_consumed_signup_token, validate_pending_apple_authorization, validate_social_account,
 };
 use super::oidc::SocialIdentityVerifier;
 use super::refresh::UserRefreshTokenService;
@@ -25,14 +26,13 @@ use super::repository::{
     PendingAppleAuthorizationRepository, SocialAccountRepository,
 };
 use super::tokens::{AccessTokenIssuer, AppleCipher, IdentityFingerprint, SignupTokens};
-use crate::common::{java_len, transact};
+use crate::common::transact;
 use crate::user::UserRepository;
 use crate::user::domain::{SignatureImagePolicy, User, UserStatus};
 use crate::user::storage::{
     SignatureImageStorage, SignatureImageUpload, SignatureImageUploadIssuer,
 };
 use crate::web::ApiError;
-use crate::web::binding::is_java_whitespace;
 
 /// 가입이 끝나지 않은 Apple 리프레시 토큰의 임시 보관 기간. ID Token 수명(10분) 안에 업로드 URL을 받고 그 뒤
 /// 회원가입 토큰(5분) 안에 가입을 끝낼 시간을 덮는다.
@@ -116,14 +116,10 @@ impl AppleSignupAuthorizationService {
         identity: &VerifiedSocialIdentity,
         encrypted_refresh_token: &str,
     ) -> Result<(), ApiError> {
-        if encrypted_refresh_token.chars().all(is_java_whitespace)
-            || java_len(encrypted_refresh_token) > 4096
-        {
-            return Err(business("임시 Apple 인증 정보가 올바르지 않습니다."));
-        }
         let hmac = self
             .fingerprint
             .encode(identity.provider, &identity.subject);
+        validate_pending_apple_authorization(&hmac, encrypted_refresh_token)?;
         let mut conn = self.pool.get()?;
         self.pending.insert(
             &mut *conn,
@@ -171,6 +167,7 @@ impl AppleSignupAuthorizationService {
             return Ok(());
         }
         let pending = self.latest_for_update(db, subject_hmac)?;
+        validate_apple_authorization(token.provider, &pending.encrypted_refresh_token)?;
         self.apple
             .insert(db, social_account_id, &pending.encrypted_refresh_token, now)?;
         self.pending.delete(db, pending.id)?;
@@ -499,6 +496,7 @@ impl SocialSignupService {
             let user = self
                 .users
                 .insert(tx, &User::create(verified.email.clone(), &keys)?, now)?;
+            validate_social_account(&hmac)?;
             let social_account_id =
                 self.social_accounts
                     .insert(tx, user.id, verified.provider, &hmac, now)?;
@@ -542,9 +540,7 @@ impl SocialSignupService {
         db: &mut impl GenericClient,
         verified: &VerifiedSocialSignupToken,
     ) -> Result<(), ApiError> {
-        if verified.token_id.chars().all(is_java_whitespace) || java_len(&verified.token_id) > 36 {
-            return Err(business("회원가입 토큰 식별자가 올바르지 않습니다."));
-        }
+        validate_consumed_signup_token(&verified.token_id)?;
         if !self
             .consumed_tokens
             .consume_if_absent(db, &verified.token_id, verified.expires_at)?

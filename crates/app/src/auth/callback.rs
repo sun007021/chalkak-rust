@@ -109,52 +109,279 @@ impl ProcessingCallbackAuthenticator {
 mod tests {
     use super::*;
     use chalkak_core::FixedClock;
+    use uuid::Uuid;
 
+    // ProcessingCallbackAuthenticatorTest의 상수와 같다.
+    const AUDIENCE: &str = "dev";
     const SECRET: &str = "test-callback-secret-with-enough-length";
-    const PATH: &str =
-        "/internal/v1/signature-processing/0190f3a2-7b1c-7d2e-8f4a-123456789abc/complete";
+    const NOW: &str = "2026-10-12T00:00:00Z";
 
-    fn auth() -> (ProcessingCallbackAuthenticator, Arc<FixedClock>) {
-        let clock = Arc::new(FixedClock::new("2026-10-12T00:00:00Z".parse().unwrap()));
-        (
-            ProcessingCallbackAuthenticator::new(SECRET, "local", clock.clone()).unwrap(),
-            clock,
+    fn now_secs() -> i64 {
+        NOW.parse::<jiff::Timestamp>().unwrap().as_second()
+    }
+
+    fn authenticator(audience: &str) -> ProcessingCallbackAuthenticator {
+        let clock = Arc::new(FixedClock::new(NOW.parse().unwrap()));
+        ProcessingCallbackAuthenticator::new(SECRET, audience, clock).unwrap()
+    }
+
+    fn signature_path(upload_id: Uuid, result: &str) -> String {
+        format!("/internal/v1/signature-processing/{upload_id}/{result}")
+    }
+
+    /// 서명 헬퍼는 구현의 `sign`을 쓰지 않고 원본 테스트처럼 HMAC을 직접 계산한다.
+    fn sign_bytes(path: &str, raw_body: Option<&[u8]>, timestamp: &str) -> String {
+        let body_hash = sha256_hex(raw_body.unwrap_or(&[]));
+        let payload = format!("{timestamp}\nPOST\n{path}\n{body_hash}\n{AUDIENCE}");
+        format!(
+            "v1={}",
+            hex_encode(&hmac_sha256(SECRET.as_bytes(), payload.as_bytes()))
         )
     }
 
-    fn now_secs() -> i64 {
-        "2026-10-12T00:00:00Z"
-            .parse::<jiff::Timestamp>()
-            .unwrap()
-            .as_second()
-    }
-
-    fn assert_rejected(result: Result<(), ApiError>) {
+    fn assert_unauthorized(result: Result<(), ApiError>) {
         let err = result.unwrap_err();
         assert_eq!(err.status(), 401);
         assert_eq!(err.message(), "유효하지 않은 이미지 처리 콜백입니다.");
     }
 
-    // ProcessingCallbackAuthenticatorTest: 정상 서명
+    // "현재 시각의 올바른 HMAC 서명은 허용한다"
     #[test]
-    fn 올바른_서명은_통과한다() {
-        let (a, _) = auth();
-        let ts = now_secs().to_string();
-        let sig = a.sign(&ts, PATH, None);
-        assert!(a.authenticate(PATH, None, Some(&ts), Some(&sig)).is_ok());
-        let body = b"{}";
-        let sig = a.sign(&ts, PATH, Some(body));
+    fn authenticate_valid_signature_succeeds() {
+        let upload_id = Uuid::new_v4();
+        let timestamp = now_secs().to_string();
+        let path = signature_path(upload_id, "complete");
+        let signature = sign_bytes(&path, None, &timestamp);
+
         assert!(
-            a.authenticate(PATH, Some(body), Some(&ts), Some(&sig))
+            authenticator(AUDIENCE)
+                .authenticate(&path, None, Some(&timestamp), Some(&signature))
                 .is_ok()
         );
     }
 
+    // "잘못된 HMAC 서명은 거부한다"
+    #[test]
+    fn authenticate_invalid_signature_throws_unauthorized_exception() {
+        let path = signature_path(Uuid::new_v4(), "complete");
+        let timestamp = now_secs().to_string();
+
+        assert_unauthorized(authenticator(AUDIENCE).authenticate(
+            &path,
+            None,
+            Some(&timestamp),
+            Some("invalid"),
+        ));
+    }
+
+    // "5분이 지난 콜백 서명은 재사용 공격으로 보고 거부한다"
+    #[test]
+    fn authenticate_expired_timestamp_throws_unauthorized_exception() {
+        let path = signature_path(Uuid::new_v4(), "complete");
+        let timestamp = (now_secs() - 301).to_string();
+        let signature = sign_bytes(&path, None, &timestamp);
+
+        assert_unauthorized(authenticator(AUDIENCE).authenticate(
+            &path,
+            None,
+            Some(&timestamp),
+            Some(&signature),
+        ));
+    }
+
+    // "timestamp가 없으면 인증 실패로 거부한다"
+    #[test]
+    fn authenticate_null_timestamp_throws_unauthorized_exception() {
+        let path = signature_path(Uuid::new_v4(), "complete");
+
+        assert_unauthorized(authenticator(AUDIENCE).authenticate(&path, None, None, Some("v1=00")));
+    }
+
+    // "서명이 없으면 인증 실패로 거부한다"
+    #[test]
+    fn authenticate_null_signature_throws_unauthorized_exception() {
+        let path = signature_path(Uuid::new_v4(), "complete");
+        let timestamp = now_secs().to_string();
+
+        assert_unauthorized(authenticator(AUDIENCE).authenticate(
+            &path,
+            None,
+            Some(&timestamp),
+            None,
+        ));
+    }
+
+    // "허용 시간 차 직전의 콜백 서명은 통과한다"
+    #[test]
+    fn authenticate_just_inside_clock_skew_succeeds() {
+        let path = signature_path(Uuid::new_v4(), "complete");
+        let timestamp = (now_secs() - 299).to_string();
+        let signature = sign_bytes(&path, None, &timestamp);
+
+        assert!(
+            authenticator(AUDIENCE)
+                .authenticate(&path, None, Some(&timestamp), Some(&signature))
+                .is_ok()
+        );
+    }
+
+    // "본문이 있는 콜백은 수신 원문의 해시로 검증한다"
+    #[test]
+    fn authenticate_json_body_succeeds() {
+        let path = format!(
+            "/internal/v1/post-image-processing/{}/complete",
+            Uuid::new_v4()
+        );
+        let raw_body = br#"{"width":4032,"height":3024}"#;
+        let timestamp = now_secs().to_string();
+        let signature = sign_bytes(&path, Some(raw_body), &timestamp);
+
+        assert!(
+            authenticator(AUDIENCE)
+                .authenticate(&path, Some(raw_body), Some(&timestamp), Some(&signature))
+                .is_ok()
+        );
+    }
+
+    // "같은 값이어도 직렬화가 다른 본문의 서명은 거부한다"
+    #[test]
+    fn authenticate_reserialized_body_throws_unauthorized_exception() {
+        let path = format!(
+            "/internal/v1/post-image-processing/{}/complete",
+            Uuid::new_v4()
+        );
+        let sent_body = br#"{"width":4032,"height":3024}"#;
+        let reserialized_body = br#"{"width": 4032, "height": 3024}"#;
+        let timestamp = now_secs().to_string();
+        let signature = sign_bytes(&path, Some(sent_body), &timestamp);
+
+        assert_unauthorized(authenticator(AUDIENCE).authenticate(
+            &path,
+            Some(reserialized_body),
+            Some(&timestamp),
+            Some(&signature),
+        ));
+    }
+
+    // "종류가 다른 경로로 만든 서명은 거부한다"
+    #[test]
+    fn authenticate_other_kind_path_throws_unauthorized_exception() {
+        let upload_id = Uuid::new_v4();
+        let timestamp = now_secs().to_string();
+        let signature = sign_bytes(&signature_path(upload_id, "complete"), None, &timestamp);
+        let post_path = format!("/internal/v1/post-image-processing/{upload_id}/complete");
+
+        assert_unauthorized(authenticator(AUDIENCE).authenticate(
+            &post_path,
+            None,
+            Some(&timestamp),
+            Some(&signature),
+        ));
+    }
+
+    // "유효한 UTF-8이 아닌 본문도 수신 바이트 그대로 검증한다"
+    #[test]
+    fn authenticate_invalid_utf8_body_succeeds() {
+        let path = format!(
+            "/internal/v1/post-image-processing/{}/complete",
+            Uuid::new_v4()
+        );
+        let raw_body = [0xC3u8, 0x28];
+        let timestamp = now_secs().to_string();
+        let signature = sign_bytes(&path, Some(&raw_body), &timestamp);
+
+        assert!(
+            authenticator(AUDIENCE)
+                .authenticate(&path, Some(&raw_body), Some(&timestamp), Some(&signature))
+                .is_ok()
+        );
+    }
+
+    // "깨진 바이트가 서로 다르면 서명도 달라진다"
+    #[test]
+    fn authenticate_different_invalid_utf8_body_throws_unauthorized_exception() {
+        let path = format!(
+            "/internal/v1/post-image-processing/{}/complete",
+            Uuid::new_v4()
+        );
+        let sent_body = [0xC3u8, 0x28];
+        let tampered_body = [0xE0u8, 0x28];
+        let timestamp = now_secs().to_string();
+        let signature = sign_bytes(&path, Some(&sent_body), &timestamp);
+
+        assert_unauthorized(authenticator(AUDIENCE).authenticate(
+            &path,
+            Some(&tampered_body),
+            Some(&timestamp),
+            Some(&signature),
+        ));
+    }
+
+    // "허용 폭을 넘어 미래로 앞선 타임스탬프는 거부한다"
+    #[test]
+    fn authenticate_far_future_timestamp_throws_unauthorized_exception() {
+        let path = signature_path(Uuid::new_v4(), "complete");
+        let timestamp = (now_secs() + 60).to_string();
+        let signature = sign_bytes(&path, None, &timestamp);
+
+        assert_unauthorized(authenticator(AUDIENCE).authenticate(
+            &path,
+            None,
+            Some(&timestamp),
+            Some(&signature),
+        ));
+    }
+
+    // "작은 시계 오차만큼 앞선 타임스탬프는 허용한다"
+    #[test]
+    fn authenticate_slightly_future_timestamp_succeeds() {
+        let path = signature_path(Uuid::new_v4(), "complete");
+        let timestamp = (now_secs() + 10).to_string();
+        let signature = sign_bytes(&path, None, &timestamp);
+
+        assert!(
+            authenticator(AUDIENCE)
+                .authenticate(&path, None, Some(&timestamp), Some(&signature))
+                .is_ok()
+        );
+    }
+
+    // "다른 환경을 대상으로 만든 서명은 거부한다"
+    #[test]
+    fn authenticate_signature_for_another_environment_throws_unauthorized_exception() {
+        let path = signature_path(Uuid::new_v4(), "complete");
+        let timestamp = now_secs().to_string();
+        let dev_signature = sign_bytes(&path, None, &timestamp);
+
+        assert_unauthorized(authenticator("prod").authenticate(
+            &path,
+            None,
+            Some(&timestamp),
+            Some(&dev_signature),
+        ));
+    }
+
+    // 경계와 형식(원본 구현의 분기). 위의 14개와 별개로 구현의 세부 규칙을 고정한다.
+    #[test]
+    fn 시각_창은_과거_300초_미래_30초이고_경계를_포함한다() {
+        let a = authenticator(AUDIENCE);
+        let path = signature_path(Uuid::new_v4(), "complete");
+        let check = |offset: i64| {
+            let ts = (now_secs() + offset).to_string();
+            a.authenticate(&path, None, Some(&ts), Some(&sign_bytes(&path, None, &ts)))
+        };
+        assert!(check(-300).is_ok());
+        assert_unauthorized(check(-301));
+        assert!(check(30).is_ok());
+        assert_unauthorized(check(31));
+    }
+
     #[test]
     fn 서명_형식이_틀리면_거절한다() {
-        let (a, _) = auth();
+        let a = authenticator(AUDIENCE);
+        let path = signature_path(Uuid::new_v4(), "complete");
         let ts = now_secs().to_string();
-        let good = a.sign(&ts, PATH, None);
+        let good = sign_bytes(&path, None, &ts);
         let hex = good.strip_prefix("v1=").unwrap().to_owned();
         for sig in [
             None,
@@ -167,47 +394,17 @@ mod tests {
             Some(format!("v1={hex}00")),
             Some(good.to_uppercase()),
         ] {
-            assert_rejected(a.authenticate(PATH, None, Some(&ts), sig.as_deref()));
+            assert_unauthorized(a.authenticate(&path, None, Some(&ts), sig.as_deref()));
         }
         // 16진수는 대소문자를 가리지 않는다.
         let upper = format!("v1={}", hex.to_uppercase());
-        assert!(a.authenticate(PATH, None, Some(&ts), Some(&upper)).is_ok());
-    }
-
-    #[test]
-    fn 경로_본문_환경이_다르면_거절한다() {
-        let (a, clock) = auth();
-        let ts = now_secs().to_string();
-        let sig = a.sign(&ts, PATH, None);
-        assert_rejected(a.authenticate(
-            &PATH.replace("complete", "failed"),
-            None,
-            Some(&ts),
-            Some(&sig),
-        ));
-        assert_rejected(a.authenticate(PATH, Some(b"x"), Some(&ts), Some(&sig)));
-        let prod = ProcessingCallbackAuthenticator::new(SECRET, "prod", clock).unwrap();
-        assert_rejected(prod.authenticate(PATH, None, Some(&ts), Some(&sig)));
-    }
-
-    // ProcessingCallbackAuthenticatorTest: 시각 창은 과거 300초, 미래 30초
-    #[test]
-    fn 시각_창_밖이면_거절한다() {
-        let (a, _) = auth();
-        let check = |offset: i64| {
-            let ts = (now_secs() + offset).to_string();
-            let sig = a.sign(&ts, PATH, None);
-            a.authenticate(PATH, None, Some(&ts), Some(&sig))
-        };
-        assert!(check(-300).is_ok());
-        assert_rejected(check(-301));
-        assert!(check(30).is_ok());
-        assert_rejected(check(31));
+        assert!(a.authenticate(&path, None, Some(&ts), Some(&upper)).is_ok());
     }
 
     #[test]
     fn 타임스탬프는_java_long_형식이어야_한다() {
-        let (a, _) = auth();
+        let a = authenticator(AUDIENCE);
+        let path = signature_path(Uuid::new_v4(), "complete");
         for ts in [
             None,
             Some(""),
@@ -217,12 +414,12 @@ mod tests {
             Some("0x10"),
             Some("99999999999999999999"),
         ] {
-            assert_rejected(a.authenticate(PATH, None, ts, Some("v1=00")));
+            assert_unauthorized(a.authenticate(&path, None, ts, Some("v1=00")));
         }
         // "+<초>"도 Long.parseLong이 받으므로 서명 대상에는 원문 그대로 들어간다.
         let ts = format!("+{}", now_secs());
-        let sig = a.sign(&ts, PATH, None);
-        assert!(a.authenticate(PATH, None, Some(&ts), Some(&sig)).is_ok());
+        let sig = sign_bytes(&path, None, &ts);
+        assert!(a.authenticate(&path, None, Some(&ts), Some(&sig)).is_ok());
     }
 
     #[test]
@@ -240,8 +437,14 @@ mod tests {
 
     #[test]
     fn 비밀키와_환경_검증() {
-        let clock = Arc::new(FixedClock::new("2026-10-12T00:00:00Z".parse().unwrap()));
+        let clock = Arc::new(FixedClock::new(NOW.parse().unwrap()));
         assert!(ProcessingCallbackAuthenticator::new("short", "local", clock.clone()).is_err());
-        assert!(ProcessingCallbackAuthenticator::new(SECRET, " ", clock).is_err());
+        assert!(ProcessingCallbackAuthenticator::new(SECRET, " ", clock.clone()).is_err());
+        // 구현의 sign()도 같은 서명을 만든다.
+        let a = ProcessingCallbackAuthenticator::new(SECRET, AUDIENCE, clock).unwrap();
+        assert_eq!(
+            a.sign("1", "/p", Some(b"x")),
+            sign_bytes("/p", Some(b"x"), "1")
+        );
     }
 }

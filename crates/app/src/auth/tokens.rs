@@ -344,127 +344,494 @@ impl AppleClientSecret {
 mod tests {
     use super::*;
     use chalkak_core::FixedClock;
+    use serde_json::{Value, json};
 
     const KEY: &str = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+    const ACCESS_AUDIENCE: &str = "chalkak-access";
+    const SIGNUP_AUDIENCE: &str = "chalkak-social-signup";
+    const ENCRYPTION_KEY: &str = "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff";
+    const OTHER_ENCRYPTION_KEY: &str =
+        "ffeeddccbbaa99887766554433221100ffeeddccbbaa99887766554433221100";
+    const REFRESH_TOKEN: &str = "apple-refresh-token";
+    const SUBJECT: &str = "google-subject";
 
-    fn clock() -> Arc<FixedClock> {
-        Arc::new(FixedClock::new("2026-10-12T00:00:00Z".parse().unwrap()))
+    fn secret() -> Vec<u8> {
+        crate::common::hex_decode(KEY).unwrap()
     }
 
-    fn signup_tokens(clock: Arc<FixedClock>) -> SignupTokens {
-        SignupTokens::new(
-            crate::common::hex_decode(KEY).unwrap(),
-            "chalkak-social-signup",
-            Duration::from_secs(300),
-            clock,
+    fn ts(s: &str) -> Timestamp {
+        s.parse().unwrap()
+    }
+
+    fn clock_at(s: &str) -> Arc<FixedClock> {
+        Arc::new(FixedClock::new(ts(s)))
+    }
+
+    fn plus(t: Timestamp, seconds: i64) -> Timestamp {
+        t.checked_add(SignedDuration::from_secs(seconds)).unwrap()
+    }
+
+    // ----- JwtAccessTokenProviderTest -----
+
+    const ACCESS_NOW: &str = "2026-08-27T00:00:00Z";
+    const FIFTEEN_MINUTES: i64 = 15 * 60;
+
+    fn access_issuer(now: &str) -> AccessTokenIssuer {
+        AccessTokenIssuer::new(
+            secret(),
+            ACCESS_AUDIENCE,
+            Duration::from_secs(900),
+            clock_at(now),
         )
     }
 
-    fn identity() -> VerifiedSocialIdentity {
-        VerifiedSocialIdentity {
-            provider: SocialProvider::Apple,
-            subject: "apple-subject".into(),
-            email: Some("user@example.com".into()),
-        }
+    fn access_claims() -> Value {
+        let now = ts(ACCESS_NOW);
+        json!({
+            "iss": TOKEN_ISSUER,
+            "aud": ACCESS_AUDIENCE,
+            "sub": Uuid::new_v4().to_string(),
+            "iat": now.as_second(),
+            "exp": plus(now, FIFTEEN_MINUTES).as_second(),
+            "purpose": "ACCESS",
+        })
     }
 
-    // JwtSocialSignupTokenProviderTest: 발급한 토큰을 검증하면 같은 값을 돌려준다.
-    #[test]
-    fn 회원가입_토큰을_발급하고_검증한다() {
-        let c = clock();
-        let tokens = signup_tokens(c.clone());
-        let upload = Uuid::new_v4();
-        let issued = tokens.issue(&identity(), upload);
-        assert_eq!(issued.expires_at, "2026-10-12T00:05:00Z".parse().unwrap());
-        let verified = tokens.verify(&issued.value).unwrap();
-        assert_eq!(verified.provider, SocialProvider::Apple);
-        assert_eq!(verified.subject, "apple-subject");
-        assert_eq!(verified.upload_id, upload);
-        assert_eq!(verified.email.as_deref(), Some("user@example.com"));
-        assert_eq!(verified.expires_at, issued.expires_at);
-        assert_eq!(
-            Uuid::parse_str(&verified.token_id)
-                .unwrap()
-                .get_version_num(),
-            4
-        );
+    fn encode_with_same_secret(claims: &Value) -> String {
+        hs256_encode(&social_signup_header(), claims, &secret())
+    }
+
+    fn access_token_accepted(token: &str, verifier_now: &str) -> bool {
+        let Ok(claims) = hs256_decode(token, &secret()) else {
+            return false;
+        };
+        Validator::access_token(TOKEN_ISSUER, ACCESS_AUDIENCE)
+            .validate(&claims, ts(verifier_now).as_millisecond())
+            .is_ok()
     }
 
     #[test]
-    fn 이메일이_없으면_클레임을_넣지_않는다() {
-        let tokens = signup_tokens(clock());
-        let mut id = identity();
-        id.email = None;
-        let issued = tokens.issue(&id, Uuid::new_v4());
-        assert_eq!(tokens.verify(&issued.value).unwrap().email, None);
-    }
-
-    // JwtSocialSignupTokenProviderTest: 만료·변조·다른 키는 401
-    #[test]
-    fn 만료되거나_변조된_토큰은_401이다() {
-        let c = clock();
-        let tokens = signup_tokens(c.clone());
-        let issued = tokens.issue(&identity(), Uuid::new_v4());
-        // 허용 오차 30초 안에서는 통과, 넘으면 만료
-        c.advance(Duration::from_secs(300 + 30));
-        assert!(tokens.verify(&issued.value).is_ok());
-        c.advance(Duration::from_secs(1));
-        let err = tokens.verify(&issued.value).unwrap_err();
-        assert_eq!(err.status(), 401);
-        assert_eq!(err.message(), "유효하지 않은 회원가입 정보입니다.");
-
-        let other = SignupTokens::new(
-            vec![1; 32],
-            "chalkak-social-signup",
-            Duration::from_secs(300),
-            clock(),
-        );
-        let issued = tokens.issue(&identity(), Uuid::new_v4());
-        assert_eq!(other.verify(&issued.value).unwrap_err().status(), 401);
-        assert_eq!(tokens.verify("not-a-jwt").unwrap_err().status(), 401);
-    }
-
-    #[test]
-    fn 다른_대상의_토큰은_거절한다() {
-        let c = clock();
-        let tokens = signup_tokens(c.clone());
-        let access = AccessTokenIssuer::new(
-            crate::common::hex_decode(KEY).unwrap(),
-            "chalkak-access",
-            Duration::from_secs(900),
-            c,
-        );
-        let token = access.issue(Uuid::new_v4());
-        assert_eq!(tokens.verify(&token.value).unwrap_err().status(), 401);
-    }
-
-    // JwtAccessTokenProviderTest: 클레임 구성
-    #[test]
-    fn 액세스_토큰은_회원_scope와_만료를_담는다() {
-        let c = clock();
-        let issuer = AccessTokenIssuer::new(
-            crate::common::hex_decode(KEY).unwrap(),
-            "chalkak-access",
-            Duration::from_secs(900),
-            c,
-        );
+    fn issue_valid_user_id_issues_verifiable_access_token() {
         let user = Uuid::new_v4();
-        let issued = issuer.issue(user);
-        assert_eq!(issued.expires_in_seconds, 900);
-        let claims = hs256_decode(&issued.value, &crate::common::hex_decode(KEY).unwrap()).unwrap();
+        let issued = access_issuer(ACCESS_NOW).issue(user);
+        assert!(!issued.value.trim().is_empty());
+        assert_eq!(issued.expires_in_seconds, FIFTEEN_MINUTES);
+        assert!(access_token_accepted(&issued.value, ACCESS_NOW));
+        let claims = hs256_decode(&issued.value, &secret()).unwrap();
         assert_eq!(claims.subject(), Some(user.to_string().as_str()));
         assert_eq!(claims.get_str("scope"), Some("USER"));
+    }
+
+    #[test]
+    fn issue_admin_scope_issues_admin_access_token() {
+        let admin = Uuid::new_v4();
+        let issued = access_issuer(ACCESS_NOW).issue_with_scope(&admin.to_string(), "ADMIN");
+        let claims = hs256_decode(&issued.value, &secret()).unwrap();
+        assert_eq!(claims.subject(), Some(admin.to_string().as_str()));
+        assert_eq!(claims.get_str("scope"), Some("ADMIN"));
+        assert!(access_token_accepted(&issued.value, ACCESS_NOW));
+    }
+
+    #[test]
+    fn decode_social_signup_token_signed_with_same_secret_throws_jwt_exception() {
+        let now = ts(ACCESS_NOW);
+        let token = encode_with_same_secret(&json!({
+            "iss": TOKEN_ISSUER,
+            "aud": SIGNUP_AUDIENCE,
+            "sub": SUBJECT,
+            "iat": now.as_second(),
+            "exp": plus(now, 300).as_second(),
+            "purpose": "SOCIAL_SIGNUP",
+        }));
+        assert!(!access_token_accepted(&token, ACCESS_NOW));
+    }
+
+    #[test]
+    fn decode_audience_mismatch_throws_jwt_exception() {
+        let mut claims = access_claims();
+        claims["aud"] = json!("chalkak-other");
+        assert!(!access_token_accepted(
+            &encode_with_same_secret(&claims),
+            ACCESS_NOW
+        ));
+    }
+
+    #[test]
+    fn decode_purpose_mismatch_throws_jwt_exception() {
+        let mut claims = access_claims();
+        claims["purpose"] = json!("SOCIAL_SIGNUP");
+        assert!(!access_token_accepted(
+            &encode_with_same_secret(&claims),
+            ACCESS_NOW
+        ));
+    }
+
+    #[test]
+    fn decode_missing_purpose_throws_jwt_exception() {
+        let mut claims = access_claims();
+        claims.as_object_mut().unwrap().remove("purpose");
+        assert!(!access_token_accepted(
+            &encode_with_same_secret(&claims),
+            ACCESS_NOW
+        ));
+    }
+
+    #[test]
+    fn decode_issuer_mismatch_throws_jwt_exception() {
+        let mut claims = access_claims();
+        claims["iss"] = json!("attacker");
+        assert!(!access_token_accepted(
+            &encode_with_same_secret(&claims),
+            ACCESS_NOW
+        ));
+    }
+
+    #[test]
+    fn decode_tampered_token_throws_jwt_exception() {
+        let token = access_issuer(ACCESS_NOW).issue(Uuid::new_v4()).value;
+        let start = token.rfind('.').unwrap() + 1;
+        let replacement = if token.as_bytes()[start] == b'A' {
+            'B'
+        } else {
+            'A'
+        };
+        let tampered = format!("{}{}{}", &token[..start], replacement, &token[start + 1..]);
+        assert!(!access_token_accepted(&tampered, ACCESS_NOW));
+    }
+
+    #[test]
+    fn decode_just_past_expiry_within_clock_skew_verifies_access_token() {
+        let token = access_issuer(ACCESS_NOW).issue(Uuid::new_v4()).value;
+        let verifier_now = plus(ts(ACCESS_NOW), FIFTEEN_MINUTES + 29).to_string();
+        assert!(access_token_accepted(&token, &verifier_now));
+    }
+
+    #[test]
+    fn decode_expired_beyond_clock_skew_throws_jwt_exception() {
+        let token = access_issuer(ACCESS_NOW).issue(Uuid::new_v4()).value;
+        let verifier_now = plus(ts(ACCESS_NOW), FIFTEEN_MINUTES + 31).to_string();
+        assert!(!access_token_accepted(&token, &verifier_now));
+    }
+
+    #[test]
+    fn decode_missing_expiry_throws_jwt_exception() {
+        let mut claims = access_claims();
+        claims.as_object_mut().unwrap().remove("exp");
+        assert!(!access_token_accepted(
+            &encode_with_same_secret(&claims),
+            ACCESS_NOW
+        ));
+    }
+
+    #[test]
+    fn decode_exactly_at_clock_skew_boundary_verifies_access_token() {
+        let token = access_issuer(ACCESS_NOW).issue(Uuid::new_v4()).value;
+        let verifier_now = plus(ts(ACCESS_NOW), FIFTEEN_MINUTES + 30).to_string();
+        assert!(access_token_accepted(&token, &verifier_now));
+    }
+
+    #[test]
+    fn decode_non_uuid_subject_throws_jwt_exception() {
+        let mut claims = access_claims();
+        claims["sub"] = json!("google-subject");
+        assert!(!access_token_accepted(
+            &encode_with_same_secret(&claims),
+            ACCESS_NOW
+        ));
+    }
+
+    #[test]
+    fn 액세스_토큰은_원본과_같은_클레임_순서와_만료를_담는다() {
+        let user = Uuid::new_v4();
+        let issued = access_issuer("2026-10-12T00:00:00Z").issue(user);
+        assert_eq!(issued.expires_in_seconds, 900);
+        let claims = hs256_decode(&issued.value, &secret()).unwrap();
         assert_eq!(claims.get_str("purpose"), Some("ACCESS"));
         assert_eq!(claims.issuer(), Some("chalkak-backend"));
         assert_eq!(claims.audience(), Some(vec!["chalkak-access"]));
         assert_eq!(claims.issued_at(), Some(1_791_763_200));
         assert_eq!(claims.expires_at(), Some(1_791_763_200 + 900));
-        Validator::access_token("chalkak-backend", "chalkak-access")
-            .validate(&claims, 1_791_763_200_000)
-            .unwrap();
+        assert!(claims.jwt_id().is_some());
     }
 
-    // HmacSocialIdentityFingerprintEncoder
+    // ----- JwtSocialSignupTokenProviderTest -----
+
+    const SIGNUP_NOW: &str = "2026-08-26T00:00:00Z";
+
+    fn signup_tokens(now: &str) -> SignupTokens {
+        signup_tokens_with(now, SIGNUP_AUDIENCE, secret())
+    }
+
+    fn signup_tokens_with(now: &str, audience: &str, key: Vec<u8>) -> SignupTokens {
+        SignupTokens::new(key, audience, Duration::from_secs(300), clock_at(now))
+    }
+
+    fn identity() -> VerifiedSocialIdentity {
+        VerifiedSocialIdentity {
+            provider: SocialProvider::Google,
+            subject: SUBJECT.into(),
+            email: Some("user@chalkak.test".into()),
+        }
+    }
+
+    fn assert_invalid_signup_token(result: Result<VerifiedSocialSignupToken, ApiError>) {
+        let error = result.unwrap_err();
+        assert_eq!(error.status(), 401);
+        assert_eq!(error.message(), "유효하지 않은 회원가입 정보입니다.");
+    }
+
+    /// `createSignedToken`: 실제 발급 경로와 달리 `jti`를 채우지 않는다.
+    fn signed_signup_token(
+        purpose: &str,
+        include_upload_id: bool,
+        issued_at: Option<Timestamp>,
+        expires_at: Option<Timestamp>,
+        jti: Option<&str>,
+    ) -> String {
+        let mut claims = json!({
+            "iss": TOKEN_ISSUER,
+            "aud": SIGNUP_AUDIENCE,
+            "sub": SUBJECT,
+            "purpose": purpose,
+            "provider": "GOOGLE",
+        });
+        let object = claims.as_object_mut().unwrap();
+        if let Some(t) = issued_at {
+            object.insert("iat".into(), json!(t.as_second()));
+        }
+        if let Some(t) = expires_at {
+            object.insert("exp".into(), json!(t.as_second()));
+        }
+        if include_upload_id {
+            object.insert("uploadId".into(), json!(Uuid::new_v4().to_string()));
+        }
+        if let Some(jti) = jti {
+            object.insert("jti".into(), json!(jti));
+        }
+        encode_with_same_secret(&claims)
+    }
+
+    fn signup_now() -> Timestamp {
+        ts(SIGNUP_NOW)
+    }
+
+    #[test]
+    fn issue_valid_identity_and_upload_id_verifies_signup_token() {
+        let tokens = signup_tokens(SIGNUP_NOW);
+        let upload = Uuid::new_v4();
+        let issued = tokens.issue(&identity(), upload);
+        let verified = tokens.verify(&issued.value).unwrap();
+        assert!(!issued.value.is_empty());
+        assert_eq!(verified.provider, SocialProvider::Google);
+        assert_eq!(verified.subject, SUBJECT);
+        assert_eq!(verified.upload_id, upload);
+        assert_eq!(verified.email.as_deref(), Some("user@chalkak.test"));
+        assert!(!verified.token_id.trim().is_empty());
+        assert_eq!(verified.expires_at, plus(signup_now(), 300));
+        assert_eq!(issued.expires_at, plus(signup_now(), 300));
+    }
+
+    #[test]
+    fn issue_apple_identity_contains_no_refresh_token() {
+        let tokens = signup_tokens(SIGNUP_NOW);
+        let apple = VerifiedSocialIdentity {
+            provider: SocialProvider::Apple,
+            subject: "apple-subject".into(),
+            email: Some("user@privaterelay.appleid.com".into()),
+        };
+        let upload = Uuid::new_v4();
+        let issued = tokens.issue(&apple, upload);
+        let verified = tokens.verify(&issued.value).unwrap();
+        let payload_part = issued.value.split('.').nth(1).unwrap();
+        let payload = String::from_utf8(
+            base64_std_decode(&payload_part.replace('-', "+").replace('_', "/")).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(verified.provider, SocialProvider::Apple);
+        assert_eq!(verified.subject, "apple-subject");
+        assert_eq!(verified.upload_id, upload);
+        assert!(!verified.token_id.trim().is_empty());
+        assert!(!payload.contains("appleEncryptedRefreshToken"));
+        assert!(!payload.contains("encrypted-apple-refresh-token"));
+    }
+
+    #[test]
+    fn issue_called_twice_generates_distinct_token_ids() {
+        let tokens = signup_tokens(SIGNUP_NOW);
+        let first = tokens
+            .verify(&tokens.issue(&identity(), Uuid::new_v4()).value)
+            .unwrap();
+        let second = tokens
+            .verify(&tokens.issue(&identity(), Uuid::new_v4()).value)
+            .unwrap();
+        assert_ne!(first.token_id, second.token_id);
+    }
+
+    #[test]
+    fn issue_null_email_verifies_signup_token_without_email() {
+        let tokens = signup_tokens(SIGNUP_NOW);
+        let mut no_email = identity();
+        no_email.email = None;
+        let issued = tokens.issue(&no_email, Uuid::new_v4());
+        assert_eq!(tokens.verify(&issued.value).unwrap().email, None);
+    }
+
+    #[test]
+    fn verify_tampered_token_throws_unauthorized_exception() {
+        let tokens = signup_tokens(SIGNUP_NOW);
+        let token = tokens.issue(&identity(), Uuid::new_v4()).value;
+        let mut parts: Vec<String> = token.split('.').map(str::to_owned).collect();
+        let replacement = if parts[1].starts_with('A') { 'B' } else { 'A' };
+        parts[1] = format!("{replacement}{}", &parts[1][1..]);
+        assert_invalid_signup_token(tokens.verify(&parts.join(".")));
+    }
+
+    #[test]
+    fn verify_expired_token_throws_unauthorized_exception() {
+        let token = signup_tokens(SIGNUP_NOW)
+            .issue(&identity(), Uuid::new_v4())
+            .value;
+        let later = plus(signup_now(), 300 + 31).to_string();
+        assert_invalid_signup_token(signup_tokens(&later).verify(&token));
+    }
+
+    #[test]
+    fn verify_wrong_issuer_throws_unauthorized_exception() {
+        // 발급자가 다른 토큰: 같은 키로 서명한 임의의 발급자 클레임.
+        let token = encode_with_same_secret(&json!({
+            "iss": "other-backend",
+            "aud": SIGNUP_AUDIENCE,
+            "sub": SUBJECT,
+            "purpose": "SOCIAL_SIGNUP",
+            "provider": "GOOGLE",
+            "uploadId": Uuid::new_v4().to_string(),
+            "jti": Uuid::new_v4().to_string(),
+            "iat": signup_now().as_second(),
+            "exp": plus(signup_now(), 300).as_second(),
+        }));
+        assert_invalid_signup_token(signup_tokens(SIGNUP_NOW).verify(&token));
+    }
+
+    #[test]
+    fn verify_wrong_audience_throws_unauthorized_exception() {
+        let token = signup_tokens_with(SIGNUP_NOW, "other-audience", secret())
+            .issue(&identity(), Uuid::new_v4())
+            .value;
+        assert_invalid_signup_token(signup_tokens(SIGNUP_NOW).verify(&token));
+    }
+
+    #[test]
+    fn verify_wrong_purpose_throws_unauthorized_exception() {
+        let token = signed_signup_token(
+            "OTHER_PURPOSE",
+            true,
+            Some(signup_now()),
+            Some(plus(signup_now(), 1800)),
+            Some(&Uuid::new_v4().to_string()),
+        );
+        assert_invalid_signup_token(signup_tokens(SIGNUP_NOW).verify(&token));
+    }
+
+    #[test]
+    fn verify_missing_token_id_throws_unauthorized_exception() {
+        let token = signed_signup_token(
+            "SOCIAL_SIGNUP",
+            true,
+            Some(signup_now()),
+            Some(plus(signup_now(), 1800)),
+            None,
+        );
+        assert_invalid_signup_token(signup_tokens(SIGNUP_NOW).verify(&token));
+    }
+
+    #[test]
+    fn verify_missing_upload_id_throws_unauthorized_exception() {
+        let token = signed_signup_token(
+            "SOCIAL_SIGNUP",
+            false,
+            Some(signup_now()),
+            Some(plus(signup_now(), 1800)),
+            Some(&Uuid::new_v4().to_string()),
+        );
+        assert_invalid_signup_token(signup_tokens(SIGNUP_NOW).verify(&token));
+    }
+
+    #[test]
+    fn verify_missing_issued_at_throws_unauthorized_exception() {
+        let token = signed_signup_token(
+            "SOCIAL_SIGNUP",
+            true,
+            None,
+            Some(plus(signup_now(), 1800)),
+            Some(&Uuid::new_v4().to_string()),
+        );
+        assert_invalid_signup_token(signup_tokens(SIGNUP_NOW).verify(&token));
+    }
+
+    #[test]
+    fn verify_missing_expires_at_throws_unauthorized_exception() {
+        let token = signed_signup_token(
+            "SOCIAL_SIGNUP",
+            true,
+            Some(signup_now()),
+            None,
+            Some(&Uuid::new_v4().to_string()),
+        );
+        assert_invalid_signup_token(signup_tokens(SIGNUP_NOW).verify(&token));
+    }
+
+    #[test]
+    fn verify_issued_at_beyond_clock_skew_throws_unauthorized_exception() {
+        let token = signed_signup_token(
+            "SOCIAL_SIGNUP",
+            true,
+            Some(plus(signup_now(), 31)),
+            Some(plus(signup_now(), 1800)),
+            Some(&Uuid::new_v4().to_string()),
+        );
+        assert_invalid_signup_token(signup_tokens(SIGNUP_NOW).verify(&token));
+    }
+
+    #[test]
+    fn 허용_오차_안의_만료와_다른_키_다른_대상_형식_오류() {
+        let c = clock_at("2026-10-12T00:00:00Z");
+        let tokens = SignupTokens::new(
+            secret(),
+            SIGNUP_AUDIENCE,
+            Duration::from_secs(300),
+            c.clone(),
+        );
+        let issued = tokens.issue(&identity(), Uuid::new_v4());
+        assert_eq!(issued.expires_at, ts("2026-10-12T00:05:00Z"));
+        c.advance(Duration::from_secs(300 + 30));
+        assert!(tokens.verify(&issued.value).is_ok());
+        c.advance(Duration::from_secs(1));
+        assert_invalid_signup_token(tokens.verify(&issued.value));
+
+        let other = signup_tokens_with("2026-10-12T00:00:00Z", SIGNUP_AUDIENCE, vec![1; 32]);
+        let fresh = signup_tokens_with("2026-10-12T00:00:00Z", SIGNUP_AUDIENCE, secret())
+            .issue(&identity(), Uuid::new_v4());
+        assert_invalid_signup_token(other.verify(&fresh.value));
+        assert_invalid_signup_token(tokens.verify("not-a-jwt"));
+    }
+
+    #[test]
+    fn 액세스_토큰은_회원가입_토큰으로_쓸_수_없다() {
+        let token = access_issuer(SIGNUP_NOW).issue(Uuid::new_v4());
+        assert_invalid_signup_token(signup_tokens(SIGNUP_NOW).verify(&token.value));
+    }
+
+    // ----- HmacSocialIdentityFingerprintEncoderTest, AppleAuthorizationFingerprintEncoderTest -----
+
+    #[test]
+    fn encode_provider_and_subject_returns_hmac_sha256_fingerprint() {
+        let encoder = IdentityFingerprint::new(secret());
+        assert_eq!(
+            encoder.encode(SocialProvider::Google, SUBJECT),
+            "921c5d35312df654eaa8ec114fd1de5a156cbcc64b23ddb6a709a9423f90c218"
+        );
+    }
+
     #[test]
     fn 소셜_식별자_지문은_제공자와_subject에_따라_다르다() {
         let enc = IdentityFingerprint::new(vec![7; 32]);
@@ -473,75 +840,229 @@ mod tests {
         assert_eq!(a, enc.encode(SocialProvider::Google, "sub-1"));
         assert_ne!(a, enc.encode(SocialProvider::Kakao, "sub-1"));
         assert_ne!(a, enc.encode(SocialProvider::Google, "sub-2"));
-        // HMAC-SHA256(key=0x07*32, "GOOGLE:sub-1")
         assert_eq!(a, hex_encode(&hmac_sha256(&[7; 32], b"GOOGLE:sub-1")));
     }
 
-    // SecureRandomRefreshTokenProvider
     #[test]
-    fn 리프레시_토큰은_난수이고_해시로만_저장한다() {
-        let a = generate_refresh_token();
-        let b = generate_refresh_token();
-        assert_ne!(a.value, b.value);
-        assert_eq!(a.value.len(), 43);
-        assert!(!a.value.contains(['=', '+', '/']));
-        assert_eq!(a.token_hash, hash_refresh_token(&a.value));
-        assert_eq!(a.token_hash.len(), 64);
+    fn encode_encrypted_refresh_token_returns_sha256_fingerprint() {
+        assert_eq!(
+            apple_authorization_fingerprint("encrypted-refresh-token"),
+            "fa52a3a1ce506d39fc04ecb7ea2fde99ba09f5839ba1062e9f6c2b2aaafb1d9d"
+        );
+    }
+
+    // ----- SecureRandomRefreshTokenProviderTest -----
+
+    fn is_base64url_43(text: &str) -> bool {
+        text.len() == 43
+            && text
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || b == b'_' || b == b'-')
+    }
+
+    #[test]
+    fn generate_token_always_returns_base64_url_value_without_padding() {
+        assert!(is_base64url_43(&generate_refresh_token().value));
+    }
+
+    #[test]
+    fn generate_token_called_twice_returns_different_values() {
+        let first = generate_refresh_token();
+        let second = generate_refresh_token();
+        assert_ne!(first.value, second.value);
+        assert_ne!(first.token_hash, second.token_hash);
+    }
+
+    #[test]
+    fn generate_token_always_returns_hash_of_value() {
+        let generated = generate_refresh_token();
+        assert_eq!(generated.token_hash.len(), 64);
+        assert!(
+            generated
+                .token_hash
+                .bytes()
+                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+        );
+        assert_eq!(generated.token_hash, hash_refresh_token(&generated.value));
+    }
+
+    #[test]
+    fn encode_same_token_returns_same_hash() {
+        let token = generate_refresh_token().value;
+        assert_eq!(hash_refresh_token(&token), hash_refresh_token(&token));
+    }
+
+    #[test]
+    fn encode_different_tokens_returns_different_hashes() {
+        assert_ne!(
+            hash_refresh_token("refresh-token-a"),
+            hash_refresh_token("refresh-token-b")
+        );
         assert_eq!(
             hash_refresh_token("abc"),
             "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
         );
     }
 
-    // AesGcmAppleAuthorizationCipherTest
-    #[test]
-    fn apple_토큰을_암호화하고_복호화한다() {
-        let cipher = AppleCipher::new(&[9; 32]);
-        let a = cipher.encrypt("refresh-token").unwrap();
-        let b = cipher.encrypt("refresh-token").unwrap();
-        assert_ne!(a, b, "iv가 매번 다르다");
-        assert_eq!(cipher.decrypt(&a).unwrap(), "refresh-token");
-        assert_eq!(
-            base64_std_decode(&a).unwrap().len(),
-            12 + "refresh-token".len() + 16
-        );
-        assert!(cipher.encrypt("  ").is_err());
-        assert!(cipher.decrypt("").is_err());
-        assert!(cipher.decrypt("AAAA").is_err(), "너무 짧다");
-        // 다른 키로는 복호화할 수 없다.
-        assert!(AppleCipher::new(&[8; 32]).decrypt(&a).is_err());
-        // 변조 거부
-        let mut bytes = base64_std_decode(&a).unwrap();
-        let last = bytes.len() - 1;
-        bytes[last] ^= 1;
-        assert!(cipher.decrypt(&base64_std_encode(&bytes)).is_err());
+    // ----- AesGcmAppleAuthorizationCipherTest -----
+
+    fn cipher(key_hex: &str) -> AppleCipher {
+        let key: [u8; 32] = crate::common::hex_decode(key_hex)
+            .unwrap()
+            .try_into()
+            .unwrap();
+        AppleCipher::new(&key)
     }
 
-    // AppleClientSecretGeneratorTest
+    const DECRYPT_FAILED: &str = "암호화된 Apple refresh token을 복호화할 수 없습니다.";
+
     #[test]
-    fn client_secret은_5분_수명의_es256_토큰이다() {
-        let key = crate::config::TEST_ENV
+    fn decrypt_encrypted_refresh_token_returns_original_refresh_token() {
+        let c = cipher(ENCRYPTION_KEY);
+        let encrypted = c.encrypt(REFRESH_TOKEN).unwrap();
+        assert_eq!(c.decrypt(&encrypted).unwrap(), REFRESH_TOKEN);
+        assert_eq!(
+            base64_std_decode(&encrypted).unwrap().len(),
+            12 + REFRESH_TOKEN.len() + 16
+        );
+    }
+
+    #[test]
+    fn encrypt_same_refresh_token_generates_different_ciphertext() {
+        let c = cipher(ENCRYPTION_KEY);
+        assert_ne!(
+            c.encrypt(REFRESH_TOKEN).unwrap(),
+            c.encrypt(REFRESH_TOKEN).unwrap()
+        );
+    }
+
+    #[test]
+    fn decrypt_with_different_key_throws_exception() {
+        let encrypted = cipher(ENCRYPTION_KEY).encrypt(REFRESH_TOKEN).unwrap();
+        assert_eq!(
+            cipher(OTHER_ENCRYPTION_KEY)
+                .decrypt(&encrypted)
+                .unwrap_err(),
+            DECRYPT_FAILED
+        );
+    }
+
+    #[test]
+    fn decrypt_tampered_ciphertext_throws_exception() {
+        let c = cipher(ENCRYPTION_KEY);
+        let mut payload = base64_std_decode(&c.encrypt(REFRESH_TOKEN).unwrap()).unwrap();
+        let last = payload.len() - 1;
+        payload[last] ^= 1;
+        assert_eq!(
+            c.decrypt(&base64_std_encode(&payload)).unwrap_err(),
+            DECRYPT_FAILED
+        );
+    }
+
+    #[test]
+    fn encrypt_missing_refresh_token_throws_exception() {
+        let c = cipher(ENCRYPTION_KEY);
+        for blank in ["", "   "] {
+            assert_eq!(
+                c.encrypt(blank).unwrap_err(),
+                "Apple refresh token이 필요합니다."
+            );
+        }
+    }
+
+    #[test]
+    fn decrypt_missing_encrypted_refresh_token_throws_exception() {
+        let c = cipher(ENCRYPTION_KEY);
+        for blank in ["", "   "] {
+            assert_eq!(
+                c.decrypt(blank).unwrap_err(),
+                "암호화된 Apple refresh token이 필요합니다."
+            );
+        }
+    }
+
+    #[test]
+    fn decrypt_invalid_base64_throws_exception() {
+        assert_eq!(
+            cipher(ENCRYPTION_KEY)
+                .decrypt("invalid-base64")
+                .unwrap_err(),
+            DECRYPT_FAILED
+        );
+        // 너무 짧은 페이로드
+        assert!(cipher(ENCRYPTION_KEY).decrypt("AAAA").is_err());
+    }
+
+    // ----- AppleClientSecretGeneratorTest -----
+
+    fn test_private_key() -> &'static str {
+        crate::config::TEST_ENV
             .iter()
             .find(|(k, _)| *k == "APPLE_PRIVATE_KEY_BASE64")
             .unwrap()
-            .1;
-        let secret = AppleClientSecret::new(key, "team", "kid", "client", clock()).unwrap();
+            .1
+    }
+
+    /// RSA 개인키 PEM(PKCS8)을 base64로 감싼 값. EC 키가 아니다.
+    const RSA_PRIVATE_KEY_BASE64: &str = "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUNkZ0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQW1Bd2dnSmNBZ0VBQW9HQkFOQlluOEdYb0pLYU1JUi8KUGpadEtOeTMwTC81bGRnUjkreUVoaTl4a2NIY1JKRVB1TlBaamdEMjkyMktVb3lHMWprWFdGa1RZcFhub1BBegpNM2JBRDVUTTFTWHFjMCtNdCtHMTRRc25rVkNlSXZ3ZmNqVUNlRXlPeml2ZEtvRFZSQm1JZngzcHA3R29WMlY3CkNhaEtEUll4R2VwaCtBMStFRjhsZHNXQlpFSHBBZ01CQUFFQ2dZQmlESE1TYmtNWSt3cytMNHVkblgyUGNjb0IKcm5tQU4rU1BJRWJ0Nk9xSmF4bXhrczZPbEdHcHZvL3VzeHZxR2tLU2w1UHlSNWNycU5ncWNrNFQ0b3J4eUgwcApDa2N6Z2tFSXQyZ2ZqK3Eyd0RjcjZxR25oVmlzVXBwaDl1MmdIYTdxUEV1YUh6aVFyM2JKZ1RFaDVOa1BKbGE1ClI2b1NMSGd0dUU1NDBnbDhDUUpCQU83TlcyQjNDZ0JwaXdISXYvaWlGS2plTkdsNVg3L1RxVmFvMEtKR3RYSWkKYnBRUnd2UDk5Qm5yRVhrU2xtNzl1SElyd3FwV01MZnN4R3VMNnNKOFd5Y0NRUURmV2NUL3Y4T0UzVWVUbWF2NwpYczFmY3BqWlBFd1VnZytjanRVdlRsQVE2b1ZUMVQxQkNwTEdwM3d5djlpLzA2L0NLeUlBNFUvUUI3cnRla3JICnB1UnZBa0J3dWo0dGJtUXBSNmxZQVVVbUFKVVNGanJWbzNjZ25iRXRlR2xzZ1VaOEIyYjl2Tml6eHlqbzV6K0wKVU12MHZ3N0h6b0tKV0VDTlFsYUNrajBTN0JNM0FrRUF4N0JaQTFlT0ZXSkp0bHQwZWovZVduSDQybkNnak0xago2OU9BSXRWZm5HQXhhQ3lFb1h3MGtrdjRMTjk5aUxSWXRiOGVuYTdVVHVnNlprd3FRNnFoSFFKQVNCeE1ycFNTCjdIZmJvbDNHODR0dEVobUV3bkN5bCtUcUExRGdiSUZtMDY3ZmtQZ29WWnBSNWhTb0RNQU9PTld1SjEwaG45NFcKZWIra0x4SjZ3S0E0T1E9PQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tCg==";
+
+    fn base64url_text(part: &str) -> String {
+        String::from_utf8(base64_std_decode(&part.replace('-', "+").replace('_', "/")).unwrap())
+            .unwrap()
+    }
+
+    #[test]
+    fn generate_valid_private_key_returns_signed_client_secret() {
+        let secret = AppleClientSecret::new(
+            test_private_key(),
+            "APPLETEAM1",
+            "APPLEKEY01",
+            "com.chalkak.ios",
+            clock_at("2026-09-03T00:00:00Z"),
+        )
+        .unwrap();
         let token = secret.generate();
         let parts: Vec<&str> = token.split('.').collect();
         assert_eq!(parts.len(), 3);
-        let header = String::from_utf8(
-            base64_std_decode(&parts[0].replace('-', "+").replace('_', "/")).unwrap(),
-        )
-        .unwrap();
-        assert_eq!(header, r#"{"kid":"kid","alg":"ES256"}"#);
-        let payload = String::from_utf8(
-            base64_std_decode(&parts[1].replace('-', "+").replace('_', "/")).unwrap(),
-        )
-        .unwrap();
         assert_eq!(
-            payload,
-            r#"{"iss":"team","sub":"client","aud":"https://appleid.apple.com","exp":1791763500,"iat":1791763200}"#
+            base64url_text(parts[0]),
+            r#"{"kid":"APPLEKEY01","alg":"ES256"}"#
         );
-        assert!(AppleClientSecret::new("bm90LWEta2V5", "t", "k", "c", clock()).is_err());
+        let iat = ts("2026-09-03T00:00:00Z").as_second();
+        assert_eq!(
+            base64url_text(parts[1]),
+            format!(
+                r#"{{"iss":"APPLETEAM1","sub":"com.chalkak.ios","aud":"https://appleid.apple.com","exp":{},"iat":{}}}"#,
+                iat + 300,
+                iat
+            )
+        );
+        // 서명은 JOSE 형식 r||s 64바이트다.
+        assert_eq!(
+            base64_std_decode(&parts[2].replace('-', "+").replace('_', "/"))
+                .unwrap()
+                .len(),
+            64
+        );
+    }
+
+    fn client_secret_with(key: &str) -> Result<AppleClientSecret, JwtError> {
+        AppleClientSecret::new(key, "t", "k", "c", clock_at("2026-09-03T00:00:00Z"))
+    }
+
+    #[test]
+    fn create_invalid_base64_throws_illegal_state_exception() {
+        assert!(client_secret_with("not-base64").is_err());
+    }
+
+    #[test]
+    fn create_invalid_pem_throws_illegal_state_exception() {
+        // base64("not-pem")
+        assert!(client_secret_with("bm90LXBlbQ==").is_err());
+    }
+
+    #[test]
+    fn create_non_ec_private_key_throws_illegal_state_exception() {
+        assert!(client_secret_with(RSA_PRIVATE_KEY_BASE64).is_err());
     }
 }

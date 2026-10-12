@@ -342,6 +342,26 @@ mod tests {
         );
     }
 
+    // AppleAuthPropertiesTest, AesGcmAppleAuthorizationCipherTest#constructor_invalidEncryptionKey
+    #[test]
+    fn apple_properties_invalid_encryption_key_rejects_startup() {
+        for bad in [
+            "too-short",
+            "",
+            "00112233",
+            "zz112233445566778899aabbccddeeff00112233445566778899aabbccddeeff",
+        ] {
+            assert!(
+                parse(
+                    &env(&[("APPLE_REFRESH_TOKEN_ENCRYPTION_KEY", bad)]),
+                    "local"
+                )
+                .is_err(),
+                "{bad}"
+            );
+        }
+    }
+
     #[test]
     fn 잘못된_값은_기동을_막는다() {
         for (key, value) in [

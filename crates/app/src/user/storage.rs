@@ -708,4 +708,211 @@ mod tests {
             500
         );
     }
+
+    // ----- S3SignatureImageStorageTest, S3SignatureImageUploadIssuerTest (원본 메서드 이름) -----
+
+    fn dev_settings() -> ImageSettings {
+        let mut s = settings();
+        s.environment = "dev".into();
+        s.base_url = "https://cdn.example.com".into();
+        s
+    }
+
+    #[test]
+    fn to_storage_keys_upload_id_creates_original_and_thumbnail_keys() {
+        let upload_id = Uuid::new_v4();
+        let storage = S3SignatureImageStorage::new(&dev_settings(), FakeHead::new(vec![]));
+        let keys = storage.to_storage_keys(upload_id);
+        assert_eq!(
+            keys.original,
+            format!("chalkak/signatures/dev/original/{upload_id}.png")
+        );
+        assert_eq!(
+            keys.thumbnail,
+            format!("chalkak/signatures/dev/thumbnail/{upload_id}.png")
+        );
+    }
+
+    #[test]
+    fn to_storage_keys_prod_environment_creates_prod_keys() {
+        let upload_id = Uuid::new_v4();
+        let mut s = dev_settings();
+        s.environment = "prod".into();
+        let storage = S3SignatureImageStorage::new(&s, FakeHead::new(vec![]));
+        let keys = storage.to_storage_keys(upload_id);
+        assert_eq!(
+            keys.original,
+            format!("chalkak/signatures/prod/original/{upload_id}.png")
+        );
+        assert_eq!(
+            keys.thumbnail,
+            format!("chalkak/signatures/prod/thumbnail/{upload_id}.png")
+        );
+        assert_eq!(
+            storage.to_staging_storage_key(upload_id),
+            format!("chalkak/staging/prod/signatures/{upload_id}.png")
+        );
+    }
+
+    #[test]
+    fn to_image_url_original_storage_key_excludes_root_prefix() {
+        let upload_id = Uuid::new_v4();
+        let storage = S3SignatureImageStorage::new(&dev_settings(), FakeHead::new(vec![]));
+        let key = storage.to_storage_keys(upload_id).original;
+        assert_eq!(
+            storage.to_image_url(&key).unwrap(),
+            format!("https://cdn.example.com/signatures/dev/original/{upload_id}.png")
+        );
+    }
+
+    #[test]
+    fn is_processing_completed_existing_thumbnail_returns_true() {
+        let upload_id = Uuid::new_v4();
+        let head = FakeHead::new(vec![("/thumbnail/", Ok(Some(png())))]);
+        let storage = S3SignatureImageStorage::new(&dev_settings(), head.clone());
+        assert!(storage.is_processing_completed(upload_id).unwrap());
+        assert_eq!(
+            *head.calls.lock().unwrap(),
+            vec![format!("chalkak/signatures/dev/thumbnail/{upload_id}.png")]
+        );
+    }
+
+    #[test]
+    fn to_image_url_storage_key_without_root_prefix_throws_illegal_argument_exception() {
+        let storage = S3SignatureImageStorage::new(&dev_settings(), FakeHead::new(vec![]));
+        let key = format!("signatures/original/{}.png", Uuid::new_v4());
+        let error = storage.to_image_url(&key).unwrap_err();
+        assert!(
+            matches!(&error, ApiError::Internal(m) if m == "스토리지 키는 root-prefix로 시작해야 합니다: chalkak")
+        );
+    }
+
+    #[test]
+    fn find_uploaded_image_no_such_key_returns_empty() {
+        let storage = S3SignatureImageStorage::new(&dev_settings(), FakeHead::new(vec![]));
+        assert_eq!(storage.find_uploaded_image(Uuid::new_v4()).unwrap(), None);
+    }
+
+    #[test]
+    fn find_uploaded_image_existing_staging_image_uses_signature_staging_path() {
+        let upload_id = Uuid::new_v4();
+        let head = FakeHead::new(vec![("/staging/", Ok(Some(png())))]);
+        let storage = S3SignatureImageStorage::new(&dev_settings(), head.clone());
+        storage.find_uploaded_image(upload_id).unwrap();
+        assert_eq!(
+            *head.calls.lock().unwrap(),
+            vec![format!("chalkak/staging/dev/signatures/{upload_id}.png")]
+        );
+    }
+
+    /// 요청 한 건에 `status` 줄만 돌려주는 한 번짜리 서버. 받은 요청 첫 줄을 넘긴다.
+    fn serve_status_once(status: &'static str) -> (String, std::thread::JoinHandle<String>) {
+        use std::io::{Read, Write};
+        let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let url = format!("http://{}", listener.local_addr().unwrap());
+        let handle = std::thread::spawn(move || {
+            let (mut stream, _) = listener.accept().unwrap();
+            let mut buffer = [0u8; 4096];
+            let n = stream.read(&mut buffer).unwrap();
+            let first_line = String::from_utf8_lossy(&buffer[..n])
+                .lines()
+                .next()
+                .unwrap_or("")
+                .to_owned();
+            let response =
+                format!("HTTP/1.1 {status}\r\nContent-Length: 0\r\nConnection: close\r\n\r\n");
+            stream.write_all(response.as_bytes()).unwrap();
+            first_line
+        });
+        (url, handle)
+    }
+
+    #[test]
+    fn find_uploaded_image_access_denied_returns_empty() {
+        // ListBucket 권한이 없으면 S3는 객체 존재를 숨기려고 404 대신 403을 준다.
+        for status in ["403 Forbidden", "404 Not Found"] {
+            let (url, server) = serve_status_once(status);
+            let mut s = dev_settings();
+            s.endpoint = chalkak_aws::S3Endpoint::custom(&url, true).unwrap();
+            let clock = Arc::new(chalkak_core::FixedClock::new(
+                "2026-10-12T00:00:00Z".parse().unwrap(),
+            ));
+            let head = HttpHeadObjects::new(&s, Some(Arc::new(StaticCredentials)), clock).unwrap();
+            assert_eq!(head.head("chalkak/staging/dev/signatures/a.png"), Ok(None));
+            let first_line = server.join().unwrap();
+            assert!(
+                first_line.starts_with("HEAD /test-bucket/chalkak/staging/dev/signatures/a.png"),
+                "{first_line}"
+            );
+        }
+    }
+
+    #[test]
+    fn find_uploaded_image_server_error_propagates() {
+        let head = FakeHead::new(vec![
+            ("/staging/", Err(HeadFailure::Http(500))),
+            ("/original/", Err(HeadFailure::Http(500))),
+        ]);
+        let storage = S3SignatureImageStorage::new(&dev_settings(), head);
+        assert_eq!(
+            storage
+                .find_uploaded_image(Uuid::new_v4())
+                .unwrap_err()
+                .status(),
+            500
+        );
+    }
+
+    #[test]
+    fn issue_processing_upload_presigns_original_and_thumbnail_keys() {
+        let upload = issuer(false).issue_processing_upload(id()).unwrap();
+        assert_eq!(upload.content_type, "image/png");
+        assert_eq!(upload.cache_control, "public, max-age=86400");
+        assert!(upload.original_upload_url.contains(
+            "/chalkak/signatures/local/original/0190f3a2-7b1c-7d2e-8f4a-123456789abc.png?"
+        ));
+        assert!(upload.thumbnail_upload_url.contains(
+            "/chalkak/signatures/local/thumbnail/0190f3a2-7b1c-7d2e-8f4a-123456789abc.png?"
+        ));
+        for url in [&upload.original_upload_url, &upload.thumbnail_upload_url] {
+            assert!(url.contains("X-Amz-Expires=300"), "{url}");
+            // 덮어쓰기 방지(`If-None-Match: *`)와 캐시 헤더, 콘텐츠 타입이 서명에 들어 있다.
+            assert!(
+                url.contains(
+                    "X-Amz-SignedHeaders=cache-control%3Bcontent-type%3Bhost%3Bif-none-match"
+                ),
+                "{url}"
+            );
+        }
+    }
+
+    #[test]
+    fn issue_dev_environment_presigns_dev_signature_upload() {
+        let s = dev_settings();
+        let storage = Arc::new(S3SignatureImageStorage::new(&s, FakeHead::new(vec![])));
+        let clock = Arc::new(chalkak_core::FixedClock::new(
+            "2026-10-12T00:00:00Z".parse().unwrap(),
+        ));
+        let issuer = S3SignatureImageUploadIssuer::new(
+            &s,
+            Some(Arc::new(StaticCredentials)),
+            storage,
+            clock,
+        );
+        let upload_id = Uuid::new_v4();
+        let upload = issuer.issue(upload_id).unwrap();
+        assert_eq!(upload.upload_id, upload_id);
+        assert_eq!(upload.expires_in_seconds, 300);
+        assert!(
+            upload
+                .upload_url
+                .contains(&format!("/chalkak/staging/dev/signatures/{upload_id}.png?"))
+        );
+        assert!(upload.upload_url.contains("X-Amz-Expires=300"));
+        assert!(
+            upload
+                .upload_url
+                .contains("X-Amz-SignedHeaders=content-type%3Bhost")
+        );
+    }
 }

@@ -35,8 +35,20 @@ pub struct SocialIdentityVerifier {
 }
 
 impl SocialIdentityVerifier {
-    pub fn new(verifiers: Vec<Arc<dyn IdTokenVerifier>>) -> SocialIdentityVerifier {
-        SocialIdentityVerifier { verifiers }
+    /// 같은 제공자의 검증기가 둘 이상이면 만들 수 없다(원본 생성자의 `IllegalStateException`).
+    pub fn new(verifiers: Vec<Arc<dyn IdTokenVerifier>>) -> Result<SocialIdentityVerifier, String> {
+        for (index, verifier) in verifiers.iter().enumerate() {
+            if verifiers[..index]
+                .iter()
+                .any(|other| other.provider() == verifier.provider())
+            {
+                return Err(format!(
+                    "같은 제공자의 ID Token 검증기가 중복 등록되었습니다: {}",
+                    verifier.provider().name()
+                ));
+            }
+        }
+        Ok(SocialIdentityVerifier { verifiers })
     }
 
     /// 설정에 맞춘 Google·Kakao·Apple 검증기.
@@ -45,27 +57,24 @@ impl SocialIdentityVerifier {
         clock: Arc<dyn Clock>,
     ) -> Result<SocialIdentityVerifier, String> {
         let mut verifiers: Vec<Arc<dyn IdTokenVerifier>> = Vec::new();
-        for (provider, settings, policy) in [
-            (
-                SocialProvider::Google,
-                &auth.google,
-                EmailPolicy::VerifiedOnly,
-            ),
-            (SocialProvider::Kakao, &auth.kakao, EmailPolicy::AsProvided),
-            (
-                SocialProvider::Apple,
-                &auth.apple_oidc,
-                EmailPolicy::VerifiedOnly,
-            ),
+        for (provider, settings) in [
+            (SocialProvider::Google, &auth.google),
+            (SocialProvider::Kakao, &auth.kakao),
+            (SocialProvider::Apple, &auth.apple_oidc),
         ] {
             verifiers.push(Arc::new(OidcIdTokenVerifier::new(
                 provider,
                 settings,
-                policy,
+                email_policy_for(provider),
                 Arc::clone(&clock),
             )?));
         }
-        Ok(SocialIdentityVerifier { verifiers })
+        SocialIdentityVerifier::new(verifiers)
+    }
+
+    /// 등록된 제공자(등록 순서).
+    pub fn providers(&self) -> Vec<SocialProvider> {
+        self.verifiers.iter().map(|v| v.provider()).collect()
     }
 
     pub fn verify(
@@ -95,6 +104,14 @@ pub enum EmailPolicy {
     VerifiedOnly,
     /// 제공자가 준 이메일을 그대로 쓴다.
     AsProvided,
+}
+
+/// 제공자별 이메일 정책. Kakao ID Token에는 `email_verified`가 없어 받은 이메일을 그대로 쓴다.
+pub fn email_policy_for(provider: SocialProvider) -> EmailPolicy {
+    match provider {
+        SocialProvider::Kakao => EmailPolicy::AsProvided,
+        SocialProvider::Google | SocialProvider::Apple => EmailPolicy::VerifiedOnly,
+    }
 }
 
 /// `Jwt.getClaimAsString`: 문자열이 아닌 스칼라는 문자열로 바꾼다.
@@ -250,9 +267,20 @@ impl IdTokenVerifier for OidcIdTokenVerifier {
             return Err(self.unauthorized(format!("{name} 로그인 nonce가 필요합니다.")));
         }
         let claims = self.decode(id_token)?;
+        self.identity_from_claims(&claims, raw_nonce)
+    }
+}
 
+impl OidcIdTokenVerifier {
+    /// 서명·시각 검증이 끝난 클레임에서 nonce와 사용자 식별 정보를 확인한다.
+    pub fn identity_from_claims(
+        &self,
+        claims: &Claims,
+        raw_nonce: &str,
+    ) -> Result<VerifiedSocialIdentity, ApiError> {
+        let name = self.provider.name();
         let expected = sha256_hex(raw_nonce.as_bytes());
-        let matches = claim_as_string(&claims, "nonce")
+        let matches = claim_as_string(claims, "nonce")
             .is_some_and(|nonce| constant_time_eq(expected.as_bytes(), nonce.as_bytes()));
         if !matches {
             return Err(self.unauthorized(format!("{name} ID Token nonce가 일치하지 않습니다.")));
@@ -274,7 +302,7 @@ impl IdTokenVerifier for OidcIdTokenVerifier {
         Ok(VerifiedSocialIdentity {
             provider: self.provider,
             subject: subject.to_owned(),
-            email: self.email_policy.extract_email(&claims),
+            email: self.email_policy.extract_email(claims),
         })
     }
 }
@@ -293,44 +321,99 @@ mod tests {
     use chalkak_core::FixedClock;
     use serde_json::json;
 
+    const EMAIL: &str = "user@chalkak.test";
+    const ID_TOKEN: &str = "id-token";
+    const RAW_NONCE: &str = "raw-nonce";
+    const ALL_PROVIDERS: [SocialProvider; 3] = [
+        SocialProvider::Google,
+        SocialProvider::Kakao,
+        SocialProvider::Apple,
+    ];
+
     fn claims(value: Value) -> Claims {
         Claims::from_map(value.as_object().unwrap().clone()).unwrap()
     }
 
-    // OidcEmailPolicy: VERIFIED_ONLY
+    /// `jwtBuilder()`: subject와 nonce 해시를 가진 ID Token 클레임.
+    fn id_claims() -> Value {
+        json!({
+            "sub": "provider-subject",
+            "nonce": sha256_hex(RAW_NONCE.as_bytes()),
+            "iat": 1_789_430_400,
+            "exp": 1_789_431_000,
+        })
+    }
+
+    // ----- OidcEmailPolicyTest -----
+
     #[test]
-    fn 검증된_이메일만_쓰는_정책() {
-        let p = EmailPolicy::VerifiedOnly;
+    fn extract_email_verified_only_with_boolean_true_returns_email() {
+        let c = claims(json!({"email": EMAIL, "email_verified": true}));
         assert_eq!(
-            p.extract_email(&claims(json!({"email":"a@b.c","email_verified":true}))),
-            Some("a@b.c".into())
+            EmailPolicy::VerifiedOnly.extract_email(&c).as_deref(),
+            Some(EMAIL)
         );
-        assert_eq!(
-            p.extract_email(&claims(json!({"email":"a@b.c","email_verified":"TRUE"}))),
-            Some("a@b.c".into())
-        );
-        for verified in [json!(false), json!("false"), json!(1), json!(null)] {
+    }
+
+    #[test]
+    fn extract_email_verified_only_with_string_true_returns_email() {
+        for verified in ["true", "TRUE"] {
+            let c = claims(json!({"email": EMAIL, "email_verified": verified}));
             assert_eq!(
-                p.extract_email(&claims(json!({"email":"a@b.c","email_verified":verified}))),
-                None
+                EmailPolicy::VerifiedOnly.extract_email(&c).as_deref(),
+                Some(EMAIL)
             );
         }
-        assert_eq!(p.extract_email(&claims(json!({"email":"a@b.c"}))), None);
+    }
+
+    #[test]
+    fn extract_email_verified_only_without_true_returns_null() {
+        for verified in ["false", "yes", ""] {
+            let c = claims(json!({"email": EMAIL, "email_verified": verified}));
+            assert_eq!(EmailPolicy::VerifiedOnly.extract_email(&c), None);
+        }
+        for verified in [json!(1), json!(null)] {
+            let c = claims(json!({"email": EMAIL, "email_verified": verified}));
+            assert_eq!(EmailPolicy::VerifiedOnly.extract_email(&c), None);
+        }
+    }
+
+    #[test]
+    fn extract_email_verified_only_with_false_or_missing_returns_null() {
+        let false_verified = claims(json!({"email": EMAIL, "email_verified": false}));
+        let missing_verified = claims(json!({"email": EMAIL}));
         assert_eq!(
-            p.extract_email(&claims(json!({"email_verified":true}))),
+            EmailPolicy::VerifiedOnly.extract_email(&false_verified),
+            None
+        );
+        assert_eq!(
+            EmailPolicy::VerifiedOnly.extract_email(&missing_verified),
+            None
+        );
+        assert_eq!(
+            EmailPolicy::VerifiedOnly.extract_email(&claims(json!({"email_verified": true}))),
             None
         );
     }
 
     #[test]
-    fn 제공된_이메일을_그대로_쓰는_정책() {
-        let p = EmailPolicy::AsProvided;
+    fn extract_email_as_provided_without_verification_returns_email() {
+        let c = claims(json!({"email": EMAIL, "email_verified": false}));
         assert_eq!(
-            p.extract_email(&claims(json!({"email":"a@b.c"}))),
-            Some("a@b.c".into())
+            EmailPolicy::AsProvided.extract_email(&c).as_deref(),
+            Some(EMAIL)
         );
-        assert_eq!(p.extract_email(&claims(json!({}))), None);
     }
+
+    #[test]
+    fn extract_email_as_provided_without_email_returns_null() {
+        assert_eq!(
+            EmailPolicy::AsProvided.extract_email(&claims(json!({}))),
+            None
+        );
+    }
+
+    // ----- OidcIdTokenVerifierTest -----
 
     struct Failing;
     impl JwksSource for Failing {
@@ -339,51 +422,313 @@ mod tests {
         }
     }
 
-    fn verifier() -> OidcIdTokenVerifier {
+    fn verifier_for(provider: SocialProvider, policy: EmailPolicy) -> OidcIdTokenVerifier {
         let settings = OidcProvider {
             issuer: "https://accounts.google.com".into(),
             jwks_uri: "http://invalid".into(),
             audience: "client".into(),
         };
         OidcIdTokenVerifier::with_source(
-            SocialProvider::Google,
+            provider,
             &settings,
-            EmailPolicy::VerifiedOnly,
+            policy,
             Arc::new(Failing),
             Arc::new(FixedClock::new("2026-10-12T00:00:00Z".parse().unwrap())),
         )
         .unwrap()
     }
 
-    // OidcIdTokenVerifierTest: 입력 검증 순서와 메시지
+    fn verifier() -> OidcIdTokenVerifier {
+        verifier_for(SocialProvider::Google, EmailPolicy::VerifiedOnly)
+    }
+
+    fn status_and_message(error: ApiError) -> (u16, String) {
+        (error.status(), error.message())
+    }
+
     #[test]
-    fn 빈_nonce와_빈_토큰과_깨진_토큰은_401이다() {
-        let v = verifier();
-        let err = v.verify("token", " ").unwrap_err();
+    fn verify_matching_nonce_returns_social_identity() {
+        let mut c = id_claims();
+        c["email"] = json!(EMAIL);
+        c["email_verified"] = json!(true);
+        let identity = verifier()
+            .identity_from_claims(&claims(c), RAW_NONCE)
+            .unwrap();
+        assert_eq!(identity.provider, SocialProvider::Google);
+        assert_eq!(identity.subject, "provider-subject");
+        assert_eq!(identity.email.as_deref(), Some(EMAIL));
+    }
+
+    #[test]
+    fn verify_mismatched_nonce_throws_unauthorized_exception() {
+        for provider in ALL_PROVIDERS {
+            let mut c = id_claims();
+            c["nonce"] = json!(sha256_hex(b"other-raw-nonce"));
+            let error = verifier_for(provider, EmailPolicy::VerifiedOnly)
+                .identity_from_claims(&claims(c), RAW_NONCE)
+                .unwrap_err();
+            assert_eq!(
+                status_and_message(error),
+                (
+                    401,
+                    format!("{} ID Token nonce가 일치하지 않습니다.", provider.name())
+                )
+            );
+        }
+    }
+
+    #[test]
+    fn verify_missing_nonce_claim_throws_unauthorized_exception() {
+        for provider in ALL_PROVIDERS {
+            let mut c = id_claims();
+            c.as_object_mut().unwrap().remove("nonce");
+            let error = verifier_for(provider, EmailPolicy::VerifiedOnly)
+                .identity_from_claims(&claims(c), RAW_NONCE)
+                .unwrap_err();
+            assert_eq!(
+                status_and_message(error),
+                (
+                    401,
+                    format!("{} ID Token nonce가 일치하지 않습니다.", provider.name())
+                )
+            );
+        }
+    }
+
+    #[test]
+    fn verify_uppercase_hex_nonce_throws_unauthorized_exception() {
+        let mut c = id_claims();
+        c["nonce"] = json!(sha256_hex(RAW_NONCE.as_bytes()).to_uppercase());
+        let error = verifier_for(SocialProvider::Kakao, EmailPolicy::VerifiedOnly)
+            .identity_from_claims(&claims(c), RAW_NONCE)
+            .unwrap_err();
         assert_eq!(
-            (err.status(), err.message().as_str()),
-            (401, "GOOGLE 로그인 nonce가 필요합니다.")
-        );
-        let err = v.verify("  ", "nonce").unwrap_err();
-        assert_eq!(
-            (err.status(), err.message().as_str()),
-            (401, "유효하지 않은 GOOGLE ID Token입니다.")
-        );
-        let err = v.verify("a.b.c", "nonce").unwrap_err();
-        assert_eq!(
-            (err.status(), err.message().as_str()),
-            (401, "유효하지 않은 GOOGLE ID Token입니다.")
+            status_and_message(error),
+            (401, "KAKAO ID Token nonce가 일치하지 않습니다.".to_owned())
         );
     }
 
     #[test]
-    fn 등록되지_않은_제공자는_400이다() {
-        let only_google = SocialIdentityVerifier::new(vec![Arc::new(verifier())]);
-        let err = only_google
-            .verify(SocialProvider::Kakao, "t", "n")
+    fn verify_raw_nonce_in_claim_throws_unauthorized_exception() {
+        let mut c = id_claims();
+        c["nonce"] = json!(RAW_NONCE);
+        let error = verifier()
+            .identity_from_claims(&claims(c), RAW_NONCE)
             .unwrap_err();
-        assert_eq!(err.status(), 400);
-        assert_eq!(err.message(), "지원하지 않는 소셜 로그인 제공자입니다.");
+        assert_eq!(
+            status_and_message(error),
+            (401, "GOOGLE ID Token nonce가 일치하지 않습니다.".to_owned())
+        );
+    }
+
+    #[test]
+    fn verify_missing_raw_nonce_throws_unauthorized_exception() {
+        // 원본 nonce가 비어 있으면 ID Token을 해석하기 전에 거절한다(해석했다면 "유효하지 않은 ..."이 나온다).
+        for raw_nonce in ["", " "] {
+            let error = verifier_for(SocialProvider::Kakao, EmailPolicy::AsProvided)
+                .verify(ID_TOKEN, raw_nonce)
+                .unwrap_err();
+            assert_eq!(
+                status_and_message(error),
+                (401, "KAKAO 로그인 nonce가 필요합니다.".to_owned())
+            );
+        }
+    }
+
+    #[test]
+    fn verify_blank_id_token_throws_unauthorized_exception() {
+        for id_token in ["", " "] {
+            let error = verifier_for(SocialProvider::Apple, EmailPolicy::VerifiedOnly)
+                .verify(id_token, RAW_NONCE)
+                .unwrap_err();
+            assert_eq!(
+                status_and_message(error),
+                (401, "유효하지 않은 APPLE ID Token입니다.".to_owned())
+            );
+        }
+    }
+
+    #[test]
+    fn verify_decoder_rejects_throws_unauthorized_exception() {
+        // 공개키를 받지 못하거나 서명이 맞지 않는 토큰은 모두 같은 401이다.
+        let error = verifier().verify("a.b.c", RAW_NONCE).unwrap_err();
+        assert_eq!(
+            status_and_message(error),
+            (401, "유효하지 않은 GOOGLE ID Token입니다.".to_owned())
+        );
+    }
+
+    #[test]
+    fn verify_missing_subject_throws_unauthorized_exception() {
+        let mut c = id_claims();
+        c.as_object_mut().unwrap().remove("sub");
+        let error = verifier_for(SocialProvider::Kakao, EmailPolicy::AsProvided)
+            .identity_from_claims(&claims(c), RAW_NONCE)
+            .unwrap_err();
+        assert_eq!(
+            status_and_message(error),
+            (
+                401,
+                "KAKAO ID Token에 사용자 식별 정보가 없습니다.".to_owned()
+            )
+        );
+    }
+
+    #[test]
+    fn verify_overlong_subject_throws_unauthorized_exception() {
+        let mut c = id_claims();
+        c["sub"] = json!("a".repeat(256));
+        let error = verifier_for(SocialProvider::Apple, EmailPolicy::VerifiedOnly)
+            .identity_from_claims(&claims(c), RAW_NONCE)
+            .unwrap_err();
+        assert_eq!(
+            status_and_message(error),
+            (
+                401,
+                "APPLE ID Token의 사용자 식별 정보가 너무 깁니다.".to_owned()
+            )
+        );
+    }
+
+    #[test]
+    fn verify_max_length_subject_returns_social_identity() {
+        let subject = "a".repeat(255);
+        let mut c = id_claims();
+        c["sub"] = json!(subject);
+        let identity = verifier()
+            .identity_from_claims(&claims(c), RAW_NONCE)
+            .unwrap();
+        assert_eq!(identity.subject, subject);
+    }
+
+    // ----- SocialIdentityVerifierTest -----
+
+    struct Stub {
+        provider: SocialProvider,
+        identity: VerifiedSocialIdentity,
+    }
+
+    impl Stub {
+        fn arc(provider: SocialProvider, subject: &str) -> Arc<dyn IdTokenVerifier> {
+            Arc::new(Stub {
+                provider,
+                identity: VerifiedSocialIdentity {
+                    provider,
+                    subject: subject.to_owned(),
+                    email: Some(EMAIL.to_owned()),
+                },
+            })
+        }
+    }
+
+    impl IdTokenVerifier for Stub {
+        fn provider(&self) -> SocialProvider {
+            self.provider
+        }
+        fn verify(
+            &self,
+            id_token: &str,
+            raw_nonce: &str,
+        ) -> Result<VerifiedSocialIdentity, ApiError> {
+            assert_eq!((id_token, raw_nonce), ("kakao-id-token", "raw-nonce"));
+            Ok(self.identity.clone())
+        }
+    }
+
+    #[test]
+    fn verify_registered_provider_delegates_to_matching_verifier() {
+        let v = SocialIdentityVerifier::new(vec![
+            Stub::arc(SocialProvider::Google, "google-subject"),
+            Stub::arc(SocialProvider::Kakao, "kakao-subject"),
+        ])
+        .unwrap();
+        let identity = v
+            .verify(SocialProvider::Kakao, "kakao-id-token", "raw-nonce")
+            .unwrap();
+        assert_eq!(identity.provider, SocialProvider::Kakao);
+        assert_eq!(identity.subject, "kakao-subject");
+        assert_eq!(identity.email.as_deref(), Some(EMAIL));
+    }
+
+    #[test]
+    fn create_duplicate_provider_throws_illegal_state_exception() {
+        let result = SocialIdentityVerifier::new(vec![
+            Stub::arc(SocialProvider::Kakao, "a"),
+            Stub::arc(SocialProvider::Kakao, "b"),
+        ]);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn verify_unsupported_provider_throws_business_exception() {
+        let only_google =
+            SocialIdentityVerifier::new(vec![Stub::arc(SocialProvider::Google, "g")]).unwrap();
+        let error = only_google
+            .verify(SocialProvider::Kakao, "kakao-id-token", "raw-nonce")
+            .unwrap_err();
+        assert_eq!(error.status(), 400);
+        assert_eq!(error.message(), "지원하지 않는 소셜 로그인 제공자입니다.");
+    }
+
+    // ----- OidcIdTokenConfigTest -----
+
+    fn auth_settings() -> crate::config::AuthSettings {
+        let env = chalkak_core::config::Env::from_pairs(crate::config::TEST_ENV.to_vec());
+        crate::config::AppSettings::from_env(
+            &env,
+            "local",
+            vec![0],
+            std::time::Duration::from_secs(900),
+        )
+        .unwrap()
+        .auth
+    }
+
+    #[test]
+    fn create_valid_properties_registers_decoders_and_verifiers() {
+        let clock = Arc::new(FixedClock::new("2026-10-12T00:00:00Z".parse().unwrap()));
+        let v = SocialIdentityVerifier::from_settings(&auth_settings(), clock).unwrap();
+        assert_eq!(
+            v.providers(),
+            vec![
+                SocialProvider::Google,
+                SocialProvider::Kakao,
+                SocialProvider::Apple
+            ]
+        );
+    }
+
+    #[test]
+    fn create_valid_properties_registers_provider_email_policies() {
+        assert_eq!(
+            email_policy_for(SocialProvider::Google),
+            EmailPolicy::VerifiedOnly
+        );
+        assert_eq!(
+            email_policy_for(SocialProvider::Apple),
+            EmailPolicy::VerifiedOnly
+        );
+        assert_eq!(
+            email_policy_for(SocialProvider::Kakao),
+            EmailPolicy::AsProvided
+        );
+    }
+
+    #[test]
+    fn create_missing_required_property_fails_to_start() {
+        let mut pairs: Vec<(&str, &str)> = crate::config::TEST_ENV
+            .iter()
+            .copied()
+            .filter(|(k, _)| *k != "APPLE_OIDC_CLIENT_ID")
+            .collect();
+        pairs.push(("APPLE_OIDC_CLIENT_ID", ""));
+        let result = crate::config::AppSettings::from_env(
+            &chalkak_core::config::Env::from_pairs(pairs),
+            "local",
+            vec![0],
+            std::time::Duration::from_secs(900),
+        );
+        assert!(result.is_err());
     }
 
     #[test]
