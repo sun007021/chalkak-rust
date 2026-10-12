@@ -152,6 +152,11 @@ pub struct HttpJwksSource {
 
 impl HttpJwksSource {
     pub fn new(url: &str) -> Result<HttpJwksSource, String> {
+        // `OidcIdTokenDecoderFactory#createJwkSource`: URI로 해석되지 않거나 절대 URL이 아니면 기동하지 않는다.
+        let scheme_ok = url.starts_with("http://") || url.starts_with("https://");
+        if !scheme_ok || url.chars().any(|c| c.is_whitespace() || c.is_control()) {
+            return Err(format!("JWK Set URI 형식이 올바르지 않습니다: {url}"));
+        }
         let client = HttpClient::builder()
             .connect_timeout(JWKS_CONNECT_TIMEOUT)
             .read_timeout(JWKS_READ_TIMEOUT)
