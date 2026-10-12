@@ -1043,3 +1043,71 @@ fn refresh_reuse_detection_races_rotation_revokes_whole_lineage() {
     );
     assert_eq!(c.count(true), 0);
 }
+
+// ---------------------------------------------------------------------------------------------
+// RefreshTokenTest (도메인 규칙을 저장소·서비스 수준에서 확인)
+// ---------------------------------------------------------------------------------------------
+
+// RefreshTokenTest#createSuccessor_rotatedToken_inheritsSessionAndAbsoluteExpiry
+#[test]
+fn create_successor_rotated_token_inherits_session_and_absolute_expiry() {
+    let Some(f) = fixture() else { return };
+    let user = save_user(&f.db);
+    let issued = f.issue(&user);
+    f.clock.set(plus(now(), 600));
+
+    let result = f.service.refresh(&issued).unwrap();
+
+    let consumed = f.token_row(&issued);
+    let successor = f.token_row(&result.refresh_token.value);
+    assert_eq!(successor.session_id, consumed.session_id);
+    assert_eq!(successor.absolute_expires_at, consumed.absolute_expires_at);
+    assert_eq!(successor.expires_at, plus(now(), 600 + days(30)));
+    assert_ne!(successor.expires_at, consumed.expires_at);
+}
+
+// RefreshTokenTest#revoke_alreadyRevoked_keepsFirstRevokedAt
+#[test]
+fn revoke_already_revoked_keeps_first_revoked_at() {
+    let Some(db) = TestDb::create() else { return };
+    let user = save_user(&db);
+    let session = Uuid::new_v4();
+    let hash = token_hash();
+    create_refresh_token(&db, &user, session, &hash);
+    RefreshTokenRepository
+        .revoke_session(&mut db.client(), session, now())
+        .unwrap();
+
+    RefreshTokenRepository
+        .revoke_session(&mut db.client(), session, plus(now(), 60))
+        .unwrap();
+
+    assert_eq!(revoked_at(&db, &hash), Some(now()));
+}
+
+// RefreshTokenTest#rotate_alreadyRotated_keepsFirstRotatedAt
+#[test]
+fn rotate_already_rotated_keeps_first_rotated_at() {
+    let Some(db) = TestDb::create() else { return };
+    let user = save_user(&db);
+    let hash = token_hash();
+    create_refresh_token(&db, &user, Uuid::new_v4(), &hash);
+    let id = RefreshTokenRepository
+        .find_by_token_hash(&mut db.client(), &hash)
+        .unwrap()
+        .unwrap()
+        .id;
+    RefreshTokenRepository
+        .mark_rotated(&mut db.client(), id, now())
+        .unwrap();
+
+    RefreshTokenRepository
+        .mark_rotated(&mut db.client(), id, plus(now(), 60))
+        .unwrap();
+
+    let found = RefreshTokenRepository
+        .find_by_token_hash(&mut db.client(), &hash)
+        .unwrap()
+        .unwrap();
+    assert_eq!(found.rotated_at, Some(now()));
+}

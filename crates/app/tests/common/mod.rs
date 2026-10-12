@@ -35,10 +35,11 @@ use chalkak_app::user::storage::{
     SignatureImageStorage, SignatureImageUpload, SignatureImageUploadIssuer,
     SignatureProcessingImageUpload,
 };
-use chalkak_app::web::ApiError;
+use chalkak_app::web::{ApiError, Routes};
 use chalkak_core::FixedClock;
 use chalkak_core::error::{AppError, ErrorCode, ErrorKind};
 use chalkak_db::Pool;
+use chalkak_http::Router;
 use jiff::{SignedDuration, Timestamp};
 use uuid::Uuid;
 
@@ -521,6 +522,61 @@ impl World {
     }
 
     // ----- 저장소 보조(`UserFixture`, `Repository.save`) -----
+
+    /// 컨트롤러 계층 테스트용 라우터. 인증 필터 없이 핸들러만 실제 서비스와 DB에 붙인다(`@WebMvcTest` +
+    /// `addFilters = false`에 해당). 주체는 `security::enter`로 올린다.
+    pub fn router(&self) -> Router {
+        use chalkak_app::AppContext;
+        use chalkak_app::auth::UsableUserPolicy;
+        use chalkak_app::config::{AppSettings, TEST_ENV};
+        use chalkak_app::wiring::Components;
+        use chalkak_core::Env;
+        use chalkak_core::log::{Level, Logger};
+
+        let clock: Arc<dyn chalkak_core::Clock> = self.clock.clone();
+        let mut pairs = TEST_ENV.to_vec();
+        pairs.push(("S3_PREFIX", "chalkak"));
+        let settings = AppSettings::from_env(
+            &Env::from_pairs(pairs),
+            "dev",
+            ACCESS_KEY.to_vec(),
+            Duration::from_secs(900),
+        )
+        .unwrap();
+        let logger = Arc::new(Logger::new(
+            Box::new(std::io::sink()),
+            Level::Error,
+            Arc::clone(&clock),
+        ));
+        let ctx = AppContext {
+            pool: self.pool.clone(),
+            clock: Arc::clone(&clock),
+            logger: Arc::clone(&logger),
+            settings: Arc::new(settings),
+        };
+        let components = Components {
+            policy: UsableUserPolicy::new(self.pool.clone()),
+            login: self.login.clone(),
+            signup: self.signup.clone(),
+            refresh: self.refresh.clone(),
+            users: self.users.clone(),
+            withdrawal: self.withdrawal.clone(),
+            callback_auth: self.callback_auth(),
+        };
+        let routes = Routes::new(logger);
+        let routes = chalkak_app::auth::api::register(routes, &ctx, &components);
+        chalkak_app::user::api::register(routes, &ctx, &components).into_router()
+    }
+
+    pub fn callback_auth(&self) -> chalkak_app::auth::callback::ProcessingCallbackAuthenticator {
+        let clock: Arc<dyn chalkak_core::Clock> = self.clock.clone();
+        chalkak_app::auth::callback::ProcessingCallbackAuthenticator::new(
+            "test-callback-secret-with-enough-length",
+            "dev",
+            clock,
+        )
+        .unwrap()
+    }
 
     /// `UserFixture.create()`.
     pub fn save_user(&self) -> User {
