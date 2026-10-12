@@ -94,6 +94,10 @@ impl<R: Read> Conn<R> {
         }
     }
 
+    pub fn reader_mut(&mut self) -> &mut R {
+        &mut self.reader
+    }
+
     /// 아직 해석하지 않은 바이트가 있는가(파이프라인된 다음 요청 등).
     pub fn has_buffered(&self) -> bool {
         self.start < self.buf.len()

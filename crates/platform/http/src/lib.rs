@@ -4,4 +4,5 @@ pub mod server;
 
 pub use server::{
     Chain, Handler, Headers, Limits, Method, Middleware, Request, Response, RouteMatch, Router,
+    Server, ShutdownSignal,
 };
