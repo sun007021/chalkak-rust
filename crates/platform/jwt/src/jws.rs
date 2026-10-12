@@ -5,9 +5,7 @@ use serde_json::{Map, Value};
 
 pub(crate) struct Jws<'a> {
     pub alg: String,
-    #[allow(dead_code)] // RS256 검증 커밋에서 사용
     pub kid: Option<String>,
-    #[allow(dead_code)]
     pub typ: Option<String>,
     pub payload: Vec<u8>,
     /// `base64url(header) "." base64url(payload)` — 서명 대상 바이트 그대로.

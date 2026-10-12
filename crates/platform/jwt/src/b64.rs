@@ -6,7 +6,6 @@
 #[derive(Clone, Copy)]
 pub(crate) enum Alphabet {
     Url,
-    #[allow(dead_code)] // ES256 PEM 해석 커밋에서 사용
     Standard,
 }
 

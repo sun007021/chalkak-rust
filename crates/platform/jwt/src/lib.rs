@@ -7,8 +7,10 @@
 mod b64;
 mod claims;
 mod error;
+mod es256;
 mod hs256;
 mod json;
+mod jwks;
 mod jws;
 pub mod original;
 mod validator;
@@ -16,5 +18,7 @@ mod validator;
 pub use b64::decode_hex;
 pub use claims::Claims;
 pub use error::{JwksError, JwtError};
+pub use es256::{Es256PublicKey, Es256Signer, es256_sign, es256_verify};
 pub use hs256::{hs256_decode, hs256_encode};
+pub use jwks::{Jwk, Jwks, rs256_verify};
 pub use validator::{ClaimError, Validator};
