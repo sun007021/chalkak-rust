@@ -147,6 +147,7 @@ dependencies = [
 name = "chalkak-http"
 version = "0.0.0"
 dependencies = [
+ "chalkak-core",
  "rustls",
  "webpki-roots",
 ]

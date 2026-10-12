@@ -11,6 +11,7 @@ mod response;
 mod router;
 mod serve;
 
+pub use chalkak_core::ShutdownSignal;
 pub use handler::{Chain, Handler, Middleware};
 pub use headers::Headers;
 pub use limits::Limits;
@@ -19,4 +20,4 @@ pub use query::{decode_path, decode_query_component, parse_query};
 pub use request::Request;
 pub use response::Response;
 pub use router::{RouteMatch, Router};
-pub use serve::{Server, ShutdownSignal};
+pub use serve::Server;

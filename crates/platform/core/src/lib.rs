@@ -12,3 +12,4 @@ pub use clock::{Clock, FixedClock, SystemClock};
 pub use config::{ConfigError, Env};
 pub use duration::parse_duration;
 pub use error::{AppError, ErrorCode, ErrorKind};
+pub use scheduler::ShutdownSignal;

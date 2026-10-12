@@ -22,9 +22,30 @@ use crate::log::{Logger, fields};
 use crate::scheduler::cron::CronSchedule;
 
 /// 종료 신호. 복제해서 여러 곳(서버, 스케줄러)이 같은 신호를 본다.
-#[derive(Clone, Debug, Default)]
+///
+/// 서버(`chalkak-http`)와 스케줄러가 한 신호를 함께 쓰도록 이쪽을 남겼다. 스케줄러는 대기를 즉시 깨우는
+/// [`wait_timeout`](Self::wait_timeout)이 필요하고, core는 http에 의존할 수 없지만 http는 core에 의존할 수 있어서다.
+/// 서버는 accept에서 막혀 있는 스레드를 깨울 방법이 따로 필요하므로 [`on_trigger`](Self::on_trigger)로 훅을 건다.
+#[derive(Clone, Default)]
 pub struct ShutdownSignal {
-    inner: Arc<(Mutex<bool>, Condvar)>,
+    inner: Arc<SignalInner>,
+}
+
+type Hook = Box<dyn Fn() + Send + Sync>;
+
+#[derive(Default)]
+struct SignalInner {
+    triggered: Mutex<bool>,
+    cvar: Condvar,
+    hooks: Mutex<Vec<Hook>>,
+}
+
+impl std::fmt::Debug for ShutdownSignal {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ShutdownSignal")
+            .field("triggered", &self.is_triggered())
+            .finish()
+    }
 }
 
 impl ShutdownSignal {
@@ -32,20 +53,59 @@ impl ShutdownSignal {
         Self::default()
     }
 
-    /// 종료를 알린다. 기다리던 모든 스레드가 깨어난다. 여러 번 불러도 된다.
+    /// 종료를 알린다. 기다리던 모든 스레드가 깨어나고 등록된 훅이 실행된다. 여러 번 불러도 되며 훅은 한 번만 돈다.
     pub fn trigger(&self) {
-        let (lock, cvar) = &*self.inner;
-        *lock.lock().unwrap_or_else(PoisonError::into_inner) = true;
-        cvar.notify_all();
+        let first = {
+            let mut triggered = self
+                .inner
+                .triggered
+                .lock()
+                .unwrap_or_else(PoisonError::into_inner);
+            !std::mem::replace(&mut *triggered, true)
+        };
+        self.inner.cvar.notify_all();
+        if first {
+            let hooks = std::mem::take(
+                &mut *self
+                    .inner
+                    .hooks
+                    .lock()
+                    .unwrap_or_else(PoisonError::into_inner),
+            );
+            for hook in hooks {
+                hook();
+            }
+        }
     }
 
     pub fn is_triggered(&self) -> bool {
-        *self.inner.0.lock().unwrap_or_else(PoisonError::into_inner)
+        *self
+            .inner
+            .triggered
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+    }
+
+    /// 신호가 올 때 한 번 실행할 훅을 건다. 이미 신호가 왔다면 바로 실행한다.
+    /// 훅은 `trigger`를 부른 스레드에서 실행되므로 오래 걸리면 안 된다.
+    pub fn on_trigger(&self, hook: impl Fn() + Send + Sync + 'static) {
+        let mut hooks = self
+            .inner
+            .hooks
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner);
+        // 훅 목록을 잠근 채로 확인해야 trigger와 엇갈려도 놓치지 않는다(trigger는 플래그를 먼저 세운 뒤 훅을 꺼낸다).
+        if self.is_triggered() {
+            drop(hooks);
+            hook();
+        } else {
+            hooks.push(Box::new(hook));
+        }
     }
 
     /// 최대 `timeout`만큼 기다린다. 종료 신호가 오면 `true`, 시간이 다 되면 `false`.
     pub fn wait_timeout(&self, timeout: Duration) -> bool {
-        let (lock, cvar) = &*self.inner;
+        let (lock, cvar) = (&self.inner.triggered, &self.inner.cvar);
         let guard = lock.lock().unwrap_or_else(PoisonError::into_inner);
         let (guard, _) = cvar
             .wait_timeout_while(guard, timeout, |triggered| !*triggered)
@@ -255,6 +315,36 @@ mod tests {
         assert!(signal.is_triggered());
         // 이미 신호가 온 뒤에는 기다리지 않는다.
         assert!(signal.wait_timeout(Duration::from_secs(30)));
+    }
+
+    #[test]
+    fn on_trigger_훅은_신호가_올_때_한_번_실행된다() {
+        let signal = ShutdownSignal::new();
+        let calls = Arc::new(AtomicUsize::new(0));
+        let counter = Arc::clone(&calls);
+        signal.on_trigger(move || {
+            counter.fetch_add(1, Ordering::SeqCst);
+        });
+        assert_eq!(calls.load(Ordering::SeqCst), 0);
+        signal.clone().trigger();
+        signal.trigger();
+        assert_eq!(
+            calls.load(Ordering::SeqCst),
+            1,
+            "여러 번 trigger해도 훅은 한 번"
+        );
+    }
+
+    #[test]
+    fn on_trigger는_이미_신호가_온_뒤에_등록해도_바로_실행된다() {
+        let signal = ShutdownSignal::new();
+        signal.trigger();
+        let calls = Arc::new(AtomicUsize::new(0));
+        let counter = Arc::clone(&calls);
+        signal.on_trigger(move || {
+            counter.fetch_add(1, Ordering::SeqCst);
+        });
+        assert_eq!(calls.load(Ordering::SeqCst), 1);
     }
 
     // RuntimeSnapshotLogger: @Scheduled(fixedRate = 60_000) - 시작 즉시 첫 실행
