@@ -25,6 +25,7 @@ toml = "0.9"
 postgres = "0.19"
 hmac = "0.12"
 sha2 = "0.10"
+jiff = "0.2"
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
