@@ -17,5 +17,8 @@ jiff = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 uuid = { workspace = true }
+# 이미지 처리 콜백 HMAC-SHA256 서명 검증.
+hmac = { workspace = true }
+sha2 = { workspace = true }
 # DB 값 변환: timestamptz -> jiff::Timestamp, date -> jiff::civil::Date, uuid -> uuid::Uuid.
 postgres = { workspace = true, features = ["with-jiff-0_2", "with-uuid-1"] }

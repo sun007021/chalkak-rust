@@ -13,6 +13,8 @@ pub mod admin;
 pub mod auth;
 pub mod common;
 pub mod feedback;
+pub mod photo;
+pub mod post;
 pub mod security;
 #[doc(hidden)]
 pub mod testing;
