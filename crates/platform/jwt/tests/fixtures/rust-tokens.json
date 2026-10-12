@@ -1,0 +1,165 @@
+{
+  "_comment": "Rust 발급 토큰과 Rust 판정. cross_java.rs가 만들고 VerifyRustTokens.java가 원본 판정과 비교한다.",
+  "now_ms": 1791763201000,
+  "access_secret_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+  "signup_secret_hex": "f0e1d2c3b4a5968778695a4b3c2d1e0f00112233445566778899aabbccddeeff",
+  "es256_public_jwk": {
+    "kty": "EC",
+    "crv": "P-256",
+    "kid": "APPLEKEY01",
+    "x": "7m_Ct9OWRu0pLR5imMG5ECXVuSYvIA2QhfJVLHGF6ro",
+    "y": "LeugWFVPjlXxmKKmKcKvDkNCXh1ucS4RZfH8VkgCSAQ"
+  },
+  "cases": [
+    {
+      "name": "access: 회원",
+      "kind": "access",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwMTk5MDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEiLCJhdWQiOiJjaGFsa2FrLWFjY2VzcyIsInB1cnBvc2UiOiJBQ0NFU1MiLCJzY29wZSI6IlVTRVIiLCJpc3MiOiJjaGFsa2FrLWJhY2tlbmQiLCJleHAiOjE3OTE3NjQxMDEsImlhdCI6MTc5MTc2MzIwMSwianRpIjoiMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAxIn0.q-yl4eFGNirhh1tRvQZmpv3O-MgQzy2e2hFmT4wIPmw",
+      "expect": "accept"
+    },
+    {
+      "name": "access: 관리자",
+      "kind": "access",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwMTk5MDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwYTEiLCJhdWQiOiJjaGFsa2FrLWFjY2VzcyIsInB1cnBvc2UiOiJBQ0NFU1MiLCJzY29wZSI6IkFETUlOIiwiaXNzIjoiY2hhbGthay1iYWNrZW5kIiwiZXhwIjoxNzkxNzY0MTAxLCJpYXQiOjE3OTE3NjMyMDEsImp0aSI6IjAwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.mClvCAw8kemHh2uvp9zVheMtnimzETbZEolic8g1fU0",
+      "expect": "accept"
+    },
+    {
+      "name": "access: 만료 29초 지남(허용 오차 안)",
+      "kind": "access",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwMTk5MDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEiLCJhdWQiOiJjaGFsa2FrLWFjY2VzcyIsInB1cnBvc2UiOiJBQ0NFU1MiLCJzY29wZSI6IlVTRVIiLCJpc3MiOiJjaGFsa2FrLWJhY2tlbmQiLCJleHAiOjE3OTE3NjMxNzIsImlhdCI6MTc5MTc2MjIwMSwianRpIjoiMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAxIn0.Xb93xYeWiH4_JMCtOfL6Pl6LfxumoKR8FZYIb1p1I6Q",
+      "expect": "accept"
+    },
+    {
+      "name": "access: 만료 31초 지남",
+      "kind": "access",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwMTk5MDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEiLCJhdWQiOiJjaGFsa2FrLWFjY2VzcyIsInB1cnBvc2UiOiJBQ0NFU1MiLCJzY29wZSI6IlVTRVIiLCJpc3MiOiJjaGFsa2FrLWJhY2tlbmQiLCJleHAiOjE3OTE3NjMxNzAsImlhdCI6MTc5MTc2MjIwMSwianRpIjoiMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAxIn0.qHUw1cFO9j3p4Z79WNLqQjL9vaUo6ifm7rjOb7rhJ7Y",
+      "expect": "reject"
+    },
+    {
+      "name": "access: 하네스 만료 10초(iat=now, exp<iat)",
+      "kind": "access",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwMTk5MDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEiLCJhdWQiOiJjaGFsa2FrLWFjY2VzcyIsInB1cnBvc2UiOiJBQ0NFU1MiLCJzY29wZSI6IlVTRVIiLCJpc3MiOiJjaGFsa2FrLWJhY2tlbmQiLCJleHAiOjE3OTE3NjMxOTEsImlhdCI6MTc5MTc2MzIwMSwianRpIjoiMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAxIn0.lkrGA23fEBrGy428CFrr0BvZfcDxxVvgS9rH6rncN1Y",
+      "expect": "reject"
+    },
+    {
+      "name": "access: exp==iat",
+      "kind": "access",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwMTk5MDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEiLCJhdWQiOiJjaGFsa2FrLWFjY2VzcyIsInB1cnBvc2UiOiJBQ0NFU1MiLCJzY29wZSI6IlVTRVIiLCJpc3MiOiJjaGFsa2FrLWJhY2tlbmQiLCJleHAiOjE3OTE3NjMyMDEsImlhdCI6MTc5MTc2MzIwMSwianRpIjoiMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAxIn0.WgQ6L8v7uS9aynWNKFAVUjALoZjaVqYICT6T2GRSPHc",
+      "expect": "reject"
+    },
+    {
+      "name": "access: 다른 키로 서명",
+      "kind": "access",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwMTk5MDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEiLCJhdWQiOiJjaGFsa2FrLWFjY2VzcyIsInB1cnBvc2UiOiJBQ0NFU1MiLCJzY29wZSI6IlVTRVIiLCJpc3MiOiJjaGFsa2FrLWJhY2tlbmQiLCJleHAiOjE3OTE3NjQxMDEsImlhdCI6MTc5MTc2MzIwMSwianRpIjoiMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAxIn0.KynOIN2p0Ij3q6HXbVcE5UDgxopKSPcFsWx5XFjtRG8",
+      "expect": "reject"
+    },
+    {
+      "name": "access: sub가 UUID가 아님",
+      "kind": "access",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3QtYS11dWlkIiwiYXVkIjoiY2hhbGthay1hY2Nlc3MiLCJwdXJwb3NlIjoiQUNDRVNTIiwic2NvcGUiOiJVU0VSIiwiaXNzIjoiY2hhbGthay1iYWNrZW5kIiwiZXhwIjoxNzkxNzY0MTAxLCJpYXQiOjE3OTE3NjMyMDEsImp0aSI6IjAwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.lJXqvK6kdNfmRzSpS6lmFQv7kgSmiLm68L-xn8InI_Y",
+      "expect": "reject"
+    },
+    {
+      "name": "access: sub 1-2-3-4-5(Java UUID 관대함)",
+      "kind": "access",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxLTItMy00LTUiLCJhdWQiOiJjaGFsa2FrLWFjY2VzcyIsInB1cnBvc2UiOiJBQ0NFU1MiLCJzY29wZSI6IlVTRVIiLCJpc3MiOiJjaGFsa2FrLWJhY2tlbmQiLCJleHAiOjE3OTE3NjQxMDEsImlhdCI6MTc5MTc2MzIwMSwianRpIjoiMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAxIn0.yL2a4slRW59ByHobuspVp1B3NiMwwHFbyH6nj_gtrzI",
+      "expect": "accept"
+    },
+    {
+      "name": "access: purpose 다름",
+      "kind": "access",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwMTk5MDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEiLCJhdWQiOiJjaGFsa2FrLWFjY2VzcyIsInB1cnBvc2UiOiJPVEhFUiIsInNjb3BlIjoiVVNFUiIsImlzcyI6ImNoYWxrYWstYmFja2VuZCIsImV4cCI6MTc5MTc2NDEwMSwiaWF0IjoxNzkxNzYzMjAxLCJqdGkiOiIwMDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwMDEifQ.TCdy5PrSvOGkMRdl7GFsUWptKE-c_xDtFHI82R60XDI",
+      "expect": "reject"
+    },
+    {
+      "name": "access: audience 다름",
+      "kind": "access",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwMTk5MDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEiLCJhdWQiOiJjaGFsa2FrLXNvY2lhbC1zaWdudXAiLCJwdXJwb3NlIjoiQUNDRVNTIiwic2NvcGUiOiJVU0VSIiwiaXNzIjoiY2hhbGthay1iYWNrZW5kIiwiZXhwIjoxNzkxNzY0MTAxLCJpYXQiOjE3OTE3NjMyMDEsImp0aSI6IjAwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.9RHVqoQai_bLbpfsW58IgpMQ7PR9pLpmFY_uufIAzLY",
+      "expect": "reject"
+    },
+    {
+      "name": "access: issuer 다름",
+      "kind": "access",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwMTk5MDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEiLCJhdWQiOiJjaGFsa2FrLWFjY2VzcyIsInB1cnBvc2UiOiJBQ0NFU1MiLCJzY29wZSI6IlVTRVIiLCJpc3MiOiJvdGhlciIsImV4cCI6MTc5MTc2NDEwMSwiaWF0IjoxNzkxNzYzMjAxLCJqdGkiOiIwMDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwMDEifQ.kuax74KCwnMjDVALRQkknsl3_wfVd7Aa6Q7JIkLLzqg",
+      "expect": "reject"
+    },
+    {
+      "name": "access: aud 없음(Java는 NullPointerException)",
+      "kind": "access",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwMTk5MDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEiLCJqdGkiOiIwMDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwMDEiLCJwdXJwb3NlIjoiQUNDRVNTIiwic2NvcGUiOiJVU0VSIiwiaXNzIjoiY2hhbGthay1iYWNrZW5kIiwiZXhwIjoxNzkxNzY0MTAxLCJpYXQiOjE3OTE3NjMyMDF9._yM6-VxBU4jELt6gVdEm68NF2pKKr8wJuI6rkHG3J9M",
+      "expect": "reject"
+    },
+    {
+      "name": "access: aud 목록에 기대 값 포함",
+      "kind": "access",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwMTk5MDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEiLCJhdWQiOlsiY2hhbGthay1hY2Nlc3MiLCJvdGhlciJdLCJwdXJwb3NlIjoiQUNDRVNTIiwic2NvcGUiOiJVU0VSIiwiaXNzIjoiY2hhbGthay1iYWNrZW5kIiwiZXhwIjoxNzkxNzY0MTAxLCJpYXQiOjE3OTE3NjMyMDEsImp0aSI6IjAwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9.AIb6ad89VVKt_1fKXG1DUnI4LryEuWFxDzhDw3RulCM",
+      "expect": "accept"
+    },
+    {
+      "name": "access: 가입 토큰 클레임을 액세스 키로",
+      "kind": "access",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzIiwiYXVkIjoiY2hhbGthay1zb2NpYWwtc2lnbnVwIiwidXBsb2FkSWQiOiIwMTk5MDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwYjEiLCJwdXJwb3NlIjoiU09DSUFMX1NJR05VUCIsInByb3ZpZGVyIjoiS0FLQU8iLCJpc3MiOiJjaGFsa2FrLWJhY2tlbmQiLCJleHAiOjE3OTE3NjM1MDEsImlhdCI6MTc5MTc2MzIwMSwianRpIjoiMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAyIn0.FowVsyjBcVKLGPNmMyeT_Si1xN58u-so9k46t6l5h94",
+      "expect": "reject"
+    },
+    {
+      "name": "signup: 이메일 있음",
+      "kind": "signup",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJrYWthby1zdWJqZWN0LTEyMzQ1IiwiYXVkIjoiY2hhbGthay1zb2NpYWwtc2lnbnVwIiwidXBsb2FkSWQiOiIwMTk5MDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwYjEiLCJwdXJwb3NlIjoiU09DSUFMX1NJR05VUCIsInByb3ZpZGVyIjoiS0FLQU8iLCJpc3MiOiJjaGFsa2FrLWJhY2tlbmQiLCJleHAiOjE3OTE3NjM1MDEsImlhdCI6MTc5MTc2MzIwMSwianRpIjoiMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAyIiwiZW1haWwiOiJ1c2VyQGV4YW1wbGUuY29tIn0._CgzL0xYen_qFVJ_7Y6rd_lgk4OCKVUeYIUM_nOEKBQ",
+      "expect": "accept"
+    },
+    {
+      "name": "signup: 이메일 없음",
+      "kind": "signup",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJrYWthby1zdWJqZWN0LTEyMzQ1IiwiYXVkIjoiY2hhbGthay1zb2NpYWwtc2lnbnVwIiwidXBsb2FkSWQiOiIwMTk5MDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwYjEiLCJwdXJwb3NlIjoiU09DSUFMX1NJR05VUCIsInByb3ZpZGVyIjoiS0FLQU8iLCJpc3MiOiJjaGFsa2FrLWJhY2tlbmQiLCJleHAiOjE3OTE3NjM1MDEsImlhdCI6MTc5MTc2MzIwMSwianRpIjoiMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAyIn0.EmXmsPNokucGJwCRZsIbx7CES51wLnR-T__dccy3zeQ",
+      "expect": "accept"
+    },
+    {
+      "name": "signup: 특수 문자 subject·email",
+      "kind": "signup",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzXCJcXC9cYlxmXG5cclx0XHUwMDAxXHUwMDFmfyA8PiYnPcOp7ZWc6riAXHUyMDI4XHUyMDI58J-YgCIsImF1ZCI6ImNoYWxrYWstc29jaWFsLXNpZ251cCIsInVwbG9hZElkIjoiMDE5OTAwMDAtMDAwMC03MDAwLTgwMDAtMDAwMDAwMDAwMGIxIiwicHVycG9zZSI6IlNPQ0lBTF9TSUdOVVAiLCJwcm92aWRlciI6IktBS0FPIiwiaXNzIjoiY2hhbGthay1iYWNrZW5kIiwiZXhwIjoxNzkxNzYzNTAxLCJpYXQiOjE3OTE3NjMyMDEsImp0aSI6IjAwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMiIsImVtYWlsIjoibyduZWlsK3RhZyZ4PTx5PkBleGFtcGxlLmNvbSJ9.DKk1Murqq-4t6BrlLyiOrX3Y_e1_ToqupCzbDZf09ws",
+      "expect": "accept"
+    },
+    {
+      "name": "signup: 만료 31초 지남",
+      "kind": "signup",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzIiwiYXVkIjoiY2hhbGthay1zb2NpYWwtc2lnbnVwIiwidXBsb2FkSWQiOiIwMTk5MDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwYjEiLCJwdXJwb3NlIjoiU09DSUFMX1NJR05VUCIsInByb3ZpZGVyIjoiS0FLQU8iLCJpc3MiOiJjaGFsa2FrLWJhY2tlbmQiLCJleHAiOjE3OTE3NjMxNzAsImlhdCI6MTc5MTc2MjgwMSwianRpIjoiMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAyIn0.jVnpVRmRLTDbvoGJAPITtbeevEDlYjewrOQZK1xHBb4",
+      "expect": "reject"
+    },
+    {
+      "name": "signup: iat 미래 31초",
+      "kind": "signup",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzIiwiYXVkIjoiY2hhbGthay1zb2NpYWwtc2lnbnVwIiwidXBsb2FkSWQiOiIwMTk5MDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwYjEiLCJwdXJwb3NlIjoiU09DSUFMX1NJR05VUCIsInByb3ZpZGVyIjoiS0FLQU8iLCJpc3MiOiJjaGFsa2FrLWJhY2tlbmQiLCJleHAiOjE3OTE3NjM1MzIsImlhdCI6MTc5MTc2MzIzMiwianRpIjoiMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAyIn0.mqf8y-11Arkt7j5eQn6cK_U_qHNmOCKZmGGfKj4AWNQ",
+      "expect": "reject"
+    },
+    {
+      "name": "signup: iat 미래 29초",
+      "kind": "signup",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzIiwiYXVkIjoiY2hhbGthay1zb2NpYWwtc2lnbnVwIiwidXBsb2FkSWQiOiIwMTk5MDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwYjEiLCJwdXJwb3NlIjoiU09DSUFMX1NJR05VUCIsInByb3ZpZGVyIjoiS0FLQU8iLCJpc3MiOiJjaGFsa2FrLWJhY2tlbmQiLCJleHAiOjE3OTE3NjM1MzAsImlhdCI6MTc5MTc2MzIzMCwianRpIjoiMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAyIn0.a2JqfgQExcqzEvlpzKoo4gIiJihVHSUj1zIUSIvlTy0",
+      "expect": "accept"
+    },
+    {
+      "name": "signup: 액세스 클레임을 가입 키로",
+      "kind": "signup",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwMTk5MDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEiLCJhdWQiOiJjaGFsa2FrLWFjY2VzcyIsInB1cnBvc2UiOiJBQ0NFU1MiLCJzY29wZSI6IlVTRVIiLCJpc3MiOiJjaGFsa2FrLWJhY2tlbmQiLCJleHAiOjE3OTE3NjQxMDEsImlhdCI6MTc5MTc2MzIwMSwianRpIjoiMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAxIn0.KynOIN2p0Ij3q6HXbVcE5UDgxopKSPcFsWx5XFjtRG8",
+      "expect": "reject"
+    },
+    {
+      "name": "signup: 하네스식 exp<iat",
+      "kind": "signup",
+      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzIiwiYXVkIjoiY2hhbGthay1zb2NpYWwtc2lnbnVwIiwidXBsb2FkSWQiOiIwMTk5MDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwYjEiLCJwdXJwb3NlIjoiU09DSUFMX1NJR05VUCIsInByb3ZpZGVyIjoiS0FLQU8iLCJpc3MiOiJjaGFsa2FrLWJhY2tlbmQiLCJleHAiOjE3OTE3NjMxOTEsImlhdCI6MTc5MTc2MzIwMSwianRpIjoiMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAyIn0.H_OdgVvAS2Z5t2ybhIRdYMFW6IosK0soeZE6-V6Fmjs",
+      "expect": "reject"
+    },
+    {
+      "name": "es256: Apple client secret",
+      "kind": "es256",
+      "token": "eyJraWQiOiJBUFBMRUtFWTAxIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJBUFBMRVRFQU0xIiwic3ViIjoiY29tLmNoYWxrYWsuaW9zIiwiYXVkIjoiaHR0cHM6Ly9hcHBsZWlkLmFwcGxlLmNvbSIsImV4cCI6MTc5MTc2MzUwMSwiaWF0IjoxNzkxNzYzMjAxfQ.5WhCR3Bcx7lIoFFkUpVmdcB49VElsU3DRizfTsO4NF0Oiz1vVQkwSp0kLEkfUSuaJFPM07gMeB9ZmeRsNFoyEA",
+      "expect": "accept"
+    },
+    {
+      "name": "es256: 서명 변조",
+      "kind": "es256",
+      "token": "eyJraWQiOiJBUFBMRUtFWTAxIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJBUFBMRVRFQU0xIiwic3ViIjoiY29tLmNoYWxrYWsuaW9zIiwiYXVkIjoiaHR0cHM6Ly9hcHBsZWlkLmFwcGxlLmNvbSIsImV4cCI6MTc5MTc2MzUwMSwiaWF0IjoxNzkxNzYzMjAxfQ.5WhCR3Bcx7lIoFFkUpVmdcB49VElsU3DRizfTsO4NF0Oiz1vVQkwSp0kLEkfUSuaJFPM07gMeB9ZAeRsNFoyEA",
+      "expect": "reject"
+    }
+  ]
+}

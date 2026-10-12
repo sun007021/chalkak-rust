@@ -7,6 +7,11 @@ all-features = true
 [advisories]
 version = 2
 yanked = "deny"
+ignore = [
+    # rsa 0.9의 Marvin 타이밍 부채널은 개인키 연산(복호화·서명)에만 해당한다. chalkak-jwt는 RS256 공개키 검증만 쓰고
+    # 개인키를 다루지 않는다. 패치된 버전이 없다(2026-09 기준). rsa 0.10이 안정화되면 올리고 이 항목을 지운다.
+    { id = "RUSTSEC-2023-0071", reason = "chalkak-jwt는 rsa의 공개키 검증만 사용한다" },
+]
 
 [licenses]
 version = 2
