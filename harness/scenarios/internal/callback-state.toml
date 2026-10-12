@@ -1,0 +1,120 @@
+name = "이미지 처리 콜백: 상태 전이"
+tags = ["internal", "post"]
+clock = "2026-10-12T09:00:00+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO users (id, email, signature_original_storage_key) VALUES
+  ('01990000-0000-7000-8000-000000000001', 'u1@test.chalkak', 'chalkak/signatures/u1/original.png'),
+  ('01990000-0000-7000-8000-000000000002', 'u2@test.chalkak', 'chalkak/signatures/u2/original.png'),
+  ('01990000-0000-7000-8000-000000000003', 'u3@test.chalkak', 'chalkak/signatures/u3/original.png'),
+  ('01990000-0000-7000-8000-000000000004', 'u4@test.chalkak', 'chalkak/signatures/u4/original.png');
+INSERT INTO topics (id, title, topic_date, starts_at, ends_at) VALUES
+  ('01990000-0000-7000-8000-0000000000f1', '오늘', '2026-10-12', '2026-10-12T00:00:00+09:00', '2026-10-13T00:00:00+09:00');
+INSERT INTO post_image_uploads (id, user_id, status, rejection_reason, image_metadata, expires_at, claimed_at) VALUES
+  ('01990000-0000-7000-8000-0000000000a1', '01990000-0000-7000-8000-000000000001', 'ISSUED', NULL, NULL, '2026-10-13T09:00:00+09:00', '2026-10-12T08:00:00+09:00'),
+  ('01990000-0000-7000-8000-0000000000a2', '01990000-0000-7000-8000-000000000002', 'ISSUED', NULL, NULL, '2026-10-13T09:00:00+09:00', '2026-10-12T08:00:00+09:00'),
+  ('01990000-0000-7000-8000-0000000000a3', '01990000-0000-7000-8000-000000000003', 'READY', NULL, '{"width":1}', '2026-10-13T09:00:00+09:00', '2026-10-12T08:00:00+09:00'),
+  ('01990000-0000-7000-8000-0000000000a4', '01990000-0000-7000-8000-000000000004', 'REJECTED', 'OLD', NULL, '2026-10-13T09:00:00+09:00', NULL),
+  ('01990000-0000-7000-8000-0000000000a5', '01990000-0000-7000-8000-000000000001', 'ISSUED', NULL, NULL, '2026-10-13T09:00:00+09:00', NULL),
+  ('01990000-0000-7000-8000-0000000000a6', '01990000-0000-7000-8000-000000000002', 'ISSUED', NULL, NULL, '2026-10-13T09:00:00+09:00', NULL);
+INSERT INTO photos (id, original_storage_key) VALUES
+  ('01990000-0000-7000-8000-000000000201', 'chalkak/posts/local/original/01990000-0000-7000-8000-0000000000a1.webp'),
+  ('01990000-0000-7000-8000-000000000202', 'chalkak/posts/local/original/01990000-0000-7000-8000-0000000000a2.webp'),
+  ('01990000-0000-7000-8000-000000000203', 'chalkak/posts/local/original/01990000-0000-7000-8000-0000000000a3.webp');
+INSERT INTO posts (id, user_id, topic_id, photo_id, post_image_upload_id, title, moderation_status, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-000000000301', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-000000000201', '01990000-0000-7000-8000-0000000000a1', '하나', 'VALIDATING', '2026-10-12T08:00:00+09:00', '2026-10-12T08:00:00+09:00'),
+  ('01990000-0000-7000-8000-000000000302', '01990000-0000-7000-8000-000000000002', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-000000000202', '01990000-0000-7000-8000-0000000000a2', '둘', 'VALIDATING', '2026-10-12T08:00:00+09:00', '2026-10-12T08:00:00+09:00'),
+  ('01990000-0000-7000-8000-000000000303', '01990000-0000-7000-8000-000000000003', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-000000000203', '01990000-0000-7000-8000-0000000000a3', '셋', 'PENDING', '2026-10-12T08:00:00+09:00', '2026-10-12T08:00:00+09:00')
+"""]
+
+[[step]]
+name = "complete: 검증 중 게시물을 검수 대기로"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a1/complete"
+body = '''{"width":4032,"height":3024,"byteSize":183423}'''
+callback = {}
+
+[[step]]
+name = "complete: 다시 보내도 같다"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a1/complete"
+body = '''{"width":4032,"height":3024,"byteSize":183423}'''
+callback = {}
+
+[[step]]
+name = "complete: 다른 값으로 다시 보내도 처음 값 유지"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a1/complete"
+body = '''{"width":1,"height":1}'''
+callback = {}
+
+[[step]]
+name = "complete: 게시물 없는 업로드"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"width":5,"height":6,"location":{"latitude":-90,"longitude":180},"capturedAt":"x","metaAttributes":{}}'''
+callback = {}
+
+[[step]]
+name = "complete: 이미 반려된 업로드"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a4/complete"
+body = '''{"width":4032,"height":3024,"byteSize":183423}'''
+callback = {}
+
+[[step]]
+name = "complete: 없는 업로드는 조용히 끝"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000ff/complete"
+body = '''{"width":4032,"height":3024,"byteSize":183423}'''
+callback = {}
+
+[[step]]
+name = "complete: 이미 승인 대기인 게시물"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a3/complete"
+body = '''{"width":4032,"height":3024,"byteSize":183423}'''
+callback = {}
+
+[[step]]
+name = "failed: 검증 중 게시물을 반려"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a2/failed"
+body = '''{"reason":"INVALID_IMAGE"}'''
+callback = {}
+
+[[step]]
+name = "failed: 다시 보내도 같다"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a2/failed"
+body = '''{"reason":"OTHER"}'''
+callback = {}
+
+[[step]]
+name = "failed: 이미 처리 완료된 업로드"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a3/failed"
+body = '''{"reason":"LATE"}'''
+callback = {}
+
+[[step]]
+name = "failed: 게시물 없는 업로드"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a6/failed"
+body = '''{"reason":"NO_POST"}'''
+callback = {}
+
+[[step]]
+name = "failed: 이미 반려된 업로드"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a4/failed"
+body = '''{"reason":"AGAIN"}'''
+callback = {}
+
+[[step]]
+name = "failed: 없는 업로드"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000ff/failed"
+body = '''{"reason":"x"}'''
+callback = {}

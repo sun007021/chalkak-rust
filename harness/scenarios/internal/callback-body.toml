@@ -1,0 +1,447 @@
+name = "이미지 처리 콜백: 본문 읽기와 검증"
+tags = ["internal", "post"]
+clock = "2026-10-12T09:00:00+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO users (id, email, signature_original_storage_key) VALUES
+  ('01990000-0000-7000-8000-000000000001', 'u1@test.chalkak', 'chalkak/signatures/u1/original.png'),
+  ('01990000-0000-7000-8000-000000000002', 'u2@test.chalkak', 'chalkak/signatures/u2/original.png'),
+  ('01990000-0000-7000-8000-000000000003', 'u3@test.chalkak', 'chalkak/signatures/u3/original.png'),
+  ('01990000-0000-7000-8000-000000000004', 'u4@test.chalkak', 'chalkak/signatures/u4/original.png');
+INSERT INTO topics (id, title, topic_date, starts_at, ends_at) VALUES
+  ('01990000-0000-7000-8000-0000000000f1', '오늘', '2026-10-12', '2026-10-12T00:00:00+09:00', '2026-10-13T00:00:00+09:00');
+INSERT INTO post_image_uploads (id, user_id, status, rejection_reason, image_metadata, expires_at, claimed_at) VALUES
+  ('01990000-0000-7000-8000-0000000000a1', '01990000-0000-7000-8000-000000000001', 'ISSUED', NULL, NULL, '2026-10-13T09:00:00+09:00', '2026-10-12T08:00:00+09:00'),
+  ('01990000-0000-7000-8000-0000000000a2', '01990000-0000-7000-8000-000000000002', 'ISSUED', NULL, NULL, '2026-10-13T09:00:00+09:00', '2026-10-12T08:00:00+09:00'),
+  ('01990000-0000-7000-8000-0000000000a3', '01990000-0000-7000-8000-000000000003', 'READY', NULL, '{"width":1}', '2026-10-13T09:00:00+09:00', '2026-10-12T08:00:00+09:00'),
+  ('01990000-0000-7000-8000-0000000000a4', '01990000-0000-7000-8000-000000000004', 'REJECTED', 'OLD', NULL, '2026-10-13T09:00:00+09:00', NULL),
+  ('01990000-0000-7000-8000-0000000000a5', '01990000-0000-7000-8000-000000000001', 'ISSUED', NULL, NULL, '2026-10-13T09:00:00+09:00', NULL),
+  ('01990000-0000-7000-8000-0000000000a6', '01990000-0000-7000-8000-000000000002', 'ISSUED', NULL, NULL, '2026-10-13T09:00:00+09:00', NULL);
+INSERT INTO photos (id, original_storage_key) VALUES
+  ('01990000-0000-7000-8000-000000000201', 'chalkak/posts/local/original/01990000-0000-7000-8000-0000000000a1.webp'),
+  ('01990000-0000-7000-8000-000000000202', 'chalkak/posts/local/original/01990000-0000-7000-8000-0000000000a2.webp'),
+  ('01990000-0000-7000-8000-000000000203', 'chalkak/posts/local/original/01990000-0000-7000-8000-0000000000a3.webp');
+INSERT INTO posts (id, user_id, topic_id, photo_id, post_image_upload_id, title, moderation_status, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-000000000301', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-000000000201', '01990000-0000-7000-8000-0000000000a1', '하나', 'VALIDATING', '2026-10-12T08:00:00+09:00', '2026-10-12T08:00:00+09:00'),
+  ('01990000-0000-7000-8000-000000000302', '01990000-0000-7000-8000-000000000002', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-000000000202', '01990000-0000-7000-8000-0000000000a2', '둘', 'VALIDATING', '2026-10-12T08:00:00+09:00', '2026-10-12T08:00:00+09:00'),
+  ('01990000-0000-7000-8000-000000000303', '01990000-0000-7000-8000-000000000003', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-000000000203', '01990000-0000-7000-8000-0000000000a3', '셋', 'PENDING', '2026-10-12T08:00:00+09:00', '2026-10-12T08:00:00+09:00')
+"""]
+
+[[step]]
+name = "complete: 본문 없음"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+callback = {}
+
+[[step]]
+name = "complete: 빈 본문"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = ''''''
+callback = {}
+
+[[step]]
+name = "complete: 깨진 JSON"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{bad'''
+callback = {}
+
+[[step]]
+name = "complete: null"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''null'''
+callback = {}
+
+[[step]]
+name = "complete: 배열"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''[]'''
+callback = {}
+
+[[step]]
+name = "complete: 문자열"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''"x"'''
+callback = {}
+
+[[step]]
+name = "complete: 숫자"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''1'''
+callback = {}
+
+[[step]]
+name = "complete: 빈 객체"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{}'''
+callback = {}
+
+[[step]]
+name = "complete: 알 수 없는 필드는 무시"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"width":1,"extra":{"a":1}}'''
+callback = {}
+
+[[step]]
+name = "complete: 뒤에 남은 값은 무시"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"width":1} {"width":-1}'''
+callback = {}
+
+[[step]]
+name = "complete: 뒤에 쓰레기"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"width":1}xxx'''
+callback = {}
+
+[[step]]
+name = "complete: BOM 접두"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''﻿{"width":1}'''
+callback = {}
+
+[[step]]
+name = "complete: width 0"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"width":0}'''
+callback = {}
+
+[[step]]
+name = "complete: width 음수"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"width":-1}'''
+callback = {}
+
+[[step]]
+name = "complete: height 0"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"height":0}'''
+callback = {}
+
+[[step]]
+name = "complete: width 문자열"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"width":"100"}'''
+callback = {}
+
+[[step]]
+name = "complete: width 소수"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"width":1.9}'''
+callback = {}
+
+[[step]]
+name = "complete: width 지수"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"width":1e2}'''
+callback = {}
+
+[[step]]
+name = "complete: width 공백 문자열"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"width":" 7 "}'''
+callback = {}
+
+[[step]]
+name = "complete: width 빈 문자열"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"width":""}'''
+callback = {}
+
+[[step]]
+name = "complete: width 문자열 아님"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"width":"abc"}'''
+callback = {}
+
+[[step]]
+name = "complete: width 불리언"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"width":true}'''
+callback = {}
+
+[[step]]
+name = "complete: width 객체"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"width":{}}'''
+callback = {}
+
+[[step]]
+name = "complete: width int 초과"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"width":2147483648}'''
+callback = {}
+
+[[step]]
+name = "complete: byteSize 음수"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"byteSize":-1}'''
+callback = {}
+
+[[step]]
+name = "complete: byteSize 0"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"byteSize":0}'''
+callback = {}
+
+[[step]]
+name = "complete: byteSize 큰 값"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"byteSize":9223372036854775807}'''
+callback = {}
+
+[[step]]
+name = "complete: byteSize long 초과"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"byteSize":9223372036854775808}'''
+callback = {}
+
+[[step]]
+name = "complete: 위도 91"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"location":{"latitude":91,"longitude":0}}'''
+callback = {}
+
+[[step]]
+name = "complete: 경도 -181"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"location":{"latitude":0,"longitude":-181}}'''
+callback = {}
+
+[[step]]
+name = "complete: 위도만"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"location":{"latitude":1.5}}'''
+callback = {}
+
+[[step]]
+name = "complete: 경도만"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"location":{"longitude":1.5}}'''
+callback = {}
+
+[[step]]
+name = "complete: 빈 위치"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"location":{}}'''
+callback = {}
+
+[[step]]
+name = "complete: 위치 null"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"location":null}'''
+callback = {}
+
+[[step]]
+name = "complete: 위치 배열"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"location":[]}'''
+callback = {}
+
+[[step]]
+name = "complete: 위도 문자열"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"location":{"latitude":"37.5","longitude":"127"}}'''
+callback = {}
+
+[[step]]
+name = "complete: 위도 NaN 문자열"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"location":{"latitude":"NaN","longitude":0}}'''
+callback = {}
+
+[[step]]
+name = "complete: 위도 경계"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"location":{"latitude":90,"longitude":-180}}'''
+callback = {}
+
+[[step]]
+name = "complete: 정밀한 좌표"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"location":{"latitude":37.56650123456789,"longitude":126.97800000000001}}'''
+callback = {}
+
+[[step]]
+name = "complete: capturedAt 64자"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"capturedAt":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}'''
+callback = {}
+
+[[step]]
+name = "complete: capturedAt 65자"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"capturedAt":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}'''
+callback = {}
+
+[[step]]
+name = "complete: capturedAt 숫자"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"capturedAt":123}'''
+callback = {}
+
+[[step]]
+name = "complete: capturedAt 배열"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"capturedAt":[]}'''
+callback = {}
+
+[[step]]
+name = "complete: metaAttributes 중첩"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"metaAttributes":{"a":[1,2,{"b":null}],"c":"d","e":1.5,"f":true}}'''
+callback = {}
+
+[[step]]
+name = "complete: metaAttributes 200개"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"metaAttributes":{"k0":0,"k1":1,"k2":2,"k3":3,"k4":4,"k5":5,"k6":6,"k7":7,"k8":8,"k9":9,"k10":10,"k11":11,"k12":12,"k13":13,"k14":14,"k15":15,"k16":16,"k17":17,"k18":18,"k19":19,"k20":20,"k21":21,"k22":22,"k23":23,"k24":24,"k25":25,"k26":26,"k27":27,"k28":28,"k29":29,"k30":30,"k31":31,"k32":32,"k33":33,"k34":34,"k35":35,"k36":36,"k37":37,"k38":38,"k39":39,"k40":40,"k41":41,"k42":42,"k43":43,"k44":44,"k45":45,"k46":46,"k47":47,"k48":48,"k49":49,"k50":50,"k51":51,"k52":52,"k53":53,"k54":54,"k55":55,"k56":56,"k57":57,"k58":58,"k59":59,"k60":60,"k61":61,"k62":62,"k63":63,"k64":64,"k65":65,"k66":66,"k67":67,"k68":68,"k69":69,"k70":70,"k71":71,"k72":72,"k73":73,"k74":74,"k75":75,"k76":76,"k77":77,"k78":78,"k79":79,"k80":80,"k81":81,"k82":82,"k83":83,"k84":84,"k85":85,"k86":86,"k87":87,"k88":88,"k89":89,"k90":90,"k91":91,"k92":92,"k93":93,"k94":94,"k95":95,"k96":96,"k97":97,"k98":98,"k99":99,"k100":100,"k101":101,"k102":102,"k103":103,"k104":104,"k105":105,"k106":106,"k107":107,"k108":108,"k109":109,"k110":110,"k111":111,"k112":112,"k113":113,"k114":114,"k115":115,"k116":116,"k117":117,"k118":118,"k119":119,"k120":120,"k121":121,"k122":122,"k123":123,"k124":124,"k125":125,"k126":126,"k127":127,"k128":128,"k129":129,"k130":130,"k131":131,"k132":132,"k133":133,"k134":134,"k135":135,"k136":136,"k137":137,"k138":138,"k139":139,"k140":140,"k141":141,"k142":142,"k143":143,"k144":144,"k145":145,"k146":146,"k147":147,"k148":148,"k149":149,"k150":150,"k151":151,"k152":152,"k153":153,"k154":154,"k155":155,"k156":156,"k157":157,"k158":158,"k159":159,"k160":160,"k161":161,"k162":162,"k163":163,"k164":164,"k165":165,"k166":166,"k167":167,"k168":168,"k169":169,"k170":170,"k171":171,"k172":172,"k173":173,"k174":174,"k175":175,"k176":176,"k177":177,"k178":178,"k179":179,"k180":180,"k181":181,"k182":182,"k183":183,"k184":184,"k185":185,"k186":186,"k187":187,"k188":188,"k189":189,"k190":190,"k191":191,"k192":192,"k193":193,"k194":194,"k195":195,"k196":196,"k197":197,"k198":198,"k199":199}}'''
+callback = {}
+
+[[step]]
+name = "complete: metaAttributes 201개"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"metaAttributes":{"k0":0,"k1":1,"k2":2,"k3":3,"k4":4,"k5":5,"k6":6,"k7":7,"k8":8,"k9":9,"k10":10,"k11":11,"k12":12,"k13":13,"k14":14,"k15":15,"k16":16,"k17":17,"k18":18,"k19":19,"k20":20,"k21":21,"k22":22,"k23":23,"k24":24,"k25":25,"k26":26,"k27":27,"k28":28,"k29":29,"k30":30,"k31":31,"k32":32,"k33":33,"k34":34,"k35":35,"k36":36,"k37":37,"k38":38,"k39":39,"k40":40,"k41":41,"k42":42,"k43":43,"k44":44,"k45":45,"k46":46,"k47":47,"k48":48,"k49":49,"k50":50,"k51":51,"k52":52,"k53":53,"k54":54,"k55":55,"k56":56,"k57":57,"k58":58,"k59":59,"k60":60,"k61":61,"k62":62,"k63":63,"k64":64,"k65":65,"k66":66,"k67":67,"k68":68,"k69":69,"k70":70,"k71":71,"k72":72,"k73":73,"k74":74,"k75":75,"k76":76,"k77":77,"k78":78,"k79":79,"k80":80,"k81":81,"k82":82,"k83":83,"k84":84,"k85":85,"k86":86,"k87":87,"k88":88,"k89":89,"k90":90,"k91":91,"k92":92,"k93":93,"k94":94,"k95":95,"k96":96,"k97":97,"k98":98,"k99":99,"k100":100,"k101":101,"k102":102,"k103":103,"k104":104,"k105":105,"k106":106,"k107":107,"k108":108,"k109":109,"k110":110,"k111":111,"k112":112,"k113":113,"k114":114,"k115":115,"k116":116,"k117":117,"k118":118,"k119":119,"k120":120,"k121":121,"k122":122,"k123":123,"k124":124,"k125":125,"k126":126,"k127":127,"k128":128,"k129":129,"k130":130,"k131":131,"k132":132,"k133":133,"k134":134,"k135":135,"k136":136,"k137":137,"k138":138,"k139":139,"k140":140,"k141":141,"k142":142,"k143":143,"k144":144,"k145":145,"k146":146,"k147":147,"k148":148,"k149":149,"k150":150,"k151":151,"k152":152,"k153":153,"k154":154,"k155":155,"k156":156,"k157":157,"k158":158,"k159":159,"k160":160,"k161":161,"k162":162,"k163":163,"k164":164,"k165":165,"k166":166,"k167":167,"k168":168,"k169":169,"k170":170,"k171":171,"k172":172,"k173":173,"k174":174,"k175":175,"k176":176,"k177":177,"k178":178,"k179":179,"k180":180,"k181":181,"k182":182,"k183":183,"k184":184,"k185":185,"k186":186,"k187":187,"k188":188,"k189":189,"k190":190,"k191":191,"k192":192,"k193":193,"k194":194,"k195":195,"k196":196,"k197":197,"k198":198,"k199":199,"k200":200}}'''
+callback = {}
+
+[[step]]
+name = "complete: metaAttributes 배열"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"metaAttributes":[]}'''
+callback = {}
+
+[[step]]
+name = "complete: metaAttributes 부동소수"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"metaAttributes":{"f":1.0,"g":1e3,"h":0.1,"i":123456789.123456789}}'''
+callback = {}
+
+[[step]]
+name = "complete: metaAttributes 유니코드"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a5/complete"
+body = '''{"metaAttributes":{"한글":"값","e":"\u00e9\ud83d\ude00"}}'''
+callback = {}
+
+[[step]]
+name = "failed: 본문 없음"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a6/failed"
+callback = {}
+
+[[step]]
+name = "failed: 빈 객체"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a6/failed"
+body = '''{}'''
+callback = {}
+
+[[step]]
+name = "failed: null"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a6/failed"
+body = '''null'''
+callback = {}
+
+[[step]]
+name = "failed: reason null"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a6/failed"
+body = '''{"reason":null}'''
+callback = {}
+
+[[step]]
+name = "failed: 공백"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a6/failed"
+body = '''{"reason":"   "}'''
+callback = {}
+
+[[step]]
+name = "failed: 빈 문자열"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a6/failed"
+body = '''{"reason":""}'''
+callback = {}
+
+[[step]]
+name = "failed: 50자"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a6/failed"
+body = '''{"reason":"rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"}'''
+callback = {}
+
+[[step]]
+name = "failed: 51자"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a6/failed"
+body = '''{"reason":"rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"}'''
+callback = {}
+
+[[step]]
+name = "failed: 숫자"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a6/failed"
+body = '''{"reason":5}'''
+callback = {}
+
+[[step]]
+name = "failed: 배열"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a6/failed"
+body = '''{"reason":[]}'''
+callback = {}
+
+[[step]]
+name = "failed: 한글 50자"
+method = "POST"
+path = "/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000a6/failed"
+body = '''{"reason":"가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가"}'''
+callback = {}
