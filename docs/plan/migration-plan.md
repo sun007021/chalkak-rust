@@ -48,7 +48,7 @@ B안 허용 목록 초안 (모두 `cargo-deny`로 고정·감사):
 | 암호 | `ring` 또는 RustCrypto(`hmac`, `sha2`, `aes-gcm`, `p256`, `rsa`) + `bcrypt` | 하나의 계열로 통일 |
 | DB 드라이버 | `postgres`(동기) | 내부적으로 tokio를 숨겨 쓰는 점은 수용 여부 확인. 대안: PG v3 프로토콜 직접 구현 |
 | JSON | `serde`, `serde_json` | derive 매크로 포함 |
-| 식별자·시간 | `uuid`(v7), `jiff` 또는 `time` + tzdb | Asia/Seoul 계산 |
+| 식별자·시간 | `uuid`(v4: requestId, v7), `jiff` 또는 `time` + tzdb | Asia/Seoul 계산 |
 | 종료 신호 | `signal-hook` | 표준 라이브러리로는 SIGTERM을 받을 수 없음. graceful shutdown(`TimeoutStopSec=30`)에 필요 |
 | HTTP 파싱(선택) | `httparse` | 직접 구현 시 퍼징 권장 |
 

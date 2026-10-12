@@ -27,6 +27,8 @@ hmac = "0.12"
 sha2 = "0.10"
 jiff = { version = "0.2", features = ["tzdb-bundle-always"] }
 uuid = { version = "1", features = ["v4"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12", "logging"] }
+webpki-roots = "1"
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
