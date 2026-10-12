@@ -1,0 +1,64 @@
+0 0 12 * * L	ERR
+	ERR
+* * * * *	ERR
+* * * * * * *	ERR
+60 * * * * *	ERR
+* 60 * * * *	ERR
+* * 24 * * *	ERR
+0 0 0 32 * *	ERR
+0 0 0 0 * *	ERR
+0 0 0 * 13 *	ERR
+0 0 0 * 0 *	ERR
+0 0 0 * * 8	ERR
+a b c d e f	ERR
+0 0 0 * * FOO	ERR
+0 0 0 * JAN-FOO *	ERR
+0 0 0 ? * ?	OK
+0 0 0 5-1 * *	ERR
+0 0 0 */0 * *	ERR
+0 0 0 * * 1-8	ERR
+0 0 0 * * -1	ERR
+0 0 0 * * *  	OK
+ 0 0 0 * * *	OK
+0  0 0 * * *	OK
+0 0 0 1/2/3 * *	ERR
+0 0 0 * * 0#2	OK
+0 0 0 * * 1#6	OK
+0 0 0 ? * 1#0	ERR
+0 0 0 L * 5	OK
+0 0 0 L * ?	OK
+0 0 0 * jan *	OK
+0 0 0 * * mon	OK
+0 0 0 * * 1,7	OK
+0 0 0 0-5 * *	ERR
+*/5 */5 */5 */5 */5 */5	OK
+0 0 0 31 2 *	OK
+-5 * * * * *	ERR
+0 0 0 */40 * *	OK
+0 0 0 * * */2	OK
+0 0 0 * * 5-7	OK
+0 0 0 * * 7-1	OK
+0 0 0 ? ? *	ERR
+@reboot	ERR
+@DAILY	OK
+0 0 0 * * ?	OK
+0 0 0 * NOV-FEB *	ERR
+0 0 0 * 11-2 *	ERR
+0 0 22-2 * * *	ERR
+0 0 0 * * FRI-MON	ERR
+0 0 0 L-0 * *	ERR
+0 0 0 0W * *	ERR
+0 0 0 1-5W * *	ERR
+0 0 0 W * *	ERR
+0 0 0 ? * 1-3#2	ERR
+0 0 0 * * 1L-2	ERR
+0 0 0 ?/5 * *	ERR
+0 0 0 * ?/5 *	ERR
+0 ? 0 * * *	ERR
+? 0 0 * * *	ERR
+0 0 0 10-12-14 * *	ERR
+0 0 0 , * *	ERR
+0 0 0 1, * *	ERR
+0 0 0 1/ * *	ERR
+0 0 0 /2 * *	ERR
+0 0 0 1-3/ * *	ERR

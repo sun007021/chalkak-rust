@@ -6,6 +6,7 @@ pub mod duration;
 pub mod error;
 pub mod log;
 pub mod request_id;
+pub mod scheduler;
 
 pub use clock::{Clock, FixedClock, SystemClock};
 pub use config::{ConfigError, Env};
