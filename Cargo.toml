@@ -25,6 +25,8 @@ toml = "0.9"
 postgres = "0.19"
 hmac = "0.12"
 sha2 = "0.10"
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12", "logging"] }
+webpki-roots = "1"
 
 [workspace.lints.rust]
 unsafe_code = "forbid"

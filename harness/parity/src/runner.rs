@@ -19,6 +19,29 @@ const IGNORED_HEADERS: &[&str] = &[
 
 pub const DEFAULT_CLOCK: &str = "2026-10-12T09:00:00+09:00";
 
+/// 앱 `Date` 헤더와 시나리오 시각의 허용 차이(초). 단계 처리 시간과 초 경계를 덮는다.
+const CLOCK_TOLERANCE_SECONDS: i64 = 10;
+
+/// 앱이 시계 파일을 반영하지 못한 채 응답하면(부하로 libfaketime이 파일을 못 읽는 경우 등) 토큰 만료처럼
+/// 보이는 거짓 차이가 생긴다. 동작 차이와 섞이지 않게 하네스 오류로 따로 알린다.
+fn check_app_clock(
+    target: &Target,
+    step: &str,
+    headers: &[(String, String)],
+    expected: i64,
+) -> Result<(), String> {
+    let Some((_, date)) = headers.iter().find(|(k, _)| k.eq_ignore_ascii_case("date")) else {
+        return Ok(());
+    };
+    match time::parse_http_date(date) {
+        Some(at) if (at - expected).abs() <= CLOCK_TOLERANCE_SECONDS => Ok(()),
+        _ => Err(format!(
+            "[{}] {step}: 앱 시계가 시나리오 시각과 다릅니다(Date: {date}). 시계 파일이 반영되지 않았습니다",
+            target.name
+        )),
+    }
+}
+
 pub fn run(target: &Target, scenario: &Scenario) -> Result<Value, String> {
     let clock = time::parse(scenario.clock.as_deref().unwrap_or(DEFAULT_CLOCK))
         .ok_or("clock 형식이 올바르지 않습니다")?
@@ -55,6 +78,8 @@ pub fn run(target: &Target, scenario: &Scenario) -> Result<Value, String> {
         };
         let res = http::send(&target.base_url, &req)
             .map_err(|e| format!("[{}] {}: {e}", target.name, step.name))?;
+
+        check_app_clock(target, &step.name, &res.headers, clock + app_offset)?;
 
         let parsed: Option<Value> = serde_json::from_slice(&res.body).ok();
         for (var, path) in &step.capture {

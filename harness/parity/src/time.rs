@@ -100,6 +100,25 @@ pub fn parse(s: &str) -> Option<Parsed> {
     })
 }
 
+/// `Date` 응답 헤더(IMF-fixdate, 예: `Mon, 12 Oct 2026 00:00:00 GMT`)를 epoch 초로 읽는다.
+pub fn parse_http_date(s: &str) -> Option<i64> {
+    const MONTHS: [&str; 12] = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    ];
+    let mut it = s.split_whitespace();
+    let _weekday = it.next()?;
+    let d: u32 = it.next()?.parse().ok()?;
+    let mon = it.next()?;
+    let m = MONTHS.iter().position(|&x| x == mon)? as u32 + 1;
+    let y: i64 = it.next()?.parse().ok()?;
+    let mut hms = it.next()?.split(':').map(|x| x.parse::<i64>().ok());
+    let (h, mi, se) = (hms.next()??, hms.next()??, hms.next()??);
+    if it.next()? != "GMT" {
+        return None;
+    }
+    Some(days_from_civil(y, m, d) * 86_400 + h * 3600 + mi * 60 + se)
+}
+
 pub fn now_epoch() -> f64 {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
@@ -126,6 +145,20 @@ mod tests {
         let p = parse("2026-10-12T00:00:00.123400Z").unwrap();
         assert_eq!(p.fraction_digits, 6);
         assert_eq!(p.zone, "Z");
+    }
+
+    #[test]
+    fn http_date를_epoch로_읽는다() {
+        assert_eq!(
+            parse_http_date("Mon, 12 Oct 2026 00:00:00 GMT"),
+            Some(1_791_763_200)
+        );
+        assert_eq!(
+            parse_http_date("Sun, 11 Oct 2026 23:59:59 GMT"),
+            Some(1_791_763_199)
+        );
+        assert_eq!(parse_http_date("2026-10-12"), None);
+        assert_eq!(parse_http_date("Mon, 12 Foo 2026 00:00:00 GMT"), None);
     }
 
     #[test]
