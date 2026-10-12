@@ -36,6 +36,7 @@
 //! # tamper_signature = true            # 서명을 깨뜨린다
 //!
 //! # 가짜 서버 응답. 시나리오 시작 시 설정하며(이전 설정은 초기화), 단계마다 [step.fakes]로 덧씌울 수 있다.
+//! # 덧씌운 값은 같은 항목을 다시 덧씌우기 전까지 이후 단계에도 유지된다.
 //! [fakes.apple_token]                  # POST /apple/auth/token. 지정하지 않으면 500
 //! status = 200
 //! body = '''{"access_token":"a","token_type":"Bearer","expires_in":3600,"refresh_token":"r","id_token":"${appleIdToken}"}'''
@@ -47,6 +48,8 @@
 //! size = 1024
 //! content_type = "image/png"
 //! ```
+//!
+//! DB에 무작위 값이 들어가는 컬럼(암호문 등)은 최상위에 `db_opaque = ["encrypted_refresh_token"]`처럼 적어 길이만 비교한다.
 //!
 //! 시나리오가 끝나면 가짜 서버가 받은 요청(JWKS 조회 제외)을 정규화해 결과의 `fakes`에 넣어 비교한다.
 //! `fakes`/`id_token`을 쓰지 않고 받은 요청도 없으면 `fakes` 항목은 생략한다.
@@ -75,6 +78,9 @@ pub struct Scenario {
     /// 시나리오 끝에 DB 상태를 비교할지. 기본은 비교한다.
     #[serde(default = "default_true")]
     pub compare_db: bool,
+    /// DB 덤프에서 길이만 비교할 컬럼 이름(무작위 IV로 암호화한 값 등).
+    #[serde(default)]
+    pub db_opaque: Vec<String>,
     #[serde(skip)]
     pub path: PathBuf,
 }

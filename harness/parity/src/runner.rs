@@ -151,13 +151,12 @@ pub fn run(target: &Target, scenario: &Scenario) -> Result<Value, String> {
     }
 
     // 가짜 서버가 받은 요청. 응답에서 본 UUID 기호를 이어 쓰도록 DB 덤프보다 먼저 정규화한다.
-    let external_calls = match fakes_url {
-        Some(url) => Some(fakes::normalize(&fakes::records(url)?, &mut norm)),
-        None => None,
-    };
+    let external_calls = fakes_url
+        .map(|url| fakes::records(url).map(|r| fakes::normalize(&r, &mut norm)))
+        .transpose()?;
 
     let db_state = if scenario.compare_db {
-        db_snapshot(&mut db, &mut norm)?
+        db_snapshot(&mut db, &mut norm, &scenario.db_opaque)?
     } else {
         Value::Null
     };
@@ -173,14 +172,18 @@ pub fn run(target: &Target, scenario: &Scenario) -> Result<Value, String> {
 
 /// 응답에서 본 UUID 기호를 이어서 쓰고, 처음 보는 UUID는 `$uuid?`로 둔 뒤 정렬한다.
 /// DB 행 순서와 처음 보는 UUID의 등장 순서는 구현마다 달라도 되기 때문이다.
-fn db_snapshot(db: &mut postgres::Client, norm: &mut Normalizer) -> Result<Value, String> {
+fn db_snapshot(
+    db: &mut postgres::Client,
+    norm: &mut Normalizer,
+    opaque: &[String],
+) -> Result<Value, String> {
     norm.freeze();
     norm.db_mode();
     let mut tables = serde_json::Map::new();
     for (table, rows) in target::dump(db)? {
         let mut rows: Vec<String> = rows
             .iter()
-            .map(|r| norm.value(r, &[], "").to_string())
+            .map(|r| norm.value(r, opaque, "").to_string())
             .collect();
         rows.sort();
         if !rows.is_empty() {
