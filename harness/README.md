@@ -192,3 +192,13 @@ Rust 구현이 그대로 따라야 하는 것들이다. 시나리오로 고정�
   이미 가입한 계정으로 업로드 URL을 요청하면 400 `이미 가입된 소셜 계정입니다.`
 - **탈퇴:** Apple 회원은 보관한 Refresh Token을 복호화한 평문으로 `/auth/revoke`를 부른다(폼: `client_id`, `client_secret`, `token`, `token_type_hint=refresh_token`).
   폐기가 실패하면(400) 탈퇴는 500으로 끝나고 회원은 그대로다. 성공하면 204, 이메일은 `withdrawn+<id>@chalkak.invalid`, 같은 Apple 계정의 재로그인은 미가입으로 돌아간다.
+- **토큰 재발급(`auth/token-refresh`):** 비활동 30일·절대 90일. 재발급마다 토큰이 회전하고 만료는 절대 만료를 넘지 않는다. 이미 회전된 토큰을 다시 내면 그 계보 전체를 폐기한다(다른 기기 계보는 유지).
+  거절은 모두 401 `REAUTHENTICATION_REQUIRED`(`다시 로그인해 주세요.`). 로그아웃은 멱등이라 모르는 토큰도 204.
+  절대 만료로 줄어든 `refreshTokenExpiresIn`은 요청이 시각을 읽는 순간에 따라 1초 흔들려 비교에서 뺀다(`opaque`).
+- **요청 본문이 흔들리는 곳:** 위반이 둘 이상인 요청은 원본이 어느 메시지를 고를지 정해져 있지 않다(Bean Validation 위반 집합 순서). 시나리오는 한 번에 하나만 어기게 한다.
+  `provider`가 빈 문자열이면 null이 아니라 본문 파싱 오류(`JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다.`)다.
+- **사인(`user/signature`, `user/signature-callbacks`):** 처리 대기 중 사인 교체는 같은 업로드 ID를 되풀이해도 현재 사인 URL을 돌려주고, 처리 시간(7분)이 지나거나 실패하면
+  400 `SIGNATURE_REGISTRATION_REQUIRED`/`SIGNATURE_REUPLOAD_REQUIRED`. 콜백은 `X-Chalkak-Callback-Timestamp`·`X-Chalkak-Callback-Signature`(`v1=<hex>`)로만 인증하고
+  서명 대상은 `타임스탬프\nPOST\n경로\nsha256(빈 본문)\n환경`, 시각 창은 과거 300초·미래 30초다. 경로의 업로드 ID는 소문자 표준형이어야 하며 아니면 인증보다 먼저 400이다.
+- **콜백 본문 제한(`user/callback-body-limit`):** `/internal/v1/*`에서 `Content-Length`가 65536바이트를 넘으면 인증 전에 413이다. 청크 본문은 길이를 모르므로 거르지 않는다.
+- **탈퇴(`user/withdraw`):** 정지 회원도 탈퇴할 수 있고, 이미 탈퇴한 회원은 401이다. 모든 리프레시 토큰이 폐기되고 소셜 계정이 지워진다(정지 회원은 계정 유지).
