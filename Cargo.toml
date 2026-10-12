@@ -25,6 +25,8 @@ toml = "0.9"
 postgres = "0.19"
 hmac = "0.12"
 sha2 = "0.10"
+jiff = { version = "0.2", features = ["tzdb-bundle-always"] }
+uuid = { version = "1", features = ["v4"] }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
