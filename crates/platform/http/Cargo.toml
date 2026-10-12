@@ -10,5 +10,7 @@ publish.workspace = true
 workspace = true
 
 [dependencies]
+# 종료 신호(ShutdownSignal)를 core와 공유한다.
+chalkak-core = { path = "../core" }
 rustls.workspace = true
 webpki-roots.workspace = true

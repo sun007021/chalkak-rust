@@ -8,3 +8,14 @@ publish.workspace = true
 
 [lints]
 workspace = true
+
+[dependencies]
+chalkak-core = { path = "../platform/core" }
+chalkak-http = { path = "../platform/http" }
+chalkak-db = { path = "../platform/db" }
+jiff = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+uuid = { workspace = true }
+# DB 값 변환: timestamptz -> jiff::Timestamp, date -> jiff::civil::Date, uuid -> uuid::Uuid.
+postgres = { workspace = true, features = ["with-jiff-0_2", "with-uuid-1"] }

@@ -10,11 +10,13 @@
 use std::io::{self, Read, Write};
 use std::net::{Ipv4Addr, Ipv6Addr, Shutdown, SocketAddr, TcpListener, TcpStream, ToSocketAddrs};
 use std::panic::{self, AssertUnwindSafe};
-use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::mpsc::{self, Receiver};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
+
+use chalkak_core::ShutdownSignal;
 
 use super::handler::Handler;
 use super::limits::Limits;
@@ -28,42 +30,6 @@ const POLL_SLICE: Duration = Duration::from_millis(50);
 /// 오류 응답 뒤 연결을 닫기 전에 상대가 보내는 나머지를 버리며 기다리는 최대 시간·바이트.
 const LINGER: Duration = Duration::from_millis(200);
 const LINGER_MAX_BYTES: usize = 256 * 1024;
-
-/// 서버 종료 신호. 복제해서 다른 스레드(시그널 핸들러 등)에서 `trigger`할 수 있다.
-#[derive(Clone, Default)]
-pub struct ShutdownSignal {
-    inner: Arc<SignalInner>,
-}
-
-#[derive(Default)]
-struct SignalInner {
-    triggered: AtomicBool,
-    wake: Mutex<Option<SocketAddr>>,
-}
-
-impl ShutdownSignal {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    /// 종료를 요청한다. 여러 번 불러도 된다.
-    pub fn trigger(&self) {
-        self.inner.triggered.store(true, Ordering::SeqCst);
-        let addr = *self.inner.wake.lock().unwrap_or_else(|e| e.into_inner());
-        if let Some(addr) = addr {
-            // accept에서 막혀 있는 서버 스레드를 깨운다.
-            let _ = TcpStream::connect_timeout(&loopback(addr), Duration::from_secs(1));
-        }
-    }
-
-    pub fn is_triggered(&self) -> bool {
-        self.inner.triggered.load(Ordering::SeqCst)
-    }
-
-    fn register(&self, addr: SocketAddr) {
-        *self.inner.wake.lock().unwrap_or_else(|e| e.into_inner()) = Some(addr);
-    }
-}
 
 /// `0.0.0.0`·`::`에 묶인 소켓은 루프백 주소로 접속해 깨운다.
 fn loopback(mut addr: SocketAddr) -> SocketAddr {
@@ -107,8 +73,11 @@ impl Server {
         let limits = Arc::new(limits);
         let max_connections = limits.max_connections.max(1);
 
-        shutdown.register(listener.local_addr()?);
-        // register 뒤에 확인해야 trigger와 엇갈려도 깨어난다.
+        // accept에서 막혀 있는 이 스레드를 신호가 오면 깨운다. 훅을 건 뒤에 확인해야 trigger와 엇갈려도 놓치지 않는다.
+        let wake = loopback(listener.local_addr()?);
+        shutdown.on_trigger(move || {
+            let _ = TcpStream::connect_timeout(&wake, Duration::from_secs(1));
+        });
         if shutdown.is_triggered() {
             return Ok(());
         }

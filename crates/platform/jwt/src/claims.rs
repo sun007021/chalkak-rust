@@ -92,14 +92,17 @@ impl Claims {
         self.get_str("jti")
     }
 
-    /// Spring `Jwt.getAudience()`: 문자열 하나도 목록으로 본다. 없거나 비어 있으면 `None`.
+    /// Spring `Jwt.getAudience()`: 문자열 하나도 목록으로 본다. 클레임이 없거나 null이면 `None`(원본은 NPE).
+    ///
+    /// 빈 배열이나 문자열이 아닌 값(`[]`, `5`)은 `None`이 아니다. 원본 java-a가 이런 토큰을 401(audience 불일치)로
+    /// 처리하므로 빈 목록으로 돌려준다.
     pub fn audience(&self) -> Option<Vec<&str>> {
-        let list: Vec<&str> = match self.map.get("aud")? {
-            Value::String(s) => vec![s.as_str()],
-            Value::Array(items) => items.iter().filter_map(Value::as_str).collect(),
-            _ => return None,
-        };
-        if list.is_empty() { None } else { Some(list) }
+        match self.map.get("aud")? {
+            Value::Null => None,
+            Value::String(s) => Some(vec![s.as_str()]),
+            Value::Array(items) => Some(items.iter().filter_map(Value::as_str).collect()),
+            _ => Some(Vec::new()),
+        }
     }
 
     /// 에포크 초.

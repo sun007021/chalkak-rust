@@ -23,6 +23,8 @@ private = { ignore = true }
 [bans]
 multiple-versions = "warn"
 wildcards = "deny"
+# 모든 crate가 publish = false라 워크스페이스 내부 path 의존성은 허용한다.
+allow-wildcard-paths = true
 deny = [
     # 웹 프레임워크
     { crate = "axum" }, { crate = "actix-web" }, { crate = "rocket" }, { crate = "warp" }, { crate = "poem" }, { crate = "tide" },

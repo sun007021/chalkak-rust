@@ -157,14 +157,13 @@ fn 액세스_토큰_발급자와_audience_purpose를_확인한다() {
 }
 
 #[test]
-fn 액세스_토큰_aud가_없거나_비면_원본은_nullpointerexception이다() {
+fn 액세스_토큰_aud가_없으면_원본은_nullpointerexception이다() {
     // JwtAccessTokenProvider#validateAudience: jwt.getAudience()가 null이면 contains 호출에서 NPE.
     // JwtException이 아니라서 401이 아니라 서블릿 오류(500)로 끝난다. 호출 측이 원본과 맞추려면 500으로 매핑한다.
+    // 근거: 원본 java-a에 aud 클레임이 없는(또는 null) 토큰을 보내면 500이다.
     let v = access_validator();
-    for edits in [vec![("aud", Value::Null)], vec![("aud", json!([]))]] {
-        let c = claims(with(access(), &edits));
-        assert_eq!(v.validate(&c, NOW_MS), Err(ClaimError::AudienceMissing));
-    }
+    let c = claims(with(access(), &[("aud", Value::Null)]));
+    assert_eq!(v.validate(&c, NOW_MS), Err(ClaimError::AudienceMissing));
     // 다른 검증이 이미 실패해도(만료) NPE가 우선한다: DelegatingOAuth2TokenValidator는 모두 실행하고 NPE는 전파된다.
     let c = claims(with(
         access(),
@@ -175,6 +174,29 @@ fn 액세스_토큰_aud가_없거나_비면_원본은_nullpointerexception이다
         ],
     ));
     assert_eq!(v.validate(&c, NOW_MS), Err(ClaimError::AudienceMissing));
+}
+
+#[test]
+fn 액세스_토큰_aud가_비었거나_문자열이_아니어도_원본은_401이다() {
+    // 원본 java-a 확인: "aud": [] / "" / [1] / 5 는 모두 401(NPE가 아니라 audience 불일치 또는 디코드 실패).
+    // [] 와 ""는 Spring이 목록으로 변환해 getAudience()가 null이 아니고 contains가 false를 돌려준다.
+    // [1]·5 같은 문자열이 아닌 값은 Claims 생성 단계(디코드)에서 이미 거절된다.
+    let v = access_validator();
+    for aud in [json!([1]), json!(5), json!(true)] {
+        let Value::Object(mut m) = access() else {
+            unreachable!()
+        };
+        m.insert("aud".into(), aud.clone());
+        assert!(Claims::from_map(m).is_err(), "aud = {aud}");
+    }
+    for aud in [json!([]), json!("")] {
+        let c = claims(with(access(), &[("aud", aud.clone())]));
+        assert_eq!(
+            v.validate(&c, NOW_MS),
+            Err(ClaimError::AudienceMismatch),
+            "aud = {aud}"
+        );
+    }
 }
 
 #[test]
