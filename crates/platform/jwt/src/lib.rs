@@ -11,8 +11,10 @@ mod hs256;
 mod json;
 mod jws;
 pub mod original;
+mod validator;
 
 pub use b64::decode_hex;
 pub use claims::Claims;
 pub use error::{JwksError, JwtError};
 pub use hs256::{hs256_decode, hs256_encode};
+pub use validator::{ClaimError, Validator};
