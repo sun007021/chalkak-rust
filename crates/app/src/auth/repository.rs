@@ -431,6 +431,26 @@ impl AppleAuthorizationRepository {
 mod tests {
     use super::*;
 
+    // PendingAppleAuthorizationTest#extendTo_atCurrentExpiry_movesOnlyForward
+    #[test]
+    fn extend_to_at_current_expiry_moves_only_forward() {
+        let ts = |s: &str| -> Timestamp { s.parse().unwrap() };
+        let expires_at = ts("2026-09-04T00:05:00Z");
+        let one_ms = jiff::SignedDuration::from_millis(1);
+        let mut p = PendingAppleAuthorization {
+            id: Uuid::nil(),
+            subject_hmac: "a".repeat(64),
+            encrypted_refresh_token: "encrypted-refresh-token".into(),
+            expires_at,
+        };
+        p.extend_to(expires_at.checked_sub(one_ms).unwrap());
+        assert_eq!(p.expires_at, expires_at);
+        p.extend_to(expires_at);
+        assert_eq!(p.expires_at, expires_at);
+        p.extend_to(expires_at.checked_add(one_ms).unwrap());
+        assert_eq!(p.expires_at, expires_at.checked_add(one_ms).unwrap());
+    }
+
     // PendingAppleAuthorization#extendTo: 앞으로만 간다.
     #[test]
     fn 임시_보관분의_만료는_앞으로만_민다() {
