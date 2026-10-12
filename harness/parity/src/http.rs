@@ -152,6 +152,13 @@ mod tests {
     }
 
     #[test]
+    fn 빈_응답의_오류는_러너가_알아보는_표지를_담는다() {
+        // runner::EMPTY_RESPONSE_MARK와 같은 문자열이어야 일시적 오류로 재실행한다.
+        let err = read_response(BufReader::new(&b""[..]), false).unwrap_err();
+        assert!(err.contains("잘못된 상태 줄: \"\""), "{err}");
+    }
+
+    #[test]
     fn content_length만큼_읽는다() {
         let raw = b"HTTP/1.1 404 Not Found\r\nContent-Length: 2\r\n\r\n{}extra";
         let res = read_response(BufReader::new(&raw[..]), false).unwrap();

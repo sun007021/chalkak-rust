@@ -47,15 +47,20 @@ fn check_app_clock(
 /// 앱 시계 오류 메시지의 표지. `check_app_clock`이 만든다.
 const CLOCK_ERROR_MARK: &str = "앱 시계가 시나리오 시각과 다릅니다";
 
-/// 시계 오류가 나면 시나리오를 처음부터(DB 초기화부터) 다시 돌린다. 시계 오류는 동작 차이가 아니라
-/// 부하로 libfaketime이 시계 파일을 놓친 하네스 문제이고, 이미 틀린 시각으로 상태가 바뀌었으므로
-/// 그 단계만 다시 보내지 않고 시나리오 전체를 다시 한다. 다른 오류는 그대로 낸다.
+/// 응답을 한 바이트도 받지 못하고 연결이 닫힌 경우의 오류 표지. `http::read_response`가 만든다.
+const EMPTY_RESPONSE_MARK: &str = "잘못된 상태 줄: \"\"";
+
+/// 일시적 하네스 오류(시계 오류, 응답 없이 닫힌 연결)가 나면 시나리오를 처음부터(DB 초기화부터) 다시 돌린다.
+/// 시계 오류는 부하로 libfaketime이 시계 파일을 놓친 것이고, 빈 응답은 시각을 뒤로 되돌린 직후 JVM이
+/// 연결을 끊는 경우가 있었다(2026-10-12, 같은 단계에서 반복). 이미 틀린 상태가 쌓였을 수 있어 그 단계만
+/// 다시 보내지 않고 시나리오 전체를 다시 한다. 세 번 모두 같으면 그 오류를 그대로 낸다(구현이 실제로
+/// 응답 없이 연결을 닫는 경우를 가리지 않는다). 다른 오류는 바로 낸다.
 pub fn run(target: &Target, scenario: &Scenario) -> Result<Value, String> {
     const ATTEMPTS: usize = 3;
     let mut last = String::new();
     for attempt in 1..=ATTEMPTS {
         match run_once(target, scenario) {
-            Err(e) if e.contains(CLOCK_ERROR_MARK) => {
+            Err(e) if e.contains(CLOCK_ERROR_MARK) || e.contains(EMPTY_RESPONSE_MARK) => {
                 eprintln!("경고: {e} (시나리오를 다시 실행합니다, {attempt}/{ATTEMPTS})");
                 last = e;
             }
