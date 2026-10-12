@@ -186,6 +186,13 @@ impl JsonObject {
     }
 }
 
+impl JsonObject {
+    /// 해석하지 않은 필드 값. 없으면 `None`이고 `null`은 `Some(Value::Null)`로 남는다(열거형·UUID처럼 필드마다 규칙이 다른 값).
+    pub fn value(&self, name: &str) -> Option<&Value> {
+        self.0.get(name)
+    }
+}
+
 /// 요청 본문을 JSON 객체로 읽는다(`@RequestBody`).
 pub fn read_json_object(req: &Request) -> Result<JsonObject, ApiError> {
     check_content_type(req)?;
@@ -401,6 +408,18 @@ mod tests {
         ] {
             assert!(read_json_object(&post(Some(ct), b"{}")).is_ok(), "{ct}");
         }
+    }
+
+    #[test]
+    fn 원시_값을_그대로_꺼낼_수_있다() {
+        let body = read_json_object(&post(
+            Some("application/json"),
+            br#"{"a":1,"b":null}"#,
+        ))
+        .unwrap();
+        assert_eq!(body.value("a"), Some(&serde_json::json!(1)));
+        assert_eq!(body.value("b"), Some(&Value::Null));
+        assert_eq!(body.value("c"), None);
     }
 
     #[test]
