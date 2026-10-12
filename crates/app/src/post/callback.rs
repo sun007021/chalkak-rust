@@ -144,14 +144,17 @@ fn invalid_body() -> ApiError {
     ))
 }
 
-/// 본문 속 JSON 값 하나. `ObjectMapper.readValue(byte[])`는 첫 값만 읽고 뒤에 남은 것은 보지 않는다.
-/// 파싱할 수 없으면 `None`(읽을 수 없는 본문). `null` 리터럴은 `Some(Value::Null)`이다.
+/// 본문 속 JSON 값 하나. 값 뒤에 공백이 아닌 것이 더 남아 있으면 읽을 수 없는 본문이다(원본은 Jackson의
+/// `FAIL_ON_TRAILING_TOKENS`가 켜진 상태라 `{"width":1}xxx`도 `{"width":1} {}`도 400이다).
+/// 파싱할 수 없으면 `None`. `null` 리터럴은 `Some(Value::Null)`이다.
 fn parse_first_value(raw: &[u8]) -> Option<Value> {
+    use serde::Deserialize;
+
     let body = raw.strip_prefix(&[0xEF, 0xBB, 0xBF]).unwrap_or(raw);
-    serde_json::Deserializer::from_slice(body)
-        .into_iter::<Value>()
-        .next()?
-        .ok()
+    let mut deserializer = serde_json::Deserializer::from_slice(body);
+    let value = Value::deserialize(&mut deserializer).ok()?;
+    deserializer.end().ok()?;
+    Some(value)
 }
 
 /// 객체 본문을 꺼낸다. `null`이면 검증기가 `IllegalArgumentException`을 던져 500이다. 객체가 아니면 읽을 수 없다.
@@ -704,6 +707,19 @@ mod tests {
             )
             .is_ok()
         );
+    }
+
+    #[test]
+    fn 값_뒤에_공백이_아닌_것이_남은_본문은_읽을_수_없다() {
+        for body in [
+            r#"{"width":1}xxx"#,
+            r#"{"width":1} {"width":-1}"#,
+            r#"{"reason":"a"} 1"#,
+        ] {
+            assert!(parse_object(body.as_bytes()).is_err(), "{body}");
+        }
+        assert!(parse_object(b" {\"width\":1} \n\t").is_ok());
+        assert!(read_fail_reason(br#"{"reason":"BAD"} x"#).is_err());
     }
 
     #[test]
