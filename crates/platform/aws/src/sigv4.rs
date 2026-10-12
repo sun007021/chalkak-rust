@@ -107,6 +107,17 @@ pub fn canonical_request(request: &Request<'_>) -> CanonicalRequest {
     }
 }
 
+/// 헤더 목록에서 `SignedHeaders` 값(소문자 이름, 중복 제거, 정렬, 세미콜론 연결)만 뽑는다.
+pub fn signed_headers(headers: &[(&str, &str)]) -> String {
+    let mut names: Vec<String> = headers
+        .iter()
+        .map(|(n, _)| n.to_ascii_lowercase())
+        .collect();
+    names.sort();
+    names.dedup();
+    names.join(";")
+}
+
 pub fn string_to_sign(scope: &Scope<'_>, time: Timestamp, canonical_request: &str) -> String {
     format!(
         "{ALGORITHM}\n{}\n{}\n{}",

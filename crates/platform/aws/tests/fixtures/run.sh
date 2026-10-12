@@ -11,5 +11,5 @@ unzip -q -o "$JAR" 'BOOT-INF/lib/*' -d "$WORK"
 CP="$WORK/BOOT-INF/lib/*"
 mkdir -p "$WORK/out"
 JAVA_TOOL_OPTIONS= "$JDK/javac" -cp "$CP" -d "$WORK/out" "$HERE/PresignFixture.java"
-JAVA_TOOL_OPTIONS= "$JDK/java" -cp "$WORK/out:$CP" PresignFixture
+JAVA_TOOL_OPTIONS=-Dstdout.encoding=UTF-8 "$JDK/java" -cp "$WORK/out:$CP" PresignFixture
 rm -rf "$WORK"
