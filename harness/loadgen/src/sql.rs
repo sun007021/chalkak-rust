@@ -33,9 +33,12 @@ pub fn classify(query: &str) -> Kind {
     }
 }
 
-/// 이 도구 자신이나 하네스가 보낸 문장인가.
+/// 이 도구 자신이나 하네스가 보낸 문장인가. `SELECT 1`은 컨테이너 헬스체크(`/actuator/health`)가 1초마다, `SELECT $1`은 풀이 쉬던 연결을 검사할 때 보내는 것이라
+/// 요청 수에 섞이면 안 된다(요청 처리 중에 DB를 `SELECT 1`로 부르는 경로는 없다).
 fn is_own(query: &str) -> bool {
-    query.contains("pg_stat_statements") || query.contains("pg_stat_activity")
+    query.contains("pg_stat_statements")
+        || query.contains("pg_stat_activity")
+        || matches!(query.trim(), "SELECT 1" | "SELECT $1") // 헬스체크, 풀의 유휴 연결 검사(is_valid)
 }
 
 pub fn reset(client: &mut Client) -> Result<(), postgres::Error> {
@@ -151,6 +154,9 @@ mod tests {
     fn 자기_문장은_걸러낸다() {
         assert!(is_own("SELECT query FROM pg_stat_statements"));
         assert!(is_own("SELECT count(*) FROM pg_stat_activity"));
+        assert!(is_own("SELECT 1"), "헬스체크");
+        assert!(is_own("SELECT $1"), "풀 유휴 연결 검사");
+        assert!(!is_own("SELECT 1 FROM posts WHERE id = $1"));
         assert!(!is_own("SELECT * FROM posts"));
     }
 }

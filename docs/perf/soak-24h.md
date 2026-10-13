@@ -52,7 +52,7 @@ done >> host-watch.csv
 ## 판정
 
 ```bash
-chalkak-loadgen trend --log soak.log --skip 0.2 --pool 10
+chalkak-loadgen trend --log soak.log --skip 0.2 --pool 11   # 풀 10 + 부하 발생기의 --db 연결 1
 ```
 
 처음 20%(워밍업)를 버리고 최소제곱 기울기를 본다. 누수 의심 기준:

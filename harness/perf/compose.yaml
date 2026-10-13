@@ -74,6 +74,8 @@ services:
       SPRING_DATASOURCE_USERNAME: chalkak
       SPRING_DATASOURCE_PASSWORD: test-password
       PERF_JAVA_OPTS: ${PERF_JAVA_OPTS:-}
+      # 주기 작업·런타임 로그는 두 앱 모두 같은 값(기본 끔). PERF_SCHEDULING=true로 둘 다 켠다.
+      CHALKAK_SCHEDULING_ENABLED: ${PERF_SCHEDULING:-false}
     volumes:
       - ${PERF_JAVA_JAR}:/app/app.jar:ro
     ports: ["127.0.0.1:${PERF_PORT_JAVA}:8080"]
@@ -98,6 +100,7 @@ services:
       DB_NAME: chalkak
       DB_USERNAME: chalkak
       DB_PASSWORD: test-password
+      CHALKAK_SCHEDULING_ENABLED: ${PERF_SCHEDULING:-false}
     volumes:
       - ${PERF_RUST_BIN}:/app/chalkak-server:ro
       - ../../migrations:/app/migrations:ro
