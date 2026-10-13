@@ -31,6 +31,8 @@ pub(crate) enum BodyKind {
 pub(crate) struct Head {
     pub method: Method,
     pub path: String,
+    /// 퍼센트 디코딩 전 경로(쿼리 제외). 오류 응답 본문의 `path`와 접근 로그가 이 형태를 쓴다.
+    pub raw_path: String,
     pub query: Vec<(String, String)>,
     pub headers: Headers,
     pub version: Version,
@@ -357,7 +359,7 @@ fn parse_head(raw: &[u8], limits: &Limits) -> Result<Head, ParseError> {
 
     let request_line = lines.next().unwrap_or_default();
     let request_line = request_line.strip_suffix(b"\r").unwrap_or(request_line);
-    let (method, path, query, version) = parse_request_line(request_line)?;
+    let (method, path, raw_path, query, version) = parse_request_line(request_line)?;
 
     let mut headers = Headers::new();
     for line in lines {
@@ -369,6 +371,7 @@ fn parse_head(raw: &[u8], limits: &Limits) -> Result<Head, ParseError> {
     Ok(Head {
         method,
         path,
+        raw_path,
         query,
         headers,
         version,
@@ -378,7 +381,7 @@ fn parse_head(raw: &[u8], limits: &Limits) -> Result<Head, ParseError> {
     })
 }
 
-type RequestLine = (Method, String, Vec<(String, String)>, Version);
+type RequestLine = (Method, String, String, Vec<(String, String)>, Version);
 
 fn parse_request_line(line: &[u8]) -> Result<RequestLine, ParseError> {
     if line
@@ -403,8 +406,8 @@ fn parse_request_line(line: &[u8]) -> Result<RequestLine, ParseError> {
         v if is_http_version(v) => return Err(ParseError::VersionNotSupported),
         _ => return Err(ParseError::BadRequest("invalid HTTP version")),
     };
-    let (path, query) = parse_target(&method, target)?;
-    Ok((method, path, query, version))
+    let (path, raw_path, query) = parse_target(&method, target)?;
+    Ok((method, path, raw_path, query, version))
 }
 
 fn is_http_version(v: &str) -> bool {
@@ -419,14 +422,14 @@ fn is_http_version(v: &str) -> bool {
 fn parse_target(
     method: &Method,
     target: &str,
-) -> Result<(String, Vec<(String, String)>), ParseError> {
+) -> Result<(String, String, Vec<(String, String)>), ParseError> {
     if target.is_empty() || target.contains('#') {
         return Err(ParseError::BadRequest("invalid request target"));
     }
     let origin_form = if target.starts_with('/') {
         target
     } else if target == "*" && *method == Method::Options {
-        return Ok(("*".to_string(), Vec::new()));
+        return Ok(("*".to_string(), "*".to_string(), Vec::new()));
     } else if let Some(rest) = strip_scheme(target) {
         // absolute-form: 호스트는 버리고 경로·쿼리만 쓴다.
         match rest.find(['/', '?']) {
@@ -444,7 +447,7 @@ fn parse_target(
     let raw_path = if raw_path.is_empty() { "/" } else { raw_path };
     let path =
         decode_path(raw_path).ok_or(ParseError::BadRequest("invalid percent-encoding in path"))?;
-    Ok((path, parse_query(raw_query)))
+    Ok((path, raw_path.to_string(), parse_query(raw_query)))
 }
 
 fn strip_scheme(target: &str) -> Option<&str> {
@@ -585,6 +588,14 @@ mod tests {
         assert_eq!(h.version, Version::Http11);
         assert_eq!(h.body, BodyKind::None);
         assert!(h.keep_alive);
+    }
+
+    #[test]
+    fn raw_path_keeps_percent_encoding() {
+        // Tomcat getRequestURI(): 오류 응답 본문의 path와 접근 로그가 쓰는 디코딩 전 경로
+        let h = head("GET /caf%C3%A9/%3Bx?a=1 HTTP/1.1\r\nHost: x\r\n\r\n").unwrap();
+        assert_eq!(h.path, "/café/;x");
+        assert_eq!(h.raw_path, "/caf%C3%A9/%3Bx");
     }
 
     #[test]

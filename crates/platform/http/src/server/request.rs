@@ -11,6 +11,8 @@ pub struct Request {
     pub method: Method,
     /// 퍼센트 디코딩된 경로(쿼리 제외). 끝 슬래시를 그대로 보존한다.
     pub path: String,
+    /// 디코딩 전 경로(쿼리 제외). Tomcat `getRequestURI()`에 해당한다.
+    pub raw_path: String,
     /// 디코딩된 쿼리. 같은 이름이 여러 번 나오면 순서대로 모두 남는다.
     pub query: Vec<(String, String)>,
     pub headers: Headers,
@@ -25,9 +27,11 @@ pub struct Request {
 impl Request {
     /// 테스트·미들웨어 합성용 간이 생성자. `remote_addr`은 `0.0.0.0:0`.
     pub fn new(method: Method, path: impl Into<String>) -> Self {
+        let path = path.into();
         Request {
             method,
-            path: path.into(),
+            raw_path: path.clone(),
+            path,
             query: Vec::new(),
             headers: Headers::new(),
             body: Vec::new(),

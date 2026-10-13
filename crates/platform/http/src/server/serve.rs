@@ -314,6 +314,7 @@ fn into_request(head: Head, body: Vec<u8>, remote_addr: SocketAddr) -> Request {
     Request {
         method: head.method,
         path: head.path,
+        raw_path: head.raw_path,
         query: head.query,
         headers: head.headers,
         body,
