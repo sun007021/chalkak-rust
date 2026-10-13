@@ -1,4 +1,10 @@
-//! 회원 도메인. 지금은 인증 판정에 필요한 "회원이 남아 있는가"만 둔다.
+//! 회원 도메인: 회원 저장, 사인 이미지 등록과 처리 콜백, 탈퇴.
+
+pub mod api;
+pub mod domain;
+pub mod repository;
+pub mod service;
+pub mod storage;
 
 use chalkak_db::DbError;
 use postgres::GenericClient;

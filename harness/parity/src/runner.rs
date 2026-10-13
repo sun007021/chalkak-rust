@@ -126,7 +126,17 @@ fn run_once(target: &Target, scenario: &Scenario) -> Result<Value, String> {
             ));
         }
         let path = subst(&step.path, &vars);
-        let body = step.body.as_ref().map(|b| subst(b, &vars).into_bytes());
+        let body = match (&step.body, step.body_size) {
+            (Some(b), None) => Some(subst(b, &vars).into_bytes()),
+            (None, Some(n)) => Some(vec![b'a'; n]),
+            (None, None) => None,
+            (Some(_), Some(_)) => {
+                return Err(format!(
+                    "{}: body와 body_size는 함께 쓸 수 없습니다",
+                    step.name
+                ));
+            }
+        };
         if let Some(spec) = &step.callback {
             let signed_path = path.split('?').next().unwrap_or(&path);
             headers.extend(callback::headers(

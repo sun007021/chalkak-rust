@@ -1,0 +1,146 @@
+name = "회원: 탈퇴(DELETE /users/me)와 탈퇴 뒤 로그인·재발급, 정지 회원의 탈퇴"
+tags = ["user", "withdraw", "oidc", "s3"]
+clock = "2026-10-12T09:00:00+09:00"
+db_opaque = ["token_hash"]
+
+# 근거: UserController#withdraw, UserWithdrawalService, UserService#completeWithdrawal, User#withdraw,
+# UserWithdrawalServiceTest, SocialLoginService/ExistingSocialAccountLoginProcessor(탈퇴·정지 회원의 남은 연결).
+# 일반 회원은 소셜 계정 연결을 지우고, 정지 회원은 재가입 우회를 막으려고 연결을 남긴다.
+# 모든 기기의 리프레시 토큰 계보를 폐기한다. 이메일과 서명 키는 개인 정보라 지워진다.
+
+[setup]
+sql = [
+  # B: 정지 회원(소셜 계정 연결 있음). 소셜 계정의 subject_hmac은 HMAC-SHA256(SOCIAL_IDENTITY_HMAC_SECRET, "GOOGLE:google-banned-sub")
+  "INSERT INTO users (id, email, status, signature_original_storage_key, signature_thumbnail_storage_key) VALUES ('01990000-0000-7000-8000-0000000000b2', 'banned@example.com', 'BANNED', 'chalkak/signatures/local/original/0198f6c1-62ba-7d30-8b12-0f733b6570b2.png', 'chalkak/signatures/local/thumbnail/0198f6c1-62ba-7d30-8b12-0f733b6570b2.png')",
+  "INSERT INTO social_accounts (id, user_id, provider, subject_hmac) VALUES ('01990000-0000-7000-8000-00000000f0b2', '01990000-0000-7000-8000-0000000000b2', 'GOOGLE', '2c6520382455db61891071b317a3dff463416e6d20a96e3b20ca005c90984308')",
+]
+
+[[id_token]]
+name = "g"
+provider = "google"
+sub = "google-sub-withdraw"
+nonce = "nonce-w"
+email = "withdraw@example.com"
+email_verified = true
+
+[[id_token]]
+name = "banned"
+provider = "google"
+sub = "google-banned-sub"
+nonce = "nonce-b"
+email = "banned@example.com"
+email_verified = true
+
+[[step]]
+name = "사인 업로드 URL 발급"
+method = "POST"
+path = "/api/v1/auth/social-signup/signature/uploads"
+body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":"nonce-w"}'
+capture = { uploadId = "uploadId", signupToken = "signupToken" }
+
+[[step]]
+name = "가입 완료"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+body = '{"signupToken":"${signupToken}"}'
+opaque = ["refreshToken"]
+capture = { userId = "userId", refreshToken = "refreshToken" }
+[step.fakes.s3."chalkak/signatures/local/original/${uploadId}.png"]
+size = 2048
+content_type = "image/png"
+[step.fakes.s3."chalkak/signatures/local/thumbnail/${uploadId}.png"]
+size = 512
+content_type = "image/png"
+
+[[step]]
+name = "다른 기기로 한 번 더 로그인"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":"nonce-w"}'
+opaque = ["refreshToken"]
+capture = { refreshToken2 = "refreshToken" }
+
+[[step]]
+name = "토큰 없이 탈퇴하면 401"
+method = "DELETE"
+path = "/api/v1/users/me"
+
+[[step]]
+name = "관리자 토큰으로 탈퇴하면 403"
+method = "DELETE"
+path = "/api/v1/users/me"
+auth = { admin = "${userId}" }
+
+[[step]]
+name = "탈퇴"
+method = "DELETE"
+path = "/api/v1/users/me"
+auth = { user = "${userId}" }
+
+[[step]]
+name = "탈퇴 뒤 사인 조회는 401"
+method = "GET"
+path = "/api/v1/users/me/signature"
+auth = { user = "${userId}" }
+
+[[step]]
+name = "이미 탈퇴한 회원의 탈퇴는 401"
+method = "DELETE"
+path = "/api/v1/users/me"
+auth = { user = "${userId}" }
+
+[[step]]
+name = "탈퇴 뒤 첫 기기의 리프레시 토큰은 폐기됨"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":"${refreshToken}"}'
+
+[[step]]
+name = "탈퇴 뒤 다른 기기의 리프레시 토큰도 폐기됨"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":"${refreshToken2}"}'
+
+[[step]]
+name = "탈퇴 뒤 같은 계정으로 로그인하면 가입이 필요하다"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":"nonce-w"}'
+
+[[step]]
+name = "탈퇴한 계정으로 다시 가입할 업로드 URL"
+method = "POST"
+path = "/api/v1/auth/social-signup/signature/uploads"
+body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":"nonce-w"}'
+capture = { uploadId2 = "uploadId", signupToken2 = "signupToken" }
+
+[[step]]
+name = "재가입"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+body = '{"signupToken":"${signupToken2}"}'
+opaque = ["refreshToken"]
+[step.fakes.s3."chalkak/signatures/local/original/${uploadId2}.png"]
+size = 2048
+content_type = "image/png"
+[step.fakes.s3."chalkak/signatures/local/thumbnail/${uploadId2}.png"]
+size = 512
+content_type = "image/png"
+
+[[step]]
+name = "정지 회원도 탈퇴할 수 있다"
+method = "DELETE"
+path = "/api/v1/users/me"
+auth = { user = "01990000-0000-7000-8000-0000000000b2" }
+
+[[step]]
+name = "정지 회원이 탈퇴해도 소셜 계정 연결은 남아 로그인할 수 없다"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${banned}","rawNonce":"nonce-b"}'
+
+[[step]]
+name = "정지 회원의 소셜 계정으로 업로드 URL을 받을 수 없다"
+method = "POST"
+path = "/api/v1/auth/social-signup/signature/uploads"
+body = '{"provider":"GOOGLE","idToken":"${banned}","rawNonce":"nonce-b"}'

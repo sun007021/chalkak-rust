@@ -1,20 +1,8 @@
 {
-  "db": {
-    "topics": [
-      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t+86370s db +09:00>\",\"id\":\"$uuid2\",\"starts_at\":\"<t-30s db +09:00>\",\"title\":\"13일 주제\",\"topic_date\":\"2026-10-13\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t-30s db +09:00>\",\"id\":\"$uuid4\",\"starts_at\":\"<t-86430s db +09:00>\",\"title\":\"12일 주제\",\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t+0s db +09:00>\"}"
-    ]
-  },
   "steps": [
     {
-      "body": {
-        "endsAt": "<t+86370s iso Z>",
-        "id": "$uuid2",
-        "phase": "OPEN",
-        "startsAt": "<t-30s iso Z>",
-        "title": "13일 주제",
-        "topicDate": "2026-10-13"
-      },
+      "step": "13일은 이미 오늘이다",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -49,18 +37,18 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "13일은 이미 오늘이다"
+      "body": {
+        "id": "$uuid2",
+        "title": "13일 주제",
+        "topicDate": "2026-10-13",
+        "startsAt": "<t-30s iso Z>",
+        "endsAt": "<t+86370s iso Z>",
+        "phase": "OPEN"
+      }
     },
     {
-      "body": {
-        "endsAt": "<t-30s iso Z>",
-        "id": "$uuid4",
-        "phase": "CLOSED",
-        "startsAt": "<t-86430s iso Z>",
-        "title": "12일 주제",
-        "topicDate": "2026-10-12"
-      },
+      "step": "12일은 마감",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -95,14 +83,18 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "12일은 마감"
+      "body": {
+        "id": "$uuid4",
+        "title": "12일 주제",
+        "topicDate": "2026-10-12",
+        "startsAt": "<t-86430s iso Z>",
+        "endsAt": "<t-30s iso Z>",
+        "phase": "CLOSED"
+      }
     },
     {
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "미래의 주제는 조회할 수 없습니다."
-      },
+      "step": "14일은 미래",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -137,8 +129,16 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "14일은 미래"
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "미래의 주제는 조회할 수 없습니다."
+      }
     }
-  ]
+  ],
+  "db": {
+    "topics": [
+      "{\"id\":\"$uuid2\",\"title\":\"13일 주제\",\"ends_at\":\"<t+86370s db +09:00>\",\"starts_at\":\"<t-30s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-13\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"id\":\"$uuid4\",\"title\":\"12일 주제\",\"ends_at\":\"<t-30s db +09:00>\",\"starts_at\":\"<t-86430s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ]
+  }
 }

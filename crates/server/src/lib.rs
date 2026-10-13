@@ -112,6 +112,7 @@ pub fn build_handler(
         pool: pool.clone(),
         clock: Arc::clone(&clock),
         logger: Arc::clone(&logger),
+        settings: Arc::new(settings.app.clone()),
         post: PostWiring::new(
             settings.post.clone(),
             Arc::new(object_store),

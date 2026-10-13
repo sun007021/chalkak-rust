@@ -1,8 +1,8 @@
 {
-  "db": {},
   "steps": [
     {
-      "body": "",
+      "step": "허용 Origin preflight",
+      "status": 200,
       "headers": [
         [
           "access-control-allow-headers",
@@ -65,11 +65,11 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "허용 Origin preflight"
+      "body": ""
     },
     {
-      "body": "Invalid CORS request",
+      "step": "허용하지 않는 Origin preflight",
+      "status": 403,
       "headers": [
         [
           "cache-control",
@@ -112,14 +112,11 @@
           "0"
         ]
       ],
-      "status": 403,
-      "step": "허용하지 않는 Origin preflight"
+      "body": "Invalid CORS request"
     },
     {
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      },
+      "step": "허용 Origin 실제 요청(인증 실패)",
+      "status": 401,
       "headers": [
         [
           "access-control-allow-origin",
@@ -178,14 +175,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "허용 Origin 실제 요청(인증 실패)"
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      }
     },
     {
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "주제를 찾을 수 없습니다."
-      },
+      "step": "회원 API에 Origin",
+      "status": 404,
       "headers": [
         [
           "cache-control",
@@ -220,8 +217,11 @@
           "0"
         ]
       ],
-      "status": 404,
-      "step": "회원 API에 Origin"
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제를 찾을 수 없습니다."
+      }
     }
-  ]
+  ],
+  "db": {}
 }

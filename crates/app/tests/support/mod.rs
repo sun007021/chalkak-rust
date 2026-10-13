@@ -132,6 +132,7 @@ impl Fx {
             pool: db.pool(8),
             clock: clock.clone(),
             logger,
+            settings: Arc::new(chalkak_app::config::test_settings(&settings())),
             post: wiring.clone(),
         };
         let command = wiring.command_service(&ctx);

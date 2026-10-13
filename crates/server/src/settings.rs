@@ -11,6 +11,7 @@
 use std::path::PathBuf;
 use std::time::Duration;
 
+use chalkak_app::config::AppSettings;
 use chalkak_app::notification::slack::settings::AdminNotificationSettings;
 use chalkak_app::post::PostSettings;
 use chalkak_core::config::{ConfigError, Env};
@@ -72,6 +73,8 @@ pub struct Settings {
     pub admin_development_bypass: bool,
     pub admin_cors_allowed_origins: Vec<String>,
     pub log_file: PathBuf,
+    /// auth·user 도메인 설정(OIDC, Apple, 이미지 저장소, 콜백).
+    pub app: AppSettings,
     pub post: PostSettings,
     /// 관리자 Slack 알림. 전달이 꺼져 있으면 `None`.
     pub admin_notification: Option<AdminNotificationSettings>,
@@ -97,6 +100,12 @@ impl Settings {
         };
 
         let post = PostSettings::from_env(env, profile.name())?;
+        let app = AppSettings::from_env(
+            env,
+            &post,
+            access_token_key.clone(),
+            access_token_expiration,
+        )?;
         let admin_notification =
             AdminNotificationSettings::from_env(env, profile == Profile::Local)?;
 
@@ -114,6 +123,7 @@ impl Settings {
             log_file: PathBuf::from(
                 env.string_or("CHALKAK_LOGGING_FILE", chalkak_core::log::DEFAULT_LOG_FILE),
             ),
+            app,
             post,
             admin_notification,
         })
@@ -185,17 +195,9 @@ mod tests {
         let mut pairs = vec![
             ("ACCESS_TOKEN_SECRET", "0011"),
             ("ACCESS_TOKEN_EXPIRATION", "15m"),
-            ("CLOUDFRONT_ORIGIN_PATH", "/chalkak"),
-            (
-                "IMAGE_PROCESSOR_CALLBACK_SECRET",
-                "test-callback-secret-with-enough-length",
-            ),
-            ("CALLBACK_MAX_BODY_BYTES", "65536"),
-            ("POST_IMAGE_PROCESSING_TIMEOUT", "7m"),
-            ("S3_BUCKET", "bucket"),
             ("S3_PREFIX", "chalkak"),
-            ("CLOUDFRONT_BASE_URL", "https://cdn.example.com"),
         ];
+        pairs.extend_from_slice(&chalkak_app::config::TEST_ENV);
         pairs.extend_from_slice(extra);
         Env::from_pairs(pairs)
     }
@@ -230,6 +232,7 @@ mod tests {
             ("SPRING_PROFILES_ACTIVE", "dev"),
             ("ADMIN_DEVELOPMENT_BYPASS_ENABLED", "true"),
             ("ADMIN_CORS_ALLOWED_ORIGIN", "https://admin.example.com"),
+            ("S3_PREFIX", "chalkak"),
             ("DB_NAME", "chalkak"),
             ("DB_USERNAME", "u"),
             ("DB_PASSWORD", "p"),
@@ -244,6 +247,7 @@ mod tests {
     fn dev와_prod의_cors_origin은_프로필마다_다르다() {
         let base = [
             ("ADMIN_CORS_ALLOWED_ORIGIN", "https://admin.example.com"),
+            ("S3_PREFIX", "chalkak"),
             ("DB_NAME", "chalkak"),
             ("DB_USERNAME", "u"),
             ("DB_PASSWORD", "p"),

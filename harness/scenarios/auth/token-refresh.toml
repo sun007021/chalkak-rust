@@ -1,0 +1,263 @@
+name = "인증: 리프레시 토큰 회전·재사용 탐지·로그아웃·비활동·절대 만료"
+tags = ["auth", "refresh", "oidc", "s3"]
+clock = "2026-10-12T09:00:00+09:00"
+db_opaque = ["token_hash"]
+
+# 근거: AuthController#refresh/logout, UserRefreshTokenService, RefreshTokenPolicy, RefreshToken,
+# UserRefreshTokenServiceTest, UserRefreshTokenRepositoryTest, RefreshTokenPolicyTest.
+# 비활동 만료 30일, 절대 만료 90일(oracle.env). 회전할 때마다 비활동 만료가 밀리지만 절대 만료를 넘지 않는다.
+# 재사용(이미 회전된 토큰)과 만료는 같은 계보를 모두 폐기하고 같은 401로 답한다.
+# ID Token은 시나리오 시작 시각 기준 10분 유효하므로 로그인은 모두 처음에 해 둔다.
+
+[[id_token]]
+name = "g"
+provider = "google"
+sub = "google-sub-refresh"
+nonce = "nonce-r"
+email = "refresh@example.com"
+email_verified = true
+
+[[step]]
+name = "업로드 URL 발급"
+method = "POST"
+path = "/api/v1/auth/social-signup/signature/uploads"
+body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":"nonce-r"}'
+capture = { uploadId = "uploadId", signupToken = "signupToken" }
+
+[[step]]
+name = "가입(첫 기기, 계보 1)"
+method = "POST"
+path = "/api/v1/auth/social-signup"
+body = '{"signupToken":"${signupToken}"}'
+opaque = ["refreshToken"]
+capture = { r1 = "refreshToken" }
+[step.fakes.s3."chalkak/signatures/local/original/${uploadId}.png"]
+size = 2048
+content_type = "image/png"
+[step.fakes.s3."chalkak/signatures/local/thumbnail/${uploadId}.png"]
+size = 512
+content_type = "image/png"
+
+[[step]]
+name = "두 번째 기기 로그인(계보 2)"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":"nonce-r"}'
+opaque = ["refreshToken"]
+capture = { r2 = "refreshToken" }
+
+[[step]]
+name = "세 번째 기기 로그인(계보 3)"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":"nonce-r"}'
+opaque = ["refreshToken"]
+capture = { r3 = "refreshToken" }
+
+[[step]]
+name = "네 번째 기기 로그인(계보 4)"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":"nonce-r"}'
+opaque = ["refreshToken"]
+capture = { r4 = "refreshToken" }
+
+[[step]]
+name = "다섯 번째 기기 로그인(계보 5)"
+method = "POST"
+path = "/api/v1/auth/social-login"
+body = '{"provider":"GOOGLE","idToken":"${g}","rawNonce":"nonce-r"}'
+opaque = ["refreshToken"]
+capture = { r5 = "refreshToken" }
+
+# --- 요청 형식 ------------------------------------------------------------------------------
+
+[[step]]
+name = "재발급: 본문 없음"
+method = "POST"
+path = "/api/v1/auth/refresh"
+
+[[step]]
+name = "재발급: 토큰 필드 없음"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{}'
+
+[[step]]
+name = "재발급: 토큰이 null"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":null}'
+
+[[step]]
+name = "재발급: 토큰이 공백"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":" \t"}'
+
+[[step]]
+name = "재발급: 토큰이 배열"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":["a"]}'
+
+[[step]]
+name = "재발급: 토큰이 숫자(문자열로 바뀌어 모르는 토큰)"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":123}'
+
+[[step]]
+name = "재발급: 모르는 토큰"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":"unknown-token"}'
+
+[[step]]
+name = "재발급: 앞뒤 공백이 붙은 토큰은 다른 토큰"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":" ${r1} "}'
+
+[[step]]
+name = "재발급: 알 수 없는 필드는 무시"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":"${r5}","extra":true}'
+opaque = ["refreshToken", "accessToken"]
+capture = { r5 = "refreshToken" }
+
+[[step]]
+name = "로그아웃: 본문 없음"
+method = "POST"
+path = "/api/v1/auth/logout"
+
+[[step]]
+name = "로그아웃: 토큰 공백"
+method = "POST"
+path = "/api/v1/auth/logout"
+body = '{"refreshToken":""}'
+
+# --- 회전과 재사용 탐지 ----------------------------------------------------------------------
+
+[[step]]
+name = "정상 재발급(계보 1: r1 → r1b)"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":"${r1}"}'
+opaque = ["refreshToken", "accessToken"]
+capture = { r1b = "refreshToken" }
+
+[[step]]
+name = "회전된 r1을 재사용하면 계보 전체 폐기"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":"${r1}"}'
+
+[[step]]
+name = "폐기된 계보의 최신 토큰도 쓸 수 없다"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":"${r1b}"}'
+
+[[step]]
+name = "다른 계보(2)는 영향받지 않는다"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":"${r2}"}'
+opaque = ["refreshToken", "accessToken"]
+capture = { r2b = "refreshToken" }
+
+# --- 로그아웃 -------------------------------------------------------------------------------
+
+[[step]]
+name = "로그아웃(계보 3)"
+method = "POST"
+path = "/api/v1/auth/logout"
+body = '{"refreshToken":"${r3}"}'
+
+[[step]]
+name = "로그아웃한 토큰으로 재발급"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":"${r3}"}'
+
+[[step]]
+name = "이미 폐기된 토큰의 로그아웃도 204"
+method = "POST"
+path = "/api/v1/auth/logout"
+body = '{"refreshToken":"${r3}"}'
+
+[[step]]
+name = "모르는 토큰의 로그아웃도 204"
+method = "POST"
+path = "/api/v1/auth/logout"
+body = '{"refreshToken":"unknown-token"}'
+
+[[step]]
+name = "회전된 옛 토큰으로 로그아웃하면 계보가 폐기된다(계보 2)"
+method = "POST"
+path = "/api/v1/auth/logout"
+body = '{"refreshToken":"${r2}"}'
+
+[[step]]
+name = "계보 2의 최신 토큰도 폐기됨"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":"${r2b}"}'
+
+# --- 시간 경과: 비활동 만료와 절대 만료 ---------------------------------------------------------------
+
+[[step]]
+name = "29일을 보낸다"
+method = "GET"
+path = "/api/v1/topics?date=2026-10-12"
+advance_seconds = 2505600
+
+[[step]]
+name = "29일째 재발급(계보 5: r5 → r5b, 만료는 59일째)"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":"${r5}"}'
+opaque = ["refreshToken", "accessToken"]
+capture = { r5b = "refreshToken" }
+advance_seconds = 86460
+
+[[step]]
+name = "30일이 지나면 만료(계보 4)"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":"${r4}"}'
+advance_seconds = 1
+
+[[step]]
+name = "만료로 폐기된 계보는 이후에도 쓸 수 없다"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":"${r4}"}'
+advance_seconds = 2419139
+
+[[step]]
+name = "58일째 재발급(계보 5: r5b → r5c, 만료는 88일째)"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":"${r5b}"}'
+opaque = ["refreshToken", "accessToken"]
+capture = { r5c = "refreshToken" }
+advance_seconds = 2505600
+
+[[step]]
+# 절대 만료로 줄어든 남은 시간은 두 요청이 각자 단계 안에서 시각을 읽는 순간(밀리초)의 차이로 1초 흔들려 비교하지 않는다.
+name = "87일째 재발급(만료는 절대 만료인 90일째로 줄어든다)"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":"${r5c}"}'
+opaque = ["refreshToken", "accessToken", "refreshTokenExpiresIn"]
+capture = { r5d = "refreshToken" }
+advance_seconds = 345600
+
+[[step]]
+name = "91일째는 절대 만료"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":"${r5d}"}'

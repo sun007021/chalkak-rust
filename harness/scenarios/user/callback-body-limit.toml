@@ -1,0 +1,46 @@
+name = "회원: 이미지 처리 콜백 본문 크기 제한(CallbackBodySizeLimitFilter)"
+tags = ["user", "callback"]
+clock = "2026-10-12T09:00:00+09:00"
+compare_db = false
+
+# 근거: CallbackBodySizeLimitFilter, CallbackBodySizeLimitConfig(`/internal/v1/*`), CallbackBodySizeLimitFilterTest.
+# 상한은 oracle.env의 CALLBACK_MAX_BODY_BYTES=65536이다. Content-Length가 상한을 넘으면 인증 전에 413 JSON으로 끊는다.
+# 사인 콜백은 본문을 읽지 않아 서명 대상 본문이 비어 있으므로(`sign_body = ""`) 상한 이하의 본문은 어떤 내용이든 통과한다.
+
+[[step]]
+name = "상한(65536바이트) 본문은 통과"
+method = "POST"
+path = "/internal/v1/signature-processing/0198f6c1-0000-7000-8000-000000000009/complete"
+callback = { sign_body = "" }
+body_size = 65536
+
+[[step]]
+name = "상한을 1바이트 넘으면 413"
+method = "POST"
+path = "/internal/v1/signature-processing/0198f6c1-0000-7000-8000-000000000009/complete"
+callback = { sign_body = "" }
+body_size = 65537
+
+[[step]]
+name = "서명이 없어도 크기가 먼저 거절된다"
+method = "POST"
+path = "/internal/v1/signature-processing/0198f6c1-0000-7000-8000-000000000009/complete"
+body_size = 70000
+
+[[step]]
+name = "상한 이하 본문이어도 서명이 없으면 401"
+method = "POST"
+path = "/internal/v1/signature-processing/0198f6c1-0000-7000-8000-000000000009/complete"
+body = '''{"a":1}'''
+
+[[step]]
+name = "경로의 업로드 ID가 틀려도 크기가 먼저 거절된다"
+method = "POST"
+path = "/internal/v1/signature-processing/not-a-uuid/failed"
+body_size = 65537
+
+[[step]]
+name = "콜백 밖의 공개 경로에는 제한이 걸리지 않는다"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body_size = 65537

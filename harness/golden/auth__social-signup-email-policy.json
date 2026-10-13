@@ -1,180 +1,8 @@
 {
-  "db": {
-    "consumed_signup_tokens": [
-      "{\"expires_at\":\"<t+300s db +09:00>\",\"jti\":\"$uuid?\"}",
-      "{\"expires_at\":\"<t+300s db +09:00>\",\"jti\":\"$uuid?\"}",
-      "{\"expires_at\":\"<t+300s db +09:00>\",\"jti\":\"$uuid?\"}",
-      "{\"expires_at\":\"<t+300s db +09:00>\",\"jti\":\"$uuid?\"}"
-    ],
-    "social_accounts": [
-      "{\"created_at\":\"<t+0s db +09:00>\",\"id\":\"$uuid?\",\"provider\":\"GOOGLE\",\"subject_hmac\":\"934b9a0e2fd12a5ce847fb1ead785c441afac95947d5cc1de7ac6c28fc604819\",\"user_id\":\"$uuid8\"}",
-      "{\"created_at\":\"<t+0s db +09:00>\",\"id\":\"$uuid?\",\"provider\":\"GOOGLE\",\"subject_hmac\":\"bc9044ba91c68874945475bfba022694eab004928c057a42727bb3067b8d0a06\",\"user_id\":\"$uuid12\"}",
-      "{\"created_at\":\"<t+0s db +09:00>\",\"id\":\"$uuid?\",\"provider\":\"GOOGLE\",\"subject_hmac\":\"d9d5b6032350f029c878718ebab701340fda3238b028b86642223a752d8ffd33\",\"user_id\":\"$uuid17\"}",
-      "{\"created_at\":\"<t+0s db +09:00>\",\"id\":\"$uuid?\",\"provider\":\"KAKAO\",\"subject_hmac\":\"a1cfb0dec926bd240a5073cc25d017b0a627211279591a41bcdca56cd4772ee4\",\"user_id\":\"$uuid4\"}"
-    ],
-    "user_refresh_tokens": [
-      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":null,\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid12\"}",
-      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":null,\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid17\"}",
-      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":null,\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid4\"}",
-      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":null,\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid8\"}"
-    ],
-    "users": [
-      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"big@example.com\",\"id\":\"$uuid17\",\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid14.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid14.png\",\"status\":\"ACTIVE\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"kakao@example.com\",\"id\":\"$uuid4\",\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid2.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid2.png\",\"status\":\"ACTIVE\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"verified-string@example.com\",\"id\":\"$uuid12\",\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid10.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid10.png\",\"status\":\"ACTIVE\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":null,\"id\":\"$uuid8\",\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid6.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid6.png\",\"status\":\"ACTIVE\",\"updated_at\":\"<t+0s db +09:00>\"}"
-    ]
-  },
-  "fakes": [
-    {
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid2.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/original/$uuid2.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid2.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid6.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/original/$uuid6.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid6.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid10.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/original/$uuid10.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid10.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid14.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/original/$uuid14.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid14.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid14.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/original/$uuid14.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid14.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid19.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/original/$uuid19.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid19.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid19.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/original/$uuid19.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid19.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid19.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid19.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid19.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/original/$uuid19.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/original/$uuid19.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/original/$uuid19.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/original/$uuid19.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    }
-  ],
   "steps": [
     {
-      "body": {
-        "expiresInSeconds": 300,
-        "signupToken": "<jwt {\"alg\":\"HS256\",\"typ\":\"JWT\"} {\"aud\":\"chalkak-social-signup\",\"email\":\"kakao@example.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"iss\":\"chalkak-backend\",\"jti\":\"<opaque len=36>\",\"provider\":\"KAKAO\",\"purpose\":\"SOCIAL_SIGNUP\",\"sub\":\"kakao-sub-1\",\"uploadId\":\"$uuid2\"}>",
-        "uploadId": "$uuid2",
-        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid2.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>"
-      },
+      "step": "카카오 업로드 URL",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -209,17 +37,16 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "카카오 업로드 URL"
+      "body": {
+        "uploadId": "$uuid2",
+        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid2.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
+        "expiresInSeconds": 300,
+        "signupToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"kakao-sub-1\",\"aud\":\"chalkak-social-signup\",\"uploadId\":\"$uuid2\",\"purpose\":\"SOCIAL_SIGNUP\",\"provider\":\"KAKAO\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\",\"email\":\"kakao@example.com\"}>"
+      }
     },
     {
-      "body": {
-        "accessToken": "<jwt {\"alg\":\"HS256\",\"typ\":\"JWT\"} {\"aud\":\"chalkak-access\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"iss\":\"chalkak-backend\",\"jti\":\"<opaque len=36>\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"sub\":\"$uuid4\"}>",
-        "expiresIn": 900,
-        "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000,
-        "userId": "$uuid4"
-      },
+      "step": "카카오 가입",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -254,16 +81,17 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "카카오 가입"
+      "body": {
+        "userId": "$uuid4",
+        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid4\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
+        "expiresIn": 900,
+        "refreshToken": "<opaque len=43>",
+        "refreshTokenExpiresIn": 2592000
+      }
     },
     {
-      "body": {
-        "expiresInSeconds": 300,
-        "signupToken": "<jwt {\"alg\":\"HS256\",\"typ\":\"JWT\"} {\"aud\":\"chalkak-social-signup\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"iss\":\"chalkak-backend\",\"jti\":\"<opaque len=36>\",\"provider\":\"GOOGLE\",\"purpose\":\"SOCIAL_SIGNUP\",\"sub\":\"google-sub-unverified\",\"uploadId\":\"$uuid6\"}>",
-        "uploadId": "$uuid6",
-        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid6.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>"
-      },
+      "step": "구글(이메일 미확인) 업로드 URL",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -298,17 +126,16 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "구글(이메일 미확인) 업로드 URL"
+      "body": {
+        "uploadId": "$uuid6",
+        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid6.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
+        "expiresInSeconds": 300,
+        "signupToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"google-sub-unverified\",\"aud\":\"chalkak-social-signup\",\"uploadId\":\"$uuid6\",\"purpose\":\"SOCIAL_SIGNUP\",\"provider\":\"GOOGLE\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>"
+      }
     },
     {
-      "body": {
-        "accessToken": "<jwt {\"alg\":\"HS256\",\"typ\":\"JWT\"} {\"aud\":\"chalkak-access\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"iss\":\"chalkak-backend\",\"jti\":\"<opaque len=36>\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"sub\":\"$uuid8\"}>",
-        "expiresIn": 900,
-        "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000,
-        "userId": "$uuid8"
-      },
+      "step": "구글(이메일 미확인) 가입",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -343,16 +170,17 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "구글(이메일 미확인) 가입"
+      "body": {
+        "userId": "$uuid8",
+        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid8\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
+        "expiresIn": 900,
+        "refreshToken": "<opaque len=43>",
+        "refreshTokenExpiresIn": 2592000
+      }
     },
     {
-      "body": {
-        "expiresInSeconds": 300,
-        "signupToken": "<jwt {\"alg\":\"HS256\",\"typ\":\"JWT\"} {\"aud\":\"chalkak-social-signup\",\"email\":\"verified-string@example.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"iss\":\"chalkak-backend\",\"jti\":\"<opaque len=36>\",\"provider\":\"GOOGLE\",\"purpose\":\"SOCIAL_SIGNUP\",\"sub\":\"google-sub-verified-string\",\"uploadId\":\"$uuid10\"}>",
-        "uploadId": "$uuid10",
-        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid10.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>"
-      },
+      "step": "구글(email_verified 문자열) 업로드 URL",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -387,17 +215,16 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "구글(email_verified 문자열) 업로드 URL"
+      "body": {
+        "uploadId": "$uuid10",
+        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid10.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
+        "expiresInSeconds": 300,
+        "signupToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"google-sub-verified-string\",\"aud\":\"chalkak-social-signup\",\"uploadId\":\"$uuid10\",\"purpose\":\"SOCIAL_SIGNUP\",\"provider\":\"GOOGLE\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\",\"email\":\"verified-string@example.com\"}>"
+      }
     },
     {
-      "body": {
-        "accessToken": "<jwt {\"alg\":\"HS256\",\"typ\":\"JWT\"} {\"aud\":\"chalkak-access\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"iss\":\"chalkak-backend\",\"jti\":\"<opaque len=36>\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"sub\":\"$uuid12\"}>",
-        "expiresIn": 900,
-        "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000,
-        "userId": "$uuid12"
-      },
+      "step": "구글(email_verified 문자열) 가입",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -432,16 +259,17 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "구글(email_verified 문자열) 가입"
+      "body": {
+        "userId": "$uuid12",
+        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid12\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
+        "expiresIn": 900,
+        "refreshToken": "<opaque len=43>",
+        "refreshTokenExpiresIn": 2592000
+      }
     },
     {
-      "body": {
-        "expiresInSeconds": 300,
-        "signupToken": "<jwt {\"alg\":\"HS256\",\"typ\":\"JWT\"} {\"aud\":\"chalkak-social-signup\",\"email\":\"big@example.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"iss\":\"chalkak-backend\",\"jti\":\"<opaque len=36>\",\"provider\":\"GOOGLE\",\"purpose\":\"SOCIAL_SIGNUP\",\"sub\":\"google-sub-big\",\"uploadId\":\"$uuid14\"}>",
-        "uploadId": "$uuid14",
-        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid14.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>"
-      },
+      "step": "큰 이미지 업로드 URL",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -476,14 +304,16 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "큰 이미지 업로드 URL"
+      "body": {
+        "uploadId": "$uuid14",
+        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid14.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
+        "expiresInSeconds": 300,
+        "signupToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"google-sub-big\",\"aud\":\"chalkak-social-signup\",\"uploadId\":\"$uuid14\",\"purpose\":\"SOCIAL_SIGNUP\",\"provider\":\"GOOGLE\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\",\"email\":\"big@example.com\"}>"
+      }
     },
     {
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "사용할 수 없는 사인 이미지입니다."
-      },
+      "step": "1 MiB를 넘는 사인 이미지",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -518,17 +348,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "1 MiB를 넘는 사인 이미지"
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "사용할 수 없는 사인 이미지입니다."
+      }
     },
     {
-      "body": {
-        "accessToken": "<jwt {\"alg\":\"HS256\",\"typ\":\"JWT\"} {\"aud\":\"chalkak-access\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"iss\":\"chalkak-backend\",\"jti\":\"<opaque len=36>\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"sub\":\"$uuid17\"}>",
-        "expiresIn": 900,
-        "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000,
-        "userId": "$uuid17"
-      },
+      "step": "정확히 1 MiB인 사인 이미지",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -563,16 +390,17 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "정확히 1 MiB인 사인 이미지"
+      "body": {
+        "userId": "$uuid17",
+        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid17\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
+        "expiresIn": 900,
+        "refreshToken": "<opaque len=43>",
+        "refreshTokenExpiresIn": 2592000
+      }
     },
     {
-      "body": {
-        "expiresInSeconds": 300,
-        "signupToken": "<jwt {\"alg\":\"HS256\",\"typ\":\"JWT\"} {\"aud\":\"chalkak-social-signup\",\"email\":\"jpeg@example.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"iss\":\"chalkak-backend\",\"jti\":\"<opaque len=36>\",\"provider\":\"GOOGLE\",\"purpose\":\"SOCIAL_SIGNUP\",\"sub\":\"google-sub-jpeg\",\"uploadId\":\"$uuid19\"}>",
-        "uploadId": "$uuid19",
-        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid19.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>"
-      },
+      "step": "JPEG 업로드 URL",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -607,14 +435,16 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "JPEG 업로드 URL"
+      "body": {
+        "uploadId": "$uuid19",
+        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid19.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
+        "expiresInSeconds": 300,
+        "signupToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"google-sub-jpeg\",\"aud\":\"chalkak-social-signup\",\"uploadId\":\"$uuid19\",\"purpose\":\"SOCIAL_SIGNUP\",\"provider\":\"GOOGLE\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\",\"email\":\"jpeg@example.com\"}>"
+      }
     },
     {
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "사용할 수 없는 사인 이미지입니다."
-      },
+      "step": "허용되지 않는 Content-Type",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -649,14 +479,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "허용되지 않는 Content-Type"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
-        "message": "업로드한 사인 이미지를 찾을 수 없습니다."
-      },
+        "message": "사용할 수 없는 사인 이미지입니다."
+      }
+    },
+    {
+      "step": "S3가 403이면 없는 것으로 본다",
+      "status": 404,
       "headers": [
         [
           "cache-control",
@@ -691,14 +521,14 @@
           "0"
         ]
       ],
-      "status": 404,
-      "step": "S3가 403이면 없는 것으로 본다"
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "업로드한 사인 이미지를 찾을 수 없습니다."
+      }
     },
     {
-      "body": {
-        "errorCode": "INTERNAL_ERROR",
-        "message": "서버에서 요청을 처리하지 못했습니다."
-      },
+      "step": "S3가 500이면 서버 오류",
+      "status": 500,
       "headers": [
         [
           "cache-control",
@@ -733,8 +563,178 @@
           "0"
         ]
       ],
-      "status": 500,
-      "step": "S3가 500이면 서버 오류"
+      "body": {
+        "errorCode": "INTERNAL_ERROR",
+        "message": "서버에서 요청을 처리하지 못했습니다."
+      }
+    }
+  ],
+  "db": {
+    "consumed_signup_tokens": [
+      "{\"jti\":\"$uuid?\",\"expires_at\":\"<t+300s db +09:00>\"}",
+      "{\"jti\":\"$uuid?\",\"expires_at\":\"<t+300s db +09:00>\"}",
+      "{\"jti\":\"$uuid?\",\"expires_at\":\"<t+300s db +09:00>\"}",
+      "{\"jti\":\"$uuid?\",\"expires_at\":\"<t+300s db +09:00>\"}"
+    ],
+    "social_accounts": [
+      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid12\",\"provider\":\"GOOGLE\",\"created_at\":\"<t+0s db +09:00>\",\"subject_hmac\":\"bc9044ba91c68874945475bfba022694eab004928c057a42727bb3067b8d0a06\"}",
+      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid17\",\"provider\":\"GOOGLE\",\"created_at\":\"<t+0s db +09:00>\",\"subject_hmac\":\"d9d5b6032350f029c878718ebab701340fda3238b028b86642223a752d8ffd33\"}",
+      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid4\",\"provider\":\"KAKAO\",\"created_at\":\"<t+0s db +09:00>\",\"subject_hmac\":\"a1cfb0dec926bd240a5073cc25d017b0a627211279591a41bcdca56cd4772ee4\"}",
+      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid8\",\"provider\":\"GOOGLE\",\"created_at\":\"<t+0s db +09:00>\",\"subject_hmac\":\"934b9a0e2fd12a5ce847fb1ead785c441afac95947d5cc1de7ac6c28fc604819\"}"
+    ],
+    "user_refresh_tokens": [
+      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid12\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"revoked_at\":null,\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid17\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"revoked_at\":null,\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid4\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"revoked_at\":null,\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid8\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"revoked_at\":null,\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}"
+    ],
+    "users": [
+      "{\"id\":\"$uuid12\",\"email\":\"verified-string@example.com\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid10.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid10.png\"}",
+      "{\"id\":\"$uuid17\",\"email\":\"big@example.com\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid14.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid14.png\"}",
+      "{\"id\":\"$uuid4\",\"email\":\"kakao@example.com\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid2.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid2.png\"}",
+      "{\"id\":\"$uuid8\",\"email\":null,\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid6.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid6.png\"}"
+    ]
+  },
+  "fakes": [
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid2.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/original/$uuid2.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid2.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid6.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/original/$uuid6.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid6.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid10.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/original/$uuid10.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid10.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid14.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/original/$uuid14.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid14.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid14.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/original/$uuid14.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid14.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid19.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/original/$uuid19.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid19.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid19.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/original/$uuid19.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid19.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid19.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid19.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid19.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/original/$uuid19.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/original/$uuid19.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/original/$uuid19.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/original/$uuid19.png"
     }
   ]
 }
