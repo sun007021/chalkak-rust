@@ -1,0 +1,494 @@
+name = "관리자 회원: 목록 조건, 상세, 상태 변경"
+tags = ["admin-api", "user"]
+clock = "2026-10-12T09:00:00+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO admins (id, username, password, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000000a1', 'operator', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-01T00:00:00Z', '2026-09-01T00:00:00Z'),
+  ('01990000-0000-7000-8000-0000000000a2', 'reviewer', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-02T00:00:00Z', '2026-09-02T00:00:00Z');
+INSERT INTO users (id, email, status, signature_original_storage_key, signature_thumbnail_storage_key, app_version, created_at, updated_at, deleted_at) VALUES
+  ('01990000-0000-7000-8000-000000000001', 'Alice@Test.Chalkak', 'ACTIVE', 'chalkak/signatures/u1/original.png', 'chalkak/signatures/u1/thumbnail.png', '1.2.0', '2026-10-01T00:00:00Z', '2026-10-01T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-000000000002', 'bob@test.chalkak', 'BANNED', 'chalkak/signatures/u2/original.png', NULL, NULL, '2026-10-02T00:00:00Z', '2026-10-02T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-000000000003', 'withdrawn+01990000-0000-7000-8000-000000000003@chalkak.invalid', 'ACTIVE', 'withdrawn/01990000-0000-7000-8000-000000000003', NULL, '1.0.0', '2026-10-03T00:00:00Z', '2026-10-05T00:00:00Z', '2026-10-05T00:00:00Z'),
+  ('01990000-0000-7000-8000-000000000004', NULL, 'ACTIVE', 'chalkak/signatures/u4/original.png', 'chalkak/signatures/u4/thumbnail.png', '2.0.0', '2026-10-04T00:00:00Z', '2026-10-04T00:00:00Z', NULL);
+INSERT INTO social_accounts (id, user_id, provider, subject_hmac, created_at) VALUES
+  ('01990000-0000-7000-8000-0000000001a1', '01990000-0000-7000-8000-000000000001', 'GOOGLE', '1111111111111111111111111111111111111111111111111111111111111111', '2026-10-01T00:00:00Z'),
+  ('01990000-0000-7000-8000-0000000001a2', '01990000-0000-7000-8000-000000000002', 'APPLE', '2222222222222222222222222222222222222222222222222222222222222222', '2026-10-02T00:00:00Z'),
+  ('01990000-0000-7000-8000-0000000001a3', '01990000-0000-7000-8000-000000000003', 'KAKAO', '3333333333333333333333333333333333333333333333333333333333333333', '2026-10-03T00:00:00Z');
+INSERT INTO topics (id, title, topic_date, starts_at, ends_at, created_at, updated_at, deleted_at) VALUES
+  ('01990000-0000-7000-8000-0000000000f1', '가을 하늘', '2026-10-12', '2026-10-11T15:00:00Z', '2026-10-12T15:00:00Z', '2026-10-01T00:00:00Z', '2026-10-01T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000000f2', '어제의 주제', '2026-10-11', '2026-10-10T15:00:00Z', '2026-10-11T15:00:00Z', '2026-10-02T00:00:00Z', '2026-10-02T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000000f3', '내일의 주제', '2026-10-13', '2026-10-12T15:00:00Z', '2026-10-13T15:00:00Z', '2026-10-03T00:00:00Z', '2026-10-03T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000000f4', '지워진 주제', '2026-10-09', '2026-10-08T15:00:00Z', '2026-10-09T15:00:00Z', '2026-10-04T00:00:00Z', '2026-10-04T00:00:00Z', '2026-10-05T00:00:00Z');
+INSERT INTO photos (id, original_storage_key, thumbnail_storage_key, metadata, created_at, updated_at, deleted_at) VALUES
+  ('01990000-0000-7000-8000-0000000002a1', 'chalkak/posts/p1/original.webp', 'chalkak/posts/p1/thumbnail.webp', '{"width": 4000, "height": 3000, "byteSize": 2048, "camera": "private"}', '2026-10-11T20:00:00Z', '2026-10-11T20:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000002a2', 'chalkak/posts/p2/original.webp', 'chalkak/posts/p2/thumbnail.webp', '{"width": 1000.9, "height": "tall"}', '2026-10-10T16:00:00Z', '2026-10-10T16:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000002a3', 'chalkak/posts/p3/original.webp', NULL, '{}', '2026-10-10T17:00:00Z', '2026-10-10T17:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000002a4', 'chalkak/posts/p4/original.webp', NULL, '{}', '2026-10-11T21:00:00Z', '2026-10-11T21:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000002a5', 'chalkak/posts/p5/original.webp', 'chalkak/posts/p5/thumbnail.webp', '{"width": 10, "height": 20, "byteSize": 30}', '2026-10-11T22:00:00Z', '2026-10-11T22:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000002a6', 'chalkak/posts/p6/original.webp', 'chalkak/posts/p6/thumbnail.webp', '{"width": 640, "height": 480, "byteSize": 99}', '2026-10-10T18:00:00Z', '2026-10-10T18:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000002a7', 'chalkak/posts/p7/original.webp', 'chalkak/posts/p7/thumbnail.webp', '{"width": 320, "height": 240, "byteSize": 77}', '2026-10-10T19:00:00Z', '2026-10-10T19:00:00Z', NULL);
+INSERT INTO post_image_uploads (id, user_id, status, rejection_reason, image_metadata, expires_at, claimed_at, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000003a1', '01990000-0000-7000-8000-000000000001', 'READY', NULL, '{"width": 4000}', '2026-10-12T00:00:00Z', '2026-10-11T20:00:00Z', '2026-10-11T19:50:00Z', '2026-10-11T20:00:00Z'),
+  ('01990000-0000-7000-8000-0000000003a2', '01990000-0000-7000-8000-000000000001', 'READY', NULL, '{"width": 1000}', '2026-10-11T00:00:00Z', '2026-10-10T16:00:00Z', '2026-10-10T15:50:00Z', '2026-10-10T16:00:00Z');
+INSERT INTO posts (id, user_id, topic_id, photo_id, post_image_upload_id, title, moderation_status, moderated_at, created_at, updated_at, deleted_at) VALUES
+  ('01990000-0000-7000-8000-0000000004a1', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-0000000002a1', '01990000-0000-7000-8000-0000000003a1', '하늘', 'PENDING', NULL, '2026-10-11T20:00:00Z', '2026-10-11T20:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000004a2', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000000f2', '01990000-0000-7000-8000-0000000002a2', '01990000-0000-7000-8000-0000000003a2', NULL, 'APPROVED', '2026-10-11T10:00:00Z', '2026-10-10T16:00:00Z', '2026-10-11T10:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000004a3', '01990000-0000-7000-8000-000000000002', '01990000-0000-7000-8000-0000000000f2', '01990000-0000-7000-8000-0000000002a3', NULL, '거절', 'REJECTED', '2026-10-11T11:00:00Z', '2026-10-10T17:00:00Z', '2026-10-11T11:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000004a4', '01990000-0000-7000-8000-000000000004', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-0000000002a4', NULL, '처리중', 'VALIDATING', NULL, '2026-10-11T21:00:00Z', '2026-10-11T21:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000004a5', '01990000-0000-7000-8000-000000000002', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-0000000002a5', NULL, NULL, 'PENDING', NULL, '2026-10-11T22:00:00Z', '2026-10-11T22:00:00Z', '2026-10-11T23:00:00Z'),
+  ('01990000-0000-7000-8000-0000000004a6', '01990000-0000-7000-8000-000000000004', '01990000-0000-7000-8000-0000000000f2', '01990000-0000-7000-8000-0000000002a6', NULL, '대기', 'PENDING', NULL, '2026-10-10T18:00:00Z', '2026-10-10T18:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000004a7', '01990000-0000-7000-8000-000000000003', '01990000-0000-7000-8000-0000000000f2', '01990000-0000-7000-8000-0000000002a7', NULL, '탈퇴', 'PENDING', NULL, '2026-10-10T19:00:00Z', '2026-10-10T19:00:00Z', NULL);
+INSERT INTO post_likes (id, post_id, user_id, created_at) VALUES
+  ('01990000-0000-7000-8000-0000000005a1', '01990000-0000-7000-8000-0000000004a2', '01990000-0000-7000-8000-000000000001', '2026-10-11T12:00:00Z'),
+  ('01990000-0000-7000-8000-0000000005a2', '01990000-0000-7000-8000-0000000004a2', '01990000-0000-7000-8000-000000000002', '2026-10-11T12:30:00Z');
+INSERT INTO feedbacks (id, user_id, content, created_at) VALUES
+  ('01990000-0000-7000-8000-0000000006a1', '01990000-0000-7000-8000-000000000001', '앱이 좋아요', '2026-10-10T00:00:00Z'),
+  ('01990000-0000-7000-8000-0000000006a2', '01990000-0000-7000-8000-000000000003', '탈퇴 전에 남긴 의견', '2026-10-11T00:00:00Z'),
+  ('01990000-0000-7000-8000-0000000006a3', '01990000-0000-7000-8000-000000000004', '버그 신고', '2026-10-11T12:00:00Z');
+INSERT INTO admin_audit_logs (id, actor_admin_id, action, target_type, target_id, reason, before_state, after_state, occurred_at, request_id) VALUES
+  ('01990000-0000-7000-8000-0000000007a1', '01990000-0000-7000-8000-0000000000a1', 'POST_APPROVED', 'POST', '01990000-0000-7000-8000-0000000004a2', NULL, '{"moderationStatus": "PENDING", "moderatedAt": null}', '{"moderationStatus": "APPROVED", "moderatedAt": "2026-10-11T10:00:00Z", "moderatedBy": "01990000-0000-7000-8000-0000000000a1"}', '2026-10-11T10:00:00Z', '11111111-1111-4111-8111-111111111111'),
+  ('01990000-0000-7000-8000-0000000007a2', '01990000-0000-7000-8000-0000000000a2', 'POST_REJECTED', 'POST', '01990000-0000-7000-8000-0000000004a3', '정책 위반', '{"moderationStatus": "PENDING", "moderatedAt": null}', '{"moderationStatus": "REJECTED", "moderatedAt": "2026-10-11T11:00:00Z", "moderatedBy": "01990000-0000-7000-8000-0000000000a2"}', '2026-10-11T11:00:00Z', '22222222-2222-4222-8222-222222222222'),
+  ('01990000-0000-7000-8000-0000000007a3', '01990000-0000-7000-8000-0000000000a1', 'USER_BANNED', 'USER', '01990000-0000-7000-8000-000000000002', '반복 위반', '{"status": "ACTIVE"}', '{"status": "BANNED"}', '2026-10-11T12:00:00Z', '33333333-3333-4333-8333-333333333333');
+"""]
+
+[[step]]
+name = "users status bogus"
+method = "GET"
+path = "/api/v1/admin/users?status=BOGUS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users status empty"
+method = "GET"
+path = "/api/v1/admin/users?status="
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users sort bogus"
+method = "GET"
+path = "/api/v1/admin/users?sort=bogus"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users sort empty"
+method = "GET"
+path = "/api/v1/admin/users?sort="
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users page abc"
+method = "GET"
+path = "/api/v1/admin/users?page=abc"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users page 0"
+method = "GET"
+path = "/api/v1/admin/users?page=0"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users pageSize 101"
+method = "GET"
+path = "/api/v1/admin/users?pageSize=101"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users page0 status bogus"
+method = "GET"
+path = "/api/v1/admin/users?page=0&status=BOGUS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users page0 pageSize0"
+method = "GET"
+path = "/api/v1/admin/users?page=0&pageSize=0"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users email long"
+method = "GET"
+path = "/api/v1/admin/users?email=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users page overflow"
+method = "GET"
+path = "/api/v1/admin/users?page=2147483648"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users page huge offset"
+method = "GET"
+path = "/api/v1/admin/users?page=2147483647&pageSize=100"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users page float"
+method = "GET"
+path = "/api/v1/admin/users?page=1.5"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users page plus"
+method = "GET"
+path = "/api/v1/admin/users?page=%2B1"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users page space"
+method = "GET"
+path = "/api/v1/admin/users?page=%201"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users page repeated"
+method = "GET"
+path = "/api/v1/admin/users?page=1&page=2&pageSize=1"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users email blank"
+method = "GET"
+path = "/api/v1/admin/users?email=%20&status=WITHDRAWN"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users email filter"
+method = "GET"
+path = "/api/v1/admin/users?email=ALICE&status=ACTIVE"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users status lowercase"
+method = "GET"
+path = "/api/v1/admin/users?status=active"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users status banned page2"
+method = "GET"
+path = "/api/v1/admin/users?status=BANNED&pageSize=1&page=1&sort=createdAtAsc"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "user id bad"
+method = "GET"
+path = "/api/v1/admin/users/abc"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "user id noncanonical"
+method = "GET"
+path = "/api/v1/admin/users/1-2-3-4-5"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "user id upper"
+method = "GET"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000001"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "user missing"
+method = "GET"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-0000000000ff"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "status body no reason"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000001/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"BANNED"}'''
+
+[[step]]
+name = "status body no status"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000001/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"reason":"x"}'''
+
+[[step]]
+name = "status body bad enum"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000001/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"NOPE","reason":"x"}'''
+
+[[step]]
+name = "status body enum ordinal"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000001/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":1,"reason":" 사유 "}'''
+
+[[step]]
+name = "status body reason blank"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000001/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"BANNED","reason":"  "}'''
+
+[[step]]
+name = "status body reason long"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000001/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"BANNED","reason":"가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가"}'''
+
+[[step]]
+name = "status unknown user"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-0000000000ff/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"BANNED","reason":"x"}'''
+
+[[step]]
+name = "status withdrawn"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000003/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"BANNED","reason":"x"}'''
+
+[[step]]
+name = "status already banned"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000002/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"BANNED","reason":"x"}'''
+
+[[step]]
+name = "status already active"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000001/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"ACTIVE","reason":"x"}'''
+
+[[step]]
+name = "status sensitive reason"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000001/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"BANNED","reason":"token=abc"}'''
+
+[[step]]
+name = "users sort space"
+method = "GET"
+path = "/api/v1/admin/users?sort=%20"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users sort lead space"
+method = "GET"
+path = "/api/v1/admin/users?sort=%20createdAtAsc"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users status lead space"
+method = "GET"
+path = "/api/v1/admin/users?status=%20ACTIVE"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users status trail space"
+method = "GET"
+path = "/api/v1/admin/users?status=ACTIVE%20"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users status space"
+method = "GET"
+path = "/api/v1/admin/users?status=%20"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users page space only"
+method = "GET"
+path = "/api/v1/admin/users?page=%20"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users page hex"
+method = "GET"
+path = "/api/v1/admin/users?page=0x1"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users page hex big"
+method = "GET"
+path = "/api/v1/admin/users?page=0xFFFFFFFF"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users page inner space"
+method = "GET"
+path = "/api/v1/admin/users?page=1%200"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users page neg hex"
+method = "GET"
+path = "/api/v1/admin/users?page=-0x1"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users page leading zeros"
+method = "GET"
+path = "/api/v1/admin/users?page=0010&pageSize=010"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users page hash"
+method = "GET"
+path = "/api/v1/admin/users?page=%231"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users pageSize plus"
+method = "GET"
+path = "/api/v1/admin/users?pageSize=%2B5"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users email upper multi"
+method = "GET"
+path = "/api/v1/admin/users?email=%C4%B0&status=ACTIVE"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users two binding errors"
+method = "GET"
+path = "/api/v1/admin/users?status=x&sort=y&page=z"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "users two binding errors rev"
+method = "GET"
+path = "/api/v1/admin/users?page=z&sort=y&status=x"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "user status ordinal0"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000003/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":0,"reason":"x"}'''
+
+[[step]]
+name = "user status string ordinal"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000003/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"0","reason":"x"}'''
+
+[[step]]
+name = "user status lowercase"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000003/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"banned","reason":"x"}'''
+
+[[step]]
+name = "user status lead space"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000003/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":" BANNED","reason":"x"}'''
+
+[[step]]
+name = "user status float"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000003/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":1.0,"reason":"x"}'''
+
+[[step]]
+name = "user status negative"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000003/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":-1,"reason":"x"}'''
+
+[[step]]
+name = "user status big"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000003/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":99,"reason":"x"}'''
+
+[[step]]
+name = "user status empty string"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000003/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"","reason":"x"}'''
+
+[[step]]
+name = "user status bool"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000003/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":true,"reason":"x"}'''
+
+[[step]]
+name = "user status reason number"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000003/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"BANNED","reason":123}'''
+
+[[step]]
+name = "user status reason array"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000003/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"BANNED","reason":["x"]}'''
+
+[[step]]
+name = "user status reason 500 plus"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000003/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"BANNED","reason":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}'''
+
+[[step]]
+name = "user status reason surrogate"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000003/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"BANNED","reason":"📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸📸"}'''
+
+[[step]]
+name = "user status reason padded 501"
+method = "PATCH"
+path = "/api/v1/admin/users/01990000-0000-7000-8000-000000000003/status"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"BANNED","reason":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  "}'''

@@ -1,0 +1,2221 @@
+{
+  "steps": [
+    {
+      "step": "회원 차단",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "userId": "$uuid2",
+        "status": "BANNED"
+      }
+    },
+    {
+      "step": "게시물 승인",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid3"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "postId": "$uuid4",
+        "moderationStatus": "APPROVED",
+        "moderatedBy": "$uuid5",
+        "moderatedAt": "<t+0s iso Z>",
+        "rejectionReason": null
+      }
+    },
+    {
+      "step": "게시물 거절",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid6"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "RESOURCE_STATE_CHANGED",
+        "message": "대기 중인 게시물만 검수할 수 있습니다."
+      }
+    },
+    {
+      "step": "주제 등록",
+      "status": 201,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid7"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "topicId": "$uuid8",
+        "title": "감사용",
+        "topicDate": "2026-10-20",
+        "startsAt": "<t+658800s iso Z>",
+        "endsAt": "<t+745200s iso Z>",
+        "phase": "BEFORE_OPEN",
+        "postCounts": {
+          "pending": 0,
+          "approved": 0,
+          "rejected": 0
+        },
+        "createdAt": "<t+5s iso Z>",
+        "updatedAt": "<t+5s iso Z>"
+      }
+    },
+    {
+      "step": "감사 로그 기본",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid9"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "auditLogs": [
+          {
+            "auditLogId": "$uuid10",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "TOPIC_CREATED",
+            "targetType": "TOPIC",
+            "targetId": "$uuid8",
+            "reason": null,
+            "beforeState": {},
+            "afterState": {
+              "title": "감사용",
+              "endsAt": "<t+745200s iso Z>",
+              "startsAt": "<t+658800s iso Z>",
+              "topicDate": "2026-10-20"
+            },
+            "occurredAt": "<t+5s iso Z>",
+            "requestId": "$uuid7"
+          },
+          {
+            "auditLogId": "$uuid11",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "POST_APPROVED",
+            "targetType": "POST",
+            "targetId": "$uuid4",
+            "reason": null,
+            "beforeState": {
+              "moderatedAt": null,
+              "moderationStatus": "PENDING"
+            },
+            "afterState": {
+              "moderatedAt": "<t+0s iso Z>",
+              "moderatedBy": "$uuid5",
+              "moderationStatus": "APPROVED"
+            },
+            "occurredAt": "<t+0s iso Z>",
+            "requestId": "$uuid3"
+          },
+          {
+            "auditLogId": "$uuid12",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "USER_BANNED",
+            "targetType": "USER",
+            "targetId": "$uuid2",
+            "reason": "스팸",
+            "beforeState": {
+              "status": "ACTIVE"
+            },
+            "afterState": {
+              "status": "BANNED"
+            },
+            "occurredAt": "<t+0s iso Z>",
+            "requestId": "$uuid1"
+          },
+          {
+            "auditLogId": "$uuid13",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "USER_BANNED",
+            "targetType": "USER",
+            "targetId": "$uuid14",
+            "reason": "반복 위반",
+            "beforeState": {
+              "status": "ACTIVE"
+            },
+            "afterState": {
+              "status": "BANNED"
+            },
+            "occurredAt": "<t-43200s iso Z>",
+            "requestId": "$uuid15"
+          },
+          {
+            "auditLogId": "$uuid16",
+            "actorAdminId": "$uuid17",
+            "actorUsername": "reviewer",
+            "action": "POST_REJECTED",
+            "targetType": "POST",
+            "targetId": "$uuid18",
+            "reason": "정책 위반",
+            "beforeState": {
+              "moderatedAt": null,
+              "moderationStatus": "PENDING"
+            },
+            "afterState": {
+              "moderatedAt": "<t-46800s iso Z>",
+              "moderatedBy": "$uuid17",
+              "moderationStatus": "REJECTED"
+            },
+            "occurredAt": "<t-46800s iso Z>",
+            "requestId": "$uuid19"
+          },
+          {
+            "auditLogId": "$uuid20",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "POST_APPROVED",
+            "targetType": "POST",
+            "targetId": "$uuid21",
+            "reason": null,
+            "beforeState": {
+              "moderatedAt": null,
+              "moderationStatus": "PENDING"
+            },
+            "afterState": {
+              "moderatedAt": "<t-50400s iso Z>",
+              "moderatedBy": "$uuid5",
+              "moderationStatus": "APPROVED"
+            },
+            "occurredAt": "<t-50400s iso Z>",
+            "requestId": "$uuid22"
+          }
+        ]
+      }
+    },
+    {
+      "step": "감사 로그 작업 필터",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid23"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "auditLogs": [
+          {
+            "auditLogId": "$uuid11",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "POST_APPROVED",
+            "targetType": "POST",
+            "targetId": "$uuid4",
+            "reason": null,
+            "beforeState": {
+              "moderatedAt": null,
+              "moderationStatus": "PENDING"
+            },
+            "afterState": {
+              "moderatedAt": "<t+0s iso Z>",
+              "moderatedBy": "$uuid5",
+              "moderationStatus": "APPROVED"
+            },
+            "occurredAt": "<t+0s iso Z>",
+            "requestId": "$uuid3"
+          },
+          {
+            "auditLogId": "$uuid20",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "POST_APPROVED",
+            "targetType": "POST",
+            "targetId": "$uuid21",
+            "reason": null,
+            "beforeState": {
+              "moderatedAt": null,
+              "moderationStatus": "PENDING"
+            },
+            "afterState": {
+              "moderatedAt": "<t-50400s iso Z>",
+              "moderatedBy": "$uuid5",
+              "moderationStatus": "APPROVED"
+            },
+            "occurredAt": "<t-50400s iso Z>",
+            "requestId": "$uuid22"
+          }
+        ]
+      }
+    },
+    {
+      "step": "감사 로그 대상 필터",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid24"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "auditLogs": [
+          {
+            "auditLogId": "$uuid13",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "USER_BANNED",
+            "targetType": "USER",
+            "targetId": "$uuid14",
+            "reason": "반복 위반",
+            "beforeState": {
+              "status": "ACTIVE"
+            },
+            "afterState": {
+              "status": "BANNED"
+            },
+            "occurredAt": "<t-43200s iso Z>",
+            "requestId": "$uuid15"
+          },
+          {
+            "auditLogId": "$uuid12",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "USER_BANNED",
+            "targetType": "USER",
+            "targetId": "$uuid2",
+            "reason": "스팸",
+            "beforeState": {
+              "status": "ACTIVE"
+            },
+            "afterState": {
+              "status": "BANNED"
+            },
+            "occurredAt": "<t+0s iso Z>",
+            "requestId": "$uuid1"
+          }
+        ]
+      }
+    },
+    {
+      "step": "감사 로그 작업자 필터",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid25"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 2,
+        "pageSize": 2,
+        "hasNext": true,
+        "auditLogs": [
+          {
+            "auditLogId": "$uuid12",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "USER_BANNED",
+            "targetType": "USER",
+            "targetId": "$uuid2",
+            "reason": "스팸",
+            "beforeState": {
+              "status": "ACTIVE"
+            },
+            "afterState": {
+              "status": "BANNED"
+            },
+            "occurredAt": "<t+0s iso Z>",
+            "requestId": "$uuid1"
+          },
+          {
+            "auditLogId": "$uuid13",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "USER_BANNED",
+            "targetType": "USER",
+            "targetId": "$uuid14",
+            "reason": "반복 위반",
+            "beforeState": {
+              "status": "ACTIVE"
+            },
+            "afterState": {
+              "status": "BANNED"
+            },
+            "occurredAt": "<t-43200s iso Z>",
+            "requestId": "$uuid15"
+          }
+        ]
+      }
+    },
+    {
+      "step": "감사 로그 기간 필터",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid26"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "auditLogs": [
+          {
+            "auditLogId": "$uuid10",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "TOPIC_CREATED",
+            "targetType": "TOPIC",
+            "targetId": "$uuid8",
+            "reason": null,
+            "beforeState": {},
+            "afterState": {
+              "title": "감사용",
+              "endsAt": "<t+745200s iso Z>",
+              "startsAt": "<t+658800s iso Z>",
+              "topicDate": "2026-10-20"
+            },
+            "occurredAt": "<t+5s iso Z>",
+            "requestId": "$uuid7"
+          },
+          {
+            "auditLogId": "$uuid11",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "POST_APPROVED",
+            "targetType": "POST",
+            "targetId": "$uuid4",
+            "reason": null,
+            "beforeState": {
+              "moderatedAt": null,
+              "moderationStatus": "PENDING"
+            },
+            "afterState": {
+              "moderatedAt": "<t+0s iso Z>",
+              "moderatedBy": "$uuid5",
+              "moderationStatus": "APPROVED"
+            },
+            "occurredAt": "<t+0s iso Z>",
+            "requestId": "$uuid3"
+          },
+          {
+            "auditLogId": "$uuid12",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "USER_BANNED",
+            "targetType": "USER",
+            "targetId": "$uuid2",
+            "reason": "스팸",
+            "beforeState": {
+              "status": "ACTIVE"
+            },
+            "afterState": {
+              "status": "BANNED"
+            },
+            "occurredAt": "<t+0s iso Z>",
+            "requestId": "$uuid1"
+          }
+        ]
+      }
+    },
+    {
+      "step": "감사 로그 대상 id 필터",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid27"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "auditLogs": [
+          {
+            "auditLogId": "$uuid11",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "POST_APPROVED",
+            "targetType": "POST",
+            "targetId": "$uuid4",
+            "reason": null,
+            "beforeState": {
+              "moderatedAt": null,
+              "moderationStatus": "PENDING"
+            },
+            "afterState": {
+              "moderatedAt": "<t+0s iso Z>",
+              "moderatedBy": "$uuid5",
+              "moderationStatus": "APPROVED"
+            },
+            "occurredAt": "<t+0s iso Z>",
+            "requestId": "$uuid3"
+          }
+        ]
+      }
+    },
+    {
+      "step": "피드백 기본",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid28"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "feedbacks": [
+          {
+            "feedbackId": "$uuid29",
+            "content": "버그 신고",
+            "createdAt": "<t-43200s iso Z>",
+            "author": {
+              "userId": "$uuid30",
+              "email": null,
+              "status": "ACTIVE",
+              "appVersion": "2.0.0"
+            }
+          },
+          {
+            "feedbackId": "$uuid31",
+            "content": "탈퇴 전에 남긴 의견",
+            "createdAt": "<t-86400s iso Z>",
+            "author": {
+              "userId": "$uuid32",
+              "email": "withdrawn+$uuid32@chalkak.invalid",
+              "status": "WITHDRAWN",
+              "appVersion": "1.0.0"
+            }
+          },
+          {
+            "feedbackId": "$uuid33",
+            "content": "앱이 좋아요",
+            "createdAt": "<t-172800s iso Z>",
+            "author": {
+              "userId": "$uuid2",
+              "email": "Alice@Test.Chalkak",
+              "status": "BANNED",
+              "appVersion": "1.2.0"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "step": "피드백 오래된 순",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid34"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 2,
+        "hasNext": true,
+        "feedbacks": [
+          {
+            "feedbackId": "$uuid33",
+            "content": "앱이 좋아요",
+            "createdAt": "<t-172800s iso Z>",
+            "author": {
+              "userId": "$uuid2",
+              "email": "Alice@Test.Chalkak",
+              "status": "BANNED",
+              "appVersion": "1.2.0"
+            }
+          },
+          {
+            "feedbackId": "$uuid31",
+            "content": "탈퇴 전에 남긴 의견",
+            "createdAt": "<t-86400s iso Z>",
+            "author": {
+              "userId": "$uuid32",
+              "email": "withdrawn+$uuid32@chalkak.invalid",
+              "status": "WITHDRAWN",
+              "appVersion": "1.0.0"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "step": "피드백 둘째 페이지",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid35"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 2,
+        "pageSize": 2,
+        "hasNext": false,
+        "feedbacks": [
+          {
+            "feedbackId": "$uuid29",
+            "content": "버그 신고",
+            "createdAt": "<t-43200s iso Z>",
+            "author": {
+              "userId": "$uuid30",
+              "email": null,
+              "status": "ACTIVE",
+              "appVersion": "2.0.0"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "step": "피드백 경계 크기",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid36"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 100,
+        "hasNext": false,
+        "feedbacks": [
+          {
+            "feedbackId": "$uuid29",
+            "content": "버그 신고",
+            "createdAt": "<t-43200s iso Z>",
+            "author": {
+              "userId": "$uuid30",
+              "email": null,
+              "status": "ACTIVE",
+              "appVersion": "2.0.0"
+            }
+          },
+          {
+            "feedbackId": "$uuid31",
+            "content": "탈퇴 전에 남긴 의견",
+            "createdAt": "<t-86400s iso Z>",
+            "author": {
+              "userId": "$uuid32",
+              "email": "withdrawn+$uuid32@chalkak.invalid",
+              "status": "WITHDRAWN",
+              "appVersion": "1.0.0"
+            }
+          },
+          {
+            "feedbackId": "$uuid33",
+            "content": "앱이 좋아요",
+            "createdAt": "<t-172800s iso Z>",
+            "author": {
+              "userId": "$uuid2",
+              "email": "Alice@Test.Chalkak",
+              "status": "BANNED",
+              "appVersion": "1.2.0"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "step": "audit action bogus",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid37"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "action: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "audit targetType bogus",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid38"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "targetType: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "audit adminId bad",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid39"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "adminId: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "audit range inverted",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid40"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "감사 로그 발생 시각 범위가 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "audit sort bad",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid41"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "sort: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "feedback sort bad",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid42"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "sort: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "feedback page 0",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid43"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "audit list",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid44"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "auditLogs": [
+          {
+            "auditLogId": "$uuid10",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "TOPIC_CREATED",
+            "targetType": "TOPIC",
+            "targetId": "$uuid8",
+            "reason": null,
+            "beforeState": {},
+            "afterState": {
+              "title": "감사용",
+              "endsAt": "<t+745200s iso Z>",
+              "startsAt": "<t+658800s iso Z>",
+              "topicDate": "2026-10-20"
+            },
+            "occurredAt": "<t+5s iso Z>",
+            "requestId": "$uuid7"
+          },
+          {
+            "auditLogId": "$uuid11",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "POST_APPROVED",
+            "targetType": "POST",
+            "targetId": "$uuid4",
+            "reason": null,
+            "beforeState": {
+              "moderatedAt": null,
+              "moderationStatus": "PENDING"
+            },
+            "afterState": {
+              "moderatedAt": "<t+0s iso Z>",
+              "moderatedBy": "$uuid5",
+              "moderationStatus": "APPROVED"
+            },
+            "occurredAt": "<t+0s iso Z>",
+            "requestId": "$uuid3"
+          },
+          {
+            "auditLogId": "$uuid12",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "USER_BANNED",
+            "targetType": "USER",
+            "targetId": "$uuid2",
+            "reason": "스팸",
+            "beforeState": {
+              "status": "ACTIVE"
+            },
+            "afterState": {
+              "status": "BANNED"
+            },
+            "occurredAt": "<t+0s iso Z>",
+            "requestId": "$uuid1"
+          },
+          {
+            "auditLogId": "$uuid13",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "USER_BANNED",
+            "targetType": "USER",
+            "targetId": "$uuid14",
+            "reason": "반복 위반",
+            "beforeState": {
+              "status": "ACTIVE"
+            },
+            "afterState": {
+              "status": "BANNED"
+            },
+            "occurredAt": "<t-43200s iso Z>",
+            "requestId": "$uuid15"
+          },
+          {
+            "auditLogId": "$uuid16",
+            "actorAdminId": "$uuid17",
+            "actorUsername": "reviewer",
+            "action": "POST_REJECTED",
+            "targetType": "POST",
+            "targetId": "$uuid18",
+            "reason": "정책 위반",
+            "beforeState": {
+              "moderatedAt": null,
+              "moderationStatus": "PENDING"
+            },
+            "afterState": {
+              "moderatedAt": "<t-46800s iso Z>",
+              "moderatedBy": "$uuid17",
+              "moderationStatus": "REJECTED"
+            },
+            "occurredAt": "<t-46800s iso Z>",
+            "requestId": "$uuid19"
+          },
+          {
+            "auditLogId": "$uuid20",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "POST_APPROVED",
+            "targetType": "POST",
+            "targetId": "$uuid21",
+            "reason": null,
+            "beforeState": {
+              "moderatedAt": null,
+              "moderationStatus": "PENDING"
+            },
+            "afterState": {
+              "moderatedAt": "<t-50400s iso Z>",
+              "moderatedBy": "$uuid5",
+              "moderationStatus": "APPROVED"
+            },
+            "occurredAt": "<t-50400s iso Z>",
+            "requestId": "$uuid22"
+          }
+        ]
+      }
+    },
+    {
+      "step": "feedbacks list",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid45"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 2,
+        "hasNext": true,
+        "feedbacks": [
+          {
+            "feedbackId": "$uuid29",
+            "content": "버그 신고",
+            "createdAt": "<t-43200s iso Z>",
+            "author": {
+              "userId": "$uuid30",
+              "email": null,
+              "status": "ACTIVE",
+              "appVersion": "2.0.0"
+            }
+          },
+          {
+            "feedbackId": "$uuid31",
+            "content": "탈퇴 전에 남긴 의견",
+            "createdAt": "<t-86400s iso Z>",
+            "author": {
+              "userId": "$uuid32",
+              "email": "withdrawn+$uuid32@chalkak.invalid",
+              "status": "WITHDRAWN",
+              "appVersion": "1.0.0"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "step": "audit action space",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid46"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "auditLogs": [
+          {
+            "auditLogId": "$uuid10",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "TOPIC_CREATED",
+            "targetType": "TOPIC",
+            "targetId": "$uuid8",
+            "reason": null,
+            "beforeState": {},
+            "afterState": {
+              "title": "감사용",
+              "endsAt": "<t+745200s iso Z>",
+              "startsAt": "<t+658800s iso Z>",
+              "topicDate": "2026-10-20"
+            },
+            "occurredAt": "<t+5s iso Z>",
+            "requestId": "$uuid7"
+          },
+          {
+            "auditLogId": "$uuid11",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "POST_APPROVED",
+            "targetType": "POST",
+            "targetId": "$uuid4",
+            "reason": null,
+            "beforeState": {
+              "moderatedAt": null,
+              "moderationStatus": "PENDING"
+            },
+            "afterState": {
+              "moderatedAt": "<t+0s iso Z>",
+              "moderatedBy": "$uuid5",
+              "moderationStatus": "APPROVED"
+            },
+            "occurredAt": "<t+0s iso Z>",
+            "requestId": "$uuid3"
+          },
+          {
+            "auditLogId": "$uuid12",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "USER_BANNED",
+            "targetType": "USER",
+            "targetId": "$uuid2",
+            "reason": "스팸",
+            "beforeState": {
+              "status": "ACTIVE"
+            },
+            "afterState": {
+              "status": "BANNED"
+            },
+            "occurredAt": "<t+0s iso Z>",
+            "requestId": "$uuid1"
+          },
+          {
+            "auditLogId": "$uuid13",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "USER_BANNED",
+            "targetType": "USER",
+            "targetId": "$uuid14",
+            "reason": "반복 위반",
+            "beforeState": {
+              "status": "ACTIVE"
+            },
+            "afterState": {
+              "status": "BANNED"
+            },
+            "occurredAt": "<t-43200s iso Z>",
+            "requestId": "$uuid15"
+          },
+          {
+            "auditLogId": "$uuid16",
+            "actorAdminId": "$uuid17",
+            "actorUsername": "reviewer",
+            "action": "POST_REJECTED",
+            "targetType": "POST",
+            "targetId": "$uuid18",
+            "reason": "정책 위반",
+            "beforeState": {
+              "moderatedAt": null,
+              "moderationStatus": "PENDING"
+            },
+            "afterState": {
+              "moderatedAt": "<t-46800s iso Z>",
+              "moderatedBy": "$uuid17",
+              "moderationStatus": "REJECTED"
+            },
+            "occurredAt": "<t-46800s iso Z>",
+            "requestId": "$uuid19"
+          },
+          {
+            "auditLogId": "$uuid20",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "action": "POST_APPROVED",
+            "targetType": "POST",
+            "targetId": "$uuid21",
+            "reason": null,
+            "beforeState": {
+              "moderatedAt": null,
+              "moderationStatus": "PENDING"
+            },
+            "afterState": {
+              "moderatedAt": "<t-50400s iso Z>",
+              "moderatedBy": "$uuid5",
+              "moderationStatus": "APPROVED"
+            },
+            "occurredAt": "<t-50400s iso Z>",
+            "requestId": "$uuid22"
+          }
+        ]
+      }
+    },
+    {
+      "step": "audit sort lead space",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid47"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "sort: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "audit targetId bad",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid48"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "targetId: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "audit occurredFrom bad",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid49"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "occurredFrom: 요청 값의 형식이 올바르지 않습니다."
+      }
+    }
+  ],
+  "db": {
+    "admin_audit_logs": [
+      "{\"id\":\"$uuid10\",\"action\":\"TOPIC_CREATED\",\"reason\":null,\"target_id\":\"$uuid8\",\"request_id\":\"$uuid7\",\"after_state\":{\"title\":\"감사용\",\"endsAt\":\"<t+745200s db Z>\",\"startsAt\":\"<t+658800s db Z>\",\"topicDate\":\"2026-10-20\"},\"occurred_at\":\"<t+5s db +09:00>\",\"target_type\":\"TOPIC\",\"before_state\":{},\"actor_admin_id\":\"$uuid5\"}",
+      "{\"id\":\"$uuid11\",\"action\":\"POST_APPROVED\",\"reason\":null,\"target_id\":\"$uuid4\",\"request_id\":\"$uuid3\",\"after_state\":{\"moderatedAt\":\"<t+0s db Z>\",\"moderatedBy\":\"$uuid5\",\"moderationStatus\":\"APPROVED\"},\"occurred_at\":\"<t+0s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"moderatedAt\":null,\"moderationStatus\":\"PENDING\"},\"actor_admin_id\":\"$uuid5\"}",
+      "{\"id\":\"$uuid12\",\"action\":\"USER_BANNED\",\"reason\":\"스팸\",\"target_id\":\"$uuid2\",\"request_id\":\"$uuid1\",\"after_state\":{\"status\":\"BANNED\"},\"occurred_at\":\"<t+0s db +09:00>\",\"target_type\":\"USER\",\"before_state\":{\"status\":\"ACTIVE\"},\"actor_admin_id\":\"$uuid5\"}",
+      "{\"id\":\"$uuid13\",\"action\":\"USER_BANNED\",\"reason\":\"반복 위반\",\"target_id\":\"$uuid14\",\"request_id\":\"$uuid15\",\"after_state\":{\"status\":\"BANNED\"},\"occurred_at\":\"<t-43200s db +09:00>\",\"target_type\":\"USER\",\"before_state\":{\"status\":\"ACTIVE\"},\"actor_admin_id\":\"$uuid5\"}",
+      "{\"id\":\"$uuid16\",\"action\":\"POST_REJECTED\",\"reason\":\"정책 위반\",\"target_id\":\"$uuid18\",\"request_id\":\"$uuid19\",\"after_state\":{\"moderatedAt\":\"<t-46800s db Z>\",\"moderatedBy\":\"$uuid17\",\"moderationStatus\":\"REJECTED\"},\"occurred_at\":\"<t-46800s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"moderatedAt\":null,\"moderationStatus\":\"PENDING\"},\"actor_admin_id\":\"$uuid17\"}",
+      "{\"id\":\"$uuid20\",\"action\":\"POST_APPROVED\",\"reason\":null,\"target_id\":\"$uuid21\",\"request_id\":\"$uuid22\",\"after_state\":{\"moderatedAt\":\"<t-50400s db Z>\",\"moderatedBy\":\"$uuid5\",\"moderationStatus\":\"APPROVED\"},\"occurred_at\":\"<t-50400s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"moderatedAt\":null,\"moderationStatus\":\"PENDING\"},\"actor_admin_id\":\"$uuid5\"}"
+    ],
+    "admins": [
+      "{\"id\":\"$uuid17\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"username\":\"reviewer\",\"created_at\":\"<t-3456000s db +09:00>\",\"updated_at\":\"<t-3456000s db +09:00>\"}",
+      "{\"id\":\"$uuid5\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"username\":\"operator\",\"created_at\":\"<t-3542400s db +09:00>\",\"updated_at\":\"<t-3542400s db +09:00>\"}"
+    ],
+    "feedbacks": [
+      "{\"id\":\"$uuid29\",\"content\":\"버그 신고\",\"user_id\":\"$uuid30\",\"created_at\":\"<t-43200s db +09:00>\"}",
+      "{\"id\":\"$uuid31\",\"content\":\"탈퇴 전에 남긴 의견\",\"user_id\":\"$uuid32\",\"created_at\":\"<t-86400s db +09:00>\"}",
+      "{\"id\":\"$uuid33\",\"content\":\"앱이 좋아요\",\"user_id\":\"$uuid2\",\"created_at\":\"<t-172800s db +09:00>\"}"
+    ],
+    "notifications": [
+      "{\"id\":\"$uuid?\",\"body\":\"내 사진이 피드에 공개되었습니다.\",\"type\":\"POST_APPROVED\",\"title\":\"게시물이 승인되었습니다.\",\"post_id\":\"$uuid4\",\"read_at\":null,\"user_id\":\"$uuid2\",\"event_key\":\"$uuid11\",\"created_at\":\"<t+0s db +09:00>\",\"rejection_reason\":null}"
+    ],
+    "photos": [
+      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":10,\"height\":20,\"byteSize\":30},\"created_at\":\"<t-7200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-7200s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p5/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p5/thumbnail.webp\"}",
+      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":1000.9,\"height\":\"tall\"},\"created_at\":\"<t-115200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-115200s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p2/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p2/thumbnail.webp\"}",
+      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":320,\"height\":240,\"byteSize\":77},\"created_at\":\"<t-104400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-104400s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p7/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p7/thumbnail.webp\"}",
+      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4000,\"camera\":\"private\",\"height\":3000,\"byteSize\":2048},\"created_at\":\"<t-14400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-14400s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p1/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p1/thumbnail.webp\"}",
+      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":640,\"height\":480,\"byteSize\":99},\"created_at\":\"<t-108000s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-108000s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p6/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p6/thumbnail.webp\"}",
+      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t-10800s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-10800s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p4/original.webp\",\"thumbnail_storage_key\":null}",
+      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t-111600s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-111600s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p3/original.webp\",\"thumbnail_storage_key\":null}"
+    ],
+    "post_image_uploads": [
+      "{\"id\":\"$uuid?\",\"status\":\"READY\",\"user_id\":\"$uuid2\",\"claimed_at\":\"<t-115200s db +09:00>\",\"created_at\":\"<t-115800s db +09:00>\",\"expires_at\":\"<t-86400s db +09:00>\",\"updated_at\":\"<t-115200s db +09:00>\",\"image_metadata\":{\"width\":1000},\"rejection_reason\":null}",
+      "{\"id\":\"$uuid?\",\"status\":\"READY\",\"user_id\":\"$uuid2\",\"claimed_at\":\"<t-14400s db +09:00>\",\"created_at\":\"<t-15000s db +09:00>\",\"expires_at\":\"<t+0s db +09:00>\",\"updated_at\":\"<t-14400s db +09:00>\",\"image_metadata\":{\"width\":4000},\"rejection_reason\":null}"
+    ],
+    "post_likes": [
+      "{\"id\":\"$uuid?\",\"post_id\":\"$uuid21\",\"user_id\":\"$uuid14\",\"created_at\":\"<t-41400s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"post_id\":\"$uuid21\",\"user_id\":\"$uuid2\",\"created_at\":\"<t-43200s db +09:00>\"}"
+    ],
+    "posts": [
+      "{\"id\":\"$uuid18\",\"title\":\"거절\",\"user_id\":\"$uuid14\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-111600s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-46800s db +09:00>\",\"moderated_at\":\"<t-46800s db +09:00>\",\"moderation_status\":\"REJECTED\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid21\",\"title\":null,\"user_id\":\"$uuid2\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-115200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-50400s db +09:00>\",\"moderated_at\":\"<t-50400s db +09:00>\",\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":\"$uuid?\"}",
+      "{\"id\":\"$uuid4\",\"title\":\"하늘\",\"user_id\":\"$uuid2\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-14400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"moderated_at\":\"<t+0s db +09:00>\",\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":\"$uuid?\"}",
+      "{\"id\":\"$uuid?\",\"title\":\"대기\",\"user_id\":\"$uuid30\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-108000s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-108000s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid?\",\"title\":\"처리중\",\"user_id\":\"$uuid30\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-10800s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-10800s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"VALIDATING\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid?\",\"title\":\"탈퇴\",\"user_id\":\"$uuid32\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-104400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-104400s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid?\",\"title\":null,\"user_id\":\"$uuid14\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-7200s db +09:00>\",\"deleted_at\":\"<t-3600s db +09:00>\",\"updated_at\":\"<t-7200s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":null}"
+    ],
+    "social_accounts": [
+      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid14\",\"provider\":\"APPLE\",\"created_at\":\"<t-864000s db +09:00>\",\"subject_hmac\":\"2222222222222222222222222222222222222222222222222222222222222222\"}",
+      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid2\",\"provider\":\"GOOGLE\",\"created_at\":\"<t-950400s db +09:00>\",\"subject_hmac\":\"1111111111111111111111111111111111111111111111111111111111111111\"}",
+      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid32\",\"provider\":\"KAKAO\",\"created_at\":\"<t-777600s db +09:00>\",\"subject_hmac\":\"3333333333333333333333333333333333333333333333333333333333333333\"}"
+    ],
+    "topics": [
+      "{\"id\":\"$uuid8\",\"title\":\"감사용\",\"ends_at\":\"<t+745200s db +09:00>\",\"starts_at\":\"<t+658800s db +09:00>\",\"created_at\":\"<t+5s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-20\",\"updated_at\":\"<t+5s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"title\":\"가을 하늘\",\"ends_at\":\"<t+54000s db +09:00>\",\"starts_at\":\"<t-32400s db +09:00>\",\"created_at\":\"<t-950400s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t-950400s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"title\":\"내일의 주제\",\"ends_at\":\"<t+140400s db +09:00>\",\"starts_at\":\"<t+54000s db +09:00>\",\"created_at\":\"<t-777600s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-13\",\"updated_at\":\"<t-777600s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"title\":\"어제의 주제\",\"ends_at\":\"<t-32400s db +09:00>\",\"starts_at\":\"<t-118800s db +09:00>\",\"created_at\":\"<t-864000s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-11\",\"updated_at\":\"<t-864000s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"title\":\"지워진 주제\",\"ends_at\":\"<t-205200s db +09:00>\",\"starts_at\":\"<t-291600s db +09:00>\",\"created_at\":\"<t-691200s db +09:00>\",\"deleted_at\":\"<t-604800s db +09:00>\",\"topic_date\":\"2026-10-09\",\"updated_at\":\"<t-691200s db +09:00>\"}"
+    ],
+    "users": [
+      "{\"id\":\"$uuid14\",\"email\":\"bob@test.chalkak\",\"status\":\"BANNED\",\"created_at\":\"<t-864000s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-864000s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u2/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}",
+      "{\"id\":\"$uuid2\",\"email\":\"Alice@Test.Chalkak\",\"status\":\"BANNED\",\"created_at\":\"<t-950400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":\"1.2.0\",\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u1/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u1/thumbnail.png\"}",
+      "{\"id\":\"$uuid30\",\"email\":null,\"status\":\"ACTIVE\",\"created_at\":\"<t-691200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-691200s db +09:00>\",\"app_version\":\"2.0.0\",\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u4/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u4/thumbnail.png\"}",
+      "{\"id\":\"$uuid32\",\"email\":\"withdrawn+$uuid32@chalkak.invalid\",\"status\":\"ACTIVE\",\"created_at\":\"<t-777600s db +09:00>\",\"deleted_at\":\"<t-604800s db +09:00>\",\"updated_at\":\"<t-604800s db +09:00>\",\"app_version\":\"1.0.0\",\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"withdrawn/$uuid32\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}"
+    ]
+  }
+}

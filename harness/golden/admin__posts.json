@@ -1,0 +1,5457 @@
+{
+  "steps": [
+    {
+      "step": "posts status validating",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "status: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "posts status bogus",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid2"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "status: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "posts topicId bad",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid3"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "topicId: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "posts topicDate bad",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid4"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "topicDate: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "posts createdAtFrom date only",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid5"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "createdAtFrom: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "posts createdAtFrom ok",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid6"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "posts": [
+          {
+            "postId": "$uuid7",
+            "title": null,
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid8",
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid10",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-7200s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": "<t-3600s iso Z>"
+          },
+          {
+            "postId": "$uuid11",
+            "title": "하늘",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid13",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-14400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          }
+        ]
+      }
+    },
+    {
+      "step": "posts createdAtFrom offset",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid14"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "posts": [
+          {
+            "postId": "$uuid7",
+            "title": null,
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid8",
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid10",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-7200s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": "<t-3600s iso Z>"
+          },
+          {
+            "postId": "$uuid11",
+            "title": "하늘",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid13",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-14400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          }
+        ]
+      }
+    },
+    {
+      "step": "posts createdAtFrom lower",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid15"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "posts": [
+          {
+            "postId": "$uuid7",
+            "title": null,
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid8",
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid10",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-7200s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": "<t-3600s iso Z>"
+          },
+          {
+            "postId": "$uuid11",
+            "title": "하늘",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid13",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-14400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          }
+        ]
+      }
+    },
+    {
+      "step": "posts createdAtFrom nosec",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid16"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "posts": [
+          {
+            "postId": "$uuid7",
+            "title": null,
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid8",
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid10",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-7200s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": "<t-3600s iso Z>"
+          },
+          {
+            "postId": "$uuid11",
+            "title": "하늘",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid13",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-14400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          }
+        ]
+      }
+    },
+    {
+      "step": "posts range inverted",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid17"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "등록 시각 범위가 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "posts userId upper",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid18"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "posts": [
+          {
+            "postId": "$uuid11",
+            "title": "하늘",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid13",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-14400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid19",
+            "title": null,
+            "moderationStatus": "APPROVED",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid21",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
+            },
+            "likeCount": 2,
+            "createdAt": "<t-115200s iso Z>",
+            "moderatedAt": "<t-50400s iso Z>",
+            "deletedAt": null
+          }
+        ]
+      }
+    },
+    {
+      "step": "posts userId short",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid22"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "posts": []
+      }
+    },
+    {
+      "step": "posts empty uuid",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid23"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "posts": [
+          {
+            "postId": "$uuid7",
+            "title": null,
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid8",
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid10",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-7200s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": "<t-3600s iso Z>"
+          },
+          {
+            "postId": "$uuid11",
+            "title": "하늘",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid13",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-14400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid24",
+            "title": "탈퇴",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid25",
+              "email": "withdrawn+$uuid25@chalkak.invalid",
+              "status": "ACTIVE",
+              "deletedAt": "<t-604800s iso Z>"
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid26",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-104400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid27",
+            "title": "대기",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid28",
+              "email": null,
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid29",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-108000s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid30",
+            "title": "거절",
+            "moderationStatus": "REJECTED",
+            "author": {
+              "userId": "$uuid8",
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid31",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p3/original.webp",
+              "thumbnailImageUrl": null
+            },
+            "likeCount": 0,
+            "createdAt": "<t-111600s iso Z>",
+            "moderatedAt": "<t-46800s iso Z>",
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid19",
+            "title": null,
+            "moderationStatus": "APPROVED",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid21",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
+            },
+            "likeCount": 2,
+            "createdAt": "<t-115200s iso Z>",
+            "moderatedAt": "<t-50400s iso Z>",
+            "deletedAt": null
+          }
+        ]
+      }
+    },
+    {
+      "step": "posts topicDate offset",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid32"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "posts": [
+          {
+            "postId": "$uuid24",
+            "title": "탈퇴",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid25",
+              "email": "withdrawn+$uuid25@chalkak.invalid",
+              "status": "ACTIVE",
+              "deletedAt": "<t-604800s iso Z>"
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid26",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-104400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid27",
+            "title": "대기",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid28",
+              "email": null,
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid29",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-108000s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid30",
+            "title": "거절",
+            "moderationStatus": "REJECTED",
+            "author": {
+              "userId": "$uuid8",
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid31",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p3/original.webp",
+              "thumbnailImageUrl": null
+            },
+            "likeCount": 0,
+            "createdAt": "<t-111600s iso Z>",
+            "moderatedAt": "<t-46800s iso Z>",
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid19",
+            "title": null,
+            "moderationStatus": "APPROVED",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid21",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
+            },
+            "likeCount": 2,
+            "createdAt": "<t-115200s iso Z>",
+            "moderatedAt": "<t-50400s iso Z>",
+            "deletedAt": null
+          }
+        ]
+      }
+    },
+    {
+      "step": "post id bad",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid33"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "ID 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "post validating detail",
+      "status": 404,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid34"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "게시물을 찾을 수 없습니다."
+      }
+    },
+    {
+      "step": "moderation empty",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid35"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "검수 상태가 필요합니다."
+      }
+    },
+    {
+      "step": "moderation validating",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid36"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "승인 요청에는 거절 사유를 입력할 수 없고, 거절 요청에는 500자 이하의 사유가 필요합니다."
+      }
+    },
+    {
+      "step": "moderation pending",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid37"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "승인 요청에는 거절 사유를 입력할 수 없고, 거절 요청에는 500자 이하의 사유가 필요합니다."
+      }
+    },
+    {
+      "step": "moderation approve with reason",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid38"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "승인 요청에는 거절 사유를 입력할 수 없고, 거절 요청에는 500자 이하의 사유가 필요합니다."
+      }
+    },
+    {
+      "step": "moderation reject no reason",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid39"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "승인 요청에는 거절 사유를 입력할 수 없고, 거절 요청에는 500자 이하의 사유가 필요합니다."
+      }
+    },
+    {
+      "step": "moderation reject blank",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid40"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "승인 요청에는 거절 사유를 입력할 수 없고, 거절 요청에는 500자 이하의 사유가 필요합니다."
+      }
+    },
+    {
+      "step": "moderation reject long",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid41"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "승인 요청에는 거절 사유를 입력할 수 없고, 거절 요청에는 500자 이하의 사유가 필요합니다."
+      }
+    },
+    {
+      "step": "moderation already approved",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid42"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "RESOURCE_STATE_CHANGED",
+        "message": "대기 중인 게시물만 검수할 수 있습니다."
+      }
+    },
+    {
+      "step": "moderation deleted post",
+      "status": 404,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid43"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "게시물을 찾을 수 없습니다."
+      }
+    },
+    {
+      "step": "moderation missing",
+      "status": 404,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid44"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "게시물을 찾을 수 없습니다."
+      }
+    },
+    {
+      "step": "moderation reject sensitive",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid45"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "민감한 정보는 관리자 감사 로그에 저장할 수 없습니다."
+      }
+    },
+    {
+      "step": "delete empty",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid46"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "삭제 사유가 필요합니다."
+      }
+    },
+    {
+      "step": "delete blank",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid47"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "삭제 사유가 필요합니다."
+      }
+    },
+    {
+      "step": "delete long",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid48"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "삭제 사유는 500자 이하여야 합니다."
+      }
+    },
+    {
+      "step": "delete validating",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid49"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 중인 게시물은 삭제할 수 없습니다."
+      }
+    },
+    {
+      "step": "delete missing",
+      "status": 404,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid50"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "게시물을 찾을 수 없습니다."
+      }
+    },
+    {
+      "step": "posts list",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid51"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 2,
+        "pageSize": 3,
+        "hasNext": false,
+        "posts": [
+          {
+            "postId": "$uuid24",
+            "title": "탈퇴",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid25",
+              "email": "withdrawn+$uuid25@chalkak.invalid",
+              "status": "ACTIVE",
+              "deletedAt": "<t-604800s iso Z>"
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid26",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-104400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid11",
+            "title": "하늘",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid13",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-14400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid7",
+            "title": null,
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid8",
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid10",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-7200s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": "<t-3600s iso Z>"
+          }
+        ]
+      }
+    },
+    {
+      "step": "post detail",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid52"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "postId": "$uuid11",
+        "title": "하늘",
+        "moderationStatus": "PENDING",
+        "author": {
+          "userId": "$uuid12",
+          "email": "Alice@Test.Chalkak",
+          "status": "ACTIVE",
+          "deletedAt": null
+        },
+        "topic": {
+          "topicId": "$uuid9",
+          "title": "가을 하늘",
+          "topicDate": "2026-10-12",
+          "startsAt": "<t-32400s iso Z>",
+          "endsAt": "<t+54000s iso Z>",
+          "deletedAt": null
+        },
+        "photo": {
+          "photoId": "$uuid13",
+          "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+          "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
+          "metadata": {
+            "width": 4000,
+            "height": 3000,
+            "byteSize": 2048
+          },
+          "createdAt": "<t-14400s iso Z>",
+          "updatedAt": "<t-14400s iso Z>",
+          "deletedAt": null
+        },
+        "imageUpload": {
+          "uploadId": "$uuid53",
+          "status": "READY",
+          "rejectionReason": null,
+          "createdAt": "<t-15000s iso Z>",
+          "updatedAt": "<t-14400s iso Z>"
+        },
+        "likeCount": 0,
+        "createdAt": "<t-14400s iso Z>",
+        "updatedAt": "<t-14400s iso Z>",
+        "moderatedAt": null,
+        "moderatedBy": null,
+        "rejectionReason": null,
+        "deletedAt": null
+      }
+    },
+    {
+      "step": "post detail approved",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid54"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "postId": "$uuid19",
+        "title": null,
+        "moderationStatus": "APPROVED",
+        "author": {
+          "userId": "$uuid12",
+          "email": "Alice@Test.Chalkak",
+          "status": "ACTIVE",
+          "deletedAt": null
+        },
+        "topic": {
+          "topicId": "$uuid20",
+          "title": "어제의 주제",
+          "topicDate": "2026-10-11",
+          "startsAt": "<t-118800s iso Z>",
+          "endsAt": "<t-32400s iso Z>",
+          "deletedAt": null
+        },
+        "photo": {
+          "photoId": "$uuid21",
+          "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
+          "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
+          "metadata": {
+            "width": 1000
+          },
+          "createdAt": "<t-115200s iso Z>",
+          "updatedAt": "<t-115200s iso Z>",
+          "deletedAt": null
+        },
+        "imageUpload": {
+          "uploadId": "$uuid55",
+          "status": "READY",
+          "rejectionReason": null,
+          "createdAt": "<t-115800s iso Z>",
+          "updatedAt": "<t-115200s iso Z>"
+        },
+        "likeCount": 2,
+        "createdAt": "<t-115200s iso Z>",
+        "updatedAt": "<t-50400s iso Z>",
+        "moderatedAt": "<t-50400s iso Z>",
+        "moderatedBy": "$uuid56",
+        "rejectionReason": null,
+        "deletedAt": null
+      }
+    },
+    {
+      "step": "post detail deleted",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid57"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "postId": "$uuid7",
+        "title": null,
+        "moderationStatus": "PENDING",
+        "author": {
+          "userId": "$uuid8",
+          "email": "bob@test.chalkak",
+          "status": "BANNED",
+          "deletedAt": null
+        },
+        "topic": {
+          "topicId": "$uuid9",
+          "title": "가을 하늘",
+          "topicDate": "2026-10-12",
+          "startsAt": "<t-32400s iso Z>",
+          "endsAt": "<t+54000s iso Z>",
+          "deletedAt": null
+        },
+        "photo": {
+          "photoId": "$uuid10",
+          "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+          "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp",
+          "metadata": {
+            "width": 10,
+            "height": 20,
+            "byteSize": 30
+          },
+          "createdAt": "<t-7200s iso Z>",
+          "updatedAt": "<t-7200s iso Z>",
+          "deletedAt": null
+        },
+        "imageUpload": null,
+        "likeCount": 0,
+        "createdAt": "<t-7200s iso Z>",
+        "updatedAt": "<t-7200s iso Z>",
+        "moderatedAt": null,
+        "moderatedBy": null,
+        "rejectionReason": null,
+        "deletedAt": "<t-3600s iso Z>"
+      }
+    },
+    {
+      "step": "post detail withdrawn",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid58"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "postId": "$uuid24",
+        "title": "탈퇴",
+        "moderationStatus": "PENDING",
+        "author": {
+          "userId": "$uuid25",
+          "email": "withdrawn+$uuid25@chalkak.invalid",
+          "status": "ACTIVE",
+          "deletedAt": "<t-604800s iso Z>"
+        },
+        "topic": {
+          "topicId": "$uuid20",
+          "title": "어제의 주제",
+          "topicDate": "2026-10-11",
+          "startsAt": "<t-118800s iso Z>",
+          "endsAt": "<t-32400s iso Z>",
+          "deletedAt": null
+        },
+        "photo": {
+          "photoId": "$uuid26",
+          "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
+          "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp",
+          "metadata": {
+            "width": 320,
+            "height": 240,
+            "byteSize": 77
+          },
+          "createdAt": "<t-104400s iso Z>",
+          "updatedAt": "<t-104400s iso Z>",
+          "deletedAt": null
+        },
+        "imageUpload": null,
+        "likeCount": 0,
+        "createdAt": "<t-104400s iso Z>",
+        "updatedAt": "<t-104400s iso Z>",
+        "moderatedAt": null,
+        "moderatedBy": null,
+        "rejectionReason": null,
+        "deletedAt": null
+      }
+    },
+    {
+      "step": "post detail noupload",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid59"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "postId": "$uuid27",
+        "title": "대기",
+        "moderationStatus": "PENDING",
+        "author": {
+          "userId": "$uuid28",
+          "email": null,
+          "status": "ACTIVE",
+          "deletedAt": null
+        },
+        "topic": {
+          "topicId": "$uuid20",
+          "title": "어제의 주제",
+          "topicDate": "2026-10-11",
+          "startsAt": "<t-118800s iso Z>",
+          "endsAt": "<t-32400s iso Z>",
+          "deletedAt": null
+        },
+        "photo": {
+          "photoId": "$uuid29",
+          "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
+          "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp",
+          "metadata": {
+            "width": 640,
+            "height": 480,
+            "byteSize": 99
+          },
+          "createdAt": "<t-108000s iso Z>",
+          "updatedAt": "<t-108000s iso Z>",
+          "deletedAt": null
+        },
+        "imageUpload": null,
+        "likeCount": 0,
+        "createdAt": "<t-108000s iso Z>",
+        "updatedAt": "<t-108000s iso Z>",
+        "moderatedAt": null,
+        "moderatedBy": null,
+        "rejectionReason": null,
+        "deletedAt": null
+      }
+    },
+    {
+      "step": "posts userId space",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid60"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "posts": [
+          {
+            "postId": "$uuid7",
+            "title": null,
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid8",
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid10",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-7200s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": "<t-3600s iso Z>"
+          },
+          {
+            "postId": "$uuid11",
+            "title": "하늘",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid13",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-14400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid24",
+            "title": "탈퇴",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid25",
+              "email": "withdrawn+$uuid25@chalkak.invalid",
+              "status": "ACTIVE",
+              "deletedAt": "<t-604800s iso Z>"
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid26",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-104400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid27",
+            "title": "대기",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid28",
+              "email": null,
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid29",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-108000s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid30",
+            "title": "거절",
+            "moderationStatus": "REJECTED",
+            "author": {
+              "userId": "$uuid8",
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid31",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p3/original.webp",
+              "thumbnailImageUrl": null
+            },
+            "likeCount": 0,
+            "createdAt": "<t-111600s iso Z>",
+            "moderatedAt": "<t-46800s iso Z>",
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid19",
+            "title": null,
+            "moderationStatus": "APPROVED",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid21",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
+            },
+            "likeCount": 2,
+            "createdAt": "<t-115200s iso Z>",
+            "moderatedAt": "<t-50400s iso Z>",
+            "deletedAt": null
+          }
+        ]
+      }
+    },
+    {
+      "step": "posts topicDate space",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid61"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "posts": [
+          {
+            "postId": "$uuid7",
+            "title": null,
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid8",
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid10",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-7200s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": "<t-3600s iso Z>"
+          },
+          {
+            "postId": "$uuid11",
+            "title": "하늘",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid13",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-14400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid24",
+            "title": "탈퇴",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid25",
+              "email": "withdrawn+$uuid25@chalkak.invalid",
+              "status": "ACTIVE",
+              "deletedAt": "<t-604800s iso Z>"
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid26",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-104400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid27",
+            "title": "대기",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid28",
+              "email": null,
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid29",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-108000s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid30",
+            "title": "거절",
+            "moderationStatus": "REJECTED",
+            "author": {
+              "userId": "$uuid8",
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid31",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p3/original.webp",
+              "thumbnailImageUrl": null
+            },
+            "likeCount": 0,
+            "createdAt": "<t-111600s iso Z>",
+            "moderatedAt": "<t-46800s iso Z>",
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid19",
+            "title": null,
+            "moderationStatus": "APPROVED",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid21",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
+            },
+            "likeCount": 2,
+            "createdAt": "<t-115200s iso Z>",
+            "moderatedAt": "<t-50400s iso Z>",
+            "deletedAt": null
+          }
+        ]
+      }
+    },
+    {
+      "step": "posts createdAtFrom space",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid62"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "posts": [
+          {
+            "postId": "$uuid7",
+            "title": null,
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid8",
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid10",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-7200s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": "<t-3600s iso Z>"
+          },
+          {
+            "postId": "$uuid11",
+            "title": "하늘",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid13",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-14400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid24",
+            "title": "탈퇴",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid25",
+              "email": "withdrawn+$uuid25@chalkak.invalid",
+              "status": "ACTIVE",
+              "deletedAt": "<t-604800s iso Z>"
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid26",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-104400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid27",
+            "title": "대기",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid28",
+              "email": null,
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid29",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-108000s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid30",
+            "title": "거절",
+            "moderationStatus": "REJECTED",
+            "author": {
+              "userId": "$uuid8",
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid31",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p3/original.webp",
+              "thumbnailImageUrl": null
+            },
+            "likeCount": 0,
+            "createdAt": "<t-111600s iso Z>",
+            "moderatedAt": "<t-46800s iso Z>",
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid19",
+            "title": null,
+            "moderationStatus": "APPROVED",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid21",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
+            },
+            "likeCount": 2,
+            "createdAt": "<t-115200s iso Z>",
+            "moderatedAt": "<t-50400s iso Z>",
+            "deletedAt": null
+          }
+        ]
+      }
+    },
+    {
+      "step": "posts createdAtFrom nozone",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid63"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "createdAtFrom: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "posts createdAtFrom 12 digits",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid64"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "createdAtFrom: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "posts createdAtFrom sec 60",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid65"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "createdAtFrom: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "posts createdAtFrom hour 24",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid66"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "posts": []
+      }
+    },
+    {
+      "step": "posts createdAtFrom leap",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid67"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "posts": [
+          {
+            "postId": "$uuid7",
+            "title": null,
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid8",
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid10",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-7200s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": "<t-3600s iso Z>"
+          },
+          {
+            "postId": "$uuid11",
+            "title": "하늘",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid13",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-14400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid24",
+            "title": "탈퇴",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid25",
+              "email": "withdrawn+$uuid25@chalkak.invalid",
+              "status": "ACTIVE",
+              "deletedAt": "<t-604800s iso Z>"
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid26",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-104400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid27",
+            "title": "대기",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid28",
+              "email": null,
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid29",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-108000s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid30",
+            "title": "거절",
+            "moderationStatus": "REJECTED",
+            "author": {
+              "userId": "$uuid8",
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid31",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p3/original.webp",
+              "thumbnailImageUrl": null
+            },
+            "likeCount": 0,
+            "createdAt": "<t-111600s iso Z>",
+            "moderatedAt": "<t-46800s iso Z>",
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid19",
+            "title": null,
+            "moderationStatus": "APPROVED",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid21",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
+            },
+            "likeCount": 2,
+            "createdAt": "<t-115200s iso Z>",
+            "moderatedAt": "<t-50400s iso Z>",
+            "deletedAt": null
+          }
+        ]
+      }
+    },
+    {
+      "step": "posts createdAtFrom lead space",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid68"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "createdAtFrom: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "posts topicDate datetime",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid69"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "topicDate: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "posts topicDate compact",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid70"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "topicDate: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "posts topicId upper",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid71"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "posts": [
+          {
+            "postId": "$uuid7",
+            "title": null,
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid8",
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid10",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-7200s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": "<t-3600s iso Z>"
+          },
+          {
+            "postId": "$uuid11",
+            "title": "하늘",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid13",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-14400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          }
+        ]
+      }
+    },
+    {
+      "step": "posts userId nonhex",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid72"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "userId: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "posts userId 36plus",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid73"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "userId: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "posts userId plus",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid74"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "posts": [
+          {
+            "postId": "$uuid11",
+            "title": "하늘",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid13",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-14400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid19",
+            "title": null,
+            "moderationStatus": "APPROVED",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid21",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
+            },
+            "likeCount": 2,
+            "createdAt": "<t-115200s iso Z>",
+            "moderatedAt": "<t-50400s iso Z>",
+            "deletedAt": null
+          }
+        ]
+      }
+    },
+    {
+      "step": "posts status lowercase",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid75"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "status: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "posts status space",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid76"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "posts": [
+          {
+            "postId": "$uuid7",
+            "title": null,
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid8",
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid10",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-7200s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": "<t-3600s iso Z>"
+          },
+          {
+            "postId": "$uuid11",
+            "title": "하늘",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid12",
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid9",
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12"
+            },
+            "photo": {
+              "photoId": "$uuid13",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-14400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid24",
+            "title": "탈퇴",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid25",
+              "email": "withdrawn+$uuid25@chalkak.invalid",
+              "status": "ACTIVE",
+              "deletedAt": "<t-604800s iso Z>"
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid26",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-104400s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          },
+          {
+            "postId": "$uuid27",
+            "title": "대기",
+            "moderationStatus": "PENDING",
+            "author": {
+              "userId": "$uuid28",
+              "email": null,
+              "status": "ACTIVE",
+              "deletedAt": null
+            },
+            "topic": {
+              "topicId": "$uuid20",
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11"
+            },
+            "photo": {
+              "photoId": "$uuid29",
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp"
+            },
+            "likeCount": 0,
+            "createdAt": "<t-108000s iso Z>",
+            "moderatedAt": null,
+            "deletedAt": null
+          }
+        ]
+      }
+    },
+    {
+      "step": "posts two binding errors",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid77"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "status: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "posts binding then range",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid78"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "createdAtTo: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "moderation ordinal",
+      "status": 404,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid79"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "게시물을 찾을 수 없습니다."
+      }
+    },
+    {
+      "step": "moderation string ordinal",
+      "status": 404,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid80"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "게시물을 찾을 수 없습니다."
+      }
+    },
+    {
+      "step": "moderation lead space",
+      "status": 404,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid81"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "게시물을 찾을 수 없습니다."
+      }
+    },
+    {
+      "step": "moderation lowercase",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid82"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      }
+    },
+    {
+      "step": "moderation empty string",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid83"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      }
+    },
+    {
+      "step": "moderation float",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid84"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      }
+    },
+    {
+      "step": "moderation bool",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid85"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      }
+    },
+    {
+      "step": "moderation reason num",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid86"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "승인 요청에는 거절 사유를 입력할 수 없고, 거절 요청에는 500자 이하의 사유가 필요합니다."
+      }
+    },
+    {
+      "step": "moderation reason empty",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid87"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "승인 요청에는 거절 사유를 입력할 수 없고, 거절 요청에는 500자 이하의 사유가 필요합니다."
+      }
+    },
+    {
+      "step": "moderation null reason",
+      "status": 404,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid88"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "게시물을 찾을 수 없습니다."
+      }
+    },
+    {
+      "step": "moderation reject trimmed 500",
+      "status": 404,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid89"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "게시물을 찾을 수 없습니다."
+      }
+    },
+    {
+      "step": "moderation reject nbsp",
+      "status": 404,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid90"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "게시물을 찾을 수 없습니다."
+      }
+    },
+    {
+      "step": "moderation reject 0x1f",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid91"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "승인 요청에는 거절 사유를 입력할 수 없고, 거절 요청에는 500자 이하의 사유가 필요합니다."
+      }
+    }
+  ],
+  "db": {
+    "admin_audit_logs": [
+      "{\"id\":\"$uuid?\",\"action\":\"POST_APPROVED\",\"reason\":null,\"target_id\":\"$uuid19\",\"request_id\":\"$uuid?\",\"after_state\":{\"moderatedAt\":\"<t-50400s db Z>\",\"moderatedBy\":\"$uuid56\",\"moderationStatus\":\"APPROVED\"},\"occurred_at\":\"<t-50400s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"moderatedAt\":null,\"moderationStatus\":\"PENDING\"},\"actor_admin_id\":\"$uuid56\"}",
+      "{\"id\":\"$uuid?\",\"action\":\"POST_REJECTED\",\"reason\":\"정책 위반\",\"target_id\":\"$uuid30\",\"request_id\":\"$uuid?\",\"after_state\":{\"moderatedAt\":\"<t-46800s db Z>\",\"moderatedBy\":\"$uuid?\",\"moderationStatus\":\"REJECTED\"},\"occurred_at\":\"<t-46800s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"moderatedAt\":null,\"moderationStatus\":\"PENDING\"},\"actor_admin_id\":\"$uuid?\"}",
+      "{\"id\":\"$uuid?\",\"action\":\"USER_BANNED\",\"reason\":\"반복 위반\",\"target_id\":\"$uuid8\",\"request_id\":\"$uuid?\",\"after_state\":{\"status\":\"BANNED\"},\"occurred_at\":\"<t-43200s db +09:00>\",\"target_type\":\"USER\",\"before_state\":{\"status\":\"ACTIVE\"},\"actor_admin_id\":\"$uuid56\"}"
+    ],
+    "admins": [
+      "{\"id\":\"$uuid56\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"username\":\"operator\",\"created_at\":\"<t-3542400s db +09:00>\",\"updated_at\":\"<t-3542400s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"username\":\"reviewer\",\"created_at\":\"<t-3456000s db +09:00>\",\"updated_at\":\"<t-3456000s db +09:00>\"}"
+    ],
+    "feedbacks": [
+      "{\"id\":\"$uuid?\",\"content\":\"버그 신고\",\"user_id\":\"$uuid28\",\"created_at\":\"<t-43200s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"content\":\"앱이 좋아요\",\"user_id\":\"$uuid12\",\"created_at\":\"<t-172800s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"content\":\"탈퇴 전에 남긴 의견\",\"user_id\":\"$uuid25\",\"created_at\":\"<t-86400s db +09:00>\"}"
+    ],
+    "photos": [
+      "{\"id\":\"$uuid10\",\"metadata\":{\"width\":10,\"height\":20,\"byteSize\":30},\"created_at\":\"<t-7200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-7200s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p5/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p5/thumbnail.webp\"}",
+      "{\"id\":\"$uuid13\",\"metadata\":{\"width\":4000,\"camera\":\"private\",\"height\":3000,\"byteSize\":2048},\"created_at\":\"<t-14400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-14400s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p1/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p1/thumbnail.webp\"}",
+      "{\"id\":\"$uuid21\",\"metadata\":{\"width\":1000.9,\"height\":\"tall\"},\"created_at\":\"<t-115200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-115200s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p2/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p2/thumbnail.webp\"}",
+      "{\"id\":\"$uuid26\",\"metadata\":{\"width\":320,\"height\":240,\"byteSize\":77},\"created_at\":\"<t-104400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-104400s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p7/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p7/thumbnail.webp\"}",
+      "{\"id\":\"$uuid29\",\"metadata\":{\"width\":640,\"height\":480,\"byteSize\":99},\"created_at\":\"<t-108000s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-108000s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p6/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p6/thumbnail.webp\"}",
+      "{\"id\":\"$uuid31\",\"metadata\":{},\"created_at\":\"<t-111600s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-111600s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p3/original.webp\",\"thumbnail_storage_key\":null}",
+      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t-10800s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-10800s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p4/original.webp\",\"thumbnail_storage_key\":null}"
+    ],
+    "post_image_uploads": [
+      "{\"id\":\"$uuid53\",\"status\":\"READY\",\"user_id\":\"$uuid12\",\"claimed_at\":\"<t-14400s db +09:00>\",\"created_at\":\"<t-15000s db +09:00>\",\"expires_at\":\"<t+0s db +09:00>\",\"updated_at\":\"<t-14400s db +09:00>\",\"image_metadata\":{\"width\":4000},\"rejection_reason\":null}",
+      "{\"id\":\"$uuid55\",\"status\":\"READY\",\"user_id\":\"$uuid12\",\"claimed_at\":\"<t-115200s db +09:00>\",\"created_at\":\"<t-115800s db +09:00>\",\"expires_at\":\"<t-86400s db +09:00>\",\"updated_at\":\"<t-115200s db +09:00>\",\"image_metadata\":{\"width\":1000},\"rejection_reason\":null}"
+    ],
+    "post_likes": [
+      "{\"id\":\"$uuid?\",\"post_id\":\"$uuid19\",\"user_id\":\"$uuid12\",\"created_at\":\"<t-43200s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"post_id\":\"$uuid19\",\"user_id\":\"$uuid8\",\"created_at\":\"<t-41400s db +09:00>\"}"
+    ],
+    "posts": [
+      "{\"id\":\"$uuid11\",\"title\":\"하늘\",\"user_id\":\"$uuid12\",\"photo_id\":\"$uuid13\",\"topic_id\":\"$uuid9\",\"created_at\":\"<t-14400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-14400s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":\"$uuid53\"}",
+      "{\"id\":\"$uuid19\",\"title\":null,\"user_id\":\"$uuid12\",\"photo_id\":\"$uuid21\",\"topic_id\":\"$uuid20\",\"created_at\":\"<t-115200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-50400s db +09:00>\",\"moderated_at\":\"<t-50400s db +09:00>\",\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":\"$uuid55\"}",
+      "{\"id\":\"$uuid24\",\"title\":\"탈퇴\",\"user_id\":\"$uuid25\",\"photo_id\":\"$uuid26\",\"topic_id\":\"$uuid20\",\"created_at\":\"<t-104400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-104400s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid27\",\"title\":\"대기\",\"user_id\":\"$uuid28\",\"photo_id\":\"$uuid29\",\"topic_id\":\"$uuid20\",\"created_at\":\"<t-108000s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-108000s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid30\",\"title\":\"거절\",\"user_id\":\"$uuid8\",\"photo_id\":\"$uuid31\",\"topic_id\":\"$uuid20\",\"created_at\":\"<t-111600s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-46800s db +09:00>\",\"moderated_at\":\"<t-46800s db +09:00>\",\"moderation_status\":\"REJECTED\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid7\",\"title\":null,\"user_id\":\"$uuid8\",\"photo_id\":\"$uuid10\",\"topic_id\":\"$uuid9\",\"created_at\":\"<t-7200s db +09:00>\",\"deleted_at\":\"<t-3600s db +09:00>\",\"updated_at\":\"<t-7200s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid?\",\"title\":\"처리중\",\"user_id\":\"$uuid28\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid9\",\"created_at\":\"<t-10800s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-10800s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"VALIDATING\",\"post_image_upload_id\":null}"
+    ],
+    "social_accounts": [
+      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid12\",\"provider\":\"GOOGLE\",\"created_at\":\"<t-950400s db +09:00>\",\"subject_hmac\":\"1111111111111111111111111111111111111111111111111111111111111111\"}",
+      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid25\",\"provider\":\"KAKAO\",\"created_at\":\"<t-777600s db +09:00>\",\"subject_hmac\":\"3333333333333333333333333333333333333333333333333333333333333333\"}",
+      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid8\",\"provider\":\"APPLE\",\"created_at\":\"<t-864000s db +09:00>\",\"subject_hmac\":\"2222222222222222222222222222222222222222222222222222222222222222\"}"
+    ],
+    "topics": [
+      "{\"id\":\"$uuid20\",\"title\":\"어제의 주제\",\"ends_at\":\"<t-32400s db +09:00>\",\"starts_at\":\"<t-118800s db +09:00>\",\"created_at\":\"<t-864000s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-11\",\"updated_at\":\"<t-864000s db +09:00>\"}",
+      "{\"id\":\"$uuid9\",\"title\":\"가을 하늘\",\"ends_at\":\"<t+54000s db +09:00>\",\"starts_at\":\"<t-32400s db +09:00>\",\"created_at\":\"<t-950400s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t-950400s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"title\":\"내일의 주제\",\"ends_at\":\"<t+140400s db +09:00>\",\"starts_at\":\"<t+54000s db +09:00>\",\"created_at\":\"<t-777600s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-13\",\"updated_at\":\"<t-777600s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"title\":\"지워진 주제\",\"ends_at\":\"<t-205200s db +09:00>\",\"starts_at\":\"<t-291600s db +09:00>\",\"created_at\":\"<t-691200s db +09:00>\",\"deleted_at\":\"<t-604800s db +09:00>\",\"topic_date\":\"2026-10-09\",\"updated_at\":\"<t-691200s db +09:00>\"}"
+    ],
+    "users": [
+      "{\"id\":\"$uuid12\",\"email\":\"Alice@Test.Chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t-950400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-950400s db +09:00>\",\"app_version\":\"1.2.0\",\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u1/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u1/thumbnail.png\"}",
+      "{\"id\":\"$uuid25\",\"email\":\"withdrawn+$uuid25@chalkak.invalid\",\"status\":\"ACTIVE\",\"created_at\":\"<t-777600s db +09:00>\",\"deleted_at\":\"<t-604800s db +09:00>\",\"updated_at\":\"<t-604800s db +09:00>\",\"app_version\":\"1.0.0\",\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"withdrawn/$uuid25\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}",
+      "{\"id\":\"$uuid28\",\"email\":null,\"status\":\"ACTIVE\",\"created_at\":\"<t-691200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-691200s db +09:00>\",\"app_version\":\"2.0.0\",\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u4/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u4/thumbnail.png\"}",
+      "{\"id\":\"$uuid8\",\"email\":\"bob@test.chalkak\",\"status\":\"BANNED\",\"created_at\":\"<t-864000s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-864000s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u2/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}"
+    ]
+  }
+}

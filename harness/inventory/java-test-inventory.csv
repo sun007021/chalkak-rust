@@ -1,258 +1,258 @@
 domain,file,method,display_name,java_layer,annotation,rust_target,status
 BackendApplicationTests.java,BackendApplicationTests.java,contextLoads,,통합(Spring+DB),@Test,,미이식
-admin,admin/api/support/AdminArgumentResolverFailClosedWebMvcTest.java,request_withoutAdminActorResolver_returnsForbidden,작업자 전략이 누락되어도 요청 값으로 관리자 ID를 위조하지 못한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/support/AdminCorsProdProfileTest.java,preflight_configuredProductionOrigin_allowsAdminRequest,운영 프로필에서도 설정한 관리자 웹 Origin의 사전 요청만 허용한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/support/AdminCorsProdProfileTest.java,request_unconfiguredProductionOrigin_rejectsAdminRequest,운영 프로필에서 등록하지 않은 Origin은 차단한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/support/AdminCorsPropertiesTest.java,create_withBlankOrigin_throwsException,빈 관리자 웹 Origin을 거부한다,단위,@Test,,미이식
-admin,admin/api/support/AdminCorsPropertiesTest.java,create_withEmptyOrigins_throwsException,관리자 웹 Origin 목록이 비어 있으면 거부한다,단위,@Test,,미이식
-admin,admin/api/support/AdminCorsPropertiesTest.java,create_withSurroundingWhitespace_trimsOrigin,관리자 웹 Origin 앞뒤 공백을 제거한다,단위,@Test,,미이식
-admin,admin/api/support/AdminCorsPropertiesTest.java,create_withWildcardOrigin_throwsException,와일드카드 관리자 웹 Origin을 거부한다,단위,@Test,,미이식
-admin,admin/api/support/AdminWebMvcConfigTest.java,getAdminEndpoint_withoutAuthentication_injectsDevelopmentAdmin,등록한 CurrentAdmin Resolver로 개발 관리자를 Controller에 주입한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/support/AdminWebMvcConfigTest.java,preflight_configuredOrigin_allowsAdminRequest,설정한 관리자 웹 Origin의 사전 요청을 허용한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/support/AdminWebMvcConfigTest.java,preflight_unconfiguredOrigin_rejectsAdminRequest,설정하지 않은 Origin의 관리자 API 사전 요청을 차단한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/support/AdminWebMvcConfigTest.java,request_configuredOrigin_allowsAdminRequest,설정한 관리자 웹 Origin의 실제 요청에 허용 응답 헤더와 요청 식별자 노출 헤더를 제공한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/support/AdminWebMvcConfigTest.java,request_unconfiguredOrigin_rejectsBeforeResolvingAdmin,설정하지 않은 Origin의 실제 관리자 API 요청을 작업자 조회 전에 차단한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/support/CurrentAdminArgumentResolverTest.java,resolveArgument_withForgedAdminHeader_ignoresHeader,가짜 관리자 ID 헤더를 보내도 개발 관리자의 ID를 전달한다,단위,@Test,,미이식
-admin,admin/api/support/CurrentAdminArgumentResolverTest.java,resolveArgument_withoutAdminHeader_injectsDevelopmentAdmin,관리자 ID 헤더 없이 현재 개발 관리자를 Controller에 전달한다,단위,@Test,,미이식
-admin,admin/api/v1/controller/AdminAuditLogControllerTest.java,getAuditLogs_allFilters_returnsAuditHistory,,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminAuditLogControllerTest.java,getAuditLogs_invalidPage_returnsBadRequest,,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminAuditLogControllerTest.java,getAuditLogs_unknownEnum_returnsBadRequest,,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminAuditLogControllerTest.java,getAuditLogs_withoutFilters_usesDefaults,,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminAuditRequestIdTest.java,updateStatus_adminRequest_savesResponseRequestIdInAuditLog,관리자 API 요청이 남긴 감사 로그의 requestId는 응답의 X-Request-Id와 같다,통합(Spring+DB),@Test,,미이식
-admin,admin/api/v1/controller/AdminAuthControllerTest.java,getCurrentAdmin_authenticatedAdmin_returnsCurrentAdmin,인증된 관리자는 자신의 식별자와 아이디를 조회한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminAuthControllerTest.java,login_blankUsername_returnsBadRequest,관리자 로그인 아이디가 비어 있으면 400을 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminAuthControllerTest.java,login_validRequest_returnsAccessTokenAndRefreshToken,관리자 로그인에 성공하면 액세스 토큰과 리프레시 토큰을 함께 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminAuthControllerTest.java,logout_blankRefreshToken_returnsBadRequest,로그아웃 요청의 리프레시 토큰이 비어 있으면 400을 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminAuthControllerTest.java,logout_refreshToken_revokesLineageWithoutAccessToken,액세스 토큰 없이 리프레시 토큰만으로 로그아웃하면 그 기기의 계보를 폐기한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminAuthControllerTest.java,refresh_blankRefreshToken_returnsBadRequest,재발급 요청의 리프레시 토큰이 비어 있으면 400을 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminAuthControllerTest.java,refresh_unusableRefreshToken_returnsReauthenticationRequired,쓸 수 없는 리프레시 토큰으로 재발급하면 재로그인 필요를 알린다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminAuthControllerTest.java,refresh_validRefreshToken_returnsRotatedTokens,리프레시 토큰으로 재발급하면 새 액세스 토큰과 회전된 리프레시 토큰을 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminFeedbackControllerTest.java,getFeedbacks_invalidSort_returnsBadRequest,정렬 조건이 올바르지 않으면 400을 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminFeedbackControllerTest.java,getFeedbacks_pageSizeOverMax_returnsBadRequest,페이지당 피드백 수가 100을 넘으면 400을 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminFeedbackControllerTest.java,getFeedbacks_withParameters_passesThemToService,오래된 순 정렬과 페이지 조건을 전달한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminFeedbackControllerTest.java,getFeedbacks_withoutParameters_usesDefaults,조회 조건을 생략하면 최신순 첫 페이지를 조회한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_alreadyDeletedPost_delegatesIdempotentlyAndReturnsNoContent,이미 삭제된 게시물도 삭제 서비스에 위임해 멱등하게 204를 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_emptyBody_returnsBadRequest,삭제 요청 본문이 비어 있으면 400을 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_invalidPostId_returnsBadRequest,삭제할 게시물 ID 형식이 올바르지 않으면 400을 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_missingOrBlankReason_returnsBadRequest,삭제 사유가 누락되거나 비어 있으면 400을 반환한다,웹 슬라이스,@ParameterizedTest,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_reasonAtMaximum_returnsNoContent,삭제 사유 입력 원문이 500자이면 허용한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_reasonOverMaximum_returnsBadRequest,삭제 사유 입력 원문이 500자를 초과하면 400을 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_unknownPost_returnsNotFound,삭제할 게시물을 찾을 수 없으면 404를 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_validReason_returnsNoContent,관리자는 사유와 함께 게시물을 삭제하고 204를 반환받는다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_validatingPost_returnsBusinessError,이미지 처리 중인 게시물을 삭제하면 기본 비즈니스 오류 400을 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,getPost_existingPost_returnsPostDetail,관리자는 삭제된 게시물을 포함한 게시물 상세 정보를 조회한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,getPost_invalidPostId_returnsBadRequest,관리자 게시물 ID 형식이 올바르지 않으면 400을 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,getPost_unknownPost_returnsNotFound,관리자 게시물 상세 조회 대상이 없으면 404를 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,getPost_withoutModeratedOrDeletedAt_returnsNullTimes,처리 시각이 없는 게시물 상세 정보는 null로 직렬화한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,getPosts_invalidFilterFormat_returnsBadRequest,관리자 게시물 필터 형식이 잘못되면 400을 반환한다,웹 슬라이스,@ParameterizedTest,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,getPosts_invalidPagination_returnsBadRequest,관리자 게시물 페이지 조건이 범위를 벗어나면 400을 반환한다,웹 슬라이스,@ParameterizedTest,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,getPosts_pageSizeBoundary_returnsOk,관리자 게시물 페이지 크기의 양쪽 경계값을 허용한다,웹 슬라이스,@ParameterizedTest,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,getPosts_validatingStatus_returnsBadRequest,내부 검증 중 상태로 관리자 게시물 목록을 요청하면 400을 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,getPosts_withAllFilters_passesQueryParameters,관리자 게시물 목록의 모든 필터와 정렬 및 페이지 조건을 서비스에 전달한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,getPosts_withoutFilters_returnsDefaultPage,관리자는 기본 조건으로 전체 게시물 목록을 조회한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_approvedRequest_returnsModerationResult,관리자는 대기 중인 게시물을 승인하고 처리 결과를 조회한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_approvedWithReason_returnsBadRequest,승인 요청에 거절 사유가 포함되면 400을 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_emptyBody_returnsBadRequest,검수 요청 본문이 비어 있으면 400을 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_invalidPostId_returnsBadRequest,검수할 게시물 ID 형식이 올바르지 않으면 400을 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_invalidStatus_returnsBadRequest,검수 상태가 누락되거나 올바르지 않으면 400을 반환한다,웹 슬라이스,@ParameterizedTest,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_nonDecisionStatus_returnsBadRequest,승인과 거절이 아닌 검수 상태를 요청하면 400을 반환한다,웹 슬라이스,@ParameterizedTest,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_nonPendingPost_returnsResourceStateChangedError,대기 상태가 아닌 게시물의 검수 요청은 현재 상태 재조회 오류를 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_rejectedRequest_returnsModerationResult,관리자는 대기 중인 게시물을 사유와 함께 거절하고 처리 결과를 조회한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_rejectedWithoutReason_returnsBadRequest,거절 사유가 누락되거나 비어 있으면 400을 반환한다,웹 슬라이스,@ParameterizedTest,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_rejectionReasonAtMaximum_returnsModerationResult,거절 사유가 최대 길이인 500자이면 요청을 허용한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_rejectionReasonOverMaximum_returnsBadRequest,거절 사유가 500자를 초과하면 400을 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminTopicControllerTest.java,createTopic_validRequest_returnsCreatedTopic,관리자는 새 주제를 등록한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminTopicControllerTest.java,deleteTopic_validReason_returnsNoContent,관리자는 사유와 함께 공개 전 주제를 삭제한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminTopicControllerTest.java,getTopic_existingTopic_returnsDetail,관리자는 주제 상세를 조회한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminTopicControllerTest.java,getTopics_withFilters_returnsTopicPage,관리자는 phase와 날짜·정렬·페이지 조건으로 주제 목록을 조회한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminTopicControllerTest.java,mutateTopic_blankRequiredValue_returnsBadRequest,빈 제목 또는 삭제 사유는 400으로 거절한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminTopicControllerTest.java,updateTopic_validRequest_returnsUpdatedTopic,관리자는 공개 전 주제를 수정한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminTopicPaginationTest.java,getTopics_offsetOverflow_returnsBusinessError,조회 범위를 넘는 페이지는 서버 오류 대신 기존 형식의 400 오류를 반환한다,통합(Spring+DB),@ParameterizedTest,,미이식
-admin,admin/api/v1/controller/AdminTopicPaginationTest.java,getTopics_validPage_returnsExistingPageContract,일반 페이지와 조회 가능한 마지막 페이지까지 기존 응답 형식을 유지한다,통합(Spring+DB),@ParameterizedTest,,미이식
-admin,admin/api/v1/controller/AdminUserControllerTest.java,getUser_unknownUser_returnsNotFound,존재하지 않는 관리자 사용자 상세는 404를 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminUserControllerTest.java,getUser_withdrawnUser_returnsDetailWithoutSignatureUrls,관리자는 탈퇴 사용자의 비식별 상세를 조회한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminUserControllerTest.java,getUsers_invalidQuery_returnsBadRequest,관리자 사용자 조회 조건이 잘못되면 400을 반환한다,웹 슬라이스,@ParameterizedTest,,미이식
-admin,admin/api/v1/controller/AdminUserControllerTest.java,getUsers_withFilters_passesQueryParameters,관리자 사용자 필터와 정렬·페이지 조건을 서비스에 전달한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminUserControllerTest.java,getUsers_withoutStatus_returnsActiveUsersByDefault,관리자는 상태를 생략하면 활성 사용자 목록을 조회한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminUserControllerTest.java,updateStatus_banned_returnsUpdatedStatus,관리자는 사유를 남겨 사용자를 차단한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminUserControllerTest.java,updateStatus_blankReason_returnsBadRequest,상태 변경 사유가 비어 있으면 400을 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminUserControllerTest.java,updateStatus_sameStatus_returnsStateChanged,이미 같은 상태인 사용자 변경 요청은 상태 충돌 코드와 400을 반환한다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/controller/AdminUserControllerTest.java,updateStatus_withdrawnRequest_returnsBadRequest,탈퇴 상태는 관리자 변경 요청 값으로 사용할 수 없다,웹 슬라이스,@Test,,미이식
-admin,admin/api/v1/docs/AdminAuditLogOpenApiTest.java,adminApiDocs_exposesReadOnlyAuditLogContract,,통합(Spring+DB),@Test,,미이식
-admin,admin/api/v1/docs/AdminAuthOpenApiTest.java,adminApiDocs_documentsRefreshFailureAndKeepsLogoutIdempotent,"관리자 재발급 문서는 재로그인 필요 401을, 로그아웃 문서는 인증 실패 응답을 두지 않는다",통합(Spring+DB),@Test,,미이식
-admin,admin/api/v1/docs/AdminAuthOpenApiTest.java,adminApiDocs_exposesAdminSecurityAndRefreshTokenExceptions,관리자 문서는 리프레시 토큰 경로만 공개하고 나머지 관리자 API에 관리자 Bearer 인증을 요구한다,통합(Spring+DB),@Test,,미이식
-admin,admin/api/v1/docs/AdminFeedbackOpenApiTest.java,adminApiDocs_exposesReadOnlyFeedbackContract,admin-api 문서는 조회 전용 피드백 계약을 제공한다,통합(Spring+DB),@Test,,미이식
-admin,admin/api/v1/docs/AdminFeedbackOpenApiTest.java,userApiDocs_hidesAdminFeedbackPath,user-api 문서는 관리자 피드백 경로를 노출하지 않는다,통합(Spring+DB),@Test,,미이식
-admin,admin/api/v1/docs/AdminPostOpenApiTest.java,adminApiDocs_adminPostEndpoints_exposeDistinctListAndDetailSchemas,admin-api 문서는 관리자 게시물 목록과 상세 계약을 서로 다른 스키마로 제공한다,통합(Spring+DB),@Test,,미이식
-admin,admin/api/v1/docs/AdminTopicOpenApiTest.java,adminApiDocs_adminTopicEndpoints_exposeLifecycleContract,admin-api 문서에 주제 CRUD와 필터 계약을 노출하고 user-api에서는 제외한다,통합(Spring+DB),@Test,,미이식
-admin,admin/api/v1/docs/AdminUserOpenApiTest.java,adminApiDocs_adminUserEndpoints_exposeQueryAndDetailContracts,admin-api 문서에 관리자 사용자 목록·상세 계약만 노출한다,통합(Spring+DB),@Test,,미이식
-admin,admin/domain/AdminAuditLogTest.java,create_approvedActionWithRejectedTransition_throwsBusinessException,승인 작업에 거절 상태 전이를 기록할 수 없다,단위,@Test,,미이식
-admin,admin/domain/AdminAuditLogTest.java,create_approvedActionWithoutModerationMetadata_throwsBusinessException,승인 작업에는 검수 시각과 작업자가 모두 필요하다,단위,@Test,,미이식
-admin,admin/domain/AdminAuditLogTest.java,create_benignReason_createsAuditLog,민감값이 없는 일반 문장과 문서 URL은 사유로 저장한다,단위,@Test,,미이식
-admin,admin/domain/AdminAuditLogTest.java,create_blankReason_normalizesToNull,선택 사유가 비어 있으면 null로 정규화한다,단위,@Test,,미이식
-admin,admin/domain/AdminAuditLogTest.java,create_maxLengthReason_createsAuditLog,사유는 코드 포인트 기준 500자까지 저장한다,단위,@Test,,미이식
-admin,admin/domain/AdminAuditLogTest.java,create_mismatchedActionAndTarget_throwsBusinessException,,단위,@Test,,미이식
-admin,admin/domain/AdminAuditLogTest.java,create_mismatchedModerator_throwsBusinessException,검수 작업자는 감사 로그 작업자와 같아야 한다,단위,@Test,,미이식
-admin,admin/domain/AdminAuditLogTest.java,create_missingRequiredIdentifier_throwsBusinessException,필수 식별자가 없으면 감사 로그를 생성할 수 없다,단위,@Test,,미이식
-admin,admin/domain/AdminAuditLogTest.java,create_partialTopicUpdate_throwsBusinessException,주제 수정 작업에는 수정 전후의 전체 업무 상태가 필요하다,단위,@Test,,미이식
-admin,admin/domain/AdminAuditLogTest.java,create_reasonContainingSensitiveValue_throwsBusinessException,,단위,@ParameterizedTest,,미이식
-admin,admin/domain/AdminAuditLogTest.java,create_rejectionWithoutReason_throwsBusinessException,거절 작업에 사유가 없으면 감사 로그를 생성할 수 없다,단위,@Test,,미이식
-admin,admin/domain/AdminAuditLogTest.java,create_stateContainingBinaryValue_throwsBusinessException,바이너리 객체는 감사 로그 상태에 저장할 수 없다,단위,@Test,,미이식
-admin,admin/domain/AdminAuditLogTest.java,create_stateContainingCredential_throwsBusinessException,,단위,@Test,,미이식
-admin,admin/domain/AdminAuditLogTest.java,create_stateContainingImageReference_throwsBusinessException,,단위,@Test,,미이식
-admin,admin/domain/AdminAuditLogTest.java,create_stateFieldOutsideActionAllowlist_throwsBusinessException,,단위,@Test,,미이식
-admin,admin/domain/AdminAuditLogTest.java,create_tooLongReason_throwsBusinessException,사유가 500자를 초과하면 감사 로그를 생성할 수 없다,단위,@Test,,미이식
-admin,admin/domain/AdminAuditLogTest.java,create_userBanWithoutTransition_throwsBusinessException,회원 정지 작업에 같은 상태를 기록할 수 없다,단위,@Test,,미이식
-admin,admin/domain/AdminAuditLogTest.java,create_validActionStateChange_createsAuditLog,작업별 올바른 상태 전이를 감사 로그로 생성한다,단위,@ParameterizedTest,,미이식
-admin,admin/domain/AdminAuditLogTest.java,create_validAuditInformation_createsAuditLog,,단위,@Test,,미이식
-admin,admin/domain/AdminAuditLogTest.java,create_withoutChangedState_throwsBusinessException,,단위,@Test,,미이식
-admin,admin/domain/AdminAuditSnapshotTest.java,from_benignStringValue_createsSnapshot,민감값이 없는 일반 문장과 문서 URL은 상태 값으로 저장한다,단위,@Test,,미이식
-admin,admin/domain/AdminAuditSnapshotTest.java,from_immutableNumber_createsSnapshot,불변 숫자 값은 감사 로그 상태로 저장한다,단위,@Test,,미이식
-admin,admin/domain/AdminAuditSnapshotTest.java,from_maxLengthString_createsSnapshot,문자열 상태 값은 코드 포인트 기준 2000자까지 허용한다,단위,@Test,,미이식
-admin,admin/domain/AdminAuditSnapshotTest.java,from_mutableNumber_throwsBusinessException,생성 뒤 값이 바뀔 수 있는 숫자 객체는 저장할 수 없다,단위,@Test,,미이식
-admin,admin/domain/AdminAuditSnapshotTest.java,from_nestedValue_throwsBusinessException,중첩 객체나 목록은 감사 로그 상태에 저장할 수 없다,단위,@Test,,미이식
-admin,admin/domain/AdminAuditSnapshotTest.java,from_obfuscatedSensitiveKey_throwsBusinessException,대소문자와 구분자 형태가 달라도 민감 키를 차단한다,단위,@Test,,미이식
-admin,admin/domain/AdminAuditSnapshotTest.java,from_safeScalarValues_createsImmutableSnapshot,,단위,@Test,,미이식
-admin,admin/domain/AdminAuditSnapshotTest.java,from_sensitiveStringValue_throwsBusinessException,허용 필드의 문자열 값에 숨긴 민감정보도 차단한다,단위,@ParameterizedTest,,미이식
-admin,admin/domain/AdminAuditSnapshotTest.java,from_tooDeepState_throwsBusinessException,과도하게 중첩된 상태는 감사 로그에 저장할 수 없다,단위,@Test,,미이식
-admin,admin/domain/AdminAuditSnapshotTest.java,from_tooLongString_throwsBusinessException,문자열 상태 값이 2000자를 초과하면 저장할 수 없다,단위,@Test,,미이식
-admin,admin/domain/AdminTest.java,create_blankPasswordHash_throwsException,비밀번호 해시가 비어 있으면 관리자를 생성할 수 없다,단위,@ParameterizedTest,,미이식
-admin,admin/domain/AdminTest.java,create_blankUsername_throwsException,사용자명이 비어 있으면 관리자를 생성할 수 없다,단위,@ParameterizedTest,,미이식
-admin,admin/domain/AdminTest.java,create_maxLengthUsername_createsAdmin,사용자명이 100자이면 관리자를 생성할 수 있다,단위,@Test,,미이식
-admin,admin/domain/AdminTest.java,create_overlongPasswordHash_throwsException,비밀번호 해시가 255자를 초과하면 관리자를 생성할 수 없다,단위,@Test,,미이식
-admin,admin/domain/AdminTest.java,create_overlongUsername_throwsException,사용자명이 100자를 초과하면 관리자를 생성할 수 없다,단위,@Test,,미이식
-admin,admin/domain/AdminTest.java,create_plainPassword_throwsException,BCrypt 형식이 아닌 비밀번호 값으로 관리자를 생성할 수 없다,단위,@Test,,미이식
-admin,admin/domain/AdminTest.java,create_validAccount_createsAdmin,사용자명과 단방향 비밀번호 해시로 관리자를 생성한다,단위,@Test,,미이식
-admin,admin/infrastructure/bootstrap/AdminAccountBootstrapTest.java,run_existingConfiguredAdmin_keepsStoredAccount,설정한 관리자 계정이 이미 있으면 비밀번호 해시를 덮어쓰지 않는다,통합(Spring+DB),@Test,,미이식
-admin,admin/infrastructure/bootstrap/AdminAccountBootstrapTest.java,run_missingConfiguredAdmin_createsHashedAccount,설정한 관리자 계정이 없으면 BCrypt 해시만 저장한다,통합(Spring+DB),@Test,,미이식
-admin,admin/infrastructure/bootstrap/DevelopmentAdminBootstrapProfileTest.java,register_prodAndDevProfiles_doesNotRegisterDevelopmentAdminBootstrap,운영 프로필이 개발 프로필과 함께 활성화되어도 부트스트랩을 등록하지 않는다,단위,@Test,,미이식
-admin,admin/infrastructure/bootstrap/DevelopmentAdminBootstrapProfileTest.java,register_prodProfile_doesNotRegisterDevelopmentAdminBootstrap,운영 프로필에서는 개발 관리자 부트스트랩을 등록하지 않는다,단위,@Test,,미이식
-admin,admin/infrastructure/bootstrap/DevelopmentAdminBootstrapTest.java,run_missingDevelopmentAdmin_createsHashedAdmin,개발 관리자가 없으면 사용할 수 없는 임의 비밀번호의 BCrypt 해시로 생성한다,통합(Spring+DB),@Test,,미이식
-admin,admin/infrastructure/bootstrap/DevelopmentAdminBootstrapTest.java,run_repeatedExecution_keepsSingleDevelopmentAdmin,개발 부트스트랩을 반복 실행해도 관리자 한 명만 유지한다,통합(Spring+DB),@Test,,미이식
-admin,admin/infrastructure/infra/DevAdminActorResolverTest.java,resolve_developmentProfile_returnsPersistedDevelopmentAdmin,개발 환경에서는 저장된 dev-admin의 ID를 현재 작업자로 반환한다,통합(Spring+DB),@Test,,미이식
-admin,admin/infrastructure/infra/SecurityContextAdminActorResolverTest.java,resolve_adminJwt_returnsAuthenticatedAdmin,관리자 권한 JWT의 subject를 현재 관리자 식별자로 반환한다,단위,@Test,,미이식
-admin,admin/infrastructure/infra/SecurityContextAdminActorResolverTest.java,resolve_userJwt_throwsForbidden,일반 사용자 권한 JWT이면 403 예외를 반환한다,단위,@Test,,미이식
-admin,admin/infrastructure/infra/SecurityContextAdminActorResolverTest.java,resolve_withoutAuthentication_throwsUnauthorized,인증 정보가 없으면 401 예외를 반환한다,단위,@Test,,미이식
-admin,admin/infrastructure/persistence/audit/AdminAuditLogQueryRepositoryTest.java,deleteActor_withAuditHistory_isRejectedToPreserveActorIdentity,,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/audit/AdminAuditLogQueryRepositoryTest.java,findAuditLogs_combinedFiltersAndInclusiveBoundary_returnsMatchingDeletedTargetHistory,,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/audit/AdminAuditLogQueryRepositoryTest.java,findAuditLogs_sameOccurredAt_usesIdForStablePagination,,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/audit/AdminAuditLogRepositoryTest.java,migration_adminAuditLogs_hasQueryIndexes,,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/audit/AdminAuditLogRepositoryTest.java,repository_restrictedSurface_exposesOnlySaveAndQueryWithinPackage,JPA 감사 로그 저장소는 같은 패키지에 저장·조회 기능만 노출한다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/audit/AdminAuditLogRepositoryTest.java,save_sameRequestId_persistsMultipleAuditLogs,한 요청에서 여러 관리자 작업을 기록할 수 있다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/audit/AdminAuditLogRepositoryTest.java,save_unknownActorAdminId_throwsDataIntegrityViolationException,존재하지 않는 관리자는 감사 로그 작업자가 될 수 없다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/audit/AdminAuditLogRepositoryTest.java,save_validAuditLog_persistsPostgresTypes,감사 로그의 UUIDv7과 PostgreSQL enum·JSONB 필드를 저장한다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/auth/AdminRepositoryTest.java,findByUsername_savedAdmin_returnsAdmin,관리자를 저장하고 사용자명으로 조회한다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/auth/AdminRepositoryTest.java,save_duplicateUsername_throwsException,동일한 사용자명을 가진 관리자를 중복 저장할 수 없다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/feedback/AdminFeedbackQueryRepositoryTest.java,findFeedbacks_bannedAndWithdrawnAuthors_areIncluded,정지·탈퇴 회원이 남긴 피드백도 상태와 함께 조회한다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/feedback/AdminFeedbackQueryRepositoryTest.java,findFeedbacks_createdAtAsc_returnsOldestFirst,오래된 순 정렬을 선택할 수 있다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/feedback/AdminFeedbackQueryRepositoryTest.java,findFeedbacks_createdAtDesc_returnsNewestFirstWithAuthor,피드백 목록은 작성자 정보와 함께 최신순으로 조회한다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/feedback/AdminFeedbackQueryRepositoryTest.java,findFeedbacks_withMorePages_reportsHasNext,다음 페이지가 남으면 hasNext로 알린다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPostById_existingPost_returnsSingleRichProjection,상세 조회는 게시물 연관 정보와 사진·업로드 메타데이터 및 좋아요 수를 반환한다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPostById_moderatedPost_returnsModeratorAndReasonFromAuditLog,상세 조회는 관리자 검수 감사 로그에서 처리자와 사유를 함께 조회한다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPostById_softDeletedLegacyPost_returnsDeletedStateWithNullUpload,상세 조회는 삭제된 연관 정보와 업로드 연결이 없는 기존 게시물도 반환한다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPostById_unknownPost_returnsEmpty,존재하지 않는 게시물 상세 조회는 빈 결과를 반환한다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPostById_validatingPost_returnsEmpty,내부 검증 중 게시물은 관리자 상세에서 조회하지 않는다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPosts_combinedFilters_returnsOnlyMatchingPost,상태·주제·날짜·사용자·등록 시각 필터를 함께 적용한다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPosts_createdAtSortAndPagination_returnsStablePages,등록 시각 오름차순과 내림차순은 ID 보조 정렬로 페이지 경계를 유지한다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPosts_eachFilter_returnsMatchingPosts,각 목록 필터는 삭제 여부와 관계없이 해당 조건만 정확히 적용한다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPosts_noFilters_excludesValidatingAndIncludesSoftDeletedPost,관리자 목록은 내부 검증 중 게시물을 제외하고 삭제된 게시물을 함께 조회한다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/topic/AdminTopicQueryRepositoryTest.java,findActiveTopicById_activeOrDeleted_preservesVisibilityAndCounts,상세는 삭제된 주제를 제외하고 게시글이 없으면 집계가 0이다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/topic/AdminTopicQueryRepositoryTest.java,findTopics_dateBounds_returnsInclusiveRange,날짜 양 끝 경계를 포함하고 각각의 단독 조건도 적용한다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/topic/AdminTopicQueryRepositoryTest.java,findTopics_eachSort_returnsStablePages,네 정렬은 ID 보조 정렬과 다음 페이지 경계를 유지한다,JPA 슬라이스,@ParameterizedTest,,미이식
-admin,admin/infrastructure/persistence/topic/AdminTopicQueryRepositoryTest.java,findTopics_phaseAtBoundary_returnsMatchingTopic,시작 시각은 공개 중이고 종료 시각은 종료로 조회한다,JPA 슬라이스,@ParameterizedTest,,미이식
-admin,admin/infrastructure/persistence/user/AdminUserQueryRepositoryTest.java,findUserById_activeUser_returnsProviderSignatureAndVisiblePostCounts,활성 사용자 상세에 소셜 제공자와 관리자 공개 게시물 상태별 개수를 제공한다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/user/AdminUserQueryRepositoryTest.java,findUserById_withdrawnUser_returnsAnonymizedData,탈퇴 사용자 상세도 비식별 정보로 조회한다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/user/AdminUserQueryRepositoryTest.java,findUsers_eachStatus_returnsMatchingDerivedStatus,각 회원 상태 필터는 탈퇴 여부를 반영해 해당 회원만 조회한다,JPA 슬라이스,@ParameterizedTest,,미이식
-admin,admin/infrastructure/persistence/user/AdminUserQueryRepositoryTest.java,findUsers_statusAndEmailFilter_returnsMatchingUser,파생 상태와 대소문자를 무시한 이메일 부분 검색을 함께 적용한다,JPA 슬라이스,@Test,,미이식
-admin,admin/infrastructure/persistence/user/AdminUserQueryRepositoryTest.java,findUsers_withoutFilters_returnsEveryDerivedStatusInStableOrder,관리자 사용자 목록은 탈퇴자를 포함해 안정적인 최신순으로 조회한다,JPA 슬라이스,@Test,,미이식
-admin,admin/service/audit/AdminAuditLogQueryServiceTest.java,getAuditLogs_allFilters_returnsReadOnlyPage,,단위,@Test,,미이식
-admin,admin/service/audit/AdminAuditLogQueryServiceTest.java,getAuditLogs_excessiveOffset_throwsBusinessException,,단위,@Test,,미이식
-admin,admin/service/audit/AdminAuditLogQueryServiceTest.java,getAuditLogs_reversedPeriod_throwsBusinessException,,단위,@Test,,미이식
-admin,admin/service/audit/AdminAuditLogServiceTest.java,createAuditLog_auditPersistenceFailure_rollsBackBusinessChange,감사 로그 저장이 실패하면 앞선 업무 변경도 함께 롤백한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/audit/AdminAuditLogServiceTest.java,createAuditLog_businessFailure_rollsBackChangeAndAuditLog,,통합(Spring+DB),@Test,,미이식
-admin,admin/service/audit/AdminAuditLogServiceTest.java,createAuditLog_withinBusinessTransaction_persistsChangeAndAuditLog,업무 트랜잭션 안에서 변경과 감사 로그를 함께 저장하고 감사 로그에는 현재 요청의 requestId를 남긴다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/audit/AdminAuditLogServiceTest.java,createAuditLog_withoutBusinessTransaction_throwsIllegalTransactionStateException,업무 트랜잭션 없이 감사 로그만 저장할 수 없다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/auth/AdminAuthenticationServiceTest.java,getCurrentAdmin_existingAdmin_returnsCurrentAdmin,인증된 관리자 식별자로 DB의 관리자 정보를 조회한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/auth/AdminAuthenticationServiceTest.java,getCurrentAdmin_missingAdmin_throwsUnauthorized,존재하지 않는 관리자 식별자는 인증 실패로 거부한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/auth/AdminAuthenticationServiceTest.java,login_passwordExceedsByteLimit_throwsUnauthorized,BCrypt의 72바이트를 넘는 로그인 비밀번호는 500 대신 인증 실패로 거부한다,통합(Spring+DB),@ParameterizedTest,,미이식
-admin,admin/service/auth/AdminAuthenticationServiceTest.java,login_passwordWithinByteLimit_succeeds,BCrypt의 바이트 길이 한도 직전과 경계 비밀번호로 로그인할 수 있다,통합(Spring+DB),@ParameterizedTest,,미이식
-admin,admin/service/auth/AdminAuthenticationServiceTest.java,login_unknownUsername_hidesAccountExistence,없는 아이디도 BCrypt 비교를 수행하고 같은 인증 실패 응답으로 거부한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/auth/AdminAuthenticationServiceTest.java,login_validCredentials_opensRefreshTokenLineage,로그인에 성공하면 리프레시 토큰 계보를 열고 저장소에는 해시만 남긴다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/auth/AdminAuthenticationServiceTest.java,login_validCredentials_returnsAdminAccessToken,실제 저장된 계정의 비밀번호가 일치하면 검증 가능한 관리자 JWT를 발급한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/auth/AdminAuthenticationServiceTest.java,login_wrongPassword_throwsCommonUnauthorized,잘못된 비밀번호는 공통 인증 실패 응답으로 거부한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/auth/AdminRefreshTokenServiceTest.java,issue_newAdmin_storesHashOnlyAndReturnsPlainToken,리프레시 토큰을 발급하면 평문은 반환만 하고 저장소에는 해시만 남는다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/auth/AdminRefreshTokenServiceTest.java,logout_liveToken_revokesOnlyThatLineage,로그아웃하면 그 기기의 계보만 폐기하고 재발급을 막는다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/auth/AdminRefreshTokenServiceTest.java,logout_unknownOrRevokedToken_doesNothing,모르는 토큰이나 이미 폐기된 토큰으로 로그아웃해도 예외를 던지지 않는다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/auth/AdminRefreshTokenServiceTest.java,refresh_absoluteExpiredToken_revokesLineageAndRequiresReauthentication,회전을 이어가도 절대 만료 시각에 도달하면 재로그인을 요구한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/auth/AdminRefreshTokenServiceTest.java,refresh_inactivityExpiredToken_revokesLineageAndRequiresReauthentication,비활동 만료가 지난 토큰은 절대 만료가 남아 있어도 재로그인을 요구한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/auth/AdminRefreshTokenServiceTest.java,refresh_liveToken_rotatesTokenAndReissuesAdminAccessToken,살아 있는 토큰으로 재발급하면 관리자 scope의 액세스 토큰과 새 토큰을 함께 내준다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/auth/AdminRefreshTokenServiceTest.java,refresh_reusedLineageRevoked_keepsOtherDeviceLineageUsable,한 계보를 폐기해도 다른 기기의 계보는 그대로 재발급할 수 있다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/auth/AdminRefreshTokenServiceTest.java,refresh_revokedToken_keepsRevokedAtAndRequiresReauthentication,이미 폐기된 토큰으로 재발급하면 폐기 시각을 덮어쓰지 않고 재로그인을 요구한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/auth/AdminRefreshTokenServiceTest.java,refresh_rotatedToken_revokesWholeLineage,회전된 토큰을 다시 내면 계보 전체를 폐기하고 재로그인을 요구한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/auth/AdminRefreshTokenServiceTest.java,refresh_unknownToken_requiresReauthentication,존재하지 않는 토큰으로 재발급하면 재로그인을 요구한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/feedback/AdminFeedbackQueryServiceTest.java,getFeedbacks_bannedAuthor_derivesBannedStatus,정지된 작성자의 피드백은 BANNED 상태로 내려준다,단위,@Test,,미이식
-admin,admin/service/feedback/AdminFeedbackQueryServiceTest.java,getFeedbacks_invalidPagination_throwsBusinessException,페이지 조건이 범위를 벗어나면 조회하지 않는다,단위,@ParameterizedTest,,미이식
-admin,admin/service/feedback/AdminFeedbackQueryServiceTest.java,getFeedbacks_withdrawnAuthor_derivesWithdrawnStatus,탈퇴한 작성자의 피드백은 WITHDRAWN 상태로 내려준다,단위,@Test,,미이식
-admin,admin/service/post/AdminPostCommandDeletionTest.java,deletePost_allowedStatus_softDeletesAndPreservesMediaAndCreatesAudit,허용된 검수 상태의 게시물을 삭제하면 미디어를 보존하고 soft delete와 감사 로그를 저장한다,통합(Spring+DB),@ParameterizedTest,,미이식
-admin,admin/service/post/AdminPostCommandDeletionTest.java,deletePost_alreadyDeletedPost_keepsFirstDeletionAndAudit,삭제 요청을 다시 보내도 최초 삭제 시각과 감사 로그를 유지한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostCommandDeletionTest.java,deletePost_approvedPost_deletesPostLikes,관리자가 승인 게시물을 삭제하면 연결된 좋아요도 제거한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostCommandDeletionTest.java,deletePost_approvedPost_excludesEveryUserReadModel,삭제된 게시물은 사용자 상세·캘린더·피드 조회에서 즉시 제외한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostCommandDeletionTest.java,deletePost_auditActorForeignKeyFailure_rollsBackEveryChange,감사 로그 관리자 외래키 저장이 실패하면 게시물과 사진 삭제도 롤백한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostCommandDeletionTest.java,deletePost_unknownPost_throwsNotFoundException,존재하지 않는 게시물은 삭제할 수 없다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostCommandDeletionTest.java,deletePost_validatingPost_throwsBusinessException,이미지 처리 중인 게시물은 기본 비즈니스 오류로 삭제를 거부한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_approvedRequest_createsNotification,게시물을 승인하면 검수 감사 기록과 연결된 알림함 항목을 저장한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_approvedRequest_updatesPostAndCreatesAuditLog,대기 중인 게시물을 승인하면 상태와 처리 시각 및 감사 로그를 원자적으로 저장한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_deletedPendingPost_throwsNotFoundException,삭제된 대기 게시물은 검수 대상에서 제외한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_duplicateEventKey_rejectsDuplicateNotification,같은 검수 사건의 알림함 항목은 DB 제약으로 중복 저장할 수 없다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_nonPendingPost_throwsResourceStateChangedException,대기 상태가 아닌 게시물은 현재 상태 재조회 오류로 검수를 거부한다,통합(Spring+DB),@ParameterizedTest,,미이식
-admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_rejectedRequest_createsNotificationWithReason,게시물을 반려하면 정규화된 사유를 알림함에 보관한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_rejectedRequest_updatesPostAndCreatesAuditLogWithReason,대기 중인 게시물을 거절하면 정규화한 사유와 처리자를 감사 로그에 저장한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_unknownPost_throwsNotFoundException,존재하지 않는 게시물은 검수할 수 없다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostModerationConcurrencyTest.java,moderate_auditActorForeignKeyFailure_rollsBackPostTransition,감사 로그 작업자 외래키 저장이 실패하면 게시물 검수 상태도 함께 롤백한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostModerationConcurrencyTest.java,moderate_concurrentApproveAndReject_decidesExactlyOnce,두 관리자가 동시에 승인과 거절을 요청하면 하나만 확정하고 감사 로그도 하나만 남긴다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostModerationDeletionConcurrencyTest.java,moderateAndDelete_concurrentSamePendingPost_deletesConsistently,같은 대기 게시물의 승인과 삭제가 겹쳐도 교착 없이 삭제 상태로 수렴한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostModerationLogTest.java,moderate_approve_logsApprovedWithWaitSeconds,관리자가 승인하면 approved 로그에 대기 시간을 초 단위로 남긴다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostModerationLogTest.java,moderate_reject_logsRejected,관리자가 반려하면 rejected 로그를 한 건 남긴다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostNotificationTransactionTest.java,moderate_rolledBackTransaction_removesNotificationAndAudit,검수 트랜잭션이 롤백되면 게시물 변경과 감사 로그 및 알림이 모두 사라진다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostQueryServiceTest.java,getPost_deletedRejectedPost_returnsAdminDetail,"삭제된 거절 게시물도 작성자와 주제, 사진 메타데이터를 포함해 상세 조회한다",통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostQueryServiceTest.java,getPost_unknownPost_throwsNotFoundException,존재하지 않는 관리자 게시물 상세를 조회하면 찾을 수 없음 예외를 발생시킨다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostQueryServiceTest.java,getPosts_allFilters_returnsMatchingPost,"상태와 주제, 날짜, 작성자, 등록 시각 조건에 맞는 게시물만 조회한다",통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostQueryServiceTest.java,getPosts_createdAtFromAfterCreatedAtTo_throwsBusinessException,등록 시각 시작이 종료보다 늦으면 잘못된 요청 예외를 발생시킨다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostQueryServiceTest.java,getPosts_pageOffsetOverflow_throwsBusinessException,페이지 오프셋이 정수 범위를 넘으면 잘못된 요청 예외를 발생시킨다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostQueryServiceTest.java,getPosts_validatingStatus_throwsBusinessException,내부 검증 중 상태는 관리자 게시물 조회 조건으로 요청할 수 없다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/post/AdminPostQueryServiceTest.java,getPosts_withoutFilters_returnsVisibleStatusesIncludingDeleted,필터가 없으면 내부 검증 중을 제외하고 삭제된 게시물도 최신순으로 조회한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/topic/AdminTopicCommandServiceTest.java,createTopic_adjacentPeriod_savesTopic,이전 종료와 다음 시작이 같은 시각이면 주제를 생성한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/topic/AdminTopicCommandServiceTest.java,createTopic_duplicateDate_throwsBusinessException,활성 주제와 날짜가 중복되면 생성하지 않는다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/topic/AdminTopicCommandServiceTest.java,createTopic_overlappingDeletedTopic_savesTopic,삭제된 주제의 기간은 새 주제를 막지 않는다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/topic/AdminTopicCommandServiceTest.java,createTopic_overlappingPeriod_throwsBusinessException,날짜가 달라도 참여 기간이 겹치면 주제를 생성하지 않는다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/topic/AdminTopicCommandServiceTest.java,createTopic_validRequest_savesTopicAndAuditLog,주제를 생성하면 관리자 감사 로그를 남긴다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/topic/AdminTopicCommandServiceTest.java,deleteTopic_beforeOpen_softDeletesAndAudits,공개 전 주제를 사유와 함께 삭제하면 목록에서 제외하고 감사 로그를 남긴다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/topic/AdminTopicCommandServiceTest.java,insertTopic_overlappingPeriod_violatesDatabaseConstraint,DB는 날짜가 다른 주제라도 참여 기간이 겹치면 저장하지 않는다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/topic/AdminTopicCommandServiceTest.java,updateTopic_beforeOpen_updatesAndAudits,공개 전 주제를 수정하면 변경 전후 감사 로그를 남긴다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/topic/AdminTopicCommandServiceTest.java,updateTopic_openTopicWithOverlappingPeriod_throwsStateChanged,참여 중인 주제는 변경 기간이 다른 주제와 겹쳐도 상태 오류를 먼저 반환한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/topic/AdminTopicCommandServiceTest.java,updateTopic_openTopic_throwsStateChanged,참여 중인 주제는 수정할 수 없다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/topic/AdminTopicCommandServiceTest.java,updateTopic_overlappingPeriod_throwsBusinessException,공개 전 주제의 종료 시각을 늘려 다른 주제와 겹치면 수정하지 않는다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/topic/AdminTopicConcurrencyTest.java,createTopic_auditActorForeignKeyFailure_rollsBackTopic,감사 로그 관리자 외래키 저장이 실패하면 주제 생성도 롤백한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/topic/AdminTopicConcurrencyTest.java,createTopic_sameDateConcurrently_createsExactlyOnce,같은 날짜의 주제를 동시에 생성하면 하나만 저장하고 감사 로그도 하나만 남긴다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/topic/AdminTopicQueryServiceTest.java,getTopic_deletedTopic_throwsNotFoundException,삭제된 주제 상세은 찾을 수 없음으로 응답한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/topic/AdminTopicQueryServiceTest.java,getTopic_existingPosts_returnsModerationCounts,주제 상세은 게시물 검수 상태별 통계를 함께 반환한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/topic/AdminTopicQueryServiceTest.java,getTopic_phaseBoundaries_derivesFromClock,phase 경계에서 시작 시각은 OPEN이고 종료 시각은 CLOSED다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/topic/AdminTopicQueryServiceTest.java,getTopics_offsetExceedsIntegerRange_throwsBusinessException,페이지 offset이 정수 범위를 넘으면 잘못된 조회 조건으로 거절한다,통합(Spring+DB),@ParameterizedTest,,미이식
-admin,admin/service/topic/AdminTopicQueryServiceTest.java,getTopics_offsetWithinIntegerRange_returnsEmptyPage,허용되는 최대 페이지와 그 직전 페이지는 빈 목록을 반환한다,통합(Spring+DB),@ParameterizedTest,,미이식
-admin,admin/service/topic/AdminTopicQueryServiceTest.java,getTopics_phaseAndDateFilters_returnsMatchingActiveTopics,관리자 목록은 삭제 주제를 제외하고 Clock 기준 phase와 날짜 필터를 적용한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/user/AdminUserQueryServiceTest.java,getUser_activeUser_returnsSignatureImageUrls,활성 사용자 상세에 사인 이미지 URL을 조립한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/user/AdminUserQueryServiceTest.java,getUser_unknownUser_throwsNotFoundException,존재하지 않는 사용자 상세는 404 예외를 발생시킨다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/user/AdminUserQueryServiceTest.java,getUser_withdrawnUser_hidesRemovedSignature,탈퇴 사용자 상세에서 제거된 사인 저장 키를 URL로 노출하지 않는다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/user/AdminUserQueryServiceTest.java,getUsers_pageOffsetOverflow_throwsBusinessException,페이지 오프셋이 정수 범위를 넘으면 잘못된 요청이다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/user/AdminUserQueryServiceTest.java,getUsers_withdrawnFilter_returnsDerivedStatus,탈퇴 필터로 파생 WITHDRAWN 상태 사용자를 조회한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/user/AdminUserStatusConcurrencyTest.java,updateStatus_auditActorForeignKeyFailure_rollsBackUserTransition,감사 로그의 관리자 외래키 저장이 실패하면 사용자 차단도 롤백한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/user/AdminUserStatusConcurrencyTest.java,updateStatus_concurrentBan_changesExactlyOnce,동시에 같은 사용자를 차단하면 한 요청만 성공하고 감사 로그도 하나만 남긴다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/user/AdminUserStatusServiceTest.java,updateStatus_activeUserWithoutSocialAccount_updatesStatusAndAuditLog,소셜 계정이 없는 활성 사용자도 관리자가 차단하면 상태와 감사 로그를 저장한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/user/AdminUserStatusServiceTest.java,updateStatus_bannedUserWithoutSocialAccount_updatesStatusAndAuditLog,소셜 계정이 없는 차단 사용자도 관리자가 차단 해제하면 상태와 감사 로그를 갱신한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/user/AdminUserStatusServiceTest.java,updateStatus_blankReason_throwsBusinessException,상태 변경 사유가 비어 있으면 사용자를 변경하지 않는다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/user/AdminUserStatusServiceTest.java,updateStatus_sameStatus_throwsStateChanged,이미 같은 상태인 사용자는 상태를 다시 변경하지 않는다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/user/AdminUserStatusServiceTest.java,updateStatus_unknownUser_throwsNotFoundException,존재하지 않는 사용자의 상태 변경은 404로 거절한다,통합(Spring+DB),@Test,,미이식
-admin,admin/service/user/AdminUserStatusServiceTest.java,updateStatus_withdrawnUser_throwsBusinessException,탈퇴 사용자의 상태는 변경하지 않는다,통합(Spring+DB),@Test,,미이식
+admin,admin/api/support/AdminArgumentResolverFailClosedWebMvcTest.java,request_withoutAdminActorResolver_returnsForbidden,작업자 전략이 누락되어도 요청 값으로 관리자 ID를 위조하지 못한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::인증_주체가_없으면_요청_값으로_관리자를_꾸밀_수_없다,이식
+admin,admin/api/support/AdminCorsProdProfileTest.java,preflight_configuredProductionOrigin_allowsAdminRequest,운영 프로필에서도 설정한 관리자 웹 Origin의 사전 요청만 허용한다,웹 슬라이스,@Test,crates/server/src/web/cors.rs::허용_origin의_사전_요청은_허용_목록으로_답한다,이식
+admin,admin/api/support/AdminCorsProdProfileTest.java,request_unconfiguredProductionOrigin_rejectsAdminRequest,운영 프로필에서 등록하지 않은 Origin은 차단한다,웹 슬라이스,@Test,crates/server/src/web/cors.rs::허용하지_않는_origin은_403이다,이식
+admin,admin/api/support/AdminCorsPropertiesTest.java,create_withBlankOrigin_throwsException,빈 관리자 웹 Origin을 거부한다,단위,@Test,crates/server/src/settings.rs::cors_origin은_앞뒤_공백을_떼고_빈_값과_누락은_거절한다,이식
+admin,admin/api/support/AdminCorsPropertiesTest.java,create_withEmptyOrigins_throwsException,관리자 웹 Origin 목록이 비어 있으면 거부한다,단위,@Test,crates/server/src/settings.rs::cors_origin은_앞뒤_공백을_떼고_빈_값과_누락은_거절한다,이식
+admin,admin/api/support/AdminCorsPropertiesTest.java,create_withSurroundingWhitespace_trimsOrigin,관리자 웹 Origin 앞뒤 공백을 제거한다,단위,@Test,crates/server/src/settings.rs::cors_origin은_앞뒤_공백을_떼고_빈_값과_누락은_거절한다,이식
+admin,admin/api/support/AdminCorsPropertiesTest.java,create_withWildcardOrigin_throwsException,와일드카드 관리자 웹 Origin을 거부한다,단위,@Test,crates/server/src/settings.rs::cors_origin에_와일드카드가_있으면_거절한다,이식
+admin,admin/api/support/AdminWebMvcConfigTest.java,getAdminEndpoint_withoutAuthentication_injectsDevelopmentAdmin,등록한 CurrentAdmin Resolver로 개발 관리자를 Controller에 주입한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::개발_우회에서는_저장된_dev_admin을_작업자로_쓰고_헤더를_무시한다,이식
+admin,admin/api/support/AdminWebMvcConfigTest.java,preflight_configuredOrigin_allowsAdminRequest,설정한 관리자 웹 Origin의 사전 요청을 허용한다,웹 슬라이스,@Test,crates/server/src/web/cors.rs::허용_origin의_사전_요청은_허용_목록으로_답한다,이식
+admin,admin/api/support/AdminWebMvcConfigTest.java,preflight_unconfiguredOrigin_rejectsAdminRequest,설정하지 않은 Origin의 관리자 API 사전 요청을 차단한다,웹 슬라이스,@Test,crates/server/src/web/cors.rs::허용하지_않는_origin은_403이다,이식
+admin,admin/api/support/AdminWebMvcConfigTest.java,request_configuredOrigin_allowsAdminRequest,설정한 관리자 웹 Origin의 실제 요청에 허용 응답 헤더와 요청 식별자 노출 헤더를 제공한다,웹 슬라이스,@Test,crates/server/src/web/cors.rs::실제_요청은_안쪽_응답에_cors_헤더를_붙인다,이식
+admin,admin/api/support/AdminWebMvcConfigTest.java,request_unconfiguredOrigin_rejectsBeforeResolvingAdmin,설정하지 않은 Origin의 실제 관리자 API 요청을 작업자 조회 전에 차단한다,웹 슬라이스,@Test,crates/server/src/web/cors.rs::허용_밖_origin의_실제_요청도_403이다,이식
+admin,admin/api/support/CurrentAdminArgumentResolverTest.java,resolveArgument_withForgedAdminHeader_ignoresHeader,가짜 관리자 ID 헤더를 보내도 개발 관리자의 ID를 전달한다,단위,@Test,crates/app/src/admin/endpoint_tests.rs::개발_우회에서는_저장된_dev_admin을_작업자로_쓰고_헤더를_무시한다,이식
+admin,admin/api/support/CurrentAdminArgumentResolverTest.java,resolveArgument_withoutAdminHeader_injectsDevelopmentAdmin,관리자 ID 헤더 없이 현재 개발 관리자를 Controller에 전달한다,단위,@Test,crates/app/src/admin/endpoint_tests.rs::개발_우회에서는_저장된_dev_admin을_작업자로_쓰고_헤더를_무시한다,이식
+admin,admin/api/v1/controller/AdminAuditLogControllerTest.java,getAuditLogs_allFilters_returnsAuditHistory,,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::감사_로그_목록은_필터를_받고_잘못된_조건은_400이다,이식
+admin,admin/api/v1/controller/AdminAuditLogControllerTest.java,getAuditLogs_invalidPage_returnsBadRequest,,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::감사_로그_목록은_필터를_받고_잘못된_조건은_400이다,이식
+admin,admin/api/v1/controller/AdminAuditLogControllerTest.java,getAuditLogs_unknownEnum_returnsBadRequest,,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::감사_로그_목록은_필터를_받고_잘못된_조건은_400이다,이식
+admin,admin/api/v1/controller/AdminAuditLogControllerTest.java,getAuditLogs_withoutFilters_usesDefaults,,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::감사_로그_목록은_필터를_받고_잘못된_조건은_400이다,이식
+admin,admin/api/v1/controller/AdminAuditRequestIdTest.java,updateStatus_adminRequest_savesResponseRequestIdInAuditLog,관리자 API 요청이 남긴 감사 로그의 requestId는 응답의 X-Request-Id와 같다,통합(Spring+DB),@Test,crates/app/src/admin/endpoint_tests.rs::감사_로그에는_현재_요청의_요청_id가_남는다,이식
+admin,admin/api/v1/controller/AdminAuthControllerTest.java,getCurrentAdmin_authenticatedAdmin_returnsCurrentAdmin,인증된 관리자는 자신의 식별자와 아이디를 조회한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::인증된_관리자는_자신의_정보를_조회한다,이식
+admin,admin/api/v1/controller/AdminAuthControllerTest.java,login_blankUsername_returnsBadRequest,관리자 로그인 아이디가 비어 있으면 400을 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::로그인은_토큰을_함께_주고_검증_오류는_400이다,이식
+admin,admin/api/v1/controller/AdminAuthControllerTest.java,login_validRequest_returnsAccessTokenAndRefreshToken,관리자 로그인에 성공하면 액세스 토큰과 리프레시 토큰을 함께 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::로그인은_토큰을_함께_주고_검증_오류는_400이다,이식
+admin,admin/api/v1/controller/AdminAuthControllerTest.java,logout_blankRefreshToken_returnsBadRequest,로그아웃 요청의 리프레시 토큰이 비어 있으면 400을 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::로그아웃은_액세스_토큰_없이_204이고_빈_토큰은_400이다,이식
+admin,admin/api/v1/controller/AdminAuthControllerTest.java,logout_refreshToken_revokesLineageWithoutAccessToken,액세스 토큰 없이 리프레시 토큰만으로 로그아웃하면 그 기기의 계보를 폐기한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::로그아웃은_액세스_토큰_없이_204이고_빈_토큰은_400이다,이식
+admin,admin/api/v1/controller/AdminAuthControllerTest.java,refresh_blankRefreshToken_returnsBadRequest,재발급 요청의 리프레시 토큰이 비어 있으면 400을 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::재발급은_회전하고_쓸_수_없는_토큰은_재로그인을_알린다,이식
+admin,admin/api/v1/controller/AdminAuthControllerTest.java,refresh_unusableRefreshToken_returnsReauthenticationRequired,쓸 수 없는 리프레시 토큰으로 재발급하면 재로그인 필요를 알린다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::재발급은_회전하고_쓸_수_없는_토큰은_재로그인을_알린다,이식
+admin,admin/api/v1/controller/AdminAuthControllerTest.java,refresh_validRefreshToken_returnsRotatedTokens,리프레시 토큰으로 재발급하면 새 액세스 토큰과 회전된 리프레시 토큰을 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::재발급은_회전하고_쓸_수_없는_토큰은_재로그인을_알린다,이식
+admin,admin/api/v1/controller/AdminFeedbackControllerTest.java,getFeedbacks_invalidSort_returnsBadRequest,정렬 조건이 올바르지 않으면 400을 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::피드백_목록은_기본값과_정렬_오류를_다룬다,이식
+admin,admin/api/v1/controller/AdminFeedbackControllerTest.java,getFeedbacks_pageSizeOverMax_returnsBadRequest,페이지당 피드백 수가 100을 넘으면 400을 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::피드백_목록은_기본값과_정렬_오류를_다룬다,이식
+admin,admin/api/v1/controller/AdminFeedbackControllerTest.java,getFeedbacks_withParameters_passesThemToService,오래된 순 정렬과 페이지 조건을 전달한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::피드백_목록은_기본값과_정렬_오류를_다룬다,이식
+admin,admin/api/v1/controller/AdminFeedbackControllerTest.java,getFeedbacks_withoutParameters_usesDefaults,조회 조건을 생략하면 최신순 첫 페이지를 조회한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::피드백_목록은_기본값과_정렬_오류를_다룬다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_alreadyDeletedPost_delegatesIdempotentlyAndReturnsNoContent,이미 삭제된 게시물도 삭제 서비스에 위임해 멱등하게 204를 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::삭제는_멱등하게_204이고_검증_중이면_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_emptyBody_returnsBadRequest,삭제 요청 본문이 비어 있으면 400을 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::삭제는_멱등하게_204이고_검증_중이면_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_invalidPostId_returnsBadRequest,삭제할 게시물 ID 형식이 올바르지 않으면 400을 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::삭제는_멱등하게_204이고_검증_중이면_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_missingOrBlankReason_returnsBadRequest,삭제 사유가 누락되거나 비어 있으면 400을 반환한다,웹 슬라이스,@ParameterizedTest,crates/app/src/admin/endpoint_tests.rs::삭제는_멱등하게_204이고_검증_중이면_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_reasonAtMaximum_returnsNoContent,삭제 사유 입력 원문이 500자이면 허용한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::삭제는_멱등하게_204이고_검증_중이면_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_reasonOverMaximum_returnsBadRequest,삭제 사유 입력 원문이 500자를 초과하면 400을 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::삭제는_멱등하게_204이고_검증_중이면_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_unknownPost_returnsNotFound,삭제할 게시물을 찾을 수 없으면 404를 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::삭제는_멱등하게_204이고_검증_중이면_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_validReason_returnsNoContent,관리자는 사유와 함께 게시물을 삭제하고 204를 반환받는다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::삭제는_멱등하게_204이고_검증_중이면_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,deletePost_validatingPost_returnsBusinessError,이미지 처리 중인 게시물을 삭제하면 기본 비즈니스 오류 400을 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::삭제는_멱등하게_204이고_검증_중이면_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,getPost_existingPost_returnsPostDetail,관리자는 삭제된 게시물을 포함한 게시물 상세 정보를 조회한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::게시물_상세는_없으면_404이고_형식이_틀리면_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,getPost_invalidPostId_returnsBadRequest,관리자 게시물 ID 형식이 올바르지 않으면 400을 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::게시물_상세는_없으면_404이고_형식이_틀리면_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,getPost_unknownPost_returnsNotFound,관리자 게시물 상세 조회 대상이 없으면 404를 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::게시물_상세는_없으면_404이고_형식이_틀리면_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,getPost_withoutModeratedOrDeletedAt_returnsNullTimes,처리 시각이 없는 게시물 상세 정보는 null로 직렬화한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::게시물_상세는_없으면_404이고_형식이_틀리면_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,getPosts_invalidFilterFormat_returnsBadRequest,관리자 게시물 필터 형식이 잘못되면 400을 반환한다,웹 슬라이스,@ParameterizedTest,crates/app/src/admin/endpoint_tests.rs::게시물_목록은_기본_조건으로_읽고_잘못된_조건은_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,getPosts_invalidPagination_returnsBadRequest,관리자 게시물 페이지 조건이 범위를 벗어나면 400을 반환한다,웹 슬라이스,@ParameterizedTest,crates/app/src/admin/endpoint_tests.rs::게시물_목록은_기본_조건으로_읽고_잘못된_조건은_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,getPosts_pageSizeBoundary_returnsOk,관리자 게시물 페이지 크기의 양쪽 경계값을 허용한다,웹 슬라이스,@ParameterizedTest,crates/app/src/admin/endpoint_tests.rs::게시물_목록은_기본_조건으로_읽고_잘못된_조건은_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,getPosts_validatingStatus_returnsBadRequest,내부 검증 중 상태로 관리자 게시물 목록을 요청하면 400을 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::게시물_목록은_기본_조건으로_읽고_잘못된_조건은_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,getPosts_withAllFilters_passesQueryParameters,관리자 게시물 목록의 모든 필터와 정렬 및 페이지 조건을 서비스에 전달한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::게시물_목록은_기본_조건으로_읽고_잘못된_조건은_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,getPosts_withoutFilters_returnsDefaultPage,관리자는 기본 조건으로 전체 게시물 목록을 조회한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::게시물_목록은_기본_조건으로_읽고_잘못된_조건은_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_approvedRequest_returnsModerationResult,관리자는 대기 중인 게시물을 승인하고 처리 결과를 조회한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::검수는_승인과_거절을_처리하고_잘못된_요청은_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_approvedWithReason_returnsBadRequest,승인 요청에 거절 사유가 포함되면 400을 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::검수는_승인과_거절을_처리하고_잘못된_요청은_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_emptyBody_returnsBadRequest,검수 요청 본문이 비어 있으면 400을 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::검수는_승인과_거절을_처리하고_잘못된_요청은_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_invalidPostId_returnsBadRequest,검수할 게시물 ID 형식이 올바르지 않으면 400을 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::검수는_승인과_거절을_처리하고_잘못된_요청은_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_invalidStatus_returnsBadRequest,검수 상태가 누락되거나 올바르지 않으면 400을 반환한다,웹 슬라이스,@ParameterizedTest,crates/app/src/admin/endpoint_tests.rs::검수는_승인과_거절을_처리하고_잘못된_요청은_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_nonDecisionStatus_returnsBadRequest,승인과 거절이 아닌 검수 상태를 요청하면 400을 반환한다,웹 슬라이스,@ParameterizedTest,crates/app/src/admin/endpoint_tests.rs::검수는_승인과_거절을_처리하고_잘못된_요청은_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_nonPendingPost_returnsResourceStateChangedError,대기 상태가 아닌 게시물의 검수 요청은 현재 상태 재조회 오류를 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::검수는_승인과_거절을_처리하고_잘못된_요청은_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_rejectedRequest_returnsModerationResult,관리자는 대기 중인 게시물을 사유와 함께 거절하고 처리 결과를 조회한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::검수는_승인과_거절을_처리하고_잘못된_요청은_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_rejectedWithoutReason_returnsBadRequest,거절 사유가 누락되거나 비어 있으면 400을 반환한다,웹 슬라이스,@ParameterizedTest,crates/app/src/admin/endpoint_tests.rs::검수는_승인과_거절을_처리하고_잘못된_요청은_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_rejectionReasonAtMaximum_returnsModerationResult,거절 사유가 최대 길이인 500자이면 요청을 허용한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::검수는_승인과_거절을_처리하고_잘못된_요청은_400이다,이식
+admin,admin/api/v1/controller/AdminPostControllerTest.java,moderatePost_rejectionReasonOverMaximum_returnsBadRequest,거절 사유가 500자를 초과하면 400을 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::검수는_승인과_거절을_처리하고_잘못된_요청은_400이다,이식
+admin,admin/api/v1/controller/AdminTopicControllerTest.java,createTopic_validRequest_returnsCreatedTopic,관리자는 새 주제를 등록한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::주제는_등록_조회_수정_삭제를_거친다,이식
+admin,admin/api/v1/controller/AdminTopicControllerTest.java,deleteTopic_validReason_returnsNoContent,관리자는 사유와 함께 공개 전 주제를 삭제한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::주제는_등록_조회_수정_삭제를_거친다,이식
+admin,admin/api/v1/controller/AdminTopicControllerTest.java,getTopic_existingTopic_returnsDetail,관리자는 주제 상세를 조회한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::주제는_등록_조회_수정_삭제를_거친다,이식
+admin,admin/api/v1/controller/AdminTopicControllerTest.java,getTopics_withFilters_returnsTopicPage,관리자는 phase와 날짜·정렬·페이지 조건으로 주제 목록을 조회한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::주제는_등록_조회_수정_삭제를_거친다,이식
+admin,admin/api/v1/controller/AdminTopicControllerTest.java,mutateTopic_blankRequiredValue_returnsBadRequest,빈 제목 또는 삭제 사유는 400으로 거절한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::주제는_등록_조회_수정_삭제를_거친다,이식
+admin,admin/api/v1/controller/AdminTopicControllerTest.java,updateTopic_validRequest_returnsUpdatedTopic,관리자는 공개 전 주제를 수정한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::주제는_등록_조회_수정_삭제를_거친다,이식
+admin,admin/api/v1/controller/AdminTopicPaginationTest.java,getTopics_offsetOverflow_returnsBusinessError,조회 범위를 넘는 페이지는 서버 오류 대신 기존 형식의 400 오류를 반환한다,통합(Spring+DB),@ParameterizedTest,crates/app/src/admin/endpoint_tests.rs::주제는_등록_조회_수정_삭제를_거친다,이식
+admin,admin/api/v1/controller/AdminTopicPaginationTest.java,getTopics_validPage_returnsExistingPageContract,일반 페이지와 조회 가능한 마지막 페이지까지 기존 응답 형식을 유지한다,통합(Spring+DB),@ParameterizedTest,crates/app/src/admin/db_tests.rs::허용되는_마지막_페이지는_빈_목록이고_그_다음은_거절한다,이식
+admin,admin/api/v1/controller/AdminUserControllerTest.java,getUser_unknownUser_returnsNotFound,존재하지 않는 관리자 사용자 상세는 404를 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::사용자_상세는_없으면_404이고_상태_변경은_차단_결과를_준다,이식
+admin,admin/api/v1/controller/AdminUserControllerTest.java,getUser_withdrawnUser_returnsDetailWithoutSignatureUrls,관리자는 탈퇴 사용자의 비식별 상세를 조회한다,웹 슬라이스,@Test,crates/app/src/admin/user/service.rs::상세는_탈퇴한_회원의_서명을_숨긴다,이식
+admin,admin/api/v1/controller/AdminUserControllerTest.java,getUsers_invalidQuery_returnsBadRequest,관리자 사용자 조회 조건이 잘못되면 400을 반환한다,웹 슬라이스,@ParameterizedTest,crates/app/src/admin/endpoint_tests.rs::사용자_목록은_상태를_생략하면_활성_사용자를_준다,이식
+admin,admin/api/v1/controller/AdminUserControllerTest.java,getUsers_withFilters_passesQueryParameters,관리자 사용자 필터와 정렬·페이지 조건을 서비스에 전달한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::사용자_목록은_상태를_생략하면_활성_사용자를_준다,이식
+admin,admin/api/v1/controller/AdminUserControllerTest.java,getUsers_withoutStatus_returnsActiveUsersByDefault,관리자는 상태를 생략하면 활성 사용자 목록을 조회한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::사용자_목록은_상태를_생략하면_활성_사용자를_준다,이식
+admin,admin/api/v1/controller/AdminUserControllerTest.java,updateStatus_banned_returnsUpdatedStatus,관리자는 사유를 남겨 사용자를 차단한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::사용자_상세는_없으면_404이고_상태_변경은_차단_결과를_준다,이식
+admin,admin/api/v1/controller/AdminUserControllerTest.java,updateStatus_blankReason_returnsBadRequest,상태 변경 사유가 비어 있으면 400을 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::사용자_상세는_없으면_404이고_상태_변경은_차단_결과를_준다,이식
+admin,admin/api/v1/controller/AdminUserControllerTest.java,updateStatus_sameStatus_returnsStateChanged,이미 같은 상태인 사용자 변경 요청은 상태 충돌 코드와 400을 반환한다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::사용자_상세는_없으면_404이고_상태_변경은_차단_결과를_준다,이식
+admin,admin/api/v1/controller/AdminUserControllerTest.java,updateStatus_withdrawnRequest_returnsBadRequest,탈퇴 상태는 관리자 변경 요청 값으로 사용할 수 없다,웹 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::사용자_상세는_없으면_404이고_상태_변경은_차단_결과를_준다,이식
+admin,admin/api/v1/docs/AdminAuditLogOpenApiTest.java,adminApiDocs_exposesReadOnlyAuditLogContract,,통합(Spring+DB),@Test,"제외: springdoc OpenAPI 문서 생성은 이식 범위 밖이다(Rust 서버는 /v3/api-docs를 제공하지 않고, 엔드포인트 계약은 harness 골든이 고정한다)",제외
+admin,admin/api/v1/docs/AdminAuthOpenApiTest.java,adminApiDocs_documentsRefreshFailureAndKeepsLogoutIdempotent,"관리자 재발급 문서는 재로그인 필요 401을, 로그아웃 문서는 인증 실패 응답을 두지 않는다",통합(Spring+DB),@Test,"제외: springdoc OpenAPI 문서 생성은 이식 범위 밖이다(Rust 서버는 /v3/api-docs를 제공하지 않고, 엔드포인트 계약은 harness 골든이 고정한다)",제외
+admin,admin/api/v1/docs/AdminAuthOpenApiTest.java,adminApiDocs_exposesAdminSecurityAndRefreshTokenExceptions,관리자 문서는 리프레시 토큰 경로만 공개하고 나머지 관리자 API에 관리자 Bearer 인증을 요구한다,통합(Spring+DB),@Test,"제외: springdoc OpenAPI 문서 생성은 이식 범위 밖이다(Rust 서버는 /v3/api-docs를 제공하지 않고, 엔드포인트 계약은 harness 골든이 고정한다)",제외
+admin,admin/api/v1/docs/AdminFeedbackOpenApiTest.java,adminApiDocs_exposesReadOnlyFeedbackContract,admin-api 문서는 조회 전용 피드백 계약을 제공한다,통합(Spring+DB),@Test,"제외: springdoc OpenAPI 문서 생성은 이식 범위 밖이다(Rust 서버는 /v3/api-docs를 제공하지 않고, 엔드포인트 계약은 harness 골든이 고정한다)",제외
+admin,admin/api/v1/docs/AdminFeedbackOpenApiTest.java,userApiDocs_hidesAdminFeedbackPath,user-api 문서는 관리자 피드백 경로를 노출하지 않는다,통합(Spring+DB),@Test,"제외: springdoc OpenAPI 문서 생성은 이식 범위 밖이다(Rust 서버는 /v3/api-docs를 제공하지 않고, 엔드포인트 계약은 harness 골든이 고정한다)",제외
+admin,admin/api/v1/docs/AdminPostOpenApiTest.java,adminApiDocs_adminPostEndpoints_exposeDistinctListAndDetailSchemas,admin-api 문서는 관리자 게시물 목록과 상세 계약을 서로 다른 스키마로 제공한다,통합(Spring+DB),@Test,"제외: springdoc OpenAPI 문서 생성은 이식 범위 밖이다(Rust 서버는 /v3/api-docs를 제공하지 않고, 엔드포인트 계약은 harness 골든이 고정한다)",제외
+admin,admin/api/v1/docs/AdminTopicOpenApiTest.java,adminApiDocs_adminTopicEndpoints_exposeLifecycleContract,admin-api 문서에 주제 CRUD와 필터 계약을 노출하고 user-api에서는 제외한다,통합(Spring+DB),@Test,"제외: springdoc OpenAPI 문서 생성은 이식 범위 밖이다(Rust 서버는 /v3/api-docs를 제공하지 않고, 엔드포인트 계약은 harness 골든이 고정한다)",제외
+admin,admin/api/v1/docs/AdminUserOpenApiTest.java,adminApiDocs_adminUserEndpoints_exposeQueryAndDetailContracts,admin-api 문서에 관리자 사용자 목록·상세 계약만 노출한다,통합(Spring+DB),@Test,"제외: springdoc OpenAPI 문서 생성은 이식 범위 밖이다(Rust 서버는 /v3/api-docs를 제공하지 않고, 엔드포인트 계약은 harness 골든이 고정한다)",제외
+admin,admin/domain/AdminAuditLogTest.java,create_approvedActionWithRejectedTransition_throwsBusinessException,승인 작업에 거절 상태 전이를 기록할 수 없다,단위,@Test,crates/app/src/admin/audit/domain.rs::create_승인_작업에_거절_상태_전이를_기록할_수_없다,이식
+admin,admin/domain/AdminAuditLogTest.java,create_approvedActionWithoutModerationMetadata_throwsBusinessException,승인 작업에는 검수 시각과 작업자가 모두 필요하다,단위,@Test,crates/app/src/admin/audit/domain.rs::create_승인_작업에는_검수_시각과_작업자가_모두_필요하다,이식
+admin,admin/domain/AdminAuditLogTest.java,create_benignReason_createsAuditLog,민감값이 없는 일반 문장과 문서 URL은 사유로 저장한다,단위,@Test,crates/app/src/admin/audit/sensitive.rs::일반_문장과_문서_url은_통과한다,이식
+admin,admin/domain/AdminAuditLogTest.java,create_blankReason_normalizesToNull,선택 사유가 비어 있으면 null로 정규화한다,단위,@Test,crates/app/src/admin/audit/domain.rs::create_선택_사유가_비어_있으면_null로_정규화한다,이식
+admin,admin/domain/AdminAuditLogTest.java,create_maxLengthReason_createsAuditLog,사유는 코드 포인트 기준 500자까지 저장한다,단위,@Test,crates/app/src/admin/audit/domain.rs::create_사유는_코드_포인트_500자까지,이식
+admin,admin/domain/AdminAuditLogTest.java,create_mismatchedActionAndTarget_throwsBusinessException,,단위,@Test,crates/app/src/admin/audit/domain.rs::create_대상_종류가_작업과_다르면_거절한다,이식
+admin,admin/domain/AdminAuditLogTest.java,create_mismatchedModerator_throwsBusinessException,검수 작업자는 감사 로그 작업자와 같아야 한다,단위,@Test,crates/app/src/admin/audit/domain.rs::create_검수_작업자는_감사_로그_작업자와_같아야_한다,이식
+admin,admin/domain/AdminAuditLogTest.java,create_missingRequiredIdentifier_throwsBusinessException,필수 식별자가 없으면 감사 로그를 생성할 수 없다,단위,@Test,제외: 필수 식별자가 Option이 아닌 Uuid 필드라 누락 상태를 만들 수 없다(컴파일러가 강제),제외
+admin,admin/domain/AdminAuditLogTest.java,create_partialTopicUpdate_throwsBusinessException,주제 수정 작업에는 수정 전후의 전체 업무 상태가 필요하다,단위,@Test,crates/app/src/admin/audit/domain.rs::create_주제_수정에는_수정_전후의_전체_업무_상태가_필요하다,이식
+admin,admin/domain/AdminAuditLogTest.java,create_reasonContainingSensitiveValue_throwsBusinessException,,단위,@ParameterizedTest,crates/app/src/admin/audit/domain.rs::create_사유에_민감정보_값이_있으면_거절한다,이식
+admin,admin/domain/AdminAuditLogTest.java,create_rejectionWithoutReason_throwsBusinessException,거절 작업에 사유가 없으면 감사 로그를 생성할 수 없다,단위,@Test,crates/app/src/admin/audit/domain.rs::create_거절_작업에_사유가_없으면_거절한다,이식
+admin,admin/domain/AdminAuditLogTest.java,create_stateContainingBinaryValue_throwsBusinessException,바이너리 객체는 감사 로그 상태에 저장할 수 없다,단위,@Test,제외: 상태 값이 serde_json::Value뿐이라 바이너리 값이 표현되지 않는다(snapshot_중첩_객체나_목록은_저장할_수_없다가 비스칼라를 막는다),제외
+admin,admin/domain/AdminAuditLogTest.java,create_stateContainingCredential_throwsBusinessException,,단위,@Test,crates/app/src/admin/audit/domain.rs::create_상태에_비밀번호나_토큰_키가_있으면_거절한다,이식
+admin,admin/domain/AdminAuditLogTest.java,create_stateContainingImageReference_throwsBusinessException,,단위,@Test,crates/app/src/admin/audit/domain.rs::create_이미지_url이나_스토리지_키가_있으면_거절한다,이식
+admin,admin/domain/AdminAuditLogTest.java,create_stateFieldOutsideActionAllowlist_throwsBusinessException,,단위,@Test,crates/app/src/admin/audit/domain.rs::create_허용_목록_밖의_필드는_거절한다,이식
+admin,admin/domain/AdminAuditLogTest.java,create_tooLongReason_throwsBusinessException,사유가 500자를 초과하면 감사 로그를 생성할 수 없다,단위,@Test,crates/app/src/admin/audit/domain.rs::create_사유는_코드_포인트_500자까지,이식
+admin,admin/domain/AdminAuditLogTest.java,create_userBanWithoutTransition_throwsBusinessException,회원 정지 작업에 같은 상태를 기록할 수 없다,단위,@Test,crates/app/src/admin/audit/domain.rs::create_회원_정지_작업에_같은_상태를_기록할_수_없다,이식
+admin,admin/domain/AdminAuditLogTest.java,create_validActionStateChange_createsAuditLog,작업별 올바른 상태 전이를 감사 로그로 생성한다,단위,@ParameterizedTest,crates/app/src/admin/audit/domain.rs::create_작업별_올바른_상태_전이를_감사_로그로_만든다,이식
+admin,admin/domain/AdminAuditLogTest.java,create_validAuditInformation_createsAuditLog,,단위,@Test,crates/app/src/admin/audit/domain.rs::create_올바른_정보로_감사_로그를_만들고_사유를_다듬는다,이식
+admin,admin/domain/AdminAuditLogTest.java,create_withoutChangedState_throwsBusinessException,,단위,@Test,crates/app/src/admin/audit/domain.rs::create_변경된_상태가_없으면_거절한다,이식
+admin,admin/domain/AdminAuditSnapshotTest.java,from_benignStringValue_createsSnapshot,민감값이 없는 일반 문장과 문서 URL은 상태 값으로 저장한다,단위,@Test,crates/app/src/admin/audit/domain.rs::snapshot_일반_문장과_문서_url은_저장한다,이식
+admin,admin/domain/AdminAuditSnapshotTest.java,from_immutableNumber_createsSnapshot,불변 숫자 값은 감사 로그 상태로 저장한다,단위,@Test,crates/app/src/admin/audit/domain.rs::snapshot_숫자는_저장한다,이식
+admin,admin/domain/AdminAuditSnapshotTest.java,from_maxLengthString_createsSnapshot,문자열 상태 값은 코드 포인트 기준 2000자까지 허용한다,단위,@Test,crates/app/src/admin/audit/domain.rs::snapshot_문자열은_코드_포인트_2000자까지,이식
+admin,admin/domain/AdminAuditSnapshotTest.java,from_mutableNumber_throwsBusinessException,생성 뒤 값이 바뀔 수 있는 숫자 객체는 저장할 수 없다,단위,@Test,제외: 숫자는 불변 값 타입(serde_json::Number)이라 생성 뒤 바뀌는 객체가 없다,제외
+admin,admin/domain/AdminAuditSnapshotTest.java,from_nestedValue_throwsBusinessException,중첩 객체나 목록은 감사 로그 상태에 저장할 수 없다,단위,@Test,crates/app/src/admin/audit/domain.rs::snapshot_중첩_객체나_목록은_저장할_수_없다,이식
+admin,admin/domain/AdminAuditSnapshotTest.java,from_obfuscatedSensitiveKey_throwsBusinessException,대소문자와 구분자 형태가 달라도 민감 키를 차단한다,단위,@Test,crates/app/src/admin/audit/domain.rs::snapshot_민감_키는_대소문자와_구분자가_달라도_막는다,이식
+admin,admin/domain/AdminAuditSnapshotTest.java,from_safeScalarValues_createsImmutableSnapshot,,단위,@Test,crates/app/src/admin/audit/domain.rs::snapshot_숫자는_저장한다,이식
+admin,admin/domain/AdminAuditSnapshotTest.java,from_sensitiveStringValue_throwsBusinessException,허용 필드의 문자열 값에 숨긴 민감정보도 차단한다,단위,@ParameterizedTest,crates/app/src/admin/audit/domain.rs::snapshot_허용_필드의_문자열에_숨긴_민감정보도_막는다,이식
+admin,admin/domain/AdminAuditSnapshotTest.java,from_tooDeepState_throwsBusinessException,과도하게 중첩된 상태는 감사 로그에 저장할 수 없다,단위,@Test,crates/app/src/admin/audit/domain.rs::snapshot_과도하게_중첩된_상태는_저장할_수_없다,이식
+admin,admin/domain/AdminAuditSnapshotTest.java,from_tooLongString_throwsBusinessException,문자열 상태 값이 2000자를 초과하면 저장할 수 없다,단위,@Test,crates/app/src/admin/audit/domain.rs::snapshot_문자열은_코드_포인트_2000자까지,이식
+admin,admin/domain/AdminTest.java,create_blankPasswordHash_throwsException,비밀번호 해시가 비어 있으면 관리자를 생성할 수 없다,단위,@ParameterizedTest,crates/app/src/admin/auth/domain.rs::해시가_비었거나_길거나_bcrypt_형식이_아니면_거절한다,이식
+admin,admin/domain/AdminTest.java,create_blankUsername_throwsException,사용자명이 비어 있으면 관리자를 생성할 수 없다,단위,@ParameterizedTest,crates/app/src/admin/auth/domain.rs::사용자명이_비었거나_길면_거절한다,이식
+admin,admin/domain/AdminTest.java,create_maxLengthUsername_createsAdmin,사용자명이 100자이면 관리자를 생성할 수 있다,단위,@Test,crates/app/src/admin/auth/domain.rs::사용자명과_해시로_관리자를_만든다,이식
+admin,admin/domain/AdminTest.java,create_overlongPasswordHash_throwsException,비밀번호 해시가 255자를 초과하면 관리자를 생성할 수 없다,단위,@Test,crates/app/src/admin/auth/domain.rs::해시가_비었거나_길거나_bcrypt_형식이_아니면_거절한다,이식
+admin,admin/domain/AdminTest.java,create_overlongUsername_throwsException,사용자명이 100자를 초과하면 관리자를 생성할 수 없다,단위,@Test,crates/app/src/admin/auth/domain.rs::사용자명이_비었거나_길면_거절한다,이식
+admin,admin/domain/AdminTest.java,create_plainPassword_throwsException,BCrypt 형식이 아닌 비밀번호 값으로 관리자를 생성할 수 없다,단위,@Test,crates/app/src/admin/auth/domain.rs::해시가_비었거나_길거나_bcrypt_형식이_아니면_거절한다,이식
+admin,admin/domain/AdminTest.java,create_validAccount_createsAdmin,사용자명과 단방향 비밀번호 해시로 관리자를 생성한다,단위,@Test,crates/app/src/admin/auth/domain.rs::사용자명과_해시로_관리자를_만든다,이식
+admin,admin/infrastructure/bootstrap/AdminAccountBootstrapTest.java,run_existingConfiguredAdmin_keepsStoredAccount,설정한 관리자 계정이 이미 있으면 비밀번호 해시를 덮어쓰지 않는다,통합(Spring+DB),@Test,crates/app/src/admin/bootstrap.rs::설정한_계정이_없으면_만들고_있으면_그대로_둔다,이식
+admin,admin/infrastructure/bootstrap/AdminAccountBootstrapTest.java,run_missingConfiguredAdmin_createsHashedAccount,설정한 관리자 계정이 없으면 BCrypt 해시만 저장한다,통합(Spring+DB),@Test,crates/app/src/admin/bootstrap.rs::설정한_계정이_없으면_만들고_있으면_그대로_둔다,이식
+admin,admin/infrastructure/bootstrap/DevelopmentAdminBootstrapProfileTest.java,register_prodAndDevProfiles_doesNotRegisterDevelopmentAdminBootstrap,운영 프로필이 개발 프로필과 함께 활성화되어도 부트스트랩을 등록하지 않는다,단위,@Test,crates/server/src/settings.rs::우회_설정은_local에서만_읽는다,이식
+admin,admin/infrastructure/bootstrap/DevelopmentAdminBootstrapProfileTest.java,register_prodProfile_doesNotRegisterDevelopmentAdminBootstrap,운영 프로필에서는 개발 관리자 부트스트랩을 등록하지 않는다,단위,@Test,crates/server/src/settings.rs::우회_설정은_local에서만_읽는다,이식
+admin,admin/infrastructure/bootstrap/DevelopmentAdminBootstrapTest.java,run_missingDevelopmentAdmin_createsHashedAdmin,개발 관리자가 없으면 사용할 수 없는 임의 비밀번호의 BCrypt 해시로 생성한다,통합(Spring+DB),@Test,crates/app/src/admin/bootstrap.rs::개발_우회에서는_로그인할_수_없는_계정을_둔다,이식
+admin,admin/infrastructure/bootstrap/DevelopmentAdminBootstrapTest.java,run_repeatedExecution_keepsSingleDevelopmentAdmin,개발 부트스트랩을 반복 실행해도 관리자 한 명만 유지한다,통합(Spring+DB),@Test,crates/app/src/admin/bootstrap.rs::개발_우회에서는_로그인할_수_없는_계정을_둔다,이식
+admin,admin/infrastructure/infra/DevAdminActorResolverTest.java,resolve_developmentProfile_returnsPersistedDevelopmentAdmin,개발 환경에서는 저장된 dev-admin의 ID를 현재 작업자로 반환한다,통합(Spring+DB),@Test,crates/app/src/admin/endpoint_tests.rs::개발_우회에서는_저장된_dev_admin을_작업자로_쓰고_헤더를_무시한다,이식
+admin,admin/infrastructure/infra/SecurityContextAdminActorResolverTest.java,resolve_adminJwt_returnsAuthenticatedAdmin,관리자 권한 JWT의 subject를 현재 관리자 식별자로 반환한다,단위,@Test,crates/app/src/admin/support.rs::관리자_권한이_있으면_sub를_식별자로_읽는다,이식
+admin,admin/infrastructure/infra/SecurityContextAdminActorResolverTest.java,resolve_userJwt_throwsForbidden,일반 사용자 권한 JWT이면 403 예외를 반환한다,단위,@Test,crates/app/src/admin/support.rs::관리자_권한이_없으면_403이다,이식
+admin,admin/infrastructure/infra/SecurityContextAdminActorResolverTest.java,resolve_withoutAuthentication_throwsUnauthorized,인증 정보가 없으면 401 예외를 반환한다,단위,@Test,crates/app/src/admin/support.rs::주체가_없으면_401이다,이식
+admin,admin/infrastructure/persistence/audit/AdminAuditLogQueryRepositoryTest.java,deleteActor_withAuditHistory_isRejectedToPreserveActorIdentity,,JPA 슬라이스,@Test,crates/app/src/admin/db_tests.rs::감사_로그가_있는_관리자는_삭제할_수_없다,이식
+admin,admin/infrastructure/persistence/audit/AdminAuditLogQueryRepositoryTest.java,findAuditLogs_combinedFiltersAndInclusiveBoundary_returnsMatchingDeletedTargetHistory,,JPA 슬라이스,@Test,crates/app/src/admin/db_tests.rs::감사_로그_조회는_경계를_포함하고_같은_시각이면_id로_안정적으로_나눈다,이식
+admin,admin/infrastructure/persistence/audit/AdminAuditLogQueryRepositoryTest.java,findAuditLogs_sameOccurredAt_usesIdForStablePagination,,JPA 슬라이스,@Test,crates/app/src/admin/db_tests.rs::감사_로그_조회는_경계를_포함하고_같은_시각이면_id로_안정적으로_나눈다,이식
+admin,admin/infrastructure/persistence/audit/AdminAuditLogRepositoryTest.java,migration_adminAuditLogs_hasQueryIndexes,,JPA 슬라이스,@Test,crates/app/src/admin/db_tests.rs::감사_로그_테이블에_조회_인덱스가_있다,이식
+admin,admin/infrastructure/persistence/audit/AdminAuditLogRepositoryTest.java,repository_restrictedSurface_exposesOnlySaveAndQueryWithinPackage,JPA 감사 로그 저장소는 같은 패키지에 저장·조회 기능만 노출한다,JPA 슬라이스,@Test,제외: JPA 패키지 가시성 규칙이다. Rust는 모듈 가시성(pub 여부)을 컴파일러가 강제한다,제외
+admin,admin/infrastructure/persistence/audit/AdminAuditLogRepositoryTest.java,save_sameRequestId_persistsMultipleAuditLogs,한 요청에서 여러 관리자 작업을 기록할 수 있다,JPA 슬라이스,@Test,crates/app/src/admin/db_tests.rs::감사_로그는_유형과_jsonb를_저장하고_한_요청에서_여러_건을_남긴다,이식
+admin,admin/infrastructure/persistence/audit/AdminAuditLogRepositoryTest.java,save_unknownActorAdminId_throwsDataIntegrityViolationException,존재하지 않는 관리자는 감사 로그 작업자가 될 수 없다,JPA 슬라이스,@Test,crates/app/src/admin/db_tests.rs::작업자가_없으면_감사_로그가_실패하고_업무_변경도_롤백한다,이식
+admin,admin/infrastructure/persistence/audit/AdminAuditLogRepositoryTest.java,save_validAuditLog_persistsPostgresTypes,감사 로그의 UUIDv7과 PostgreSQL enum·JSONB 필드를 저장한다,JPA 슬라이스,@Test,crates/app/src/admin/db_tests.rs::감사_로그는_유형과_jsonb를_저장하고_한_요청에서_여러_건을_남긴다,이식
+admin,admin/infrastructure/persistence/auth/AdminRepositoryTest.java,findByUsername_savedAdmin_returnsAdmin,관리자를 저장하고 사용자명으로 조회한다,JPA 슬라이스,@Test,crates/app/src/admin/db_tests.rs::관리자는_사용자명으로_찾고_중복_저장은_실패한다,이식
+admin,admin/infrastructure/persistence/auth/AdminRepositoryTest.java,save_duplicateUsername_throwsException,동일한 사용자명을 가진 관리자를 중복 저장할 수 없다,JPA 슬라이스,@Test,crates/app/src/admin/db_tests.rs::관리자는_사용자명으로_찾고_중복_저장은_실패한다,이식
+admin,admin/infrastructure/persistence/feedback/AdminFeedbackQueryRepositoryTest.java,findFeedbacks_bannedAndWithdrawnAuthors_areIncluded,정지·탈퇴 회원이 남긴 피드백도 상태와 함께 조회한다,JPA 슬라이스,@Test,crates/app/src/admin/feedback.rs::작성자_상태와_함께_정렬해_읽는다,이식
+admin,admin/infrastructure/persistence/feedback/AdminFeedbackQueryRepositoryTest.java,findFeedbacks_createdAtAsc_returnsOldestFirst,오래된 순 정렬을 선택할 수 있다,JPA 슬라이스,@Test,crates/app/src/admin/feedback.rs::작성자_상태와_함께_정렬해_읽는다,이식
+admin,admin/infrastructure/persistence/feedback/AdminFeedbackQueryRepositoryTest.java,findFeedbacks_createdAtDesc_returnsNewestFirstWithAuthor,피드백 목록은 작성자 정보와 함께 최신순으로 조회한다,JPA 슬라이스,@Test,crates/app/src/admin/feedback.rs::작성자_상태와_함께_정렬해_읽는다,이식
+admin,admin/infrastructure/persistence/feedback/AdminFeedbackQueryRepositoryTest.java,findFeedbacks_withMorePages_reportsHasNext,다음 페이지가 남으면 hasNext로 알린다,JPA 슬라이스,@Test,crates/app/src/admin/feedback.rs::작성자_상태와_함께_정렬해_읽는다,이식
+admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPostById_existingPost_returnsSingleRichProjection,상세 조회는 게시물 연관 정보와 사진·업로드 메타데이터 및 좋아요 수를 반환한다,JPA 슬라이스,@Test,crates/app/src/admin/post/service.rs::목록은_검증_중인_게시물을_빼고_조건으로_거른다,이식
+admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPostById_moderatedPost_returnsModeratorAndReasonFromAuditLog,상세 조회는 관리자 검수 감사 로그에서 처리자와 사유를 함께 조회한다,JPA 슬라이스,@Test,crates/app/src/admin/post/service.rs::상세는_검수한_관리자와_거절_사유를_감사_로그에서_읽는다,이식
+admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPostById_softDeletedLegacyPost_returnsDeletedStateWithNullUpload,상세 조회는 삭제된 연관 정보와 업로드 연결이 없는 기존 게시물도 반환한다,JPA 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::삭제는_멱등하게_204이고_검증_중이면_400이다,이식
+admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPostById_unknownPost_returnsEmpty,존재하지 않는 게시물 상세 조회는 빈 결과를 반환한다,JPA 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::게시물_상세는_없으면_404이고_형식이_틀리면_400이다,이식
+admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPostById_validatingPost_returnsEmpty,내부 검증 중 게시물은 관리자 상세에서 조회하지 않는다,JPA 슬라이스,@Test,crates/app/src/admin/post/service.rs::목록은_검증_중인_게시물을_빼고_조건으로_거른다,이식
+admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPosts_combinedFilters_returnsOnlyMatchingPost,상태·주제·날짜·사용자·등록 시각 필터를 함께 적용한다,JPA 슬라이스,@Test,crates/app/src/admin/post/service.rs::목록은_검증_중인_게시물을_빼고_조건으로_거른다,이식
+admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPosts_createdAtSortAndPagination_returnsStablePages,등록 시각 오름차순과 내림차순은 ID 보조 정렬로 페이지 경계를 유지한다,JPA 슬라이스,@Test,crates/app/src/admin/endpoint_tests.rs::게시물_목록은_기본_조건으로_읽고_잘못된_조건은_400이다,이식
+admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPosts_eachFilter_returnsMatchingPosts,각 목록 필터는 삭제 여부와 관계없이 해당 조건만 정확히 적용한다,JPA 슬라이스,@Test,crates/app/src/admin/post/service.rs::목록은_검증_중인_게시물을_빼고_조건으로_거른다,이식
+admin,admin/infrastructure/persistence/post/AdminPostQueryRepositoryTest.java,findPosts_noFilters_excludesValidatingAndIncludesSoftDeletedPost,관리자 목록은 내부 검증 중 게시물을 제외하고 삭제된 게시물을 함께 조회한다,JPA 슬라이스,@Test,crates/app/src/admin/post/service.rs::목록은_검증_중인_게시물을_빼고_조건으로_거른다,이식
+admin,admin/infrastructure/persistence/topic/AdminTopicQueryRepositoryTest.java,findActiveTopicById_activeOrDeleted_preservesVisibilityAndCounts,상세는 삭제된 주제를 제외하고 게시글이 없으면 집계가 0이다,JPA 슬라이스,@Test,crates/app/src/admin/topic.rs::목록은_단계와_날짜로_거르고_삭제되지_않은_게시물만_센다,이식
+admin,admin/infrastructure/persistence/topic/AdminTopicQueryRepositoryTest.java,findTopics_dateBounds_returnsInclusiveRange,날짜 양 끝 경계를 포함하고 각각의 단독 조건도 적용한다,JPA 슬라이스,@Test,crates/app/src/admin/db_tests.rs::주제_목록은_날짜_경계를_포함하고_네_정렬이_페이지를_안정적으로_나눈다,이식
+admin,admin/infrastructure/persistence/topic/AdminTopicQueryRepositoryTest.java,findTopics_eachSort_returnsStablePages,네 정렬은 ID 보조 정렬과 다음 페이지 경계를 유지한다,JPA 슬라이스,@ParameterizedTest,crates/app/src/admin/db_tests.rs::주제_목록은_날짜_경계를_포함하고_네_정렬이_페이지를_안정적으로_나눈다,이식
+admin,admin/infrastructure/persistence/topic/AdminTopicQueryRepositoryTest.java,findTopics_phaseAtBoundary_returnsMatchingTopic,시작 시각은 공개 중이고 종료 시각은 종료로 조회한다,JPA 슬라이스,@ParameterizedTest,crates/app/src/admin/db_tests.rs::시작_시각은_공개_중이고_종료_시각은_종료다,이식
+admin,admin/infrastructure/persistence/user/AdminUserQueryRepositoryTest.java,findUserById_activeUser_returnsProviderSignatureAndVisiblePostCounts,활성 사용자 상세에 소셜 제공자와 관리자 공개 게시물 상태별 개수를 제공한다,JPA 슬라이스,@Test,crates/app/src/admin/user/service.rs::상세는_탈퇴한_회원의_서명을_숨긴다,이식
+admin,admin/infrastructure/persistence/user/AdminUserQueryRepositoryTest.java,findUserById_withdrawnUser_returnsAnonymizedData,탈퇴 사용자 상세도 비식별 정보로 조회한다,JPA 슬라이스,@Test,crates/app/src/admin/user/service.rs::상세는_탈퇴한_회원의_서명을_숨긴다,이식
+admin,admin/infrastructure/persistence/user/AdminUserQueryRepositoryTest.java,findUsers_eachStatus_returnsMatchingDerivedStatus,각 회원 상태 필터는 탈퇴 여부를 반영해 해당 회원만 조회한다,JPA 슬라이스,@ParameterizedTest,crates/app/src/admin/user/service.rs::목록은_상태와_이메일로_거르고_게시물_수를_센다,이식
+admin,admin/infrastructure/persistence/user/AdminUserQueryRepositoryTest.java,findUsers_statusAndEmailFilter_returnsMatchingUser,파생 상태와 대소문자를 무시한 이메일 부분 검색을 함께 적용한다,JPA 슬라이스,@Test,crates/app/src/admin/user/service.rs::목록은_상태와_이메일로_거르고_게시물_수를_센다,이식
+admin,admin/infrastructure/persistence/user/AdminUserQueryRepositoryTest.java,findUsers_withoutFilters_returnsEveryDerivedStatusInStableOrder,관리자 사용자 목록은 탈퇴자를 포함해 안정적인 최신순으로 조회한다,JPA 슬라이스,@Test,crates/app/src/admin/user/service.rs::목록은_상태와_이메일로_거르고_게시물_수를_센다,이식
+admin,admin/service/audit/AdminAuditLogQueryServiceTest.java,getAuditLogs_allFilters_returnsReadOnlyPage,,단위,@Test,crates/app/src/admin/db_tests.rs::감사_로그_조회는_경계를_포함하고_같은_시각이면_id로_안정적으로_나눈다,이식
+admin,admin/service/audit/AdminAuditLogQueryServiceTest.java,getAuditLogs_excessiveOffset_throwsBusinessException,,단위,@Test,crates/app/src/admin/db_tests.rs::감사_로그_조회의_기간과_오프셋이_틀리면_거절한다,이식
+admin,admin/service/audit/AdminAuditLogQueryServiceTest.java,getAuditLogs_reversedPeriod_throwsBusinessException,,단위,@Test,crates/app/src/admin/db_tests.rs::감사_로그_조회의_기간과_오프셋이_틀리면_거절한다,이식
+admin,admin/service/audit/AdminAuditLogServiceTest.java,createAuditLog_auditPersistenceFailure_rollsBackBusinessChange,감사 로그 저장이 실패하면 앞선 업무 변경도 함께 롤백한다,통합(Spring+DB),@Test,crates/app/src/admin/db_tests.rs::작업자가_없으면_감사_로그가_실패하고_업무_변경도_롤백한다,이식
+admin,admin/service/audit/AdminAuditLogServiceTest.java,createAuditLog_businessFailure_rollsBackChangeAndAuditLog,,통합(Spring+DB),@Test,crates/app/src/admin/db_tests.rs::업무_실패면_감사_로그도_함께_사라진다,이식
+admin,admin/service/audit/AdminAuditLogServiceTest.java,createAuditLog_withinBusinessTransaction_persistsChangeAndAuditLog,업무 트랜잭션 안에서 변경과 감사 로그를 함께 저장하고 감사 로그에는 현재 요청의 requestId를 남긴다,통합(Spring+DB),@Test,crates/app/src/admin/endpoint_tests.rs::감사_로그에는_현재_요청의_요청_id가_남는다,이식
+admin,admin/service/audit/AdminAuditLogServiceTest.java,createAuditLog_withoutBusinessTransaction_throwsIllegalTransactionStateException,업무 트랜잭션 없이 감사 로그만 저장할 수 없다,통합(Spring+DB),@Test,제외: 감사 로그 생성 함수가 &mut Transaction을 인자로 요구해 트랜잭션 없는 호출이 컴파일되지 않는다(Spring 전파 규칙의 런타임 검사가 필요 없다),제외
+admin,admin/service/auth/AdminAuthenticationServiceTest.java,getCurrentAdmin_existingAdmin_returnsCurrentAdmin,인증된 관리자 식별자로 DB의 관리자 정보를 조회한다,통합(Spring+DB),@Test,crates/app/src/admin/auth/service.rs::현재_관리자는_식별자로_찾고_없으면_401이다,이식
+admin,admin/service/auth/AdminAuthenticationServiceTest.java,getCurrentAdmin_missingAdmin_throwsUnauthorized,존재하지 않는 관리자 식별자는 인증 실패로 거부한다,통합(Spring+DB),@Test,crates/app/src/admin/auth/service.rs::현재_관리자는_식별자로_찾고_없으면_401이다,이식
+admin,admin/service/auth/AdminAuthenticationServiceTest.java,login_passwordExceedsByteLimit_throwsUnauthorized,BCrypt의 72바이트를 넘는 로그인 비밀번호는 500 대신 인증 실패로 거부한다,통합(Spring+DB),@ParameterizedTest,crates/app/src/admin/auth/domain.rs::비밀번호는_72바이트까지_일치_검사한다,이식
+admin,admin/service/auth/AdminAuthenticationServiceTest.java,login_passwordWithinByteLimit_succeeds,BCrypt의 바이트 길이 한도 직전과 경계 비밀번호로 로그인할 수 있다,통합(Spring+DB),@ParameterizedTest,crates/app/src/admin/auth/domain.rs::비밀번호는_72바이트까지_일치_검사한다,이식
+admin,admin/service/auth/AdminAuthenticationServiceTest.java,login_unknownUsername_hidesAccountExistence,없는 아이디도 BCrypt 비교를 수행하고 같은 인증 실패 응답으로 거부한다,통합(Spring+DB),@Test,crates/app/src/admin/auth/service.rs::비밀번호가_틀리거나_계정이_없으면_같은_401이다,이식
+admin,admin/service/auth/AdminAuthenticationServiceTest.java,login_validCredentials_opensRefreshTokenLineage,로그인에 성공하면 리프레시 토큰 계보를 열고 저장소에는 해시만 남긴다,통합(Spring+DB),@Test,crates/app/src/admin/auth/service.rs::로그인하면_관리자_토큰과_리프레시_토큰을_준다,이식
+admin,admin/service/auth/AdminAuthenticationServiceTest.java,login_validCredentials_returnsAdminAccessToken,실제 저장된 계정의 비밀번호가 일치하면 검증 가능한 관리자 JWT를 발급한다,통합(Spring+DB),@Test,crates/app/src/admin/auth/service.rs::로그인하면_관리자_토큰과_리프레시_토큰을_준다,이식
+admin,admin/service/auth/AdminAuthenticationServiceTest.java,login_wrongPassword_throwsCommonUnauthorized,잘못된 비밀번호는 공통 인증 실패 응답으로 거부한다,통합(Spring+DB),@Test,crates/app/src/admin/auth/service.rs::비밀번호가_틀리거나_계정이_없으면_같은_401이다,이식
+admin,admin/service/auth/AdminRefreshTokenServiceTest.java,issue_newAdmin_storesHashOnlyAndReturnsPlainToken,리프레시 토큰을 발급하면 평문은 반환만 하고 저장소에는 해시만 남는다,통합(Spring+DB),@Test,crates/app/src/admin/auth/service.rs::로그인하면_관리자_토큰과_리프레시_토큰을_준다,이식
+admin,admin/service/auth/AdminRefreshTokenServiceTest.java,logout_liveToken_revokesOnlyThatLineage,로그아웃하면 그 기기의 계보만 폐기하고 재발급을 막는다,통합(Spring+DB),@Test,crates/app/src/admin/auth/service.rs::로그아웃은_계보를_폐기하고_모르는_토큰에도_성공한다,이식
+admin,admin/service/auth/AdminRefreshTokenServiceTest.java,logout_unknownOrRevokedToken_doesNothing,모르는 토큰이나 이미 폐기된 토큰으로 로그아웃해도 예외를 던지지 않는다,통합(Spring+DB),@Test,crates/app/src/admin/auth/service.rs::로그아웃은_계보를_폐기하고_모르는_토큰에도_성공한다,이식
+admin,admin/service/auth/AdminRefreshTokenServiceTest.java,refresh_absoluteExpiredToken_revokesLineageAndRequiresReauthentication,회전을 이어가도 절대 만료 시각에 도달하면 재로그인을 요구한다,통합(Spring+DB),@Test,crates/app/src/admin/auth/service.rs::모르는_토큰이거나_만료된_토큰은_401이고_만료는_계보를_폐기한다,이식
+admin,admin/service/auth/AdminRefreshTokenServiceTest.java,refresh_inactivityExpiredToken_revokesLineageAndRequiresReauthentication,비활동 만료가 지난 토큰은 절대 만료가 남아 있어도 재로그인을 요구한다,통합(Spring+DB),@Test,crates/app/src/admin/auth/service.rs::모르는_토큰이거나_만료된_토큰은_401이고_만료는_계보를_폐기한다,이식
+admin,admin/service/auth/AdminRefreshTokenServiceTest.java,refresh_liveToken_rotatesTokenAndReissuesAdminAccessToken,살아 있는 토큰으로 재발급하면 관리자 scope의 액세스 토큰과 새 토큰을 함께 내준다,통합(Spring+DB),@Test,crates/app/src/admin/auth/service.rs::재발급하면_토큰이_회전하고_이전_토큰은_쓸_수_없다,이식
+admin,admin/service/auth/AdminRefreshTokenServiceTest.java,refresh_reusedLineageRevoked_keepsOtherDeviceLineageUsable,한 계보를 폐기해도 다른 기기의 계보는 그대로 재발급할 수 있다,통합(Spring+DB),@Test,crates/app/src/admin/auth/service.rs::기기마다_계보가_나뉜다,이식
+admin,admin/service/auth/AdminRefreshTokenServiceTest.java,refresh_revokedToken_keepsRevokedAtAndRequiresReauthentication,이미 폐기된 토큰으로 재발급하면 폐기 시각을 덮어쓰지 않고 재로그인을 요구한다,통합(Spring+DB),@Test,crates/app/src/admin/auth/service.rs::재발급하면_토큰이_회전하고_이전_토큰은_쓸_수_없다,이식
+admin,admin/service/auth/AdminRefreshTokenServiceTest.java,refresh_rotatedToken_revokesWholeLineage,회전된 토큰을 다시 내면 계보 전체를 폐기하고 재로그인을 요구한다,통합(Spring+DB),@Test,crates/app/src/admin/auth/service.rs::재발급하면_토큰이_회전하고_이전_토큰은_쓸_수_없다,이식
+admin,admin/service/auth/AdminRefreshTokenServiceTest.java,refresh_unknownToken_requiresReauthentication,존재하지 않는 토큰으로 재발급하면 재로그인을 요구한다,통합(Spring+DB),@Test,crates/app/src/admin/auth/service.rs::모르는_토큰이거나_만료된_토큰은_401이고_만료는_계보를_폐기한다,이식
+admin,admin/service/feedback/AdminFeedbackQueryServiceTest.java,getFeedbacks_bannedAuthor_derivesBannedStatus,정지된 작성자의 피드백은 BANNED 상태로 내려준다,단위,@Test,crates/app/src/admin/feedback.rs::작성자_상태와_함께_정렬해_읽는다,이식
+admin,admin/service/feedback/AdminFeedbackQueryServiceTest.java,getFeedbacks_invalidPagination_throwsBusinessException,페이지 조건이 범위를 벗어나면 조회하지 않는다,단위,@ParameterizedTest,crates/app/src/admin/feedback.rs::페이지_조건이_틀리면_조회_조건_오류다,이식
+admin,admin/service/feedback/AdminFeedbackQueryServiceTest.java,getFeedbacks_withdrawnAuthor_derivesWithdrawnStatus,탈퇴한 작성자의 피드백은 WITHDRAWN 상태로 내려준다,단위,@Test,crates/app/src/admin/feedback.rs::작성자_상태와_함께_정렬해_읽는다,이식
+admin,admin/service/post/AdminPostCommandDeletionTest.java,deletePost_allowedStatus_softDeletesAndPreservesMediaAndCreatesAudit,허용된 검수 상태의 게시물을 삭제하면 미디어를 보존하고 soft delete와 감사 로그를 저장한다,통합(Spring+DB),@ParameterizedTest,crates/app/src/admin/post/service.rs::삭제하면_사진과_좋아요를_정리하고_감사_로그를_남긴다,이식
+admin,admin/service/post/AdminPostCommandDeletionTest.java,deletePost_alreadyDeletedPost_keepsFirstDeletionAndAudit,삭제 요청을 다시 보내도 최초 삭제 시각과 감사 로그를 유지한다,통합(Spring+DB),@Test,crates/app/src/admin/endpoint_tests.rs::삭제는_멱등하게_204이고_검증_중이면_400이다,이식
+admin,admin/service/post/AdminPostCommandDeletionTest.java,deletePost_approvedPost_deletesPostLikes,관리자가 승인 게시물을 삭제하면 연결된 좋아요도 제거한다,통합(Spring+DB),@Test,crates/app/src/admin/post/service.rs::삭제하면_사진과_좋아요를_정리하고_감사_로그를_남긴다,이식
+admin,admin/service/post/AdminPostCommandDeletionTest.java,deletePost_approvedPost_excludesEveryUserReadModel,삭제된 게시물은 사용자 상세·캘린더·피드 조회에서 즉시 제외한다,통합(Spring+DB),@Test,제외: 사용자 상세·캘린더·피드 조회는 post 모듈(#19)의 SQL이다. 관리자 쪽은 deleted_at 설정만 책임지며 그 값은 post/service.rs::삭제하면_사진과_좋아요를_정리하고_감사_로그를_남긴다가 확인한다,제외
+admin,admin/service/post/AdminPostCommandDeletionTest.java,deletePost_auditActorForeignKeyFailure_rollsBackEveryChange,감사 로그 관리자 외래키 저장이 실패하면 게시물과 사진 삭제도 롤백한다,통합(Spring+DB),@Test,crates/app/src/admin/db_tests.rs::삭제_중_감사_로그가_실패하면_게시물과_사진이_그대로다,이식
+admin,admin/service/post/AdminPostCommandDeletionTest.java,deletePost_unknownPost_throwsNotFoundException,존재하지 않는 게시물은 삭제할 수 없다,통합(Spring+DB),@Test,crates/app/src/admin/endpoint_tests.rs::삭제는_멱등하게_204이고_검증_중이면_400이다,이식
+admin,admin/service/post/AdminPostCommandDeletionTest.java,deletePost_validatingPost_throwsBusinessException,이미지 처리 중인 게시물은 기본 비즈니스 오류로 삭제를 거부한다,통합(Spring+DB),@Test,crates/app/src/admin/post/service.rs::이미지_처리_중인_게시물은_삭제할_수_없다,이식
+admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_approvedRequest_createsNotification,게시물을 승인하면 검수 감사 기록과 연결된 알림함 항목을 저장한다,통합(Spring+DB),@Test,crates/app/src/admin/post/service.rs::승인하면_상태와_감사_로그와_알림이_함께_남는다,이식
+admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_approvedRequest_updatesPostAndCreatesAuditLog,대기 중인 게시물을 승인하면 상태와 처리 시각 및 감사 로그를 원자적으로 저장한다,통합(Spring+DB),@Test,crates/app/src/admin/post/service.rs::승인하면_상태와_감사_로그와_알림이_함께_남는다,이식
+admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_deletedPendingPost_throwsNotFoundException,삭제된 대기 게시물은 검수 대상에서 제외한다,통합(Spring+DB),@Test,crates/app/src/admin/post/service.rs::대기_중이_아니거나_없는_게시물은_검수할_수_없다,이식
+admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_duplicateEventKey_rejectsDuplicateNotification,같은 검수 사건의 알림함 항목은 DB 제약으로 중복 저장할 수 없다,통합(Spring+DB),@Test,crates/app/src/admin/db_tests.rs::같은_검수_사건의_알림은_중복_저장할_수_없다,이식
+admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_nonPendingPost_throwsResourceStateChangedException,대기 상태가 아닌 게시물은 현재 상태 재조회 오류로 검수를 거부한다,통합(Spring+DB),@ParameterizedTest,crates/app/src/admin/post/service.rs::대기_중이_아니거나_없는_게시물은_검수할_수_없다,이식
+admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_rejectedRequest_createsNotificationWithReason,게시물을 반려하면 정규화된 사유를 알림함에 보관한다,통합(Spring+DB),@Test,crates/app/src/admin/post/service.rs::거절하면_사유가_감사_로그와_알림에_남는다,이식
+admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_rejectedRequest_updatesPostAndCreatesAuditLogWithReason,대기 중인 게시물을 거절하면 정규화한 사유와 처리자를 감사 로그에 저장한다,통합(Spring+DB),@Test,crates/app/src/admin/post/service.rs::거절하면_사유가_감사_로그와_알림에_남는다,이식
+admin,admin/service/post/AdminPostCommandModerationTest.java,moderate_unknownPost_throwsNotFoundException,존재하지 않는 게시물은 검수할 수 없다,통합(Spring+DB),@Test,crates/app/src/admin/post/service.rs::대기_중이_아니거나_없는_게시물은_검수할_수_없다,이식
+admin,admin/service/post/AdminPostModerationConcurrencyTest.java,moderate_auditActorForeignKeyFailure_rollsBackPostTransition,감사 로그 작업자 외래키 저장이 실패하면 게시물 검수 상태도 함께 롤백한다,통합(Spring+DB),@Test,crates/app/src/admin/db_tests.rs::검수_중_감사_로그가_실패하면_게시물_상태와_알림이_남지_않는다,이식
+admin,admin/service/post/AdminPostModerationConcurrencyTest.java,moderate_concurrentApproveAndReject_decidesExactlyOnce,두 관리자가 동시에 승인과 거절을 요청하면 하나만 확정하고 감사 로그도 하나만 남긴다,통합(Spring+DB),@Test,crates/app/src/admin/db_tests.rs::승인과_거절이_동시에_오면_하나만_확정한다,이식
+admin,admin/service/post/AdminPostModerationDeletionConcurrencyTest.java,moderateAndDelete_concurrentSamePendingPost_deletesConsistently,같은 대기 게시물의 승인과 삭제가 겹쳐도 교착 없이 삭제 상태로 수렴한다,통합(Spring+DB),@Test,crates/app/src/admin/db_tests.rs::승인과_삭제가_겹쳐도_교착_없이_삭제_상태로_수렴한다,이식
+admin,admin/service/post/AdminPostModerationLogTest.java,moderate_approve_logsApprovedWithWaitSeconds,관리자가 승인하면 approved 로그에 대기 시간을 초 단위로 남긴다,통합(Spring+DB),@Test,crates/app/src/admin/db_tests.rs::검수하면_결정_로그를_한_건씩_남긴다,이식
+admin,admin/service/post/AdminPostModerationLogTest.java,moderate_reject_logsRejected,관리자가 반려하면 rejected 로그를 한 건 남긴다,통합(Spring+DB),@Test,crates/app/src/admin/db_tests.rs::검수하면_결정_로그를_한_건씩_남긴다,이식
+admin,admin/service/post/AdminPostNotificationTransactionTest.java,moderate_rolledBackTransaction_removesNotificationAndAudit,검수 트랜잭션이 롤백되면 게시물 변경과 감사 로그 및 알림이 모두 사라진다,통합(Spring+DB),@Test,crates/app/src/admin/db_tests.rs::검수_중_감사_로그가_실패하면_게시물_상태와_알림이_남지_않는다,이식
+admin,admin/service/post/AdminPostQueryServiceTest.java,getPost_deletedRejectedPost_returnsAdminDetail,"삭제된 거절 게시물도 작성자와 주제, 사진 메타데이터를 포함해 상세 조회한다",통합(Spring+DB),@Test,crates/app/src/admin/post/service.rs::상세는_검수한_관리자와_거절_사유를_감사_로그에서_읽는다,이식
+admin,admin/service/post/AdminPostQueryServiceTest.java,getPost_unknownPost_throwsNotFoundException,존재하지 않는 관리자 게시물 상세를 조회하면 찾을 수 없음 예외를 발생시킨다,통합(Spring+DB),@Test,crates/app/src/admin/endpoint_tests.rs::게시물_상세는_없으면_404이고_형식이_틀리면_400이다,이식
+admin,admin/service/post/AdminPostQueryServiceTest.java,getPosts_allFilters_returnsMatchingPost,"상태와 주제, 날짜, 작성자, 등록 시각 조건에 맞는 게시물만 조회한다",통합(Spring+DB),@Test,crates/app/src/admin/post/service.rs::목록은_검증_중인_게시물을_빼고_조건으로_거른다,이식
+admin,admin/service/post/AdminPostQueryServiceTest.java,getPosts_createdAtFromAfterCreatedAtTo_throwsBusinessException,등록 시각 시작이 종료보다 늦으면 잘못된 요청 예외를 발생시킨다,통합(Spring+DB),@Test,crates/app/src/admin/post/service.rs::목록은_검증_중인_게시물을_빼고_조건으로_거른다,이식
+admin,admin/service/post/AdminPostQueryServiceTest.java,getPosts_pageOffsetOverflow_throwsBusinessException,페이지 오프셋이 정수 범위를 넘으면 잘못된 요청 예외를 발생시킨다,통합(Spring+DB),@Test,crates/app/src/admin/support.rs::페이지_검사,이식
+admin,admin/service/post/AdminPostQueryServiceTest.java,getPosts_validatingStatus_throwsBusinessException,내부 검증 중 상태는 관리자 게시물 조회 조건으로 요청할 수 없다,통합(Spring+DB),@Test,crates/app/src/admin/post/service.rs::목록은_검증_중인_게시물을_빼고_조건으로_거른다,이식
+admin,admin/service/post/AdminPostQueryServiceTest.java,getPosts_withoutFilters_returnsVisibleStatusesIncludingDeleted,필터가 없으면 내부 검증 중을 제외하고 삭제된 게시물도 최신순으로 조회한다,통합(Spring+DB),@Test,crates/app/src/admin/post/service.rs::목록은_검증_중인_게시물을_빼고_조건으로_거른다,이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,createTopic_adjacentPeriod_savesTopic,이전 종료와 다음 시작이 같은 시각이면 주제를 생성한다,통합(Spring+DB),@Test,crates/app/src/admin/db_tests.rs::기간이_맞닿거나_삭제된_주제와_겹치는_새_주제는_만들_수_있다,이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,createTopic_duplicateDate_throwsBusinessException,활성 주제와 날짜가 중복되면 생성하지 않는다,통합(Spring+DB),@Test,crates/app/src/admin/topic.rs::날짜가_겹치거나_기간이_겹치면_거절하고_감사_로그를_남기지_않는다,이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,createTopic_overlappingDeletedTopic_savesTopic,삭제된 주제의 기간은 새 주제를 막지 않는다,통합(Spring+DB),@Test,crates/app/src/admin/db_tests.rs::기간이_맞닿거나_삭제된_주제와_겹치는_새_주제는_만들_수_있다,이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,createTopic_overlappingPeriod_throwsBusinessException,날짜가 달라도 참여 기간이 겹치면 주제를 생성하지 않는다,통합(Spring+DB),@Test,crates/app/src/admin/topic.rs::날짜가_겹치거나_기간이_겹치면_거절하고_감사_로그를_남기지_않는다,이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,createTopic_validRequest_savesTopicAndAuditLog,주제를 생성하면 관리자 감사 로그를 남긴다,통합(Spring+DB),@Test,crates/app/src/admin/topic.rs::주제를_만들면_감사_로그를_남긴다,이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,deleteTopic_beforeOpen_softDeletesAndAudits,공개 전 주제를 사유와 함께 삭제하면 목록에서 제외하고 감사 로그를 남긴다,통합(Spring+DB),@Test,crates/app/src/admin/topic.rs::삭제는_사유를_감사_로그에_남기고_주제를_숨긴다,이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,insertTopic_overlappingPeriod_violatesDatabaseConstraint,DB는 날짜가 다른 주제라도 참여 기간이 겹치면 저장하지 않는다,통합(Spring+DB),@Test,crates/app/src/admin/db_tests.rs::날짜가_달라도_기간이_겹치면_db가_저장하지_않는다,이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,updateTopic_beforeOpen_updatesAndAudits,공개 전 주제를 수정하면 변경 전후 감사 로그를 남긴다,통합(Spring+DB),@Test,crates/app/src/admin/topic.rs::수정은_공개_전_주제만_하고_바뀐_것이_있어야_한다,이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,updateTopic_openTopicWithOverlappingPeriod_throwsStateChanged,참여 중인 주제는 변경 기간이 다른 주제와 겹쳐도 상태 오류를 먼저 반환한다,통합(Spring+DB),@Test,crates/app/src/admin/db_tests.rs::수정한_기간이_다른_주제와_겹치면_거절하고_참여_중이면_상태_오류가_먼저다,이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,updateTopic_openTopic_throwsStateChanged,참여 중인 주제는 수정할 수 없다,통합(Spring+DB),@Test,crates/app/src/admin/topic.rs::수정은_공개_전_주제만_하고_바뀐_것이_있어야_한다,이식
+admin,admin/service/topic/AdminTopicCommandServiceTest.java,updateTopic_overlappingPeriod_throwsBusinessException,공개 전 주제의 종료 시각을 늘려 다른 주제와 겹치면 수정하지 않는다,통합(Spring+DB),@Test,crates/app/src/admin/db_tests.rs::수정한_기간이_다른_주제와_겹치면_거절하고_참여_중이면_상태_오류가_먼저다,이식
+admin,admin/service/topic/AdminTopicConcurrencyTest.java,createTopic_auditActorForeignKeyFailure_rollsBackTopic,감사 로그 관리자 외래키 저장이 실패하면 주제 생성도 롤백한다,통합(Spring+DB),@Test,crates/app/src/admin/db_tests.rs::주제_생성_중_감사_로그가_실패하면_주제도_없다,이식
+admin,admin/service/topic/AdminTopicConcurrencyTest.java,createTopic_sameDateConcurrently_createsExactlyOnce,같은 날짜의 주제를 동시에 생성하면 하나만 저장하고 감사 로그도 하나만 남긴다,통합(Spring+DB),@Test,crates/app/src/admin/db_tests.rs::같은_날짜의_주제를_동시에_만들면_하나만_저장한다,이식
+admin,admin/service/topic/AdminTopicQueryServiceTest.java,getTopic_deletedTopic_throwsNotFoundException,삭제된 주제 상세은 찾을 수 없음으로 응답한다,통합(Spring+DB),@Test,crates/app/src/admin/endpoint_tests.rs::주제는_등록_조회_수정_삭제를_거친다,이식
+admin,admin/service/topic/AdminTopicQueryServiceTest.java,getTopic_existingPosts_returnsModerationCounts,주제 상세은 게시물 검수 상태별 통계를 함께 반환한다,통합(Spring+DB),@Test,crates/app/src/admin/topic.rs::목록은_단계와_날짜로_거르고_삭제되지_않은_게시물만_센다,이식
+admin,admin/service/topic/AdminTopicQueryServiceTest.java,getTopic_phaseBoundaries_derivesFromClock,phase 경계에서 시작 시각은 OPEN이고 종료 시각은 CLOSED다,통합(Spring+DB),@Test,crates/app/src/admin/db_tests.rs::시작_시각은_공개_중이고_종료_시각은_종료다,이식
+admin,admin/service/topic/AdminTopicQueryServiceTest.java,getTopics_offsetExceedsIntegerRange_throwsBusinessException,페이지 offset이 정수 범위를 넘으면 잘못된 조회 조건으로 거절한다,통합(Spring+DB),@ParameterizedTest,crates/app/src/admin/topic.rs::조회_조건_검사,이식
+admin,admin/service/topic/AdminTopicQueryServiceTest.java,getTopics_offsetWithinIntegerRange_returnsEmptyPage,허용되는 최대 페이지와 그 직전 페이지는 빈 목록을 반환한다,통합(Spring+DB),@ParameterizedTest,crates/app/src/admin/db_tests.rs::허용되는_마지막_페이지는_빈_목록이고_그_다음은_거절한다,이식
+admin,admin/service/topic/AdminTopicQueryServiceTest.java,getTopics_phaseAndDateFilters_returnsMatchingActiveTopics,관리자 목록은 삭제 주제를 제외하고 Clock 기준 phase와 날짜 필터를 적용한다,통합(Spring+DB),@Test,crates/app/src/admin/topic.rs::목록은_단계와_날짜로_거르고_삭제되지_않은_게시물만_센다,이식
+admin,admin/service/user/AdminUserQueryServiceTest.java,getUser_activeUser_returnsSignatureImageUrls,활성 사용자 상세에 사인 이미지 URL을 조립한다,통합(Spring+DB),@Test,crates/app/src/admin/user/service.rs::상세는_탈퇴한_회원의_서명을_숨긴다,이식
+admin,admin/service/user/AdminUserQueryServiceTest.java,getUser_unknownUser_throwsNotFoundException,존재하지 않는 사용자 상세는 404 예외를 발생시킨다,통합(Spring+DB),@Test,crates/app/src/admin/user/service.rs::상세는_탈퇴한_회원의_서명을_숨긴다,이식
+admin,admin/service/user/AdminUserQueryServiceTest.java,getUser_withdrawnUser_hidesRemovedSignature,탈퇴 사용자 상세에서 제거된 사인 저장 키를 URL로 노출하지 않는다,통합(Spring+DB),@Test,crates/app/src/admin/user/service.rs::상세는_탈퇴한_회원의_서명을_숨긴다,이식
+admin,admin/service/user/AdminUserQueryServiceTest.java,getUsers_pageOffsetOverflow_throwsBusinessException,페이지 오프셋이 정수 범위를 넘으면 잘못된 요청이다,통합(Spring+DB),@Test,crates/app/src/admin/support.rs::페이지_검사,이식
+admin,admin/service/user/AdminUserQueryServiceTest.java,getUsers_withdrawnFilter_returnsDerivedStatus,탈퇴 필터로 파생 WITHDRAWN 상태 사용자를 조회한다,통합(Spring+DB),@Test,crates/app/src/admin/user/service.rs::목록은_상태와_이메일로_거르고_게시물_수를_센다,이식
+admin,admin/service/user/AdminUserStatusConcurrencyTest.java,updateStatus_auditActorForeignKeyFailure_rollsBackUserTransition,감사 로그의 관리자 외래키 저장이 실패하면 사용자 차단도 롤백한다,통합(Spring+DB),@Test,crates/app/src/admin/db_tests.rs::차단_중_감사_로그가_실패하면_사용자_상태가_그대로다,이식
+admin,admin/service/user/AdminUserStatusConcurrencyTest.java,updateStatus_concurrentBan_changesExactlyOnce,동시에 같은 사용자를 차단하면 한 요청만 성공하고 감사 로그도 하나만 남긴다,통합(Spring+DB),@Test,crates/app/src/admin/db_tests.rs::같은_사용자를_동시에_차단하면_한_번만_바뀐다,이식
+admin,admin/service/user/AdminUserStatusServiceTest.java,updateStatus_activeUserWithoutSocialAccount_updatesStatusAndAuditLog,소셜 계정이 없는 활성 사용자도 관리자가 차단하면 상태와 감사 로그를 저장한다,통합(Spring+DB),@Test,crates/app/src/admin/user/service.rs::차단하면_상태와_감사_로그를_함께_남긴다,이식
+admin,admin/service/user/AdminUserStatusServiceTest.java,updateStatus_bannedUserWithoutSocialAccount_updatesStatusAndAuditLog,소셜 계정이 없는 차단 사용자도 관리자가 차단 해제하면 상태와 감사 로그를 갱신한다,통합(Spring+DB),@Test,crates/app/src/admin/user/service.rs::차단하면_상태와_감사_로그를_함께_남긴다,이식
+admin,admin/service/user/AdminUserStatusServiceTest.java,updateStatus_blankReason_throwsBusinessException,상태 변경 사유가 비어 있으면 사용자를 변경하지 않는다,통합(Spring+DB),@Test,crates/app/src/admin/user/service.rs::사유는_공백만이면_거절하고_앞뒤_공백을_뗀다,이식
+admin,admin/service/user/AdminUserStatusServiceTest.java,updateStatus_sameStatus_throwsStateChanged,이미 같은 상태인 사용자는 상태를 다시 변경하지 않는다,통합(Spring+DB),@Test,crates/app/src/admin/user/service.rs::상태_전이_규칙,이식
+admin,admin/service/user/AdminUserStatusServiceTest.java,updateStatus_unknownUser_throwsNotFoundException,존재하지 않는 사용자의 상태 변경은 404로 거절한다,통합(Spring+DB),@Test,crates/app/src/admin/endpoint_tests.rs::사용자_상세는_없으면_404이고_상태_변경은_차단_결과를_준다,이식
+admin,admin/service/user/AdminUserStatusServiceTest.java,updateStatus_withdrawnUser_throwsBusinessException,탈퇴 사용자의 상태는 변경하지 않는다,통합(Spring+DB),@Test,crates/app/src/admin/user/service.rs::상태_전이_규칙,이식
 architecture,architecture/ArchitectureConventionTest.java,check_productionClasses_followArchitectureConventions,운영 코드의 요청 DTO와 계층 의존 규칙을 검사한다,아키텍처,@Test,,미이식
 architecture,architecture/ArchitectureRulesTest.java,evaluate_invalidFixture_reportsViolation,각 규칙에 위반을 주입하면 실제 위반으로 판정한다,아키텍처,@ParameterizedTest,,미이식
 architecture,architecture/ArchitectureRulesTest.java,evaluate_validFixture_passesEveryRule,올바른 계층과 record 요청을 허용한다,아키텍처,@Test,,미이식
