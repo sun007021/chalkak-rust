@@ -226,6 +226,25 @@ impl RefreshTokenRepository {
         Ok(())
     }
 
+    /// `deleteUnusableBefore`: 절대 만료가 `now` 이전인 행과 `revoked_threshold`보다 먼저 폐기된 행을 지운다.
+    /// 두 조건은 서로 다른 컬럼을 보므로 문장을 나눠 각자의 인덱스를 쓴다(원본 주석). 지운 총 개수를 돌려준다.
+    pub fn delete_unusable_before(
+        &self,
+        db: &mut impl GenericClient,
+        now: Timestamp,
+        revoked_threshold: Timestamp,
+    ) -> Result<u64, DbError> {
+        let absolutely_expired = db.execute(
+            "DELETE FROM user_refresh_tokens WHERE absolute_expires_at < $1",
+            &[&now],
+        )?;
+        let revoked = db.execute(
+            "DELETE FROM user_refresh_tokens WHERE revoked_at < $1",
+            &[&revoked_threshold],
+        )?;
+        Ok(absolutely_expired + revoked)
+    }
+
     /// 계보 하나를 통째로 폐기하고 폐기된 토큰 수를 돌려준다.
     pub fn revoke_session(
         &self,
@@ -276,6 +295,18 @@ impl ConsumedSignupTokenRepository {
             &[&jti, &expires_at],
         )?;
         Ok(inserted > 0)
+    }
+
+    /// `deleteAllExpiredBefore`: 만료 시각이 `now`보다 앞선 기록만 지운다(같으면 남긴다).
+    pub fn delete_all_expired_before(
+        &self,
+        db: &mut impl GenericClient,
+        now: Timestamp,
+    ) -> Result<u64, DbError> {
+        Ok(db.execute(
+            "DELETE FROM consumed_signup_tokens WHERE expires_at < $1",
+            &[&now],
+        )?)
     }
 }
 
@@ -330,6 +361,29 @@ impl PendingAppleAuthorizationRepository {
             })
         })
         .transpose()
+    }
+
+    /// `findAllExpiredAtOrBefore`: 만료 시각이 `now` 이하인 행을 만료가 이른 순서로.
+    pub fn find_all_expired_at_or_before(
+        &self,
+        db: &mut impl GenericClient,
+        now: Timestamp,
+    ) -> Result<Vec<PendingAppleAuthorization>, DbError> {
+        db.query(
+            "SELECT id, subject_hmac, encrypted_refresh_token, expires_at \
+             FROM pending_apple_authorizations WHERE expires_at <= $1 ORDER BY expires_at ASC",
+            &[&now],
+        )?
+        .iter()
+        .map(|row| {
+            Ok(PendingAppleAuthorization {
+                id: row.try_get("id")?,
+                subject_hmac: row.try_get("subject_hmac")?,
+                encrypted_refresh_token: row.try_get("encrypted_refresh_token")?,
+                expires_at: row.try_get("expires_at")?,
+            })
+        })
+        .collect()
     }
 
     pub fn insert(

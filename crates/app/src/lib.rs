@@ -15,6 +15,7 @@ pub mod auth;
 pub mod common;
 pub mod config;
 pub mod feedback;
+pub mod jobs;
 pub mod like;
 pub mod notification;
 pub mod photo;

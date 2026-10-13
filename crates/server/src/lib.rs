@@ -13,6 +13,7 @@ use std::sync::Arc;
 
 use chalkak_app::admin::AdminConfig;
 use chalkak_app::admin::bootstrap::AdminAccount;
+use chalkak_app::jobs::{self, AppleRevocation, Job, JobDeps, Jobs};
 use chalkak_app::notification::slack::{
     NotificationMessageFactory, PostModerationPendingNotifier,
     SlackIncomingWebhookNotificationSender,
@@ -21,6 +22,7 @@ use chalkak_app::post::{
     NoopPostModerationPendingListener, PostModerationPendingListener, PostWiring,
 };
 use chalkak_app::web::Routes;
+use chalkak_app::wiring::apple_parts;
 use chalkak_app::{AppContext, register_routes};
 use chalkak_core::log::Logger;
 use chalkak_core::{Clock, ShutdownSignal, SystemClock};
@@ -158,6 +160,7 @@ pub fn run(settings: &Settings, shutdown: ShutdownSignal) -> Result<(), Box<dyn 
     migrate(settings, &pool, &logger)?;
     ensure_admin_account(&pool, settings)?;
 
+    let jobs = start_jobs(settings, &pool, &clock, &logger, &shutdown)?;
     let handler = build_handler(settings, pool.clone(), clock, Arc::clone(&logger));
     let server = Server::bind(
         ("0.0.0.0", settings.port),
@@ -168,12 +171,43 @@ pub fn run(settings: &Settings, shutdown: ShutdownSignal) -> Result<(), Box<dyn 
         .info("com.chalkak.backend.BackendApplication")
         .field("port", i64::from(settings.port))
         .log("서버를 시작했습니다");
-    let result = server.serve(handler, shutdown);
+    let result = server.serve(handler, shutdown.clone());
+    // 서버가 종료 신호 없이 끝났어도 작업을 멈춘다. 실행 중인 작업은 끝나기를 기다린 뒤(원본 스케줄러 종료에 해당)
+    // 풀을 닫는다.
+    shutdown.trigger();
+    jobs.join();
     pool.close();
     logger
         .info("com.chalkak.backend.BackendApplication")
         .log("서버를 종료했습니다");
     result.map_err(Into::into)
+}
+
+/// 주기 작업(정리 4종, 런타임 상태 로그)을 시작한다. 스케줄링이 꺼져 있으면 아무것도 시작하지 않는다.
+fn start_jobs(
+    settings: &Settings,
+    pool: &Pool,
+    clock: &Arc<dyn Clock>,
+    logger: &Arc<Logger>,
+    shutdown: &ShutdownSignal,
+) -> Result<Jobs, Box<dyn Error>> {
+    let wants_apple = settings
+        .jobs
+        .planned()
+        .contains(&Job::PendingAppleAuthorizationCleanup);
+    let apple = if wants_apple {
+        let (cipher, client) = apple_parts(&settings.app.auth, Arc::clone(clock))?;
+        Some(AppleRevocation { cipher, client })
+    } else {
+        None
+    };
+    let deps = JobDeps {
+        pool: pool.clone(),
+        clock: Arc::clone(clock),
+        logger: Arc::clone(logger),
+        apple,
+    };
+    Ok(jobs::start(&deps, &settings.jobs, shutdown)?)
 }
 
 /// 시작할 때 관리자 계정을 보장한다(`AdminAccountBootstrap`, `DevelopmentAdminBootstrap`).

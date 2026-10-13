@@ -153,6 +153,24 @@ impl AdminRefreshTokenRepository {
         Ok(())
     }
 
+    /// `deleteUnusableBefore`: 회원 토큰과 같은 기준으로 지운다. 지운 총 개수를 돌려준다.
+    pub fn delete_unusable_before(
+        &self,
+        db: &mut impl GenericClient,
+        now: Timestamp,
+        revoked_threshold: Timestamp,
+    ) -> Result<u64, DbError> {
+        let absolutely_expired = db.execute(
+            "DELETE FROM admin_refresh_tokens WHERE absolute_expires_at < $1",
+            &[&now],
+        )?;
+        let revoked = db.execute(
+            "DELETE FROM admin_refresh_tokens WHERE revoked_at < $1",
+            &[&revoked_threshold],
+        )?;
+        Ok(absolutely_expired + revoked)
+    }
+
     pub fn revoke_session(
         &self,
         db: &mut impl GenericClient,
