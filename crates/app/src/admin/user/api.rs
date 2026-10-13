@@ -56,9 +56,6 @@ fn get_users(service: &AdminUserQueryService, req: &Request) -> ApiResult {
     let sort = q.sort("sort", AdminUserSort::from_query)?;
     let page = q.integer("page")?;
     let page_size = q.integer("pageSize")?;
-    if email.as_deref().is_some_and(|e| utf16_len(e) > 320) {
-        return Err(validation("이메일 검색어가 올바르지 않습니다."));
-    }
     let (page, page_size) = page_params(page, page_size)?;
     let result = service.get_users(
         Some(status.unwrap_or(AdminUserStatus::Active)),
