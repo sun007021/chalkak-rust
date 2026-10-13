@@ -1,0 +1,132 @@
+# 하네스 lane: 서로 섞이지 않는 비교 대상 하나(앱 1개 + 전용 PostgreSQL + 전용 가짜 외부 서버 + 전용 시계 파일).
+# lane마다 compose 프로젝트 이름·호스트 포트·시계 디렉터리가 달라서 여러 lane을 동시에 띄워 시나리오를 나눠 돌릴 수 있다.
+# 직접 쓰지 않고 harness/scripts/lane.sh로 띄운다(변수는 lane.sh가 채운다).
+#
+# 이미지는 공개 기본 이미지를 그대로 쓰고, 빌드가 필요한 것(libfaketime, 앱 바이너리·JAR, fakes)은 호스트 파일을 마운트한다.
+# 컨테이너 안에서 apt·git·cargo 네트워크를 쓸 수 없는 환경(클라우드 세션)에서도 이미지 빌드 없이 뜨게 하려는 것이다.
+
+name: ${LANE_PROJECT:?lane.sh로 실행하세요}
+
+x-faketime: &faketime
+  LD_PRELOAD: /opt/faketime/libfaketime.so.1
+  FAKETIME_NO_CACHE: "1"
+  FAKETIME_DONT_FAKE_MONOTONIC: "1"
+  # libfaketime이 CLOCK_MONOTONIC 조건 변수 대기를 보정하는 기능을 끈다. 켜져 있으면(기본) 시간 제한 대기가 바로
+  # 끝나 JVM 내부 스레드가 쉬지 않고 돌며 시계 파일을 읽는다: 쉬는 Java 하나가 CPU 1~2코어를 쓰고, 기동이 4~6분
+  # 걸리고, 부하로 시계 미반영 오류가 났다(2026-10-13 측정, Object.wait(6s)가 0.8초에 끝남).
+  FAKETIME_FORCE_MONOTONIC_FIX: "0"
+  FAKETIME_TIMESTAMP_FILE: /clock/clock
+
+x-clock-volumes: &clock-volumes
+  - ${LANE_DIR}:/clock:ro
+  - ${FAKETIME_LIB}:/opt/faketime/libfaketime.so.1:ro
+
+x-http-health: &http-health
+  interval: 1s
+  timeout: 5s
+  retries: 600
+
+services:
+  pg:
+    image: postgres:18.4
+    # 공식 이미지의 root 진입점이 만든 세마포어를 postgres 사용자가 열지 못해 libfaketime이 실패한다.
+    user: postgres
+    # 데이터는 메모리(tmpfs)에 두고 내구성 설정을 끈다. 시나리오마다 비우는 일회용 DB라 결과에는 영향이 없다.
+    tmpfs:
+      - /var/lib/postgresql:uid=999,gid=999,mode=0700
+    command:
+      - postgres
+      - -c
+      - fsync=off
+      - -c
+      - synchronous_commit=off
+      - -c
+      - full_page_writes=off
+      - -c
+      - shared_preload_libraries=pg_stat_statements
+      - -c
+      - pg_stat_statements.track=all
+      - -c
+      - pg_stat_statements.max=10000
+    environment:
+      POSTGRES_DB: chalkak
+      POSTGRES_USER: chalkak
+      POSTGRES_PASSWORD: test-password
+      TZ: Asia/Seoul
+      <<: *faketime
+    volumes: *clock-volumes
+    ports: ["127.0.0.1:${LANE_DB_PORT}:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chalkak -d chalkak"]
+      interval: 1s
+      timeout: 5s
+      retries: 60
+
+  # 이 lane 전용 가짜 외부 서버. 다른 lane의 요청 기록과 섞이지 않는다.
+  fakes:
+    image: debian:trixie-slim
+    entrypoint: ["/usr/local/bin/chalkak-fakes"]
+    environment:
+      FAKES_ADDR: 0.0.0.0:9000
+      FAKES_S3_BUCKET: test-bucket
+    volumes:
+      - ${LANE_FAKES_BIN}:/usr/local/bin/chalkak-fakes:ro
+    ports: ["127.0.0.1:${LANE_FAKES_PORT}:9000"]
+    networks:
+      default:
+        # S3 가상 호스트 방식 주소(<버킷>.<엔드포인트 호스트>)가 이 컨테이너로 풀리게 한다.
+        aliases: [test-bucket.fakes]
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /__admin/health HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q UP <&3"]
+      <<: *http-health
+
+  # Rust candidate. 호스트에서 cargo build --release 한 바이너리를 마운트한다.
+  rust:
+    image: debian:trixie-slim
+    profiles: [rust]
+    entrypoint: ["/app/chalkak-server"]
+    working_dir: /app
+    env_file: ../env/oracle.env
+    environment:
+      DB_HOST: pg
+      DB_PORT: "5432"
+      DB_NAME: chalkak
+      DB_USERNAME: chalkak
+      DB_PASSWORD: test-password
+      <<: *faketime
+    volumes:
+      - ${LANE_DIR}:/clock:ro
+      - ${FAKETIME_LIB}:/opt/faketime/libfaketime.so.1:ro
+      - ${LANE_RUST_BIN}:/app/chalkak-server:ro
+      - ../../migrations:/app/migrations:ro
+    ports: ["127.0.0.1:${LANE_APP_PORT}:8080"]
+    depends_on:
+      pg: { condition: service_healthy }
+      fakes: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /actuator/health HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q UP <&3"]
+      <<: *http-health
+
+  # Java oracle(원본 기준 커밋 JAR).
+  java:
+    image: eclipse-temurin:25-jre
+    profiles: [java]
+    entrypoint: ["bash", "-c", "exec java -XX:MaxRAMPercentage=70 $$LANE_JAVA_OPTS -jar /app/app.jar"]
+    env_file: ../env/oracle.env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://pg:5432/chalkak
+      SPRING_DATASOURCE_USERNAME: chalkak
+      SPRING_DATASOURCE_PASSWORD: test-password
+      LANE_JAVA_OPTS: ${LANE_JAVA_OPTS:-}
+      <<: *faketime
+    volumes:
+      - ${LANE_DIR}:/clock:ro
+      - ${FAKETIME_LIB}:/opt/faketime/libfaketime.so.1:ro
+      - ${LANE_JAVA_JAR}:/app/app.jar:ro
+    ports: ["127.0.0.1:${LANE_APP_PORT}:8080"]
+    depends_on:
+      pg: { condition: service_healthy }
+      fakes: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /actuator/health HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q UP <&3"]
+      <<: *http-health

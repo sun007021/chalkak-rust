@@ -13,7 +13,10 @@
 | `scenarios/` | 시나리오(TOML). 형식은 `parity/src/scenario.rs` 상단 주석 참고 |
 | `golden/` | Java oracle에서 녹화한 정규화 결과 |
 | `env/` | 대상별 설정(`java-a`, `java-b`, `rust`)과 앱 공통 환경변수(`oracle.env`) |
-| `scripts/up.sh`, `down.sh` | docker compose로 대상(PostgreSQL + 앱 + 시계 파일 + fakes) 기동·정리. 서비스 정의는 저장소 루트 `compose.yaml` |
+| `scripts/check.sh` | **기본 진입점.** 빌드 → lane 준비 → 시나리오를 lane에 나눠 병렬 실행(`verify`·`compare`·`record`) |
+| `scripts/lane.sh`, `lane/compose.yaml` | lane(서로 섞이지 않는 비교 대상 하나) 띄우기·목록·정리 |
+| `scripts/oracle-jar.sh` | Java lane이 쓰는 원본 JAR(`BASELINE` 커밋)을 호스트에서 빌드 |
+| `scripts/up.sh`, `down.sh` | 예전 고정 환경(java-a·java-b·rust 한 벌) 기동·정리. 서비스 정의는 저장소 루트 `compose.yaml` |
 | `scripts/collect-sql.sh` | Java oracle이 시나리오를 처리하는 동안 보낸 SQL을 `pg_stat_statements`로 모아 저장 |
 | `scripts/collect-openapi.sh` | Java oracle의 `/v3/api-docs`(springdoc) 저장 |
 | `compose.fakes-local.yaml` | `compose.yaml`에 겹쳐 fakes를 호스트에서 빌드한 바이너리로 띄우는 설정 |
@@ -22,7 +25,61 @@
 
 ## 실행
 
-필요한 것: Docker(Compose v2). 원본 Java 이미지는 처음 한 번 `BASELINE` 커밋을 받아 컨테이너 안에서 빌드한다.
+필요한 것: Docker(Compose v2), 호스트의 libfaketime(`apt install libfaketime`), Rust 툴체인. Java lane에는 JDK 25로
+빌드한 원본 JAR이 더 필요하다(`harness/scripts/oracle-jar.sh`가 만든다).
+
+```bash
+# Rust를 golden과 비교 (Java가 필요 없다). 이 작업 트리 전용 Rust lane 2개에 시나리오를 나눠 돌린다
+harness/scripts/check.sh
+harness/scripts/check.sh --filter post --jobs 3
+
+# Java oracle과 바로 비교 / 시나리오를 바꿨을 때 golden 녹화 (Java lane은 모든 작업 트리가 함께 쓴다)
+harness/scripts/check.sh compare --filter post
+harness/scripts/check.sh record --filter post
+
+# lane 상태와 정리
+harness/scripts/lane.sh ls
+harness/scripts/lane.sh down rust          # 이 작업 트리의 Rust lane
+harness/scripts/lane.sh down all
+```
+
+같은 시나리오 31개(단계 584개) 기준 측정(2026-10-13, 4코어 클라우드 컨테이너):
+
+| | 예전 고정 환경 | lane |
+| --- | --- | --- |
+| Rust 전체 verify | 약 20분(단계당 약 2초, 추정) | lane 1개 5초, 3개 2초 |
+| Java 전체 실행 | 약 22분(추정) | lane 1개 10초, 2개 8초 |
+| Java 기동 | 4~6분(다른 작업과 겹칠 때) | 14초 |
+| 쉬는 Java 하나의 CPU | 1.1~1.7코어 | 0.04코어 |
+
+### lane
+
+lane 하나는 앱 1개(rust 또는 java) + 전용 PostgreSQL + 전용 가짜 외부 서버 + 전용 시계 파일이다. 아무것도 공유하지
+않으므로 여러 lane에 시나리오를 나눠 동시에 돌릴 수 있고, 여러 작업(작업 트리, 서브에이전트)이 서로 기다리지 않는다.
+
+- **Rust lane은 작업 트리 전용이다.** 그 작업 트리의 `target/release/chalkak-server`를 마운트하므로 다른 작업 트리가 쓰지 않는다.
+  `check.sh`는 매번 빌드하고 앱 컨테이너만 다시 만든다(약 1초). 기동이 수 초라 필요한 만큼 띄우고 내리면 된다.
+- **Java lane은 모두가 함께 쓴다.** 원본 JAR은 기준 커밋이 같으면 누구에게나 같다. 러너는 실행하는 동안 lane 잠금
+  (`lock`)을 잡고, 다른 작업이 잡고 있는 lane은 건너뛴다(모두 잡혀 있으면 기다린다). 동시에 녹화할 일이 많으면
+  `lane.sh up java N`으로 늘린다. Java 하나가 쉬는 동안 메모리 약 600MB를 쓴다.
+- 이미지는 공개 기본 이미지(`postgres:18.4`, `eclipse-temurin:25-jre`, `debian:trixie-slim`)를 그대로 쓰고,
+  libfaketime·앱 바이너리·JAR·fakes는 호스트 파일을 마운트한다. 컨테이너 안에서 apt·git·cargo 네트워크가 막힌
+  환경(클라우드 세션)에서도 이미지 빌드 없이 뜬다. 같은 이유로 lane은 리눅스 호스트용이다.
+- 상태는 `$CHALKAK_LANES_DIR`(기본 `/tmp/chalkak-lanes`)`/<lane>/`에 있다(`clock`, `target.toml`, `lock`). 포트는
+  lane 번호 N마다 `20000+N*10`(앱), `+1`(DB), `+2`(가짜 서버). 앱이 가짜 서버를 lane 네트워크의 `fakes`,
+  `test-bucket.fakes`로 찾으므로 호스트 `/etc/hosts`나 포트 전달이 필요 없다.
+
+러너를 직접 부를 때는 대상 설정을 쉼표로 여러 개 준다. 대상마다 작업 스레드 하나가 남은 시나리오를 가져간다.
+
+```bash
+target/release/chalkak-parity verify --target "$(harness/scripts/lane.sh targets rust)"
+target/release/chalkak-parity compare --left "$(harness/scripts/lane.sh targets java)" --right "$(harness/scripts/lane.sh targets rust)"
+```
+
+### 예전 고정 환경
+
+`compose.yaml`의 java-a·java-b·rust 한 벌도 그대로 쓸 수 있다(대상 설정 `harness/env/*.toml`). 대상 하나씩이라
+여러 작업이 함께 쓰면 차례를 기다린다. 원본 Java 이미지는 처음 한 번 `BASELINE` 커밋을 받아 컨테이너 안에서 빌드한다.
 
 ```bash
 # Java oracle(java-a) + Rust 개발용 DB(pg-rust)
@@ -146,17 +203,25 @@ Hibernate(소문자)와 구분해 걸러낸다.
 
 ## 결정성을 만드는 장치
 
-- **시계:** 앱과 DB 컨테이너를 libfaketime으로 띄우고, 러너가 단계마다 `harness/out/clock-<대상>` 파일에
-  오프셋을 써서 각 단계가 시나리오 시각에서 출발하게 한다. 원본이 `Clock`을 쓰지 않고 `Instant.now()`를 부르는
-  곳(주제 단계 판단, 콜백 인증 등)까지 같은 시각을 본다.
+- **시계:** 앱과 DB 컨테이너를 libfaketime으로 띄우고, 러너가 대상의 시계 파일에 오프셋(소수 초)을 써서 단계마다
+  앱 시각이 `시나리오 시각 + 1.1초` 근처에서 출발하게 한다. 원본이 `Clock`을 쓰지 않고 `Instant.now()`를 부르는
+  곳(주제 단계 판단, 콜백 인증 등)까지 같은 시각을 본다. 시계 파일은 목표 시각이 바뀔 때(시나리오 시작,
+  `advance_seconds`)나 마지막으로 맞춘 뒤 1초가 지났을 때만 다시 쓴다(`runner.rs`의 `ClockSync`). 예전처럼 단계마다
+  쓰려면 `PARITY_CLOCK=strict`. 시계를 쓴 뒤 기다리는 시간은 대상 설정 `clock_settle_ms`(lane: Java 200, Rust 50,
+  예전 환경 기본 1100).
+- **libfaketime 설정:** `FAKETIME_FORCE_MONOTONIC_FIX=0`이 꼭 필요하다. 기본값(보정 켜짐)에서는 `CLOCK_MONOTONIC`
+  시간 제한 대기가 바로 끝나서 JVM 내부 스레드(Cleaner, G1 Refine, Hikari 등)가 쉬지 않고 돌며 시계 파일을 읽는다.
+  쉬는 Java 하나가 1~2코어를 쓰고, 기동이 수 분 걸리고, 그 부하로 시계 미반영 오류가 났다(`Object.wait(6초)`가 0.8초에 끝남).
 - **DB:** 시나리오마다 `flyway_schema_history`를 뺀 모든 테이블을 비우고 `setup.sql`을 실행한다.
-- **일시적 하네스 오류는 시나리오를 다시 실행:** 앱 `Date`가 시나리오 시각과 다르거나(부하로 libfaketime이 시계 파일을 놓침) 응답 없이
-  연결이 닫히면 시나리오를 DB 초기화부터 최대 3번 다시 돌리고 경고를 낸다. 세 번 모두 같으면 그 오류로 멈추므로 구현이 실제로 응답 없이 닫는 경우는 가려지지 않는다.
-  끝나면 시계 파일을 `+0`(실제 시각)으로 되돌린다. 참고: libfaketime(`FAKETIME_NO_CACHE=1`) 아래의 JVM은 유휴 때도 코어를 많이 써서
-  java 컨테이너 둘이 4코어 장비의 부하를 30 근처로 만들었다. 이 때문에 시계 오류가 생기므로 비교 실행 중에는 다른 무거운 작업(빌드 등)을 피한다.
+- **일시적 하네스 오류는 시나리오를 다시 실행:** 앱 `Date`가 시나리오 시각과 다르거나(libfaketime이 시계 파일을 놓침) 응답 없이
+  연결이 닫히면 시나리오를 DB 초기화부터 최대 3번 다시 돌리고 경고를 낸다. 세 번 모두 같으면 그 시나리오를 오류로 남기므로 구현이 실제로 응답 없이 닫는 경우는 가려지지 않는다.
+  하네스 오류가 하나라도 있으면 종료 코드는 2다. 끝나면 시계 파일을 `+0`(실제 시각)으로 되돌린다.
 - **정규화:** UUID는 등장 순서 기호(`$uuid1`), 시각은 시나리오 시계 기준 5초 칸의 상대값과 표기 규칙
   (`<t+0s iso Z>`), JWT는 클레임을 풀어서 비교한다. 그 밖의 본문·헤더·한글 메시지는 바이트 그대로 비교한다.
   DB 덤프는 행 순서를 정렬하고, 응답에서 보지 못한 UUID는 `$uuid?`로 둔다.
+  구현이 정하지 않는 순서는 결과와 golden 모두에서 한 형식으로 맞춘다: DB 행 JSON의 키 순서(serde_json
+  `preserve_order`가 빌드 묶음에 따라 켜지고 꺼진다), `Allow` 헤더의 메서드 순서(Spring이 JVM 실행마다 다르게 낸다).
+  golden 파일도 키를 정렬해 쓴다.
 
 ## 지금까지 녹화로 확인한 원본 동작
 
