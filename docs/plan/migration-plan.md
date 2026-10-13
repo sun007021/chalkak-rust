@@ -47,6 +47,7 @@ B안 허용 목록 초안 (모두 `cargo-deny`로 고정·감사):
 | TLS | `rustls`, `webpki-roots` | 외부 HTTPS, RDS TLS |
 | 암호 | `ring` 또는 RustCrypto(`hmac`, `sha2`, `aes-gcm`, `p256`, `rsa`) + `bcrypt` | 하나의 계열로 통일 |
 | DB 드라이버 | `postgres`(동기) | 내부적으로 tokio를 숨겨 쓰는 점은 수용 여부 확인. 대안: PG v3 프로토콜 직접 구현 |
+| DB TLS | `tokio-postgres-rustls` | `postgres`에 `rustls`를 붙이는 연결자(우리 코드가 `MakeTlsConnect`를 직접 구현하려면 tokio의 I/O 트레이트가 필요하다). 원본 pgjdbc 기본값 `sslmode=prefer`(인증서 검증 없음)를 재현한다. 2026-10-13 #30에서 추가 |
 | JSON | `serde`, `serde_json` | derive 매크로 포함 |
 | 식별자·시간 | `uuid`(v4: requestId, v7), `jiff` 또는 `time` + tzdb | Asia/Seoul 계산 |
 | 종료 신호 | `signal-hook` | 표준 라이브러리로는 SIGTERM을 받을 수 없음. graceful shutdown(`TimeoutStopSec=30`)에 필요 |

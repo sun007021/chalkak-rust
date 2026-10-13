@@ -5,7 +5,7 @@ use std::ops::{Deref, DerefMut};
 use std::sync::{Arc, Condvar, Mutex, MutexGuard};
 use std::time::{Duration, Instant};
 
-use postgres::{Client, NoTls};
+use postgres::Client;
 
 use crate::config::DbConfig;
 use crate::error::DbError;
@@ -40,7 +40,7 @@ impl Inner {
     fn open(&self) -> Result<Client, postgres::Error> {
         let mut pg = self.config.pg.clone();
         pg.connect_timeout(self.config.connection_timeout);
-        pg.connect(NoTls)
+        crate::tls::connect(&pg)
     }
 
     fn give_up_slot(&self) {
