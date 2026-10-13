@@ -24,6 +24,13 @@ fn handler(db: &TestDb) -> Arc<dyn Handler> {
         ("REFRESH_TOKEN_ABSOLUTE_EXPIRATION", "90d"),
         ("CLOUDFRONT_ORIGIN_PATH", "/chalkak"),
         ("ADMIN_DEVELOPMENT_BYPASS_ENABLED", "false"),
+        ("CLOUDFRONT_ORIGIN_PATH", "/chalkak"),
+        (
+            "IMAGE_PROCESSOR_CALLBACK_SECRET",
+            "test-callback-secret-with-enough-length",
+        ),
+        ("CALLBACK_MAX_BODY_BYTES", "65536"),
+        ("POST_IMAGE_PROCESSING_TIMEOUT", "7m"),
     ]);
     let settings = Settings::from_env(&env).unwrap();
     let clock: Arc<dyn Clock> = Arc::new(FixedClock::new(NOW.parse().unwrap()));

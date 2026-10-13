@@ -314,7 +314,7 @@ pub fn body_enum<T: Copy>(
     field: &str,
     names: &[(&str, T)],
 ) -> Result<Option<T>, ApiError> {
-    match body.raw(field) {
+    match body.value(field) {
         None | Some(Value::Null) => Ok(None),
         Some(Value::String(text)) => {
             let trimmed = java_trim(text);
@@ -345,7 +345,7 @@ pub fn body_enum<T: Copy>(
 
 /// Jackson `Instant` 필드.
 pub fn body_instant(body: &JsonObject, field: &str) -> Result<Option<Timestamp>, ApiError> {
-    match body.raw(field) {
+    match body.value(field) {
         None | Some(Value::Null) => Ok(None),
         Some(Value::String(text)) => {
             let trimmed = java_trim(text);
@@ -448,7 +448,7 @@ impl JsonDate {
 }
 
 pub fn body_local_date(body: &JsonObject, field: &str) -> Result<Option<JsonDate>, ApiError> {
-    match body.raw(field) {
+    match body.value(field) {
         None | Some(Value::Null) => Ok(None),
         Some(Value::String(text)) => {
             let trimmed = java_trim(text);

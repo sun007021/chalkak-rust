@@ -1,0 +1,207 @@
+name = "게시물: 작성 거절과 요청 본문 오류"
+tags = ["p19", "post"]
+clock = "2026-10-12T09:00:00+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO users (id, email, status, signature_original_storage_key) VALUES
+  ('01990000-0000-7000-8000-000000000001', 'u1@test.chalkak', 'ACTIVE', 'chalkak/signatures/u1/original.png'),
+  ('01990000-0000-7000-8000-000000000002', 'u2@test.chalkak', 'ACTIVE', 'chalkak/signatures/u2/original.png'),
+  ('01990000-0000-7000-8000-000000000009', 'banned@test.chalkak', 'BANNED', 'chalkak/signatures/u9/original.png');
+INSERT INTO topics (id, title, topic_date, starts_at, ends_at) VALUES
+  ('01990000-0000-7000-8000-0000000000f1', '오늘', '2026-10-12', '2026-10-12T00:00:00+09:00', '2026-10-13T00:00:00+09:00'),
+  ('01990000-0000-7000-8000-0000000000f2', '어제', '2026-10-11', '2026-10-11T00:00:00+09:00', '2026-10-12T00:00:00+09:00'),
+  ('01990000-0000-7000-8000-0000000000f3', '내일', '2026-10-13', '2026-10-13T00:00:00+09:00', '2026-10-14T00:00:00+09:00');
+INSERT INTO post_image_uploads (id, user_id, status, rejection_reason, image_metadata, expires_at, claimed_at) VALUES
+  ('01990000-0000-7000-8000-0000000000a1', '01990000-0000-7000-8000-000000000001', 'ISSUED', NULL, NULL, '2026-10-13T09:00:00+09:00', NULL),
+  ('01990000-0000-7000-8000-0000000000a2', '01990000-0000-7000-8000-000000000001', 'READY', NULL, '{"width":1}', '2026-10-13T09:00:00+09:00', NULL),
+  ('01990000-0000-7000-8000-0000000000a3', '01990000-0000-7000-8000-000000000001', 'REJECTED', 'BAD', NULL, '2026-10-13T09:00:00+09:00', NULL),
+  ('01990000-0000-7000-8000-0000000000a4', '01990000-0000-7000-8000-000000000001', 'READY', NULL, '{"width":1}', '2026-10-13T09:00:00+09:00', '2026-10-12T08:00:00+09:00'),
+  ('01990000-0000-7000-8000-0000000000a5', '01990000-0000-7000-8000-000000000002', 'READY', NULL, '{"width":1}', '2026-10-13T09:00:00+09:00', NULL),
+  ('01990000-0000-7000-8000-0000000000a6', '01990000-0000-7000-8000-000000000001', 'READY', NULL, '{"width":1}', '2026-10-12T08:59:59+09:00', NULL),
+  ('01990000-0000-7000-8000-0000000000a7', '01990000-0000-7000-8000-000000000001', 'ISSUED', NULL, NULL, '2026-10-12T08:59:59+09:00', NULL)
+"""]
+
+[[step]]
+name = "인증 없음"
+method = "POST"
+path = "/api/v1/posts"
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"01990000-0000-7000-8000-0000000000a2"}'''
+
+[[step]]
+name = "차단된 회원"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000009" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"01990000-0000-7000-8000-0000000000a2"}'''
+
+[[step]]
+name = "없는 회원"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-0000000000ee" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"01990000-0000-7000-8000-0000000000a2"}'''
+
+[[step]]
+name = "없는 주제"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000ff","photoUploadId":"01990000-0000-7000-8000-0000000000a2"}'''
+
+[[step]]
+name = "마감된 주제"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f2","photoUploadId":"01990000-0000-7000-8000-0000000000a2"}'''
+
+[[step]]
+name = "시작 전 주제"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f3","photoUploadId":"01990000-0000-7000-8000-0000000000a2"}'''
+
+[[step]]
+name = "없는 업로드"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"01990000-0000-7000-8000-0000000000fe"}'''
+
+[[step]]
+name = "다른 회원의 업로드"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"01990000-0000-7000-8000-0000000000a5"}'''
+
+[[step]]
+name = "이미 사용한 업로드"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"01990000-0000-7000-8000-0000000000a4"}'''
+
+[[step]]
+name = "반려된 업로드"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"01990000-0000-7000-8000-0000000000a3"}'''
+
+[[step]]
+name = "claim 기한이 지난 업로드"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"01990000-0000-7000-8000-0000000000a6"}'''
+
+[[step]]
+name = "claim 기한이 지난 미처리 업로드"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"01990000-0000-7000-8000-0000000000a7"}'''
+[step.fakes.s3."chalkak/staging/local/posts/01990000-0000-7000-8000-0000000000a7.webp"]
+size = 1
+content_type = "image/webp"
+
+[[step]]
+name = "S3가 403이면 사진이 없는 것으로 본다"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"01990000-0000-7000-8000-0000000000a1"}'''
+[step.fakes.s3."chalkak/staging/local/posts/01990000-0000-7000-8000-0000000000a1.webp"]
+status = 403
+
+[[step]]
+name = "S3 확인이 5xx면 서버 오류"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"01990000-0000-7000-8000-0000000000a1"}'''
+[step.fakes.s3."chalkak/staging/local/posts/01990000-0000-7000-8000-0000000000a1.webp"]
+status = 500
+
+[[step]]
+name = "본문 없음"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "깨진 JSON"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = "{not json"
+
+[[step]]
+name = "주제 누락"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '''{"photoUploadId":"01990000-0000-7000-8000-0000000000a2"}'''
+
+[[step]]
+name = "업로드 누락"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1"}'''
+
+[[step]]
+name = "제목이 10자를 넘는다"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"01990000-0000-7000-8000-0000000000a2","title":"12345678901"}'''
+
+[[step]]
+name = "잘못된 UUID 형식"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '''{"topicId":"nope","photoUploadId":"01990000-0000-7000-8000-0000000000a2"}'''
+
+[[step]]
+name = "UUID가 아닌 값 타입"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '''{"topicId":123,"photoUploadId":"01990000-0000-7000-8000-0000000000a2"}'''
+
+[[step]]
+name = "JSON 배열 본문"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = "[]"
+
+[[step]]
+name = "제목이 공백이면 비어 있는 제목으로 작성된다"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"01990000-0000-7000-8000-0000000000a2","title":"   "}'''
+
+[[step]]
+name = "업로드 URL 발급은 인증이 필요하다"
+method = "POST"
+path = "/api/v1/posts/uploads"
+
+[[step]]
+name = "차단된 회원은 업로드를 못 받는다"
+method = "POST"
+path = "/api/v1/posts/uploads"
+auth = { user = "01990000-0000-7000-8000-000000000009" }
+
+[[step]]
+name = "업로드 URL 발급에 본문이 있어도 된다"
+method = "POST"
+path = "/api/v1/posts/uploads"
+auth = { user = "01990000-0000-7000-8000-000000000002" }
+body = '''{"x":1}'''

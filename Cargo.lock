@@ -144,6 +144,7 @@ dependencies = [
  "chalkak-db",
  "chalkak-http",
  "chalkak-jwt",
+ "hmac 0.12.1",
  "jiff",
  "postgres",
  "serde",
@@ -224,6 +225,7 @@ name = "chalkak-server"
 version = "0.0.0"
 dependencies = [
  "chalkak-app",
+ "chalkak-aws",
  "chalkak-core",
  "chalkak-db",
  "chalkak-http",

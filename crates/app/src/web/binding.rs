@@ -174,8 +174,8 @@ pub fn required_date_query(req: &Request, name: &str) -> Result<LocalDate, ApiEr
 pub struct JsonObject(Map<String, Value>);
 
 impl JsonObject {
-    /// 필드의 원래 JSON 값. 문자열이 아닌 타입(열거형·시각·날짜)을 도메인별로 해석할 때 쓴다.
-    pub fn raw(&self, name: &str) -> Option<&Value> {
+    /// 필드의 원본 JSON 값. 문자열 말고 UUID·숫자 필드를 직접 해석해야 하는 DTO가 쓴다.
+    pub fn value(&self, name: &str) -> Option<&Value> {
         self.0.get(name)
     }
 
