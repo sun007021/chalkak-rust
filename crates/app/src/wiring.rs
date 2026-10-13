@@ -5,6 +5,8 @@
 
 use std::sync::Arc;
 
+use chalkak_core::Clock;
+
 use crate::AppContext;
 use crate::auth::UsableUserPolicy;
 use crate::auth::apple::{AppleHttpTokenClient, AppleTokenClient};
@@ -19,7 +21,9 @@ use crate::auth::service::{
 use crate::auth::tokens::{
     AccessTokenIssuer, AppleCipher, AppleClientSecret, IdentityFingerprint, SignupTokens,
 };
-use crate::config::{ACCESS_TOKEN_AUDIENCE, SIGNUP_TOKEN_AUDIENCE, SIGNUP_TOKEN_LIFETIME};
+use crate::config::{
+    ACCESS_TOKEN_AUDIENCE, AuthSettings, SIGNUP_TOKEN_AUDIENCE, SIGNUP_TOKEN_LIFETIME,
+};
 use crate::post::ProcessingCallbackAuthenticator;
 use crate::user::domain::SignatureImagePolicy;
 use crate::user::service::{SignatureProcessingPolicy, UserService, UserWithdrawalService};
@@ -27,6 +31,31 @@ use crate::user::storage::{
     HeadObjects, HttpHeadObjects, S3SignatureImageStorage, S3SignatureImageUploadIssuer,
     SignatureImageStorage, SignatureImageUploadIssuer, credentials_for,
 };
+
+/// Apple 리프레시 토큰 암호기와 토큰 서버 클라이언트. 로그인·탈퇴와 임시 인증 정보 정리가 같은 구성을 쓴다.
+pub fn apple_parts(
+    auth: &AuthSettings,
+    clock: Arc<dyn Clock>,
+) -> Result<(AppleCipher, Arc<dyn AppleTokenClient>), String> {
+    let client_secret = Arc::new(
+        AppleClientSecret::new(
+            &auth.apple.private_key_base64,
+            &auth.apple.team_id,
+            &auth.apple.key_id,
+            &auth.apple.client_id,
+            clock,
+        )
+        .map_err(|e| format!("APPLE_PRIVATE_KEY_BASE64: {e}"))?,
+    );
+    let apple_client: Arc<dyn AppleTokenClient> = Arc::new(AppleHttpTokenClient::new(
+        &auth.apple.token_uri,
+        &auth.apple.revoke_uri,
+        &auth.apple.client_id,
+        client_secret,
+    )?);
+    let cipher = AppleCipher::new(&auth.apple.encryption_key);
+    Ok((cipher, apple_client))
+}
 
 /// 라우트가 쓰는 서비스 묶음.
 #[derive(Clone)]
@@ -62,23 +91,7 @@ impl Components {
         let fingerprint = IdentityFingerprint::new(auth.social_identity_key.clone());
         let verifier = SocialIdentityVerifier::from_settings(auth, Arc::clone(&clock))?;
 
-        let client_secret = Arc::new(
-            AppleClientSecret::new(
-                &auth.apple.private_key_base64,
-                &auth.apple.team_id,
-                &auth.apple.key_id,
-                &auth.apple.client_id,
-                Arc::clone(&clock),
-            )
-            .map_err(|e| format!("APPLE_PRIVATE_KEY_BASE64: {e}"))?,
-        );
-        let apple_client: Arc<dyn AppleTokenClient> = Arc::new(AppleHttpTokenClient::new(
-            &auth.apple.token_uri,
-            &auth.apple.revoke_uri,
-            &auth.apple.client_id,
-            client_secret,
-        )?);
-        let cipher = AppleCipher::new(&auth.apple.encryption_key);
+        let (cipher, apple_client) = apple_parts(auth, Arc::clone(&clock))?;
         let apple_signup = AppleSignupAuthorizationService::new(
             pool.clone(),
             Arc::clone(&clock),
