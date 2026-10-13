@@ -268,6 +268,7 @@ mod tests {
             ("DB_PASSWORD", "p"),
             ("ADMIN_USERNAME", "operator"),
             ("ADMIN_PASSWORD_HASH", "h"),
+            ("ADMIN_NOTIFICATION_DELIVERY_ENABLED", "false"),
         ]);
         let prod = Settings::from_env(&prod).unwrap().jobs;
         assert!(prod.runtime_log);
