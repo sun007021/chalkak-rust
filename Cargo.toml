@@ -10,6 +10,7 @@ members = [
     "crates/server",
     "harness/parity",
     "harness/fakes",
+    "harness/loadgen",
 ]
 
 [workspace.package]

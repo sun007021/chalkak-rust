@@ -1,0 +1,17 @@
+[package]
+name = "chalkak-loadgen"
+version = "0.0.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+description = "성능·동시성·장시간 시험용 부하 발생기. 스레드와 블로킹 소켓만 쓴다(비동기 런타임 없음)"
+
+[dependencies]
+serde_json.workspace = true
+postgres.workspace = true
+hmac.workspace = true
+sha2.workspace = true
+
+[lints]
+workspace = true
