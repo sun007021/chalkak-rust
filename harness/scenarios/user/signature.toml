@@ -195,27 +195,23 @@ name = "처리 중에도 이전 사인은 조회된다"
 method = "GET"
 path = "/api/v1/users/me/signature"
 auth = { user = "01990000-0000-7000-8000-0000000000a1" }
-advance_seconds = 419
+advance_seconds = 360
 
+# 처리 시간(7분)의 정확한 경계는 시계가 실제로 흘러 요청마다 달라지므로 넣지 않는다(서비스 테스트가 경계를 본다).
+# 경계에서 20초 이상 떨어진 시각만 쓴다.
 [[step]]
-name = "처리 시작 6분 59초 뒤는 아직 유효"
+name = "처리 시작 6분 50초 뒤는 아직 유효"
 method = "GET"
 path = "/api/v1/users/me/signature"
 auth = { user = "01990000-0000-7000-8000-0000000000a1" }
-advance_seconds = 1
+advance_seconds = 50
 
 [[step]]
-name = "정확히 7분(경계)은 아직 유효"
+name = "7분 20초가 지나면 다시 등록해야 한다(조회)"
 method = "GET"
 path = "/api/v1/users/me/signature"
 auth = { user = "01990000-0000-7000-8000-0000000000a1" }
-advance_seconds = 1
-
-[[step]]
-name = "7분 1초가 지나면 다시 등록해야 한다(조회)"
-method = "GET"
-path = "/api/v1/users/me/signature"
-auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+advance_seconds = 30
 
 [[step]]
 name = "시간이 지난 업로드 ID로 변경하면 재업로드 필요"
