@@ -96,10 +96,10 @@ fn detail_of(row: UserDetailRow, deps: &AdminDeps) -> Result<AdminUserDetail, Ap
             thumbnail_image_url: None,
         }
     } else {
-        let urls = deps.image_urls();
+        let urls = &deps.image_urls;
         UserSignature {
-            original_image_url: urls.url(Some(&row.signature_original_storage_key))?,
-            thumbnail_image_url: urls.url(row.signature_thumbnail_storage_key.as_deref())?,
+            original_image_url: urls.get_url(Some(&row.signature_original_storage_key))?,
+            thumbnail_image_url: urls.get_url(row.signature_thumbnail_storage_key.as_deref())?,
         }
     };
     Ok(AdminUserDetail {

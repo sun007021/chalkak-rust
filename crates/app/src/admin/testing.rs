@@ -29,6 +29,10 @@ pub fn deps_at(db: &TestDb, now: &str) -> AdminDeps {
         )),
         clock,
         config: Arc::new(AdminConfig::for_tests(ACCESS_KEY.to_vec())),
+        image_urls: crate::photo::url::CloudFrontUrlProvider::new(
+            "https://cdn.test.chalkak",
+            "/chalkak",
+        ),
     }
 }
 

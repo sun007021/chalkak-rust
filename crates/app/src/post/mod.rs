@@ -68,14 +68,19 @@ impl PostWiring {
         )
     }
 
+    /// 이미지 주소 변환기. 게시물 조회와 관리자 조회가 같은 설정으로 만든다.
+    pub fn image_urls(&self) -> CloudFrontUrlProvider {
+        CloudFrontUrlProvider::new(
+            &self.settings.cloudfront_base_url,
+            &self.settings.cloudfront_origin_path,
+        )
+    }
+
     pub fn query_service(&self, ctx: &AppContext) -> PostQueryService {
         PostQueryService::new(
             ctx.pool.clone(),
             ctx.clock.clone(),
-            CloudFrontUrlProvider::new(
-                &self.settings.cloudfront_base_url,
-                &self.settings.cloudfront_origin_path,
-            ),
+            self.image_urls(),
             self.policy(),
         )
     }

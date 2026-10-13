@@ -11,8 +11,9 @@ use jiff::Timestamp;
 use postgres::Transaction;
 use uuid::Uuid;
 
-use super::config::{AdminConfig, ImageUrlProvider, InvalidStorageKey};
+use super::config::AdminConfig;
 use crate::common::java_uuid_from_string;
+use crate::photo::url::{CloudFrontUrlProvider, InvalidStorageKey};
 use crate::security::{self, AUTHORITY_ADMIN};
 use crate::web::ApiError;
 
@@ -26,15 +27,12 @@ pub struct AdminDeps {
     pub clock: Arc<dyn Clock>,
     pub logger: Arc<Logger>,
     pub config: Arc<AdminConfig>,
+    pub image_urls: CloudFrontUrlProvider,
 }
 
 impl AdminDeps {
     pub fn now(&self) -> Timestamp {
         self.clock.now()
-    }
-
-    pub fn image_urls(&self) -> ImageUrlProvider {
-        self.config.image_urls()
     }
 }
 

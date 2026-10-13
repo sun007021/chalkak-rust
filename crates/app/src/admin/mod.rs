@@ -1,7 +1,7 @@
 //! 관리자 도메인(원본 `admin` 패키지).
 //!
 //! 하위 구성: `auth`(로그인·토큰), `audit`(감사 로그), `user`·`post`·`topic`·`feedback`(관리 API),
-//! `notification_adapter`(알림 모듈이 들어오기 전까지 쓰는 임시 어댑터), `bootstrap`(시작 시 계정 보장).
+//! `bootstrap`(시작 시 계정 보장).
 
 pub mod audit;
 pub mod auth;
@@ -13,7 +13,6 @@ mod db_tests;
 #[cfg(test)]
 mod endpoint_tests;
 pub mod feedback;
-pub mod notification_adapter;
 pub mod post;
 pub mod support;
 #[cfg(test)]
@@ -34,6 +33,7 @@ pub fn register(routes: Routes, ctx: &AppContext) -> Routes {
         clock: Arc::clone(&ctx.clock),
         logger: Arc::clone(&ctx.logger),
         config: Arc::new(ctx.admin.clone()),
+        image_urls: ctx.post.image_urls(),
     };
     register_with(routes, &deps)
 }

@@ -794,12 +794,12 @@ fn 같은_검수_사건의_알림은_중복_저장할_수_없다() {
         .get(0);
     let mut client = db.client();
     let mut save = || {
-        super::notification_adapter::create_for_moderation(
+        crate::notification::create_for_moderation(
             &mut client,
             author,
             post,
             event_key,
-            super::notification_adapter::ModerationDecision::Approved,
+            crate::notification::ModerationDecision::Approved,
             None,
             ts("2026-10-12T01:00:00Z"),
         )

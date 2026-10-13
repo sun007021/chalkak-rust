@@ -13,11 +13,11 @@ use crate::admin::audit::domain::{
 };
 use crate::admin::audit::service::{AuditLogCommand, create_audit_log};
 use crate::admin::binding::{code_points, has_text, java_trim};
-use crate::admin::notification_adapter::{ModerationDecision, create_for_moderation};
 use crate::admin::support::{
     AdminDeps, AdminPage, INVALID_QUERY_MESSAGE, business, in_transaction, not_found,
     state_changed, validate_pagination,
 };
+use crate::notification::{ModerationDecision, create_for_moderation};
 use crate::web::ApiError;
 use crate::web::binding::is_java_whitespace;
 use chalkak_core::log::fields;
@@ -93,12 +93,12 @@ impl AdminPostQueryService {
         };
         let mut conn = self.deps.pool.get()?;
         let result = AdminPostRepository.find_posts(&mut *conn, &criteria, page, page_size)?;
-        let urls = self.deps.image_urls();
+        let urls = &self.deps.image_urls;
         let mut items = Vec::with_capacity(result.items.len());
         for row in result.items {
             items.push(PostListItem {
-                original_image_url: urls.url(Some(&row.original_storage_key))?,
-                thumbnail_image_url: urls.url(row.thumbnail_storage_key.as_deref())?,
+                original_image_url: urls.get_url(Some(&row.original_storage_key))?,
+                thumbnail_image_url: urls.get_url(row.thumbnail_storage_key.as_deref())?,
                 row,
             });
         }
@@ -115,10 +115,10 @@ impl AdminPostQueryService {
         let row = AdminPostRepository
             .find_post_by_id(&mut *conn, post_id)?
             .ok_or_else(|| not_found(NOT_FOUND_MESSAGE))?;
-        let urls = self.deps.image_urls();
+        let urls = &self.deps.image_urls;
         Ok(PostDetail {
-            original_image_url: urls.url(Some(&row.original_storage_key))?,
-            thumbnail_image_url: urls.url(row.thumbnail_storage_key.as_deref())?,
+            original_image_url: urls.get_url(Some(&row.original_storage_key))?,
+            thumbnail_image_url: urls.get_url(row.thumbnail_storage_key.as_deref())?,
             row,
         })
     }

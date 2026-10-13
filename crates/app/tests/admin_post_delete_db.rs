@@ -47,6 +47,7 @@ fn delete_post_approved_post_excludes_every_user_read_model() {
         config: Arc::new(AdminConfig::for_tests(
             b"0123456789abcdef0123456789abcdef".to_vec(),
         )),
+        image_urls: fx.ctx.post.image_urls(),
     };
     AdminPostCommandService::new(deps)
         .delete_post(post, admin, "운영 정책 위반")
