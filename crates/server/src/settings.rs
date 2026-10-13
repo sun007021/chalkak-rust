@@ -12,6 +12,7 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 use chalkak_app::config::AppSettings;
+use chalkak_app::jobs::JobsSettings;
 use chalkak_app::notification::slack::settings::AdminNotificationSettings;
 use chalkak_app::post::PostSettings;
 use chalkak_core::config::{ConfigError, Env};
@@ -80,6 +81,8 @@ pub struct Settings {
     pub post: PostSettings,
     /// 관리자 Slack 알림. 전달이 꺼져 있으면 `None`.
     pub admin_notification: Option<AdminNotificationSettings>,
+    /// 주기 작업 켜기·끄기.
+    pub jobs: JobsSettings,
 }
 
 impl Settings {
@@ -112,6 +115,9 @@ impl Settings {
         let admin_notification =
             AdminNotificationSettings::from_env(env, profile == Profile::Local)?;
 
+        // 런타임 상태 로그는 dev·prod에서만 기본으로 켠다(`application-dev.yml`, `application-prod.yml`).
+        let jobs = JobsSettings::from_env(env, profile != Profile::Local)?;
+
         Ok(Settings {
             profile,
             port,
@@ -130,6 +136,7 @@ impl Settings {
             app,
             post,
             admin_notification,
+            jobs,
         })
     }
 }
@@ -243,6 +250,28 @@ mod tests {
         assert_eq!(s.access_token_key, [0x00, 0x11]);
         assert_eq!(s.access_token_expiration, Duration::from_secs(900));
         assert_eq!(s.db.pg.get_ports(), [5432]);
+    }
+
+    // application.yml: 스케줄링과 정리 작업은 기본 켜짐, 런타임 로그는 기본 꺼짐. application-dev/prod.yml이 로그를 켠다.
+    #[test]
+    fn 주기_작업_설정은_프로필에_따라_런타임_로그_기본값만_다르다() {
+        let local = Settings::from_env(&env(&[])).unwrap().jobs;
+        assert!(local.scheduling_enabled);
+        assert!(local.refresh_token_cleanup && local.notification_cleanup);
+        assert!(!local.runtime_log);
+
+        let prod = env(&[
+            ("SPRING_PROFILES_ACTIVE", "prod"),
+            ("ADMIN_CORS_ALLOWED_ORIGIN", "https://admin.example.com"),
+            ("DB_NAME", "chalkak"),
+            ("DB_USERNAME", "u"),
+            ("DB_PASSWORD", "p"),
+            ("ADMIN_USERNAME", "operator"),
+            ("ADMIN_PASSWORD_HASH", "h"),
+        ]);
+        let prod = Settings::from_env(&prod).unwrap().jobs;
+        assert!(prod.runtime_log);
+        assert_eq!(prod.planned().len(), 5);
     }
 
     #[test]
