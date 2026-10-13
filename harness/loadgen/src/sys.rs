@@ -75,6 +75,7 @@ pub struct Summary {
     pub fds_max: u64,
     pub fds_last: u64,
     pub threads_max: u64,
+    pub threads_last: u64,
     pub samples: u64,
 }
 
@@ -103,6 +104,7 @@ impl Watcher {
                         fds_max: g.1.fds_max.max(cur.fds),
                         fds_last: cur.fds,
                         threads_max: g.1.threads_max.max(cur.threads),
+                        threads_last: cur.threads,
                         samples: g.1.samples + 1,
                     };
                     g.0 = Some(cur);

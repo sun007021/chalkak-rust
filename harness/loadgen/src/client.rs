@@ -40,6 +40,14 @@ impl Client {
         }
     }
 
+    /// 연결만 미리 맺어 둔다(첫 요청이 연결 시간을 먹지 않게). 이미 있으면 그대로 둔다.
+    pub fn warm(&mut self) -> io::Result<()> {
+        if self.conn.is_none() {
+            self.connect()?;
+        }
+        Ok(())
+    }
+
     fn connect(&mut self) -> io::Result<()> {
         let stream = TcpStream::connect_timeout(&self.addr, Duration::from_secs(10))?;
         stream.set_nodelay(true)?;

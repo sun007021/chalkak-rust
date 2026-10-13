@@ -128,7 +128,7 @@ fn interval_line(
 ) -> String {
     let (rss, fds, threads) = watcher.map_or((0, 0, 0), |w| {
         let p = w.peek();
-        (p.rss_kb_last / 1024, p.fds_last, p.threads_max)
+        (p.rss_kb_last / 1024, p.fds_last, p.threads_last)
     });
     format!(
         "[{:>6.0}s] rps {:>7.0}  err {:>4}  p50 {:>6.1}ms  p99 {:>7.1}ms  max {:>8.1}ms  rss {rss}MB  fd {fds}  threads {threads}  db연결 {}  load {:.1}",

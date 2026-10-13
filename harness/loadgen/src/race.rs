@@ -72,14 +72,8 @@ fn fire(env: &Env, calls: Vec<Call>) -> Vec<u16> {
             };
             thread::spawn(move || {
                 let mut client = Client::new(env.addr, true);
-                // 연결을 미리 맺어 두고(첫 요청은 느리다) 동시에 보낸다.
-                let warm = Call {
-                    method: "GET",
-                    path: "/actuator/health".into(),
-                    who: None,
-                    body: None,
-                };
-                send(&env, &mut client, &warm);
+                // 연결을 미리 맺어 두고(요청은 보내지 않는다: 헬스체크도 풀 연결을 쓴다) 동시에 보낸다.
+                let _ = client.warm();
                 barrier.wait();
                 send(&env, &mut client, &call)
             })

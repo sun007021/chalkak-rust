@@ -3,10 +3,11 @@
 #
 #   harness/scripts/perf.sh up                 # 빌드 -> 스택 기동(Java, Rust, 각자의 PostgreSQL, 가짜 서버) -> 시드
 #   harness/scripts/perf.sh startup [N]        # 두 앱을 N번씩 재시작하며 기동 시간(컨테이너 시작 -> /actuator/health UP) 측정
-#   harness/scripts/perf.sh sql                # 엔드포인트별 요청당 SQL 수·DB 시간 (pg_stat_statements)
+#   harness/scripts/perf.sh sql [java|rust]    # 엔드포인트별 요청당 SQL 수·DB 시간 (pg_stat_statements)
 #   harness/scripts/perf.sh bench [라운드]     # 번갈아 가며 혼합 부하(고정 RPS, 최대 처리량)와 엔드포인트별 최대 처리량
 #   harness/scripts/perf.sh race               # 동시성 시험(같은 자원 동시 요청, 풀 고갈) 두 구현
 #   harness/scripts/perf.sh soak <java|rust> <기간>   # 장시간 시험(예: 30m, 24h). 메모리·FD·DB 연결 추세를 1분마다 찍는다
+#   harness/scripts/perf.sh trend <java|rust>  # soak 로그에서 메모리·FD·스레드·DB 연결 누수 추세 판정
 #   harness/scripts/perf.sh report             # 결과 디렉터리를 비교해 게이트 판정(마크다운)
 #   harness/scripts/perf.sh run <java|rust> <파일명> [loadgen run 옵션...]   # 임의 부하 한 번 (결과: $PERF_OUT/<면>/<파일명>.json)
 #   harness/scripts/perf.sh restart <java|rust>
@@ -92,9 +93,9 @@ cmd_startup() {
   done
 }
 
-cmd_sql() {
+cmd_sql() { # [java|rust]...
   mkdir -p "$OUT"
-  for side in java rust; do
+  for side in ${@:-java rust}; do
     wait_health "$side"
     # 같은 시작 상태에서 같은 요청 열을 보내야 문장 수를 정확히 비교할 수 있다(좋아요 같은 경로는 상태에 따라 갈린다).
     "$LOADGEN" seed --db "$(db_url "$side")" ${PERF_SEED_ARGS:-}
@@ -116,6 +117,7 @@ run_one() { # <side> <파일명> 추가 인자...
 cmd_bench() {
   local rounds=${1:-$ROUNDS} r side order
   mapfile -t eps < <("$LOADGEN" list)
+  [[ -n "${PERF_NO_SEED:-}" ]] || cmd_seed # 앞선 시험(race 등)이 남긴 상태를 지우고 같은 데이터에서 시작한다
   for ((r = 1; r <= rounds; r++)); do
     if ((r % 2 == 1)); then order="java rust"; else order="rust java"; fi
     for side in $order; do
@@ -161,14 +163,15 @@ case "${1:-}" in
   up) cmd_up ;;
   seed) cmd_seed ;;
   startup) shift; cmd_startup "$@" ;;
-  sql) cmd_sql ;;
+  sql) shift; cmd_sql "$@" ;;
   bench) shift; cmd_bench "$@" ;;
   race) cmd_race ;;
   soak) shift; cmd_soak "$@" ;;
   report) cmd_report ;;
+  trend) shift; "$LOADGEN" trend --log "$OUT/${1:?java|rust}/soak.log" ;;
   run) shift; side=${1:?java|rust}; file=${2:?파일명}; shift 2; run_one "$side" "$file" "$@" ;;
   restart) shift; cmd_restart "$@" ;;
   ps) compose ps ;;
   down) compose down -v --remove-orphans ;;
-  *) sed -n '2,19p' "$0"; exit 2 ;;
+  *) awk 'NR>1 && /^#/ {print; next} NR>1 {exit}' "$0"; exit 2 ;;
 esac
