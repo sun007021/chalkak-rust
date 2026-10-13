@@ -619,3 +619,88 @@ fn trigger_before_serve_returns_immediately() {
     let handler: Arc<dyn Handler> = Arc::new(echo);
     server.serve(handler, shutdown).unwrap();
 }
+
+// 성능 시험(#31)에서 찾은 문제: 연결 하나가 워커 하나를 닫힐 때까지 붙잡아서, 유휴 keep-alive 연결이
+// workers 수만큼 쌓이면 새 요청이 하나도 처리되지 않았다(Tomcat은 NIO poller가 유휴 연결을 워커 없이 들고 있다).
+#[test]
+fn idle_keep_alive_connections_do_not_starve_new_requests() {
+    let srv = TestServer::start(echo, 2, fast_limits());
+    // workers(2)보다 많은 유휴 keep-alive 연결: 요청을 한 번 처리한 뒤 열어 둔다.
+    let mut idle: Vec<Client> = (0..8)
+        .map(|i| {
+            let mut c = srv.connect();
+            c.send(&format!("GET /idle{i} HTTP/1.1\r\nHost: t\r\n\r\n"));
+            assert_eq!(c.read_reply(false).status, 200);
+            c
+        })
+        .collect();
+
+    let started = Instant::now();
+    let mut fresh = srv.connect();
+    fresh.send("GET /fresh HTTP/1.1\r\nHost: t\r\n\r\n");
+    assert_eq!(fresh.read_reply(false).status, 200);
+    assert!(
+        started.elapsed() < Duration::from_secs(1),
+        "유휴 연결이 워커를 붙잡으면 안 된다: {:?}",
+        started.elapsed()
+    );
+
+    // 유휴 연결도 계속 쓸 수 있다.
+    idle[3].send("GET /again HTTP/1.1\r\nHost: t\r\n\r\n");
+    assert_eq!(idle[3].read_reply(false).status, 200);
+}
+
+#[test]
+fn handler_concurrency_is_capped_at_workers() {
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    let current = Arc::new(AtomicUsize::new(0));
+    let peak = Arc::new(AtomicUsize::new(0));
+    let (c, p) = (Arc::clone(&current), Arc::clone(&peak));
+    let slow = move |_r: Request| {
+        let now = c.fetch_add(1, Ordering::SeqCst) + 1;
+        p.fetch_max(now, Ordering::SeqCst);
+        thread::sleep(Duration::from_millis(100));
+        c.fetch_sub(1, Ordering::SeqCst);
+        Response::new(200)
+    };
+    let srv = TestServer::start(slow, 3, fast_limits());
+    let handles: Vec<_> = (0..9)
+        .map(|_| {
+            let addr = srv.addr;
+            thread::spawn(move || {
+                let mut c = Client::new(TcpStream::connect(addr).unwrap());
+                c.send("GET / HTTP/1.1\r\nHost: t\r\nConnection: close\r\n\r\n");
+                c.read_reply(false).status
+            })
+        })
+        .collect();
+    for h in handles {
+        assert_eq!(h.join().unwrap(), 200);
+    }
+    let peak = peak.load(Ordering::SeqCst);
+    assert!(
+        (2..=3).contains(&peak),
+        "동시에 처리하는 요청은 workers(3) 이하: {peak}"
+    );
+}
+
+#[test]
+fn shutdown_with_many_idle_connections_is_quick() {
+    let mut srv = TestServer::start(echo, 2, fast_limits());
+    let mut idle: Vec<Client> = (0..100)
+        .map(|_| {
+            let mut c = srv.connect();
+            c.send("GET / HTTP/1.1\r\nHost: t\r\n\r\n");
+            assert_eq!(c.read_reply(false).status, 200);
+            c
+        })
+        .collect();
+    let started = Instant::now();
+    srv.stop();
+    assert!(
+        started.elapsed() < Duration::from_secs(2),
+        "{:?}",
+        started.elapsed()
+    );
+    assert!(idle.iter_mut().all(Client::is_closed_by_peer));
+}

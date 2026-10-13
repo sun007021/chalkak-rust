@@ -1,18 +1,20 @@
-//! `Server`: 소켓을 열고 워커 스레드 풀로 연결을 처리한다.
+//! `Server`: 소켓을 열고 연결마다 스레드로 처리하되, 요청을 실행하는 동시 수는 `workers`로 묶는다.
 //!
-//! 구조: `serve`를 부른 스레드가 accept 루프를 돌고, 받은 연결을 유한 큐로 워커에 넘긴다.
-//! 워커 하나가 연결 하나를 닫힐 때까지(keep-alive 포함) 맡는다. 동시 연결 수가 `max_connections`를
-//! 넘으면 새 연결은 503으로 즉시 닫는다.
+//! 구조: `serve`를 부른 스레드가 accept 루프를 돌고, 받은 연결마다 스레드 하나를 띄운다. 연결 스레드는 요청을 읽고,
+//! 핸들러를 실행하는 동안만 세마포어 자리(`workers`개)를 쥔다. 그래서 요청 없이 열려 있는 keep-alive 연결은
+//! 스레드 하나(대부분 sleep 중)만 차지할 뿐 요청을 처리할 자리를 막지 않는다. 예전에는 워커 풀의 워커 하나가 연결 하나를
+//! 닫힐 때까지 붙잡아서, 유휴 연결이 `workers`개 쌓이면 새 요청이 하나도 처리되지 않았다(#31 성능 시험에서 발견).
+//! `workers`는 Tomcat의 `max-threads`처럼 동시에 실행하는 요청 수 상한이다. 열린 연결 수가 `max_connections`를 넘으면
+//! 새 연결은 503으로 즉시 닫는다.
 //!
 //! 종료: [`ShutdownSignal::trigger`]가 호출되면 accept를 멈추고, 처리 중인 요청은 끝까지 응답한 뒤
-//! `Connection: close`로 닫으며, 요청을 기다리던 유휴 연결은 바로 닫는다. 모든 워커가 끝나면 `serve`가 돌아온다.
+//! `Connection: close`로 닫으며, 요청을 기다리던 유휴 연결은 바로 닫는다. 모든 연결이 끝나면 `serve`가 돌아온다.
 
 use std::io::{self, Read, Write};
 use std::net::{Ipv4Addr, Ipv6Addr, Shutdown, SocketAddr, TcpListener, TcpStream, ToSocketAddrs};
 use std::panic::{self, AssertUnwindSafe};
 use std::sync::atomic::{AtomicUsize, Ordering};
-use std::sync::mpsc::{self, Receiver};
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Condvar, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
 
@@ -26,7 +28,7 @@ use super::request::Request;
 use super::response::{Response, WriteOptions, serialize};
 
 /// 소켓 읽기를 이 간격으로 끊어서 종료 신호·마감 시각을 확인한다.
-const POLL_SLICE: Duration = Duration::from_millis(50);
+const POLL_SLICE: Duration = Duration::from_millis(100);
 /// 오류 응답 뒤 연결을 닫기 전에 상대가 보내는 나머지를 버리며 기다리는 최대 시간·바이트.
 const LINGER: Duration = Duration::from_millis(200);
 const LINGER_MAX_BYTES: usize = 256 * 1024;
@@ -50,7 +52,7 @@ pub struct Server {
 }
 
 impl Server {
-    /// 주소에 바인딩한다. `workers`가 0이면 1로 본다. 포트 0을 주면 [`Server::local_addr`]로 실제 포트를 알 수 있다.
+    /// 주소에 바인딩한다. `workers`는 동시에 실행하는 요청 수 상한이다(0이면 1). 포트 0을 주면 [`Server::local_addr`]로 실제 포트를 알 수 있다.
     pub fn bind(addr: impl ToSocketAddrs, workers: usize, limits: Limits) -> io::Result<Server> {
         Ok(Server {
             listener: TcpListener::bind(addr)?,
@@ -82,25 +84,8 @@ impl Server {
             return Ok(());
         }
 
-        let (tx, rx) = mpsc::sync_channel::<TcpStream>(max_connections);
-        let rx = Arc::new(Mutex::new(rx));
+        let gate = Arc::new(Gate::new(workers));
         let active = Arc::new(AtomicUsize::new(0));
-
-        let mut handles = Vec::with_capacity(workers);
-        for i in 0..workers {
-            let worker = Worker {
-                rx: Arc::clone(&rx),
-                active: Arc::clone(&active),
-                handler: Arc::clone(&handler),
-                limits: Arc::clone(&limits),
-                shutdown: shutdown.clone(),
-            };
-            handles.push(
-                thread::Builder::new()
-                    .name(format!("chalkak-http-{i}"))
-                    .spawn(move || worker.run())?,
-            );
-        }
 
         for incoming in listener.incoming() {
             if shutdown.is_triggered() {
@@ -126,18 +111,70 @@ impl Server {
                 reject_busy(stream, &limits);
                 continue;
             }
-            if tx.send(stream).is_err() {
-                active.fetch_sub(1, Ordering::SeqCst);
-                break;
+            let conn = Connection {
+                active: ActiveGuard(Arc::clone(&active)),
+                gate: Arc::clone(&gate),
+                handler: Arc::clone(&handler),
+                limits: Arc::clone(&limits),
+                shutdown: shutdown.clone(),
+            };
+            let spawned = thread::Builder::new()
+                .name("chalkak-conn".to_owned())
+                .spawn(move || conn.run(stream));
+            if spawned.is_err() {
+                // 스레드를 못 만들면(자원 고갈) 그 연결만 닫는다. 클로저와 함께 소켓·개수 표시가 정리된다.
+                thread::sleep(Duration::from_millis(10));
             }
         }
 
-        drop(tx);
         drop(listener);
-        for h in handles {
-            let _ = h.join();
+        // 남은 연결은 진행 중인 요청을 마치고 닫힌다(유휴 연결은 POLL_SLICE 안에 종료 신호를 본다).
+        while active.load(Ordering::SeqCst) > 0 {
+            thread::sleep(Duration::from_millis(5));
         }
         Ok(())
+    }
+}
+
+/// 동시에 실행할 요청 수를 묶는 세마포어.
+struct Gate {
+    free: Mutex<usize>,
+    available: Condvar,
+}
+
+impl Gate {
+    fn new(permits: usize) -> Gate {
+        Gate {
+            free: Mutex::new(permits),
+            available: Condvar::new(),
+        }
+    }
+
+    fn acquire(&self) -> Permit<'_> {
+        let mut free = self.free.lock().unwrap_or_else(|e| e.into_inner());
+        while *free == 0 {
+            free = self.available.wait(free).unwrap_or_else(|e| e.into_inner());
+        }
+        *free -= 1;
+        Permit(self)
+    }
+}
+
+struct Permit<'a>(&'a Gate);
+
+impl Drop for Permit<'_> {
+    fn drop(&mut self) {
+        *self.0.free.lock().unwrap_or_else(|e| e.into_inner()) += 1;
+        self.0.available.notify_one();
+    }
+}
+
+/// 열린 연결 수를 맞춘다. 연결 스레드가 어떻게 끝나든(패닉 포함) 개수가 줄어든다.
+struct ActiveGuard(Arc<AtomicUsize>);
+
+impl Drop for ActiveGuard {
+    fn drop(&mut self) {
+        self.0.fetch_sub(1, Ordering::SeqCst);
     }
 }
 
@@ -155,26 +192,25 @@ fn reject_busy(mut stream: TcpStream, limits: &Limits) {
     let _ = stream.shutdown(Shutdown::Both);
 }
 
-struct Worker {
-    rx: Arc<Mutex<Receiver<TcpStream>>>,
-    active: Arc<AtomicUsize>,
+struct Connection {
+    active: ActiveGuard,
+    gate: Arc<Gate>,
     handler: Arc<dyn Handler>,
     limits: Arc<Limits>,
     shutdown: ShutdownSignal,
 }
 
-impl Worker {
-    fn run(self) {
-        loop {
-            let next = {
-                let rx = self.rx.lock().unwrap_or_else(|e| e.into_inner());
-                rx.recv()
-            };
-            let Ok(stream) = next else { break };
-            // 연결 처리 중 패닉은 handle_connection 안에서 잡는다. 여기서는 개수만 맞춘다.
-            serve_connection(stream, self.handler.as_ref(), &self.limits, &self.shutdown);
-            self.active.fetch_sub(1, Ordering::SeqCst);
-        }
+impl Connection {
+    fn run(self, stream: TcpStream) {
+        // 연결 처리 중 핸들러 패닉은 serve_connection 안에서 잡는다.
+        serve_connection(
+            stream,
+            self.handler.as_ref(),
+            &self.limits,
+            &self.shutdown,
+            &self.gate,
+        );
+        drop(self.active);
     }
 }
 
@@ -239,6 +275,7 @@ fn serve_connection(
     handler: &dyn Handler,
     limits: &Limits,
     shutdown: &ShutdownSignal,
+    gate: &Gate,
 ) {
     let _ = stream.set_nodelay(true);
     let _ = stream.set_write_timeout(Some(limits.read_timeout));
@@ -287,7 +324,10 @@ fn serve_connection(
         let version = head.version;
         let head_only = head.method == Method::Head;
         let request = into_request(head, body, peer);
+        // 요청을 다 읽은 뒤에야 자리를 잡는다: 읽는 동안·유휴 동안에는 다른 요청을 막지 않는다.
+        let permit = gate.acquire();
         let outcome = panic::catch_unwind(AssertUnwindSafe(|| handler.handle(request)));
+        drop(permit);
         let (response, panicked) = match outcome {
             Ok(r) => (r, false),
             Err(_) => (Response::new(500), true),

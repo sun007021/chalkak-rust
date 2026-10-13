@@ -1,0 +1,115 @@
+# 성능 비교 환경: Java 서버와 Rust 서버를 같은 머신에서 같은 DB 설정·같은 풀 크기·같은 자원 한도로 띄운다.
+# 하네스 lane과 달리 libfaketime을 쓰지 않는다(실제 시계). 직접 쓰지 않고 harness/scripts/perf.sh로 띄운다.
+#
+# 앱마다 전용 PostgreSQL을 둔다. 한 DB를 나눠 쓰면 앞서 돈 쪽의 테이블 부풀음·캐시가 뒤에 도는 쪽에 영향을 준다.
+# 두 앱은 동시에 떠 있지만 한 번에 한쪽만 부하를 받는다(쉬는 쪽은 거의 CPU를 쓰지 않는다).
+
+name: ${PERF_PROJECT:?perf.sh로 실행하세요}
+
+x-postgres: &postgres
+  image: postgres:18.4
+  # 데이터는 메모리(tmpfs): 디스크가 다른 작업과 겹쳐 흔들리는 것을 피한다. fsync 등 내구성 설정은 기본값 그대로 둔다.
+  tmpfs:
+    - /var/lib/postgresql:uid=999,gid=999,mode=0700
+  user: postgres
+  command:
+    - postgres
+    - -c
+    - shared_preload_libraries=pg_stat_statements
+    - -c
+    - pg_stat_statements.track=all
+    - -c
+    - pg_stat_statements.max=10000
+    - -c
+    - max_connections=200
+  environment:
+    POSTGRES_DB: chalkak
+    POSTGRES_USER: chalkak
+    POSTGRES_PASSWORD: test-password
+    TZ: Asia/Seoul
+  cpus: ${PERF_DB_CPUS:-1}
+  mem_limit: 1g
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U chalkak -d chalkak"]
+    interval: 1s
+    timeout: 5s
+    retries: 60
+
+x-health: &health
+  interval: 1s
+  timeout: 5s
+  retries: 600
+
+services:
+  pg-java:
+    <<: *postgres
+    ports: ["127.0.0.1:${PERF_PORT_PG_JAVA}:5432"]
+
+  pg-rust:
+    <<: *postgres
+    ports: ["127.0.0.1:${PERF_PORT_PG_RUST}:5432"]
+
+  fakes:
+    image: debian:trixie-slim
+    entrypoint: ["/usr/local/bin/chalkak-fakes"]
+    environment:
+      FAKES_ADDR: 0.0.0.0:9000
+      FAKES_S3_BUCKET: test-bucket
+    volumes:
+      - ${PERF_FAKES_BIN}:/usr/local/bin/chalkak-fakes:ro
+    networks:
+      default:
+        aliases: [test-bucket.fakes]
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /__admin/health HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q UP <&3"]
+      <<: *health
+
+  # 원본 Java 서버(기준 커밋 JAR). 풀 크기·스레드 수는 원본 기본값(HikariCP 10, Tomcat 200)이다.
+  java:
+    image: eclipse-temurin:25-jre
+    entrypoint: ["bash", "-c", "exec java -XX:MaxRAMPercentage=70 $$PERF_JAVA_OPTS -jar /app/app.jar"]
+    env_file: ../env/oracle.env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://pg-java:5432/chalkak
+      SPRING_DATASOURCE_USERNAME: chalkak
+      SPRING_DATASOURCE_PASSWORD: test-password
+      PERF_JAVA_OPTS: ${PERF_JAVA_OPTS:-}
+      # 주기 작업·런타임 로그는 두 앱 모두 같은 값(기본 끔). PERF_SCHEDULING=true로 둘 다 켠다.
+      CHALKAK_SCHEDULING_ENABLED: ${PERF_SCHEDULING:-false}
+    volumes:
+      - ${PERF_JAVA_JAR}:/app/app.jar:ro
+    ports: ["127.0.0.1:${PERF_PORT_JAVA}:8080"]
+    cpus: ${PERF_APP_CPUS:-2}
+    mem_limit: ${PERF_APP_MEM:-1536m}
+    depends_on:
+      pg-java: { condition: service_healthy }
+      fakes: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /actuator/health HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q UP <&3"]
+      <<: *health
+
+  # Rust 서버. 호스트에서 cargo build --release 한 바이너리를 마운트한다. 풀 크기 10(원본과 같다).
+  rust:
+    image: debian:trixie-slim
+    entrypoint: ["/app/chalkak-server"]
+    working_dir: /app
+    env_file: ../env/oracle.env
+    environment:
+      DB_HOST: pg-rust
+      DB_PORT: "5432"
+      DB_NAME: chalkak
+      DB_USERNAME: chalkak
+      DB_PASSWORD: test-password
+      CHALKAK_SCHEDULING_ENABLED: ${PERF_SCHEDULING:-false}
+    volumes:
+      - ${PERF_RUST_BIN}:/app/chalkak-server:ro
+      - ../../migrations:/app/migrations:ro
+    ports: ["127.0.0.1:${PERF_PORT_RUST}:8080"]
+    cpus: ${PERF_APP_CPUS:-2}
+    mem_limit: ${PERF_APP_MEM:-1536m}
+    depends_on:
+      pg-rust: { condition: service_healthy }
+      fakes: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /actuator/health HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q UP <&3"]
+      <<: *health

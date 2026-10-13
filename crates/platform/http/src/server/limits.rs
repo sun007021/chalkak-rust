@@ -15,7 +15,7 @@ pub struct Limits {
     pub read_timeout: Duration,
     /// 요청 사이(또는 첫 요청 전) 유휴 연결을 이만큼 두었다가 조용히 닫는다.
     pub keep_alive_timeout: Duration,
-    /// 동시에 열어 둘 연결 수(처리 중 + 대기열). 넘는 연결은 503으로 즉시 닫는다.
+    /// 동시에 열어 둘 연결 수(요청을 기다리는 유휴 keep-alive 연결 포함). 넘는 연결은 503으로 즉시 닫는다.
     pub max_connections: usize,
 }
 

@@ -248,6 +248,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "chalkak-loadgen"
+version = "0.0.0"
+dependencies = [
+ "hmac 0.12.1",
+ "postgres",
+ "serde_json",
+ "sha2 0.10.9",
+]
+
+[[package]]
 name = "chalkak-parity"
 version = "0.0.0"
 dependencies = [
