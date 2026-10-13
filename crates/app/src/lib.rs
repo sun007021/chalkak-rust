@@ -6,6 +6,7 @@
 //!
 //! 지금 들어 있는 것:
 //! - [`topic`]: 날짜로 주제 조회(`GET /api/v1/topics`)와 주제 도메인 전체(생성·수정·삭제 규칙, 저장소 질의).
+//! - [`notification`]: 알림함 조회·읽음 처리, 검수 결과 알림 생성, 관리자 Slack 알림, 보관 기간이 지난 알림 정리 쿼리.
 //! - [`feedback`], [`user`], [`auth`], [`admin`]: 하네스 platform 시나리오가 건드리는 최소 조각.
 //!   (`POST /api/v1/feedbacks`, 회원 존재 확인, 관리자 로그아웃 요청 검증.) 해당 도메인 이슈에서 확장한다.
 
@@ -14,6 +15,7 @@ pub mod auth;
 pub mod common;
 pub mod feedback;
 pub mod like;
+pub mod notification;
 pub mod photo;
 pub mod post;
 pub mod security;
@@ -44,6 +46,7 @@ pub struct AppContext {
 pub fn register_routes(routes: web::Routes, ctx: &AppContext) -> web::Routes {
     let routes = topic::api::register(routes, ctx);
     let routes = feedback::api::register(routes, ctx);
+    let routes = notification::api::register(routes, ctx);
     let routes = post::api::register(routes, ctx);
     let routes = like::api::register(routes, ctx);
     let routes = post::callback::register(routes, ctx);
