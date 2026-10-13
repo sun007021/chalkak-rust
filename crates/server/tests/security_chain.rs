@@ -82,6 +82,10 @@ fn harness_with(bypass: bool, database_up: bool) -> Harness {
     let router = Routes::new(Arc::clone(&logger))
         .get("/api/v1/topics", move |_| Err(not_found()))
         .get("/api/v1/posts", move |_| ok())
+        .get("/api/v1/posts/calendar", move |_| ok())
+        .get("/api/v1/posts/calendar/months", move |_| {
+            Ok(Response::new(200).with_body(r#"{"months":[]}"#))
+        })
         .get("/api/v1/posts/{postId}", move |_| ok())
         .post("/api/v1/posts/{postId}/likes", move |_| ok())
         .post("/api/v1/auth/login", move |_| ok())
@@ -625,4 +629,99 @@ fn rejections_are_logged_without_secrets() {
     assert_eq!(denied[0]["status"], 403);
     let all = serde_json::to_string(&lines).unwrap();
     assert!(!all.contains("abc.def.ghi"), "토큰은 로그에 남지 않는다");
+}
+
+// SecurityFilterChainTest#postCalendar_validAccessToken_reachesController
+#[test]
+fn post_calendar_valid_access_token_reaches_controller() {
+    let h = harness();
+    let r = get(&h, "/api/v1/posts/calendar", Some(&user_token()));
+    assert_eq!(r.status, 200);
+}
+
+// SecurityFilterChainTest#postCalendar_adminToken_returnsForbidden
+#[test]
+fn post_calendar_admin_token_returns_forbidden() {
+    let h = harness();
+    let r = get(&h, "/api/v1/posts/calendar", Some(&admin_token()));
+    assert_forbidden(&r);
+}
+
+// SecurityFilterChainTest#postCalendar_withoutToken_isRejectedByFilter
+#[test]
+fn post_calendar_without_token_is_rejected_by_filter() {
+    let h = harness();
+    let r = get(&h, "/api/v1/posts/calendar", None);
+    assert_eq!(r.status, 401);
+    assert_eq!(r.headers.get("www-authenticate"), Some("Bearer"));
+}
+
+// SecurityFilterChainTest#postCalendarMonths_validAccessToken_returnsOk
+#[test]
+fn post_calendar_months_valid_access_token_returns_ok() {
+    let h = harness();
+    let r = get(&h, "/api/v1/posts/calendar/months", Some(&user_token()));
+    assert_eq!(r.status, 200);
+    assert_eq!(body(&r), json!({"months": []}));
+}
+
+// SecurityFilterChainTest#postCalendarMonths_withoutToken_returnsUnauthorized
+#[test]
+fn post_calendar_months_without_token_returns_unauthorized() {
+    let h = harness();
+    let r = get(&h, "/api/v1/posts/calendar/months", None);
+    assert_eq!(r.status, 401);
+    assert_eq!(r.headers.get("www-authenticate"), Some("Bearer"));
+}
+
+// SecurityFilterChainTest#postCalendarMonths_adminToken_returnsForbidden
+#[test]
+fn post_calendar_months_admin_token_returns_forbidden() {
+    let h = harness();
+    let r = get(&h, "/api/v1/posts/calendar/months", Some(&admin_token()));
+    assert_forbidden(&r);
+}
+
+/// `AdminSecurityFilterChainTest.protectedAdminEndpoints`.
+fn protected_admin_endpoints() -> Vec<(Method, String)> {
+    let id = "0198f6c1-62ba-7d30-8b12-0f733b6570f6";
+    vec![
+        (Method::Get, "/api/v1/admin/auth/me".to_owned()),
+        (Method::Get, "/api/v1/admin/posts".to_owned()),
+        (Method::Get, format!("/api/v1/admin/posts/{id}")),
+        (Method::Put, format!("/api/v1/admin/posts/{id}/moderation")),
+        (Method::Delete, format!("/api/v1/admin/posts/{id}")),
+        (Method::Get, "/api/v1/admin/users".to_owned()),
+        (Method::Get, format!("/api/v1/admin/users/{id}")),
+        (Method::Patch, format!("/api/v1/admin/users/{id}/status")),
+        (Method::Get, "/api/v1/admin/topics".to_owned()),
+        (Method::Post, "/api/v1/admin/topics".to_owned()),
+        (Method::Get, format!("/api/v1/admin/topics/{id}")),
+        (Method::Put, format!("/api/v1/admin/topics/{id}")),
+        (Method::Delete, format!("/api/v1/admin/topics/{id}")),
+        (Method::Get, "/api/v1/admin/audit-logs".to_owned()),
+    ]
+}
+
+// AdminSecurityFilterChainTest#adminEndpoints_withoutToken_returnsUnauthorized
+#[test]
+fn admin_endpoints_without_token_returns_unauthorized() {
+    let h = harness();
+    for (method, path) in protected_admin_endpoints() {
+        let r = send(&h, method.clone(), &path, None);
+        assert_eq!(r.status, 401, "{method:?} {path}");
+        assert_eq!(body(&r)["errorCode"], "UNAUTHORIZED", "{method:?} {path}");
+    }
+}
+
+// AdminSecurityFilterChainTest#adminEndpoints_userToken_returnsForbidden
+#[test]
+fn admin_endpoints_user_token_returns_forbidden() {
+    let h = harness();
+    let t = user_token();
+    for (method, path) in protected_admin_endpoints() {
+        let r = send(&h, method.clone(), &path, Some(&t));
+        assert_eq!(r.status, 403, "{method:?} {path}");
+        assert_eq!(body(&r)["errorCode"], "FORBIDDEN", "{method:?} {path}");
+    }
 }

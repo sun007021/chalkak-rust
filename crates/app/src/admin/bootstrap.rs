@@ -89,6 +89,8 @@ mod tests {
         assert_eq!(hash, HASH);
     }
 
+    // AdminLocalConfigurationTest#localConfiguration_invalidPasswordHash_rejectsStartup
+    // (빈 값, 평문, 예시 문구)
     #[test]
     fn 계정_정보가_틀리면_시작을_막는다() {
         let Some(db) = TestDb::create() else { return };
@@ -96,6 +98,9 @@ mod tests {
         let config = AdminConfig::for_tests(ACCESS_KEY.to_vec());
         for bad in [
             account("", HASH),
+            account("local-operator", ""),
+            account("local-operator", "plain-test-password"),
+            account("local-operator", "REPLACE_WITH_BCRYPT_HASH"),
             account("operator", "plain"),
             account(&"a".repeat(101), HASH),
         ] {

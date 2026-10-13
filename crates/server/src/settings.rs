@@ -245,7 +245,9 @@ mod tests {
         let s = Settings::from_env(&env(&[])).unwrap();
         assert_eq!(s.profile, Profile::Local);
         assert_eq!(s.port, 8080);
+        // AdminLocalConfigurationTest#localConfiguration_defaultSettings_usesDevelopmentIdentity
         assert!(s.admin_development_bypass);
+        assert_eq!(s.admin_account, None);
         assert_eq!(s.admin_cors_allowed_origins, ["http://localhost:3000"]);
         assert_eq!(s.access_token_key, [0x00, 0x11]);
         assert_eq!(s.access_token_expiration, Duration::from_secs(900));
@@ -280,20 +282,51 @@ mod tests {
         let local = env(&[("ADMIN_DEVELOPMENT_BYPASS_ENABLED", "false")]);
         assert!(!Settings::from_env(&local).unwrap().admin_development_bypass);
 
-        let dev = env(&[
-            ("SPRING_PROFILES_ACTIVE", "dev"),
-            ("ADMIN_DEVELOPMENT_BYPASS_ENABLED", "true"),
-            ("ADMIN_CORS_ALLOWED_ORIGIN", "https://admin.example.com"),
-            ("S3_PREFIX", "chalkak"),
-            ("DB_NAME", "chalkak"),
-            ("DB_USERNAME", "u"),
-            ("DB_PASSWORD", "p"),
-            ("ADMIN_USERNAME", "operator"),
-            ("ADMIN_PASSWORD_HASH", "h"),
-            ("CLOUDFRONT_BASE_URL", "https://cdn.example.com"),
-            ("ADMIN_NOTIFICATION_DELIVERY_ENABLED", "false"),
+        // AdminLocalConfigurationTest#deploymentConfiguration_localBypassVariable_keepsRealAuthentication,
+        // AdminDevelopmentBypassTest#developmentAdmin_deploymentProfiles_doesNotRegisterBypass
+        for profile in ["dev", "prod"] {
+            let deployed = env(&[
+                ("SPRING_PROFILES_ACTIVE", profile),
+                ("ADMIN_DEVELOPMENT_BYPASS_ENABLED", "true"),
+                ("ADMIN_CORS_ALLOWED_ORIGIN", "https://admin.example.com"),
+                ("S3_PREFIX", "chalkak"),
+                ("DB_NAME", "chalkak"),
+                ("DB_USERNAME", "u"),
+                ("DB_PASSWORD", "p"),
+                ("ADMIN_USERNAME", "operator"),
+                ("ADMIN_PASSWORD_HASH", "h"),
+                ("CLOUDFRONT_BASE_URL", "https://cdn.example.com"),
+                ("ADMIN_NOTIFICATION_DELIVERY_ENABLED", "false"),
+            ]);
+            let settings = Settings::from_env(&deployed).unwrap();
+            assert!(!settings.admin_development_bypass, "{profile}");
+            assert_eq!(
+                settings.admin_account,
+                Some(("operator".to_owned(), "h".to_owned())),
+                "{profile}: 실제 관리자 계정을 쓴다"
+            );
+        }
+    }
+
+    // AdminLocalConfigurationTest#localConfiguration_bypassDisabled_usesConfiguredAccountAndAuthentication
+    #[test]
+    fn local에서_우회를_끄면_지정한_계정을_쓴다() {
+        let local = env(&[
+            ("ADMIN_DEVELOPMENT_BYPASS_ENABLED", "false"),
+            ("ADMIN_USERNAME", "local-operator"),
+            (
+                "ADMIN_PASSWORD_HASH",
+                "$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy",
+            ),
         ]);
-        assert!(!Settings::from_env(&dev).unwrap().admin_development_bypass);
+        let settings = Settings::from_env(&local).unwrap();
+        assert!(!settings.admin_development_bypass);
+        let (username, hash) = settings.admin_account.unwrap();
+        assert_eq!(username, "local-operator");
+        assert_eq!(
+            hash,
+            "$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy"
+        );
     }
 
     // application-dev.yml / application-prod.yml
