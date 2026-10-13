@@ -34,6 +34,7 @@ rustls = { version = "0.23", default-features = false, features = ["ring", "std"
 webpki-roots = "1"
 signal-hook = "0.3"
 bcrypt = "0.17"
+aes-gcm = "0.10"
 
 [workspace.lints.rust]
 unsafe_code = "forbid"

@@ -135,6 +135,7 @@ impl Fx {
             admin: chalkak_app::admin::AdminConfig::for_tests(
                 b"0123456789abcdef0123456789abcdef".to_vec(),
             ),
+            settings: Arc::new(chalkak_app::config::test_settings(&settings())),
             post: wiring.clone(),
         };
         let command = wiring.command_service(&ctx);

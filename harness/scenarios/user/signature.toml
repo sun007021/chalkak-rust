@@ -1,0 +1,279 @@
+name = "회원: 내 사인 조회·업로드 URL 발급·변경(UserController, UserService)과 처리 시간 초과"
+tags = ["user", "signature", "s3"]
+clock = "2026-10-12T09:00:00+09:00"
+
+# 근거: UserController, UserService(getSignature, createSignatureUpload, updateSignature), UserTest,
+# SignatureProcessingPolicy, SignatureImagePolicy, S3SignatureImageStorage.
+# 사인 변경은 업로드한 이미지(staging 또는 original)를 HeadObject로 확인한 뒤 처리 상태를 시작한다.
+# 가짜 S3의 HeadObject 응답으로 "올라간 상태"를 만든다.
+
+[setup]
+sql = [
+  # A: 정상 회원, B: 정지 회원, C: 탈퇴 회원
+  "INSERT INTO users (id, email, status, signature_original_storage_key, signature_thumbnail_storage_key) VALUES ('01990000-0000-7000-8000-0000000000a1', 'a@example.com', 'ACTIVE', 'chalkak/signatures/local/original/0198f6c1-62ba-7d30-8b12-0f733b6570d4.png', 'chalkak/signatures/local/thumbnail/0198f6c1-62ba-7d30-8b12-0f733b6570d4.png')",
+  "INSERT INTO users (id, email, status, signature_original_storage_key, signature_thumbnail_storage_key) VALUES ('01990000-0000-7000-8000-0000000000b2', 'b@example.com', 'BANNED', 'chalkak/signatures/local/original/0198f6c1-62ba-7d30-8b12-0f733b6570b2.png', 'chalkak/signatures/local/thumbnail/0198f6c1-62ba-7d30-8b12-0f733b6570b2.png')",
+  "INSERT INTO users (id, email, status, signature_original_storage_key, signature_thumbnail_storage_key, deleted_at) VALUES ('01990000-0000-7000-8000-0000000000c3', NULL, 'ACTIVE', 'chalkak/signatures/local/original/0198f6c1-62ba-7d30-8b12-0f733b6570c3.png', 'chalkak/signatures/local/thumbnail/0198f6c1-62ba-7d30-8b12-0f733b6570c3.png', now())",
+]
+
+# --- 조회 -----------------------------------------------------------------------------------
+
+[[step]]
+name = "정상 회원의 사인 조회"
+method = "GET"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "정지 회원도 사인은 조회할 수 있다(validateExisting)"
+method = "GET"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000b2" }
+
+[[step]]
+name = "탈퇴 회원은 401"
+method = "GET"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000c3" }
+
+[[step]]
+name = "없는 회원은 401"
+method = "GET"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000d4" }
+
+[[step]]
+name = "토큰 없이 조회하면 401"
+method = "GET"
+path = "/api/v1/users/me/signature"
+
+# --- 업로드 URL 발급 --------------------------------------------------------------------------
+
+[[step]]
+name = "사인 변경용 업로드 URL 발급"
+method = "POST"
+path = "/api/v1/users/me/signature/uploads"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+capture = { uploadId = "uploadId" }
+
+[[step]]
+name = "정지 회원은 업로드 URL을 받을 수 없다(validateUsable)"
+method = "POST"
+path = "/api/v1/users/me/signature/uploads"
+auth = { user = "01990000-0000-7000-8000-0000000000b2" }
+
+[[step]]
+name = "탈퇴 회원의 업로드 URL 발급은 401"
+method = "POST"
+path = "/api/v1/users/me/signature/uploads"
+auth = { user = "01990000-0000-7000-8000-0000000000c3" }
+
+[[step]]
+name = "없는 회원의 업로드 URL 발급은 401"
+method = "POST"
+path = "/api/v1/users/me/signature/uploads"
+auth = { user = "01990000-0000-7000-8000-0000000000d4" }
+
+# --- 변경: 요청 형식 --------------------------------------------------------------------------
+
+[[step]]
+name = "본문 없이 변경"
+method = "PUT"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "업로드 ID가 없음"
+method = "PUT"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+body = '{}'
+
+[[step]]
+name = "업로드 ID가 null"
+method = "PUT"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+body = '{"signatureOriginalUploadId":null}'
+
+[[step]]
+name = "업로드 ID가 빈 문자열"
+method = "PUT"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+body = '{"signatureOriginalUploadId":"  "}'
+
+[[step]]
+name = "업로드 ID 형식 오류"
+method = "PUT"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+body = '{"signatureOriginalUploadId":"not-a-uuid"}'
+
+[[step]]
+name = "업로드 ID가 숫자"
+method = "PUT"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+body = '{"signatureOriginalUploadId":123}'
+
+[[step]]
+name = "업로드 ID가 하이픈 없는 32자"
+method = "PUT"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+body = '{"signatureOriginalUploadId":"0198f6c162ba7d308b120f733b6570d4"}'
+
+[[step]]
+name = "정지 회원의 변경은 형식이 맞아도 403"
+method = "PUT"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000b2" }
+body = '{"signatureOriginalUploadId":"${uploadId}"}'
+
+[[step]]
+name = "정지 회원의 변경도 형식이 틀리면 400이 먼저"
+method = "PUT"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000b2" }
+body = '{}'
+
+[[step]]
+name = "탈퇴 회원의 변경은 401"
+method = "PUT"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000c3" }
+body = '{"signatureOriginalUploadId":"${uploadId}"}'
+
+# --- 변경: 이미지 확인 ------------------------------------------------------------------------
+
+[[step]]
+name = "업로드한 이미지가 없음"
+method = "PUT"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+body = '{"signatureOriginalUploadId":"${uploadId}"}'
+
+[[step]]
+name = "PNG가 아닌 이미지"
+method = "PUT"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+body = '{"signatureOriginalUploadId":"${uploadId}"}'
+[step.fakes.s3."chalkak/staging/local/signatures/${uploadId}.png"]
+size = 2048
+content_type = "image/jpeg"
+
+[[step]]
+name = "1MiB를 넘는 이미지"
+method = "PUT"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+body = '{"signatureOriginalUploadId":"${uploadId}"}'
+[step.fakes.s3."chalkak/staging/local/signatures/${uploadId}.png"]
+size = 1048577
+content_type = "image/png"
+
+[[step]]
+name = "정확히 1MiB인 PNG는 처리 시작"
+method = "PUT"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+body = '{"signatureOriginalUploadId":"${uploadId}"}'
+[step.fakes.s3."chalkak/staging/local/signatures/${uploadId}.png"]
+size = 1048576
+content_type = "image/png"
+
+[[step]]
+name = "처리 중에 같은 업로드 ID로 다시 변경하면 같은 응답"
+method = "PUT"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+body = '{"signatureOriginalUploadId":"${uploadId}"}'
+
+[[step]]
+name = "처리 중에도 이전 사인은 조회된다"
+method = "GET"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+advance_seconds = 360
+
+# 처리 시간(7분)의 정확한 경계는 시계가 실제로 흘러 요청마다 달라지므로 넣지 않는다(서비스 테스트가 경계를 본다).
+# 경계에서 20초 이상 떨어진 시각만 쓴다.
+[[step]]
+name = "처리 시작 6분 50초 뒤는 아직 유효"
+method = "GET"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+advance_seconds = 50
+
+[[step]]
+name = "7분 20초가 지나면 다시 등록해야 한다(조회)"
+method = "GET"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+advance_seconds = 30
+
+[[step]]
+name = "시간이 지난 업로드 ID로 변경하면 재업로드 필요"
+method = "PUT"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+body = '{"signatureOriginalUploadId":"${uploadId}"}'
+
+[[step]]
+name = "현재 사인과 같은 업로드 ID는 처리 상태만 정리하고 성공"
+method = "PUT"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+body = '{"signatureOriginalUploadId":"0198f6c1-62ba-7d30-8b12-0f733b6570d4"}'
+
+[[step]]
+name = "정리 뒤 조회는 다시 가능"
+method = "GET"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+
+# --- 변경: 이미 처리가 끝난 업로드, 다른 회원의 사인 ------------------------------------------------
+
+[[step]]
+name = "다른 회원이 쓰는 사인 이미지의 업로드 ID는 찾을 수 없음"
+method = "PUT"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+body = '{"signatureOriginalUploadId":"0198f6c1-62ba-7d30-8b12-0f733b6570b2"}'
+[step.fakes.s3."chalkak/signatures/local/original/0198f6c1-62ba-7d30-8b12-0f733b6570b2.png"]
+size = 100
+content_type = "image/png"
+
+[[step]]
+name = "새 업로드 ID 발급"
+method = "POST"
+path = "/api/v1/users/me/signature/uploads"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+capture = { uploadId2 = "uploadId" }
+
+[[step]]
+name = "original과 thumbnail이 모두 있으면 바로 완료"
+method = "PUT"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+body = '{"signatureOriginalUploadId":"${uploadId2}"}'
+[step.fakes.s3."chalkak/signatures/local/original/${uploadId2}.png"]
+size = 4096
+content_type = "image/png"
+[step.fakes.s3."chalkak/signatures/local/thumbnail/${uploadId2}.png"]
+size = 512
+content_type = "image/png"
+
+[[step]]
+name = "완료 뒤 조회는 새 사인"
+method = "GET"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "대문자·공백이 섞인 업로드 ID도 같은 UUID로 읽힌다"
+method = "PUT"
+path = "/api/v1/users/me/signature"
+auth = { user = "01990000-0000-7000-8000-0000000000a1" }
+body = '{"signatureOriginalUploadId":"  ${uploadId2}  "}'

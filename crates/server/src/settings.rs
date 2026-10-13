@@ -11,7 +11,7 @@
 use std::path::PathBuf;
 use std::time::Duration;
 
-use chalkak_app::admin::auth::domain::RefreshTokenPolicy;
+use chalkak_app::config::AppSettings;
 use chalkak_app::notification::slack::settings::AdminNotificationSettings;
 use chalkak_app::post::PostSettings;
 use chalkak_core::config::{ConfigError, Env};
@@ -71,14 +71,12 @@ pub struct Settings {
     pub access_token_key: Vec<u8>,
     pub access_token_expiration: Duration,
     pub admin_development_bypass: bool,
-    /// 리프레시 토큰 비활동 만료(`REFRESH_TOKEN_INACTIVITY_EXPIRATION`).
-    pub refresh_token_inactivity: Duration,
-    /// 리프레시 토큰 절대 만료(`REFRESH_TOKEN_ABSOLUTE_EXPIRATION`).
-    pub refresh_token_absolute: Duration,
     /// 시작 시 보장할 관리자 계정(`ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`). 비어 있으면 만들지 않는다.
     pub admin_account: Option<(String, String)>,
     pub admin_cors_allowed_origins: Vec<String>,
     pub log_file: PathBuf,
+    /// auth·user 도메인 설정(OIDC, Apple, 이미지 저장소, 콜백).
+    pub app: AppSettings,
     pub post: PostSettings,
     /// 관리자 Slack 알림. 전달이 꺼져 있으면 `None`.
     pub admin_notification: Option<AdminNotificationSettings>,
@@ -103,17 +101,14 @@ impl Settings {
             Profile::Dev | Profile::Prod => false,
         };
 
-        let refresh_token_inactivity =
-            env.required_duration("REFRESH_TOKEN_INACTIVITY_EXPIRATION")?;
-        let refresh_token_absolute = env.required_duration("REFRESH_TOKEN_ABSOLUTE_EXPIRATION")?;
-        RefreshTokenPolicy::new(refresh_token_inactivity, refresh_token_absolute).map_err(
-            |reason| ConfigError::Invalid {
-                key: "REFRESH_TOKEN_INACTIVITY_EXPIRATION".to_owned(),
-                reason,
-            },
-        )?;
         let admin_account = admin_account(env, profile)?;
         let post = PostSettings::from_env(env, profile.name())?;
+        let app = AppSettings::from_env(
+            env,
+            &post,
+            access_token_key.clone(),
+            access_token_expiration,
+        )?;
         let admin_notification =
             AdminNotificationSettings::from_env(env, profile == Profile::Local)?;
 
@@ -127,13 +122,12 @@ impl Settings {
             access_token_key,
             access_token_expiration,
             admin_development_bypass,
-            refresh_token_inactivity,
-            refresh_token_absolute,
             admin_account,
             admin_cors_allowed_origins: cors_origins(env, profile)?,
             log_file: PathBuf::from(
                 env.string_or("CHALKAK_LOGGING_FILE", chalkak_core::log::DEFAULT_LOG_FILE),
             ),
+            app,
             post,
             admin_notification,
         })
@@ -223,19 +217,9 @@ mod tests {
         let mut pairs = vec![
             ("ACCESS_TOKEN_SECRET", "0011"),
             ("ACCESS_TOKEN_EXPIRATION", "15m"),
-            ("REFRESH_TOKEN_INACTIVITY_EXPIRATION", "30d"),
-            ("REFRESH_TOKEN_ABSOLUTE_EXPIRATION", "90d"),
-            ("CLOUDFRONT_ORIGIN_PATH", "/chalkak"),
-            (
-                "IMAGE_PROCESSOR_CALLBACK_SECRET",
-                "test-callback-secret-with-enough-length",
-            ),
-            ("CALLBACK_MAX_BODY_BYTES", "65536"),
-            ("POST_IMAGE_PROCESSING_TIMEOUT", "7m"),
-            ("S3_BUCKET", "bucket"),
             ("S3_PREFIX", "chalkak"),
-            ("CLOUDFRONT_BASE_URL", "https://cdn.example.com"),
         ];
+        pairs.extend_from_slice(&chalkak_app::config::TEST_ENV);
         pairs.extend_from_slice(extra);
         Env::from_pairs(pairs)
     }
@@ -270,6 +254,7 @@ mod tests {
             ("SPRING_PROFILES_ACTIVE", "dev"),
             ("ADMIN_DEVELOPMENT_BYPASS_ENABLED", "true"),
             ("ADMIN_CORS_ALLOWED_ORIGIN", "https://admin.example.com"),
+            ("S3_PREFIX", "chalkak"),
             ("DB_NAME", "chalkak"),
             ("DB_USERNAME", "u"),
             ("DB_PASSWORD", "p"),
@@ -286,6 +271,7 @@ mod tests {
     fn dev와_prod의_cors_origin은_프로필마다_다르다() {
         let base = [
             ("ADMIN_CORS_ALLOWED_ORIGIN", "https://admin.example.com"),
+            ("S3_PREFIX", "chalkak"),
             ("DB_NAME", "chalkak"),
             ("DB_USERNAME", "u"),
             ("DB_PASSWORD", "p"),
@@ -360,9 +346,15 @@ mod tests {
     #[test]
     fn 리프레시_토큰과_이미지_주소_설정을_읽는다() {
         let s = Settings::from_env(&env(&[])).unwrap();
-        assert_eq!(s.refresh_token_inactivity, Duration::from_secs(30 * 86_400));
-        assert_eq!(s.refresh_token_absolute, Duration::from_secs(90 * 86_400));
-        assert_eq!(s.post.cloudfront_base_url, "https://cdn.example.com");
+        assert_eq!(
+            s.app.auth.refresh_inactivity,
+            Duration::from_secs(30 * 86_400)
+        );
+        assert_eq!(
+            s.app.auth.refresh_absolute,
+            Duration::from_secs(90 * 86_400)
+        );
+        assert_eq!(s.post.cloudfront_base_url, "https://cdn.test.chalkak");
         assert_eq!(s.post.cloudfront_origin_path, "/chalkak");
         assert_eq!(s.admin_account, None);
         let s = Settings::from_env(&env(&[

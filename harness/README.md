@@ -177,6 +177,7 @@ size = 2048
 content_type = "image/png"
 ```
 
+- 이미지 처리 콜백(`/internal/v1/**`) 단계는 `callback = {}`로 HMAC 헤더(`X-Chalkak-Callback-Timestamp`, `-Signature`)를 붙인다. 서명 대상은 `타임스탬프\nPOST\n경로\nsha256hex(빈 본문)\nlocal`이고 비밀키는 `oracle.env`의 `IMAGE_PROCESSOR_CALLBACK_SECRET`이다. `timestamp_offset`, `sign_path`, `secret`, `audience`, `signature`, `omit_timestamp`, `omit_signature`로 잘못된 요청을 만든다.
 - 응답 지정과 s3 키의 `${변수}`는 단계마다 현재 변수 값으로 채운다. 그래서 앞 단계에서 `capture`한 `uploadId`로 키를 지정할 수 있다.
 - 비교에서 **빼는 것**: JWKS 조회(앱의 공개키 캐시 상태로 횟수가 달라진다), 요청 헤더(Content-Type만 남긴다), S3의 호스트·경로 방식(`버킷/키`만 남긴다).
 - Apple 요청 본문은 폼 필드로 풀어 이름순으로 비교하고, `client_secret`(ES256 JWT)은 헤더·클레임으로 풀어 비교한다. **서명 검증은 하지 않는다**(허용 목록에 `p256`이 없다).
@@ -272,3 +273,13 @@ Rust 구현이 그대로 따라야 하는 것들이다. 시나리오로 고정�
 - **게시물:** 목록·상세는 삭제된 게시물을 포함하고 `VALIDATING`을 뺀다. 검수는 `PENDING`만 처리하고 아니면 `RESOURCE_STATE_CHANGED`. 삭제는 이미 삭제된 게시물에 204로 멱등.
 - **리프레시 토큰:** 회전한 토큰을 다시 내면 계보 전체를 폐기하고 401 `REAUTHENTICATION_REQUIRED`. 폐기는 401 응답 전에 커밋된다.
 - **감사 로그:** 같은 시각이면 id(UUIDv7)로 정렬하므로, 시나리오는 변경 단계마다 시계를 올려 순서를 고정했다.
+- **토큰 재발급(`auth/token-refresh`):** 비활동 30일·절대 90일. 재발급마다 토큰이 회전하고 만료는 절대 만료를 넘지 않는다. 이미 회전된 토큰을 다시 내면 그 계보 전체를 폐기한다(다른 기기 계보는 유지).
+  거절은 모두 401 `REAUTHENTICATION_REQUIRED`(`다시 로그인해 주세요.`). 로그아웃은 멱등이라 모르는 토큰도 204.
+  절대 만료로 줄어든 `refreshTokenExpiresIn`은 요청이 시각을 읽는 순간에 따라 1초 흔들려 비교에서 뺀다(`opaque`).
+- **요청 본문이 흔들리는 곳:** 위반이 둘 이상인 요청은 원본이 어느 메시지를 고를지 정해져 있지 않다(Bean Validation 위반 집합 순서). 시나리오는 한 번에 하나만 어기게 한다.
+  `provider`가 빈 문자열이면 null이 아니라 본문 파싱 오류(`JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다.`)다.
+- **사인(`user/signature`, `user/signature-callbacks`):** 처리 대기 중 사인 교체는 같은 업로드 ID를 되풀이해도 현재 사인 URL을 돌려주고, 처리 시간(7분)이 지나거나 실패하면
+  400 `SIGNATURE_REGISTRATION_REQUIRED`/`SIGNATURE_REUPLOAD_REQUIRED`. 콜백은 `X-Chalkak-Callback-Timestamp`·`X-Chalkak-Callback-Signature`(`v1=<hex>`)로만 인증하고
+  서명 대상은 `타임스탬프\nPOST\n경로\nsha256(빈 본문)\n환경`, 시각 창은 과거 300초·미래 30초다. 경로의 업로드 ID는 소문자 표준형이어야 하며 아니면 인증보다 먼저 400이다.
+- **콜백 본문 제한(`user/callback-body-limit`):** `/internal/v1/*`에서 `Content-Length`가 65536바이트를 넘으면 인증 전에 413이다. 청크 본문은 길이를 모르므로 거르지 않는다.
+- **탈퇴(`user/withdraw`):** 정지 회원도 탈퇴할 수 있고, 이미 탈퇴한 회원은 401이다. 모든 리프레시 토큰이 폐기되고 소셜 계정이 지워진다(정지 회원은 계정 유지).

@@ -56,6 +56,20 @@ impl Routes {
         self.route(Method::Post, pattern, handler)
     }
 
+    pub fn put<F>(self, pattern: &'static str, handler: F) -> Self
+    where
+        F: Fn(&Request) -> ApiResult + Send + Sync + 'static,
+    {
+        self.route(Method::Put, pattern, handler)
+    }
+
+    pub fn delete<F>(self, pattern: &'static str, handler: F) -> Self
+    where
+        F: Fn(&Request) -> ApiResult + Send + Sync + 'static,
+    {
+        self.route(Method::Delete, pattern, handler)
+    }
+
     /// 404·405 응답을 원본 모양으로 정해 라우터를 완성한다.
     pub fn into_router(self) -> Router {
         let logger_404 = Arc::clone(&self.logger);
@@ -115,6 +129,8 @@ mod tests {
         Routes::new(logger())
             .get("/a", |_| Ok(Response::new(200).with_body("ok")))
             .post("/a", |_| Err(ApiError::UnreadableBody))
+            .put("/p", |_| Ok(Response::new(204)))
+            .delete("/p", |_| Ok(Response::new(204)))
             .get("/boom", |_| panic!("boom"))
             .into_router()
     }
@@ -158,6 +174,14 @@ mod tests {
         assert_eq!(r.headers.get("allow"), Some("GET,HEAD,POST,OPTIONS"));
         assert_eq!(r.headers.get("accept-patch"), Some(""));
         assert!(r.body.is_empty());
+    }
+
+    #[test]
+    fn put과_delete도_등록한다() {
+        let router = router();
+        assert_eq!(call(&router, Method::Put, "/p").status, 204);
+        assert_eq!(call(&router, Method::Delete, "/p").status, 204);
+        assert_eq!(call(&router, Method::Post, "/p").status, 405);
     }
 
     #[test]

@@ -17,22 +17,16 @@ const NOW_SECONDS: i64 = 1_791_774_000;
 const USER: &str = "01990000-0000-7000-8000-000000000001";
 
 fn handler(db: &TestDb) -> Arc<dyn Handler> {
-    let env = Env::from_pairs([
+    let mut pairs = vec![
         ("ACCESS_TOKEN_SECRET", SECRET_HEX),
         ("ACCESS_TOKEN_EXPIRATION", "15m"),
         ("REFRESH_TOKEN_INACTIVITY_EXPIRATION", "30d"),
         ("REFRESH_TOKEN_ABSOLUTE_EXPIRATION", "90d"),
         ("CLOUDFRONT_ORIGIN_PATH", "/chalkak"),
         ("ADMIN_DEVELOPMENT_BYPASS_ENABLED", "false"),
-        ("CLOUDFRONT_BASE_URL", "https://cdn.test.chalkak"),
-        ("CLOUDFRONT_ORIGIN_PATH", "/chalkak"),
-        (
-            "IMAGE_PROCESSOR_CALLBACK_SECRET",
-            "test-callback-secret-with-enough-length",
-        ),
-        ("CALLBACK_MAX_BODY_BYTES", "65536"),
-        ("POST_IMAGE_PROCESSING_TIMEOUT", "7m"),
-    ]);
+    ];
+    pairs.extend_from_slice(&chalkak_app::config::TEST_ENV);
+    let env = Env::from_pairs(pairs);
     let settings = Settings::from_env(&env).unwrap();
     let clock: Arc<dyn Clock> = Arc::new(FixedClock::new(NOW.parse().unwrap()));
     let logger = Arc::new(Logger::new(

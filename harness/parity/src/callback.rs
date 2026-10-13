@@ -19,6 +19,7 @@ fn hex(bytes: &[u8]) -> String {
 /// 서명 헤더 두 개를 만든다. `path`는 쿼리를 뺀 요청 경로, `now`는 앱 시각(epoch 초).
 pub fn headers(spec: &CallbackSpec, path: &str, body: &[u8], now: i64) -> Vec<(String, String)> {
     let timestamp = (now + spec.timestamp_offset.unwrap_or(0)).to_string();
+    let path = spec.sign_path.as_deref().unwrap_or(path);
     let signed_body = spec.sign_body.as_deref().map_or(body, str::as_bytes);
     let payload = format!(
         "{timestamp}\nPOST\n{path}\n{}\n{}",

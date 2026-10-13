@@ -511,6 +511,15 @@ mod tests {
     }
 
     #[test]
+    fn 원시_값을_그대로_꺼낼_수_있다() {
+        let body =
+            read_json_object(&post(Some("application/json"), br#"{"a":1,"b":null}"#)).unwrap();
+        assert_eq!(body.value("a"), Some(&serde_json::json!(1)));
+        assert_eq!(body.value("b"), Some(&Value::Null));
+        assert_eq!(body.value("c"), None);
+    }
+
+    #[test]
     fn 문자열_필드는_스칼라를_문자열로_바꾼다() {
         let obj = |body: &str| {
             read_json_object(&post(Some("application/json"), body.as_bytes())).unwrap()

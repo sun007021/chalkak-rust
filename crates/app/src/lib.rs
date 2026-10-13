@@ -13,6 +13,7 @@
 pub mod admin;
 pub mod auth;
 pub mod common;
+pub mod config;
 pub mod feedback;
 pub mod like;
 pub mod notification;
@@ -24,6 +25,7 @@ pub mod testing;
 pub mod topic;
 pub mod user;
 pub mod web;
+pub mod wiring;
 
 use std::sync::Arc;
 
@@ -38,15 +40,22 @@ pub struct AppContext {
     pub logger: Arc<Logger>,
     /// 관리자 도메인 설정(토큰 키·수명, 이미지 주소, 개발 우회).
     pub admin: admin::AdminConfig,
+    /// auth·user 도메인 설정.
+    pub settings: Arc<config::AppSettings>,
     /// 게시물·사진·좋아요 흐름이 서버 조립에서 받는 것(설정, S3 호출, 검수 대기 구독자).
     pub post: post::PostWiring,
 }
 
 /// 모든 도메인의 라우트를 등록한다.
 pub fn register_routes(routes: web::Routes, ctx: &AppContext) -> web::Routes {
+    // 설정이 잘못되면 서버를 띄우지 않는다(스프링의 빈 생성 실패와 같다). 설정 값 검증은 `AppSettings::from_env`가 먼저 한다.
+    let components = wiring::Components::build(ctx)
+        .unwrap_or_else(|e| panic!("auth·user 구성 요소를 만들 수 없습니다: {e}"));
     let routes = topic::api::register(routes, ctx);
     let routes = feedback::api::register(routes, ctx);
     let routes = notification::api::register(routes, ctx);
+    let routes = auth::api::register(routes, ctx, &components);
+    let routes = user::api::register(routes, ctx, &components);
     let routes = post::api::register(routes, ctx);
     let routes = like::api::register(routes, ctx);
     let routes = post::callback::register(routes, ctx);

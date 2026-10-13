@@ -1,0 +1,178 @@
+{
+  "steps": [
+    {
+      "step": "상한(65536바이트) 본문은 통과",
+      "status": 204,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": ""
+    },
+    {
+      "step": "상한을 1바이트 넘으면 413",
+      "status": 413,
+      "headers": [
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "x-request-id",
+          "$uuid2"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문이 너무 큽니다."
+      }
+    },
+    {
+      "step": "서명이 없어도 크기가 먼저 거절된다",
+      "status": 413,
+      "headers": [
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "x-request-id",
+          "$uuid3"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문이 너무 큽니다."
+      }
+    },
+    {
+      "step": "상한 이하 본문이어도 서명이 없으면 401",
+      "status": 401,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid4"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 이미지 처리 콜백입니다."
+      }
+    },
+    {
+      "step": "경로의 업로드 ID가 틀려도 크기가 먼저 거절된다",
+      "status": 413,
+      "headers": [
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "x-request-id",
+          "$uuid5"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문이 너무 큽니다."
+      }
+    },
+    {
+      "step": "콜백 밖의 공개 경로에는 제한이 걸리지 않는다",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid6"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      }
+    }
+  ],
+  "db": null
+}

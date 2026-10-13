@@ -101,6 +101,8 @@ pub struct Step {
     #[serde(default)]
     pub headers: BTreeMap<String, String>,
     pub body: Option<String>,
+    /// 지정한 바이트 수만큼 `a`로 채운 본문을 보낸다(본문 크기 제한 시나리오). `body`와 함께 쓸 수 없다.
+    pub body_size: Option<usize>,
     pub auth: Option<Auth>,
     #[serde(default)]
     pub capture: BTreeMap<String, String>,
@@ -122,6 +124,8 @@ pub struct CallbackSpec {
     pub timestamp_offset: Option<i64>,
     pub secret: Option<String>,
     pub audience: Option<String>,
+    /// 서명 대상 경로를 실제 요청 경로 대신 이 값으로 한다(다른 콜백 경로의 서명 재사용 시나리오).
+    pub sign_path: Option<String>,
     /// 서명 대상 본문을 실제 본문 대신 이 문자열로 한다(본문 변조 시나리오).
     pub sign_body: Option<String>,
     /// 서명 헤더 값을 통째로 덮는다.

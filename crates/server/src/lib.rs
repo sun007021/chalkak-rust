@@ -86,8 +86,8 @@ pub fn admin_config(settings: &Settings) -> AdminConfig {
         access_token_issuer: ACCESS_TOKEN_ISSUER.to_owned(),
         access_token_audience: ACCESS_TOKEN_AUDIENCE.to_owned(),
         access_token_expiration: settings.access_token_expiration,
-        refresh_token_inactivity: settings.refresh_token_inactivity,
-        refresh_token_absolute: settings.refresh_token_absolute,
+        refresh_token_inactivity: settings.app.auth.refresh_inactivity,
+        refresh_token_absolute: settings.app.auth.refresh_absolute,
         development_bypass: settings.admin_development_bypass,
     }
 }
@@ -128,6 +128,7 @@ pub fn build_handler(
         clock: Arc::clone(&clock),
         logger: Arc::clone(&logger),
         admin: admin_config(settings),
+        settings: Arc::new(settings.app.clone()),
         post: PostWiring::new(
             settings.post.clone(),
             Arc::new(object_store),
