@@ -4,6 +4,9 @@ use crate::time;
 use serde::Deserialize;
 use std::path::{Path, PathBuf};
 
+/// 시계를 맞춘 직후 요청을 보낼 때 앱 시각이 시나리오 시각보다 앞선 정도(초).
+pub const CLOCK_LEAD: f64 = 1.1;
+
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Target {
@@ -17,6 +20,10 @@ pub struct Target {
     pub access_token_secret: String,
     /// 가짜 외부 서버(`harness/fakes`)의 관리 주소. 외부 연동을 쓰는 시나리오에 필요하다.
     pub fakes_url: Option<String>,
+    /// 실행하는 동안 잡는 잠금 파일. 여러 작업이 같은 대상(lane)을 동시에 쓰지 않게 한다. 없으면 잠그지 않는다.
+    pub lock_file: Option<PathBuf>,
+    /// 시계 파일을 바꾼 뒤 기다리는 시간(ms). 생략하면 `PARITY_CLOCK_SETTLE_MS` 또는 1100.
+    pub clock_settle_ms: Option<u64>,
 }
 
 impl Target {
@@ -25,22 +32,61 @@ impl Target {
         toml::from_str(&text).map_err(|e| format!("{}: {e}", path.display()))
     }
 
-    /// 앱·DB의 현재 시각을 `epoch`로 맞춘다. 실제 시각과의 차이를 초 단위 오프셋으로 쓰고,
-    /// 실제 시각의 소수부가 0에 가까울 때 써서 앱 시각이 `epoch + 0.0x`초에서 출발하게 한다.
-    pub fn set_clock(&self, epoch: i64) -> Result<(), String> {
+    /// 앱·DB의 현재 시각을 옮겨, 기다림(`settle`)이 끝나 요청을 보낼 때 앱 시각이 `epoch + CLOCK_LEAD`가 되게 한다.
+    /// 오프셋은 소수 초로 쓴다(libfaketime은 `+12.345` 형식을 받는다). 대상마다 기다림이 달라도 요청 시점의 앱
+    /// 시각은 같다. `CLOCK_LEAD`는 이전 방식(초 경계에 정수 오프셋을 쓰고 1100ms 기다림)과 같은 값이라 그때 녹화한
+    /// golden과 시각이 같다. 반환값은 기다림이 끝난 실제 시각이다.
+    pub fn set_clock(&self, epoch: i64) -> Result<f64, String> {
+        let settle = self.settle_ms();
         let now = time::now_epoch();
-        let wait = 1.0 - now.fract();
-        std::thread::sleep(std::time::Duration::from_secs_f64(wait));
-        let now = time::now_epoch().floor() as i64;
-        let offset = epoch - now;
+        let offset = epoch as f64 + CLOCK_LEAD - (now + settle as f64 / 1000.0);
         if let Some(dir) = self.clock_file.parent() {
             std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
         }
         let tmp = self.clock_file.with_extension("tmp");
-        std::fs::write(&tmp, format!("{offset:+}\n")).map_err(|e| e.to_string())?;
+        std::fs::write(&tmp, format!("{offset:+.3}\n")).map_err(|e| e.to_string())?;
         std::fs::rename(&tmp, &self.clock_file).map_err(|e| e.to_string())?;
-        settle();
-        Ok(())
+        std::thread::sleep(std::time::Duration::from_millis(settle));
+        Ok(time::now_epoch())
+    }
+
+    /// libfaketime이 `FAKETIME_CACHE_DURATION`으로 파일을 캐시하는 경우에 대비해 바뀐 시계가 반영될 때까지 기다린다.
+    /// `FAKETIME_NO_CACHE=1`에서도 0으로 줄이면 큰 시각 이동(예: 12시간) 직후 Java가 빈 응답으로 연결을 끊는 경우가
+    /// 있었다(2026-10-12). 대상 설정의 `clock_settle_ms`가 우선하고, 없으면 환경변수, 그것도 없으면 1100ms.
+    pub fn settle_ms(&self) -> u64 {
+        self.clock_settle_ms
+            .or_else(|| {
+                std::env::var("PARITY_CLOCK_SETTLE_MS")
+                    .ok()
+                    .and_then(|v| v.parse().ok())
+            })
+            .unwrap_or(1100)
+    }
+
+    /// `lock_file`이 있으면 잠금을 잡는다. `wait`가 거짓이면 이미 잡혀 있을 때 None을 낸다.
+    /// 잠금은 돌려준 파일을 닫을 때(프로세스가 끝날 때 포함) 풀린다.
+    pub fn lock(&self, wait: bool) -> Result<Option<std::fs::File>, String> {
+        let Some(path) = &self.lock_file else {
+            return Ok(Some(
+                std::fs::File::open("/dev/null").map_err(|e| e.to_string())?,
+            ));
+        };
+        let file = std::fs::OpenOptions::new()
+            .create(true)
+            .truncate(false)
+            .write(true)
+            .open(path)
+            .map_err(|e| format!("{}: {e}", path.display()))?;
+        if wait {
+            file.lock()
+                .map_err(|e| format!("{}: {e}", path.display()))?;
+            return Ok(Some(file));
+        }
+        match file.try_lock() {
+            Ok(()) => Ok(Some(file)),
+            Err(std::fs::TryLockError::WouldBlock) => Ok(None),
+            Err(std::fs::TryLockError::Error(e)) => Err(format!("{}: {e}", path.display())),
+        }
     }
 
     /// 시계 파일을 "+0"(실제 시각)으로 되돌린다. 시나리오 시각으로 옮긴 채 두면 이후 DB를 직접 조회하는 사람이나
@@ -53,17 +99,6 @@ impl Target {
         postgres::Client::connect(&self.db_url, postgres::NoTls)
             .map_err(|e| format!("[{}] DB 연결 실패: {e}", self.name))
     }
-}
-
-/// libfaketime이 `FAKETIME_CACHE_DURATION`으로 파일을 캐시하는 경우에 대비해 바뀐 시계가 반영될 때까지 기다린다.
-/// `FAKETIME_NO_CACHE=1`에서도 0으로 줄이면 큰 시각 이동(예: 12시간) 직후 Java가 빈 응답으로 연결을 끊는 경우가
-/// 있었다(2026-10-12). 기본값 1100ms를 유지한다.
-fn settle() {
-    let ms = std::env::var("PARITY_CLOCK_SETTLE_MS")
-        .ok()
-        .and_then(|v| v.parse().ok())
-        .unwrap_or(1100);
-    std::thread::sleep(std::time::Duration::from_millis(ms));
 }
 
 /// 마이그레이션 이력을 뺀 모든 테이블을 비우고 시나리오 준비 SQL을 실행한다.

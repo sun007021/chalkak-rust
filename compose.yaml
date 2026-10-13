@@ -13,6 +13,10 @@ x-faketime: &faketime
   LD_PRELOAD: /opt/faketime/libfaketime.so.1
   FAKETIME_NO_CACHE: "1"
   FAKETIME_DONT_FAKE_MONOTONIC: "1"
+  # libfaketime이 CLOCK_MONOTONIC 조건 변수 대기를 보정하는 기능을 끈다. 켜져 있으면(기본) 시간 제한 대기가 바로
+  # 끝나 JVM 내부 스레드가 쉬지 않고 돌며 시계 파일을 읽는다: 쉬는 Java 하나가 CPU 1~2코어를 쓰고, 기동이 4~6분
+  # 걸리고, 부하로 시계 미반영 오류가 났다(2026-10-13 측정, Object.wait(6s)가 0.8초에 끝남).
+  FAKETIME_FORCE_MONOTONIC_FIX: "0"
 
 x-postgres: &postgres
   image: chalkak/postgres-faketime:18.4
