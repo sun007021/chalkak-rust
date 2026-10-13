@@ -21,6 +21,7 @@ fn handler(db: &TestDb) -> Arc<dyn Handler> {
         ("ACCESS_TOKEN_SECRET", SECRET_HEX),
         ("ACCESS_TOKEN_EXPIRATION", "15m"),
         ("ADMIN_DEVELOPMENT_BYPASS_ENABLED", "false"),
+        ("CLOUDFRONT_BASE_URL", "https://cdn.test.chalkak"),
         ("CLOUDFRONT_ORIGIN_PATH", "/chalkak"),
         (
             "IMAGE_PROCESSOR_CALLBACK_SECRET",
@@ -169,4 +170,158 @@ fn feedback_flow_validates_body_then_user_then_stores() {
     let r = post(r#"{"content":"좋아요"}"#, json_type, Some(&t));
     assert_eq!(r.status, 401);
     assert!(!r.headers.contains("www-authenticate"), "컨트롤러가 낸 401");
+}
+
+fn send(
+    h: &Arc<dyn Handler>,
+    method: Method,
+    path: &str,
+    query: &[(&str, &str)],
+    bearer: Option<&str>,
+) -> Response {
+    let mut req = Request::new(method, path);
+    req.query = query
+        .iter()
+        .map(|(k, v)| ((*k).to_owned(), (*v).to_owned()))
+        .collect();
+    call(h, req, bearer)
+}
+
+// 하네스 시나리오 notification/* 의 핵심 흐름: 목록·상세·미읽음·읽음·모두 읽기
+#[test]
+fn notification_inbox_flow() {
+    let Some(db) = TestDb::create() else { return };
+    let admin = "01990000-0000-7000-8000-0000000000a1";
+    let (topic, photo, post, event, notification) = (
+        "01990000-0000-7000-8000-0000000000f1",
+        "01990000-0000-7000-8000-0000000000b1",
+        "01990000-0000-7000-8000-0000000000c1",
+        "01990000-0000-7000-8000-0000000000d1",
+        "01990000-0000-7000-8000-000000000101",
+    );
+    db.client()
+        .batch_execute(&format!(
+            "INSERT INTO users (id, email, signature_original_storage_key) VALUES \
+               ('{USER}', 'user1@test.chalkak', 'chalkak/signatures/user1/original.png'); \
+             INSERT INTO admins (id, username, password) VALUES ('{admin}', 'operator', 'x'); \
+             INSERT INTO topics (id, title, topic_date, starts_at, ends_at) VALUES \
+               ('{topic}', '주제', '2026-10-12', '2026-10-12T00:00:00+09:00', '2026-10-13T00:00:00+09:00'); \
+             INSERT INTO photos (id, original_storage_key, thumbnail_storage_key) VALUES \
+               ('{photo}', 'chalkak/posts/p1/original.webp', 'chalkak/posts/p1/thumbnail.webp'); \
+             INSERT INTO posts (id, user_id, topic_id, photo_id, moderation_status) VALUES \
+               ('{post}', '{USER}', '{topic}', '{photo}', 'REJECTED'); \
+             INSERT INTO admin_audit_logs (id, actor_admin_id, action, target_type, target_id, reason, \
+               before_state, after_state, occurred_at, request_id) VALUES \
+               ('{event}', '{admin}', 'POST_REJECTED', 'POST', '{post}', '사진 품질', \
+                '{{\"status\":\"PENDING\"}}', '{{\"status\":\"REJECTED\"}}', '2026-10-12T00:00:00Z', gen_random_uuid()); \
+             INSERT INTO notifications (id, user_id, post_id, event_key, type, title, body, rejection_reason, created_at) VALUES \
+               ('{notification}', '{USER}', '{post}', '{event}', 'POST_REJECTED', '게시물이 반려되었습니다.', \
+                '반려 사유를 확인해 주세요.', '사진 품질', '2026-10-12T01:00:00.5Z')"
+        ))
+        .unwrap();
+    let h = handler(&db);
+    let t = user_token();
+    let base = "/api/v1/notifications";
+
+    assert_eq!(send(&h, Method::Get, base, &[], None).status, 401);
+    // 조회 조건 오류는 회원 확인보다 먼저다(@Valid 인자 해석 -> @RequiresExistingUser).
+    let r = send(&h, Method::Get, base, &[("pageSize", "0")], Some(&t));
+    assert_eq!(
+        (r.status, json_body(&r)["message"].as_str().unwrap()),
+        (400, "조회 조건이 올바르지 않습니다.")
+    );
+
+    let r = send(&h, Method::Get, base, &[], Some(&t));
+    assert_eq!(r.status, 200);
+    assert_eq!(
+        json_body(&r),
+        json!({
+            "currentPage": 1, "pageSize": 20, "hasNext": false,
+            "notifications": [{
+                "id": notification, "type": "POST_REJECTED",
+                "title": "게시물이 반려되었습니다.", "body": "반려 사유를 확인해 주세요.",
+                "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
+                "readAt": null, "createdAt": "2026-10-12T01:00:00.500Z"
+            }]
+        })
+    );
+
+    let detail = send(
+        &h,
+        Method::Get,
+        &format!("{base}/{notification}"),
+        &[],
+        Some(&t),
+    );
+    assert_eq!(detail.status, 200);
+    let d = json_body(&detail);
+    assert_eq!(
+        d["originalImageUrl"],
+        "https://cdn.test.chalkak/posts/p1/original.webp"
+    );
+    assert_eq!(d["rejectionReason"], "사진 품질");
+    assert_eq!(
+        send(&h, Method::Get, &format!("{base}/abc"), &[], Some(&t)).status,
+        400
+    );
+
+    let unread = send(
+        &h,
+        Method::Get,
+        &format!("{base}/unread-status"),
+        &[],
+        Some(&t),
+    );
+    assert_eq!(json_body(&unread), json!({"hasUnread": true}));
+
+    let r = send(
+        &h,
+        Method::Patch,
+        &format!("{base}/{notification}/read"),
+        &[],
+        Some(&t),
+    );
+    assert_eq!((r.status, r.body.len()), (204, 0));
+    let unread = send(
+        &h,
+        Method::Get,
+        &format!("{base}/unread-status"),
+        &[],
+        Some(&t),
+    );
+    assert_eq!(json_body(&unread), json!({"hasUnread": false}));
+    let r = send(
+        &h,
+        Method::Get,
+        &format!("{base}/{notification}"),
+        &[],
+        Some(&t),
+    );
+    assert_eq!(json_body(&r)["readAt"], NOW);
+
+    // 게시물이 삭제되면 알림은 남지만 보이지 않고 읽음 처리도 404다.
+    db.client()
+        .batch_execute(&format!(
+            "UPDATE posts SET deleted_at = CURRENT_TIMESTAMP WHERE id = '{post}'"
+        ))
+        .unwrap();
+    let r = send(&h, Method::Get, base, &[], Some(&t));
+    assert_eq!(json_body(&r)["notifications"], json!([]));
+    let r = send(
+        &h,
+        Method::Patch,
+        &format!("{base}/{notification}/read"),
+        &[],
+        Some(&t),
+    );
+    assert_eq!(r.status, 404);
+    let r = send(
+        &h,
+        Method::Patch,
+        &format!("{base}/read-all"),
+        &[],
+        Some(&t),
+    );
+    assert_eq!(r.status, 204);
+    assert_eq!(send(&h, Method::Delete, base, &[], Some(&t)).status, 405);
 }

@@ -11,6 +11,7 @@
 use std::path::PathBuf;
 use std::time::Duration;
 
+use chalkak_app::notification::slack::settings::AdminNotificationSettings;
 use chalkak_app::post::PostSettings;
 use chalkak_core::config::{ConfigError, Env};
 use chalkak_db::DbConfig;
@@ -72,6 +73,8 @@ pub struct Settings {
     pub admin_cors_allowed_origins: Vec<String>,
     pub log_file: PathBuf,
     pub post: PostSettings,
+    /// 관리자 Slack 알림. 전달이 꺼져 있으면 `None`.
+    pub admin_notification: Option<AdminNotificationSettings>,
 }
 
 impl Settings {
@@ -94,6 +97,8 @@ impl Settings {
         };
 
         let post = PostSettings::from_env(env, profile.name())?;
+        let admin_notification =
+            AdminNotificationSettings::from_env(env, profile == Profile::Local)?;
 
         Ok(Settings {
             profile,
@@ -110,6 +115,7 @@ impl Settings {
                 env.string_or("CHALKAK_LOGGING_FILE", chalkak_core::log::DEFAULT_LOG_FILE),
             ),
             post,
+            admin_notification,
         })
     }
 }
@@ -227,6 +233,8 @@ mod tests {
             ("DB_NAME", "chalkak"),
             ("DB_USERNAME", "u"),
             ("DB_PASSWORD", "p"),
+            ("CLOUDFRONT_BASE_URL", "https://cdn.example.com"),
+            ("ADMIN_NOTIFICATION_DELIVERY_ENABLED", "false"),
         ]);
         assert!(!Settings::from_env(&dev).unwrap().admin_development_bypass);
     }
@@ -239,6 +247,8 @@ mod tests {
             ("DB_NAME", "chalkak"),
             ("DB_USERNAME", "u"),
             ("DB_PASSWORD", "p"),
+            ("CLOUDFRONT_BASE_URL", "https://cdn.example.com"),
+            ("ADMIN_NOTIFICATION_DELIVERY_ENABLED", "false"),
         ];
         let mut dev = vec![("SPRING_PROFILES_ACTIVE", "dev")];
         dev.extend_from_slice(&base);

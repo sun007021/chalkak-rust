@@ -1,0 +1,3477 @@
+{
+  "steps": [
+    {
+      "step": "쿼리 page=0",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=-1",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid2"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 pageSize=0",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid3"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 pageSize=-5",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid4"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 pageSize=101",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid5"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 pageSize=100",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid6"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 100,
+        "hasNext": false,
+        "notifications": [
+          {
+            "id": "$uuid7",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": null,
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid8",
+            "type": "POST_REJECTED",
+            "title": "게시물이 반려되었습니다.",
+            "body": "반려 사유를 확인해 주세요.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid9",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
+            "readAt": "<t-154800s iso Z>",
+            "createdAt": "<t-169200s iso Z>"
+          }
+        ]
+      }
+    },
+    {
+      "step": "쿼리 pageSize=1",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid10"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 1,
+        "hasNext": true,
+        "notifications": [
+          {
+            "id": "$uuid7",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": null,
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          }
+        ]
+      }
+    },
+    {
+      "step": "쿼리 page=abc",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid11"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 pageSize=abc",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid12"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "pageSize: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=1.5",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid13"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 pageSize=1.5",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid14"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "pageSize: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid15"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": [
+          {
+            "id": "$uuid7",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": null,
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid8",
+            "type": "POST_REJECTED",
+            "title": "게시물이 반려되었습니다.",
+            "body": "반려 사유를 확인해 주세요.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid9",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
+            "readAt": "<t-154800s iso Z>",
+            "createdAt": "<t-169200s iso Z>"
+          }
+        ]
+      }
+    },
+    {
+      "step": "쿼리 pageSize=",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid16"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": [
+          {
+            "id": "$uuid7",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": null,
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid8",
+            "type": "POST_REJECTED",
+            "title": "게시물이 반려되었습니다.",
+            "body": "반려 사유를 확인해 주세요.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid9",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
+            "readAt": "<t-154800s iso Z>",
+            "createdAt": "<t-169200s iso Z>"
+          }
+        ]
+      }
+    },
+    {
+      "step": "쿼리 page=&pageSize=",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid17"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": [
+          {
+            "id": "$uuid7",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": null,
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid8",
+            "type": "POST_REJECTED",
+            "title": "게시물이 반려되었습니다.",
+            "body": "반려 사유를 확인해 주세요.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid9",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
+            "readAt": "<t-154800s iso Z>",
+            "createdAt": "<t-169200s iso Z>"
+          }
+        ]
+      }
+    },
+    {
+      "step": "쿼리 page=%20",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid18"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": [
+          {
+            "id": "$uuid7",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": null,
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid8",
+            "type": "POST_REJECTED",
+            "title": "게시물이 반려되었습니다.",
+            "body": "반려 사유를 확인해 주세요.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid9",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
+            "readAt": "<t-154800s iso Z>",
+            "createdAt": "<t-169200s iso Z>"
+          }
+        ]
+      }
+    },
+    {
+      "step": "쿼리 page=%201%202",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid19"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 12,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": []
+      }
+    },
+    {
+      "step": "쿼리 page=1&page=2",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid20"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": [
+          {
+            "id": "$uuid7",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": null,
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid8",
+            "type": "POST_REJECTED",
+            "title": "게시물이 반려되었습니다.",
+            "body": "반려 사유를 확인해 주세요.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid9",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
+            "readAt": "<t-154800s iso Z>",
+            "createdAt": "<t-169200s iso Z>"
+          }
+        ]
+      }
+    },
+    {
+      "step": "쿼리 page=2&page=x",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid21"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 2,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": []
+      }
+    },
+    {
+      "step": "쿼리 page=x&page=2",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid22"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=&page=2",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid23"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": [
+          {
+            "id": "$uuid7",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": null,
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid8",
+            "type": "POST_REJECTED",
+            "title": "게시물이 반려되었습니다.",
+            "body": "반려 사유를 확인해 주세요.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid9",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
+            "readAt": "<t-154800s iso Z>",
+            "createdAt": "<t-169200s iso Z>"
+          }
+        ]
+      }
+    },
+    {
+      "step": "쿼리 page=0x1",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid24"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": [
+          {
+            "id": "$uuid7",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": null,
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid8",
+            "type": "POST_REJECTED",
+            "title": "게시물이 반려되었습니다.",
+            "body": "반려 사유를 확인해 주세요.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid9",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
+            "readAt": "<t-154800s iso Z>",
+            "createdAt": "<t-169200s iso Z>"
+          }
+        ]
+      }
+    },
+    {
+      "step": "쿼리 page=0X1",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid25"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": [
+          {
+            "id": "$uuid7",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": null,
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid8",
+            "type": "POST_REJECTED",
+            "title": "게시물이 반려되었습니다.",
+            "body": "반려 사유를 확인해 주세요.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid9",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
+            "readAt": "<t-154800s iso Z>",
+            "createdAt": "<t-169200s iso Z>"
+          }
+        ]
+      }
+    },
+    {
+      "step": "쿼리 page=%230",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid26"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=%2312",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid27"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 18,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": []
+      }
+    },
+    {
+      "step": "쿼리 page=0x10&pageSize=0x5",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid28"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 16,
+        "pageSize": 5,
+        "hasNext": false,
+        "notifications": []
+      }
+    },
+    {
+      "step": "쿼리 page=%2B2",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid29"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 2,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": []
+      }
+    },
+    {
+      "step": "쿼리 page=%2B",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid30"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=-0",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid31"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=007",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid32"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 7,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": []
+      }
+    },
+    {
+      "step": "쿼리 page=1e1",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid33"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=2147483647",
+      "status": 500,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid34"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "INTERNAL_ERROR",
+        "message": "서버에서 요청을 처리하지 못했습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=2147483648",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid35"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=-2147483648",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid36"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=2147483647&pageSize=1",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid37"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 2147483647,
+        "pageSize": 1,
+        "hasNext": false,
+        "notifications": []
+      }
+    },
+    {
+      "step": "쿼리 page=1073741825&pageSize=2",
+      "status": 500,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid38"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "INTERNAL_ERROR",
+        "message": "서버에서 요청을 처리하지 못했습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=107374183&pageSize=20",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid39"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 107374183,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": []
+      }
+    },
+    {
+      "step": "쿼리 page=0&pageSize=0",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid40"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=abc&pageSize=0",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid41"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=0&pageSize=abc",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid42"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "pageSize: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=abc&pageSize=abc",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid43"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=1&pageSize=101&x=1",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid44"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 Page=2",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid45"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": [
+          {
+            "id": "$uuid7",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": null,
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid8",
+            "type": "POST_REJECTED",
+            "title": "게시물이 반려되었습니다.",
+            "body": "반려 사유를 확인해 주세요.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid9",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
+            "readAt": "<t-154800s iso Z>",
+            "createdAt": "<t-169200s iso Z>"
+          }
+        ]
+      }
+    },
+    {
+      "step": "쿼리 PAGE=2",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid46"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": [
+          {
+            "id": "$uuid7",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": null,
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid8",
+            "type": "POST_REJECTED",
+            "title": "게시물이 반려되었습니다.",
+            "body": "반려 사유를 확인해 주세요.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid9",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
+            "readAt": "<t-154800s iso Z>",
+            "createdAt": "<t-169200s iso Z>"
+          }
+        ]
+      }
+    },
+    {
+      "step": "쿼리 pageSize=%EF%BC%92",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid47"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 2,
+        "hasNext": true,
+        "notifications": [
+          {
+            "id": "$uuid7",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": null,
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid8",
+            "type": "POST_REJECTED",
+            "title": "게시물이 반려되었습니다.",
+            "body": "반려 사유를 확인해 주세요.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          }
+        ]
+      }
+    },
+    {
+      "step": "쿼리 page=%D9%A2",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid48"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 2,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": []
+      }
+    },
+    {
+      "step": "쿼리 page=%C2%A02",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid49"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=%E3%80%802",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid50"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 2,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": []
+      }
+    },
+    {
+      "step": "쿼리 page=1,2",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid51"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=true",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid52"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=NaN",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid53"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=0x",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid54"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=0xFFFFFFFF",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid55"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=-0x1",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid56"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=%C2%A0",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid57"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=%E3%80%80",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid58"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": [
+          {
+            "id": "$uuid7",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": null,
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid8",
+            "type": "POST_REJECTED",
+            "title": "게시물이 반려되었습니다.",
+            "body": "반려 사유를 확인해 주세요.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid9",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
+            "readAt": "<t-154800s iso Z>",
+            "createdAt": "<t-169200s iso Z>"
+          }
+        ]
+      }
+    },
+    {
+      "step": "쿼리 page=%09",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid59"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": [
+          {
+            "id": "$uuid7",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": null,
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid8",
+            "type": "POST_REJECTED",
+            "title": "게시물이 반려되었습니다.",
+            "body": "반려 사유를 확인해 주세요.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid9",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
+            "readAt": "<t-154800s iso Z>",
+            "createdAt": "<t-169200s iso Z>"
+          }
+        ]
+      }
+    },
+    {
+      "step": "쿼리 pageSize=%0A",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid60"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": [
+          {
+            "id": "$uuid7",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": null,
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid8",
+            "type": "POST_REJECTED",
+            "title": "게시물이 반려되었습니다.",
+            "body": "반려 사유를 확인해 주세요.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
+            "readAt": null,
+            "createdAt": "<t-41105s iso Z>"
+          },
+          {
+            "id": "$uuid9",
+            "type": "POST_APPROVED",
+            "title": "게시물이 승인되었습니다.",
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
+            "readAt": "<t-154800s iso Z>",
+            "createdAt": "<t-169200s iso Z>"
+          }
+        ]
+      }
+    },
+    {
+      "step": "쿼리 page=%202",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid61"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 2,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": []
+      }
+    },
+    {
+      "step": "쿼리 page=2%20",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid62"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 2,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": []
+      }
+    },
+    {
+      "step": "쿼리 page=+3",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid63"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 3,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": []
+      }
+    },
+    {
+      "step": "쿼리 page=%2B%202",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid64"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 2,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": []
+      }
+    },
+    {
+      "step": "쿼리 page=%E2%80%A82",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid65"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 2,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": []
+      }
+    },
+    {
+      "step": "쿼리 page=%0B2",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid66"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 2,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": []
+      }
+    },
+    {
+      "step": "쿼리 page=%1C2",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid67"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 2,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": []
+      }
+    },
+    {
+      "step": "쿼리 page=%EF%BC%B0",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid68"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "쿼리 page=0x%EF%BC%A6",
+      "status": 200,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid69"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "currentPage": 15,
+        "pageSize": 20,
+        "hasNext": false,
+        "notifications": []
+      }
+    },
+    {
+      "step": "쿼리 page=%F0%9D%9F%A4",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid70"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "검증 오류가 회원 확인보다 먼저(없는 회원, pageSize=0)",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid71"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "형식 오류가 회원 확인보다 먼저(없는 회원, page=abc)",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid72"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "탈퇴 회원, pageSize=101",
+      "status": 400,
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid73"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      }
+    }
+  ],
+  "db": {
+    "admin_audit_logs": [
+      "{\"id\":\"$uuid?\",\"action\":\"POST_APPROVED\",\"reason\":null,\"target_id\":\"$uuid?\",\"request_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"occurred_at\":\"<t-165600s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"status\":\"PENDING\"},\"actor_admin_id\":\"$uuid?\"}",
+      "{\"id\":\"$uuid?\",\"action\":\"POST_APPROVED\",\"reason\":null,\"target_id\":\"$uuid?\",\"request_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"occurred_at\":\"<t-169200s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"status\":\"PENDING\"},\"actor_admin_id\":\"$uuid?\"}",
+      "{\"id\":\"$uuid?\",\"action\":\"POST_APPROVED\",\"reason\":null,\"target_id\":\"$uuid?\",\"request_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"occurred_at\":\"<t-259200s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"status\":\"PENDING\"},\"actor_admin_id\":\"$uuid?\"}",
+      "{\"id\":\"$uuid?\",\"action\":\"POST_APPROVED\",\"reason\":null,\"target_id\":\"$uuid?\",\"request_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"occurred_at\":\"<t-41105s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"status\":\"PENDING\"},\"actor_admin_id\":\"$uuid?\"}",
+      "{\"id\":\"$uuid?\",\"action\":\"POST_REJECTED\",\"reason\":\"사진 품질\",\"target_id\":\"$uuid?\",\"request_id\":\"$uuid?\",\"after_state\":{\"status\":\"REJECTED\"},\"occurred_at\":\"<t-41105s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"status\":\"PENDING\"},\"actor_admin_id\":\"$uuid?\"}"
+    ],
+    "admins": [
+      "{\"id\":\"$uuid?\",\"password\":\"hash-not-used\",\"username\":\"operator\",\"created_at\":\"<t+0s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ],
+    "notifications": [
+      "{\"id\":\"$uuid7\",\"body\":\"내 사진이 피드에 공개되었습니다.\",\"type\":\"POST_APPROVED\",\"title\":\"게시물이 승인되었습니다.\",\"post_id\":\"$uuid?\",\"read_at\":null,\"user_id\":\"$uuid?\",\"event_key\":\"$uuid?\",\"created_at\":\"<t-41105s db +09:00>\",\"rejection_reason\":null}",
+      "{\"id\":\"$uuid8\",\"body\":\"반려 사유를 확인해 주세요.\",\"type\":\"POST_REJECTED\",\"title\":\"게시물이 반려되었습니다.\",\"post_id\":\"$uuid?\",\"read_at\":null,\"user_id\":\"$uuid?\",\"event_key\":\"$uuid?\",\"created_at\":\"<t-41105s db +09:00>\",\"rejection_reason\":\"사진 품질\"}",
+      "{\"id\":\"$uuid9\",\"body\":\"내 사진이 피드에 공개되었습니다.\",\"type\":\"POST_APPROVED\",\"title\":\"게시물이 승인되었습니다.\",\"post_id\":\"$uuid?\",\"read_at\":\"<t-154800s db +09:00>\",\"user_id\":\"$uuid?\",\"event_key\":\"$uuid?\",\"created_at\":\"<t-169200s db +09:00>\",\"rejection_reason\":null}",
+      "{\"id\":\"$uuid?\",\"body\":\"내 사진이 피드에 공개되었습니다.\",\"type\":\"POST_APPROVED\",\"title\":\"게시물이 승인되었습니다.\",\"post_id\":\"$uuid?\",\"read_at\":null,\"user_id\":\"$uuid?\",\"event_key\":\"$uuid?\",\"created_at\":\"<t-165600s db +09:00>\",\"rejection_reason\":null}",
+      "{\"id\":\"$uuid?\",\"body\":\"내 사진이 피드에 공개되었습니다.\",\"type\":\"POST_APPROVED\",\"title\":\"게시물이 승인되었습니다.\",\"post_id\":\"$uuid?\",\"read_at\":null,\"user_id\":\"$uuid?\",\"event_key\":\"$uuid?\",\"created_at\":\"<t-259200s db +09:00>\",\"rejection_reason\":null}"
+    ],
+    "photos": [
+      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p1/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p1/thumbnail.webp\"}",
+      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p2/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p2/thumbnail.webp\"}",
+      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p3/original.webp\",\"thumbnail_storage_key\":null}",
+      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p4/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p4/thumbnail.webp\"}",
+      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/한글 공백/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/한글 공백/thumbnail.webp\"}"
+    ],
+    "posts": [
+      "{\"id\":\"$uuid?\",\"title\":\"남의것\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid?\",\"title\":\"둘째\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"REJECTED\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid?\",\"title\":\"셋째\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid?\",\"title\":\"지움\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t-637200s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
+      "{\"id\":\"$uuid?\",\"title\":\"첫 사진\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}"
+    ],
+    "topics": [
+      "{\"id\":\"$uuid?\",\"title\":\"주제1\",\"ends_at\":\"<t-896400s db +09:00>\",\"starts_at\":\"<t-982800s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-01\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"title\":\"주제2\",\"ends_at\":\"<t-810000s db +09:00>\",\"starts_at\":\"<t-896400s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-02\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"title\":\"주제3\",\"ends_at\":\"<t-723600s db +09:00>\",\"starts_at\":\"<t-810000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-03\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"id\":\"$uuid?\",\"title\":\"주제4\",\"ends_at\":\"<t-637200s db +09:00>\",\"starts_at\":\"<t-723600s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-04\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ],
+    "users": [
+      "{\"id\":\"$uuid?\",\"email\":\"gone@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t-982800s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/user3/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}",
+      "{\"id\":\"$uuid?\",\"email\":\"user1@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/user1/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}",
+      "{\"id\":\"$uuid?\",\"email\":\"user2@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/user2/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}"
+    ]
+  }
+}
