@@ -30,7 +30,7 @@ use chalkak_db::Pool;
 use chalkak_db::migrate::Migrator;
 use chalkak_http::{Chain, Handler, Limits, Router, Server};
 
-use settings::{ACCESS_TOKEN_AUDIENCE, ACCESS_TOKEN_ISSUER, Settings};
+use settings::{ACCESS_TOKEN_AUDIENCE, ACCESS_TOKEN_ISSUER, Profile, Settings};
 use web::access::AccessLog;
 use web::actuator::{Actuator, DatabaseCheck};
 use web::authorize::Authorize;
@@ -39,6 +39,7 @@ use web::callback_limit::CallbackBodyLimit;
 use web::cors::AdminCors;
 use web::dispatch::Dispatcher;
 use web::firewall::Firewall;
+use web::forwarded::ForwardedHeaders;
 use web::negotiate::Negotiate;
 use web::security_headers::SecurityHeaders;
 use web::tomcat::Tomcat;
@@ -64,11 +65,13 @@ pub fn build_chain(
         .layer(Tomcat::new(Arc::clone(&clock)))
         .layer(AccessLog::new(Arc::clone(&logger)))
         .layer(Negotiate::new(Arc::clone(&clock)))
+        // dev 프로필만: `server.forward-headers-strategy: framework`
+        .layer(ForwardedHeaders::new(settings.profile == Profile::Dev))
         .layer(CallbackBodyLimit::new(
             settings.post.callback_max_body_bytes,
         ))
         .layer(Firewall::new(Arc::clone(&clock)))
-        .layer(SecurityHeaders)
+        .layer(SecurityHeaders::new(settings.profile == Profile::Dev))
         .layer(AdminCors::new(&settings.admin_cors_allowed_origins))
         .layer(BearerAuth::new(
             settings.access_token_key.clone(),

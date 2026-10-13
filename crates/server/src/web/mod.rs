@@ -21,6 +21,7 @@ pub mod callback_limit;
 pub mod cors;
 pub mod dispatch;
 pub mod firewall;
+pub mod forwarded;
 pub mod media_type;
 pub mod negotiate;
 pub mod security_headers;
