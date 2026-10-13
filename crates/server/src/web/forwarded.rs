@@ -46,10 +46,10 @@ pub fn resolve(req: &Request) -> Resolved {
         .filter(|v| !v.is_empty());
     match forwarded {
         Some(value) => {
-            if let Some(host) = pattern_value(value, "host=") {
-                if !valid_host(&host) {
-                    return Resolved::Invalid;
-                }
+            if let Some(host) = pattern_value(value, "host=")
+                && !valid_host(&host)
+            {
+                return Resolved::Invalid;
             }
             Resolved::Scheme(pattern_value(value, "proto="))
         }
@@ -63,15 +63,15 @@ fn from_x_headers(req: &Request) -> Resolved {
         let token = value.split(',').next().unwrap_or("").trim();
         (!token.is_empty()).then(|| token.to_owned())
     };
-    if let Some(host) = first_token("x-forwarded-host") {
-        if !valid_host(&host) {
-            return Resolved::Invalid;
-        }
+    if let Some(host) = first_token("x-forwarded-host")
+        && !valid_host(&host)
+    {
+        return Resolved::Invalid;
     }
-    if let Some(port) = first_token("x-forwarded-port") {
-        if port.parse::<i32>().is_err() {
-            return Resolved::Invalid;
-        }
+    if let Some(port) = first_token("x-forwarded-port")
+        && port.parse::<i32>().is_err()
+    {
+        return Resolved::Invalid;
     }
     let scheme = first_token("x-forwarded-proto").or_else(|| {
         first_token("x-forwarded-ssl")
