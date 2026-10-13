@@ -90,6 +90,20 @@ auth = { user = "01990000-0000-7000-8000-000000000001" }
 headers = { "Accept" = 'application/problem+json, text/html' }
 
 [[step]]
+name = '성공 200 / Accept application/yaml'
+method = "GET"
+path = '/api/v1/notifications'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml' }
+
+[[step]]
+name = '성공 200 / Accept application/yaml, application/json;q=0.5'
+method = "GET"
+path = '/api/v1/notifications'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
+
+[[step]]
 name = 'Spring 예외 400 / Accept text/html'
 method = "GET"
 path = '/api/v1/topics?date=bad'
@@ -172,6 +186,20 @@ method = "GET"
 path = '/api/v1/topics?date=bad'
 auth = { user = "01990000-0000-7000-8000-000000000001" }
 headers = { "Accept" = 'application/problem+json, text/html' }
+
+[[step]]
+name = 'Spring 예외 400 / Accept application/yaml'
+method = "GET"
+path = '/api/v1/topics?date=bad'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml' }
+
+[[step]]
+name = 'Spring 예외 400 / Accept application/yaml, application/json;q=0.5'
+method = "GET"
+path = '/api/v1/topics?date=bad'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
 
 [[step]]
 name = '도메인 예외 404 / Accept text/html'
@@ -258,6 +286,20 @@ auth = { user = "01990000-0000-7000-8000-000000000001" }
 headers = { "Accept" = 'application/problem+json, text/html' }
 
 [[step]]
+name = '도메인 예외 404 / Accept application/yaml'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml' }
+
+[[step]]
+name = '도메인 예외 404 / Accept application/yaml, application/json;q=0.5'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
+
+[[step]]
 name = '경로 없음 404 / Accept text/html'
 method = "GET"
 path = '/api/v1/nothing'
@@ -340,6 +382,20 @@ method = "GET"
 path = '/api/v1/nothing'
 auth = { user = "01990000-0000-7000-8000-000000000001" }
 headers = { "Accept" = 'application/problem+json, text/html' }
+
+[[step]]
+name = '경로 없음 404 / Accept application/yaml'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml' }
+
+[[step]]
+name = '경로 없음 404 / Accept application/yaml, application/json;q=0.5'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
 
 [[step]]
 name = '메서드 없음 405 / Accept text/html'
@@ -426,6 +482,20 @@ auth = { user = "01990000-0000-7000-8000-000000000001" }
 headers = { "Accept" = 'application/problem+json, text/html' }
 
 [[step]]
+name = '메서드 없음 405 / Accept application/yaml'
+method = "DELETE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml' }
+
+[[step]]
+name = '메서드 없음 405 / Accept application/yaml, application/json;q=0.5'
+method = "DELETE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
+
+[[step]]
 name = '방화벽 400 / Accept text/html'
 method = "GET"
 path = '/api/v1/topics%3Bx'
@@ -510,6 +580,20 @@ auth = { user = "01990000-0000-7000-8000-000000000001" }
 headers = { "Accept" = 'application/problem+json, text/html' }
 
 [[step]]
+name = '방화벽 400 / Accept application/yaml'
+method = "GET"
+path = '/api/v1/topics%3Bx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml' }
+
+[[step]]
+name = '방화벽 400 / Accept application/yaml, application/json;q=0.5'
+method = "GET"
+path = '/api/v1/topics%3Bx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
+
+[[step]]
 name = 'TRACE / Accept text/html'
 method = "TRACE"
 path = '/api/v1/topics'
@@ -592,6 +676,20 @@ method = "TRACE"
 path = '/api/v1/topics'
 auth = { user = "01990000-0000-7000-8000-000000000001" }
 headers = { "Accept" = 'application/problem+json, text/html' }
+
+[[step]]
+name = 'TRACE / Accept application/yaml'
+method = "TRACE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml' }
+
+[[step]]
+name = 'TRACE / Accept application/yaml, application/json;q=0.5'
+method = "TRACE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
 
 [[step]]
 name = '깨진 JSON 400 / Accept text/html'
@@ -687,6 +785,22 @@ method = "POST"
 path = '/api/v1/feedbacks'
 auth = { user = "01990000-0000-7000-8000-000000000001" }
 headers = { "Accept" = 'application/problem+json, text/html' }
+body = '{"content": '
+
+[[step]]
+name = '깨진 JSON 400 / Accept application/yaml'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml' }
+body = '{"content": '
+
+[[step]]
+name = '깨진 JSON 400 / Accept application/yaml, application/json;q=0.5'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
 body = '{"content": '
 
 [[step]]
@@ -786,6 +900,22 @@ headers = { "Accept" = 'application/problem+json, text/html' }
 body = '{}'
 
 [[step]]
+name = '검증 400 / Accept application/yaml'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml' }
+body = '{}'
+
+[[step]]
+name = '검증 400 / Accept application/yaml, application/json;q=0.5'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
+body = '{}'
+
+[[step]]
 name = '생성 201 / Accept text/html'
 method = "POST"
 path = '/api/v1/feedbacks'
@@ -879,6 +1009,22 @@ method = "POST"
 path = '/api/v1/feedbacks'
 auth = { user = "01990000-0000-7000-8000-000000000001" }
 headers = { "Accept" = 'application/problem+json, text/html' }
+body = '{"content": "좋아요"}'
+
+[[step]]
+name = '생성 201 / Accept application/yaml'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml' }
+body = '{"content": "좋아요"}'
+
+[[step]]
+name = '생성 201 / Accept application/yaml, application/json;q=0.5'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
 body = '{"content": "좋아요"}'
 
 [[step]]

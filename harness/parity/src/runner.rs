@@ -17,6 +17,8 @@ const IGNORED_HEADERS: &[&str] = &[
     "keep-alive",
     "transfer-encoding",
     "content-length",
+    // 정적 리소스의 마지막 수정 시각(원본은 jar 빌드 시각)
+    "last-modified",
 ];
 
 pub const DEFAULT_CLOCK: &str = "2026-10-12T09:00:00+09:00";
@@ -152,8 +154,9 @@ fn run_once(target: &Target, scenario: &Scenario) -> Result<Value, String> {
             headers,
             body,
         };
-        let res = http::send(&target.base_url, &req)
+        let mut res = http::send(&target.base_url, &req)
             .map_err(|e| format!("[{}] {}: {e}", target.name, step.name))?;
+        mask_base_url(&mut res, &target.base_url);
 
         check_app_clock(target, &step.name, &res.headers, clock + app_offset)?;
 
@@ -217,6 +220,22 @@ fn run_once(target: &Target, scenario: &Scenario) -> Result<Value, String> {
         outcome["fakes"] = calls;
     }
     Ok(outcome)
+}
+
+/// 서버가 요청의 `Host`로 만들어 응답에 싣는 자기 주소(OpenAPI `servers`, `Location` 등)는 레인마다 포트가 달라
+/// 비교를 깨뜨린다. 본문과 헤더 값의 대상 주소를 `http://<base>`로 바꾼다. UTF-8이 아닌 본문(이미지 등)은 건드리지 않는다.
+fn mask_base_url(res: &mut http::Response, base_url: &str) {
+    const MASK: &str = "http://<base>";
+    for (_, value) in &mut res.headers {
+        if value.contains(base_url) {
+            *value = value.replace(base_url, MASK);
+        }
+    }
+    if let Ok(text) = std::str::from_utf8(&res.body)
+        && text.contains(base_url)
+    {
+        res.body = text.replace(base_url, MASK).into_bytes();
+    }
 }
 
 /// 앞 단계들이 쓴 시간이 쌓여도 각 단계의 앱 시각이 `시나리오 시각 + CLOCK_LEAD`에서 크게 벗어나지 않게 한다.

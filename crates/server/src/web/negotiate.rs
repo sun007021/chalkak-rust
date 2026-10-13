@@ -28,8 +28,12 @@ fn json_producible() -> Vec<MediaType> {
     vec![
         MediaType::new("application", "json"),
         MediaType::new("application", "*+json"),
+        MediaType::new("application", "yaml"),
     ]
 }
+
+/// springdoc YAML 문서(`/v3/api-docs.yaml`)가 응답 가능한 타입.
+const DOCS_YAML: &str = "application/vnd.oai.openapi";
 
 const ACTUATOR_V3: &str = "vnd.spring-boot.actuator.v3+json";
 const ACTUATOR_V2: &str = "vnd.spring-boot.actuator.v2+json";
@@ -47,9 +51,12 @@ fn actuator_producible() -> Vec<MediaType> {
 }
 
 /// 요청에서 협상에 쓰는 값.
+#[derive(Clone)]
 pub struct Wanted {
     accept: Result<Vec<MediaType>, InvalidAccept>,
     language: String,
+    /// 컨버터가 쓰는 응답에 `Content-Disposition: inline;filename=f.txt`를 붙이는 요청 경로인가.
+    disposition: bool,
 }
 
 impl Wanted {
@@ -59,6 +66,7 @@ impl Wanted {
         Wanted {
             accept: parse_accept(&accept),
             language: whitelabel::content_language(&languages),
+            disposition: needs_disposition(&req.raw_path),
         }
     }
 
@@ -106,6 +114,103 @@ impl Wanted {
     }
 }
 
+/// 확장자 때문에 안전하지 않다고 보지 않는 확장자(`AbstractMessageConverterMethodProcessor.SAFE_EXTENSIONS`).
+const SAFE_EXTENSIONS: [&str; 16] = [
+    "txt",
+    "text",
+    "yml",
+    "properties",
+    "csv",
+    "json",
+    "xml",
+    "atom",
+    "rss",
+    "png",
+    "jpe",
+    "jpeg",
+    "jpg",
+    "gif",
+    "wbmp",
+    "bmp",
+];
+
+/// 미디어 타입이 `image`·`audio`·`video`라서 안전한 확장자(`MediaTypeFactory`가 그 타입으로 푸는 것 중 흔한 것).
+const SAFE_MEDIA_EXTENSIONS: [&str; 40] = [
+    "webp", "svg", "ico", "tif", "tiff", "avif", "heic", "heif", "jfif", "apng", "mp3", "wav",
+    "ogg", "oga", "m4a", "flac", "aac", "mid", "midi", "weba", "opus", "mp4", "mpeg", "mpg",
+    "webm", "avi", "mov", "mkv", "ogv", "m4v", "3gp", "wmv", "svgz", "jp2", "psd", "mpga", "wma",
+    "aif", "aiff", "ra",
+];
+
+fn is_safe_extension(extension: &str) -> bool {
+    if extension.is_empty() {
+        return true;
+    }
+    let lower = extension.to_ascii_lowercase();
+    SAFE_EXTENSIONS.contains(&lower.as_str()) || SAFE_MEDIA_EXTENSIONS.contains(&lower.as_str())
+}
+
+/// `StringUtils.getFilenameExtension`: 마지막 `.` 뒤, 그 뒤에 `/`가 없을 때만.
+fn filename_extension(path: &str) -> Option<&str> {
+    let dot = path.rfind('.')?;
+    if path.rfind('/').is_some_and(|slash| slash > dot) {
+        return None;
+    }
+    Some(&path[dot + 1..])
+}
+
+/// 퍼센트 디코딩(잘못된 이스케이프는 그대로 둔다).
+fn percent_decode(s: &str) -> String {
+    let b = s.as_bytes();
+    let mut out = Vec::with_capacity(b.len());
+    let mut i = 0;
+    while i < b.len() {
+        let hex = |c: u8| (c as char).to_digit(16);
+        if b[i] == b'%'
+            && i + 2 < b.len()
+            && let (Some(h), Some(l)) = (hex(b[i + 1]), hex(b[i + 2]))
+        {
+            out.push((h * 16 + l) as u8);
+            i += 3;
+            continue;
+        }
+        out.push(b[i]);
+        i += 1;
+    }
+    String::from_utf8_lossy(&out).into_owned()
+}
+
+/// `addContentDispositionHeader`(반사 파일 다운로드 방어): 요청 URI 마지막 조각의 확장자나 경로 매개변수(`;…`)의
+/// 확장자가 안전 목록에 없으면 컨버터가 쓰는 응답에 `Content-Disposition: inline;filename=f.txt`를 붙인다.
+/// 확장자가 `.html`이어도 이 서버의 컨트롤러는 `text/html`을 만들지 않아 예외가 없다.
+fn needs_disposition(raw_path: &str) -> bool {
+    let filename = &raw_path[raw_path.rfind('/').map_or(0, |i| i + 1)..];
+    let (name, params) = match filename.find(';') {
+        Some(i) => (&filename[..i], &filename[i..]),
+        None => (filename, ""),
+    };
+    let name = percent_decode(name);
+    let params = percent_decode(params);
+    !is_safe_extension(filename_extension(&name).unwrap_or(""))
+        || !is_safe_extension(filename_extension(&params).unwrap_or(""))
+}
+
+/// 컨버터가 응답을 쓸 때의 부가 처리: 미디어 타입 설정, YAML 변환, `Content-Disposition`.
+fn write_converted(mut response: Response, media: &MediaType, wanted: &Wanted) -> Response {
+    if media.is("application", "yaml")
+        && let Some(yaml) = super::yaml::from_json(&response.body)
+    {
+        response.body = yaml;
+    }
+    response.headers.set("Content-Type", media.render());
+    if wanted.disposition {
+        response
+            .headers
+            .set("Content-Disposition", "inline;filename=f.txt");
+    }
+    response
+}
+
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
     /// 컨트롤러가 돌려준 본문 있는 JSON.
@@ -114,6 +219,10 @@ enum Kind {
     Handler,
     Boot,
     Actuator,
+    /// springdoc JSON 문서·설정: 응답 타입이 `application/json`으로 정해져 있어 `Accept`가 그것을 받아야 한다.
+    DocsJson,
+    /// springdoc YAML 문서([`DOCS_YAML`]만 만든다).
+    DocsYaml,
     /// 파라미터를 읽다 컨테이너 예외로 실패한 응답([`marker::PARAM`]).
     Param,
 }
@@ -122,6 +231,18 @@ enum Kind {
 pub fn finish(mut response: Response, wanted: &Wanted, clock: &dyn Clock) -> Response {
     let origin = response.headers.get(marker::ORIGIN).map(str::to_owned);
     response.headers.remove(marker::ORIGIN);
+    // 정적 리소스가 HTML이면 핸들러가 `text/html`을 만들 수 있다고 밝혀 두어 `.html` 확장자가 안전하다.
+    let adjusted;
+    let wanted = if response.headers.contains(marker::HTML_RESOURCE) {
+        response.headers.remove(marker::HTML_RESOURCE);
+        adjusted = Wanted {
+            disposition: false,
+            ..wanted.clone()
+        };
+        &adjusted
+    } else {
+        wanted
+    };
     let carried = take_carried(&mut response);
 
     let kind = match origin.as_deref() {
@@ -129,13 +250,21 @@ pub fn finish(mut response: Response, wanted: &Wanted, clock: &dyn Clock) -> Res
         Some(marker::HANDLER) => Kind::Handler,
         Some(marker::BOOT) => Kind::Boot,
         Some(marker::ACTUATOR) => Kind::Actuator,
+        Some(marker::DOCS_YAML) => Kind::DocsYaml,
+        Some(marker::DOCS_JSON) => Kind::DocsJson,
         Some(marker::PARAM) => Kind::Param,
         // 액추에이터는 핸들러 매핑의 `produces` 검사가 먼저라 액추에이터 타입을 받지 못하면 406이다.
         Some(marker::ACTUATOR_PARAM) => {
             if matches!(wanted.select(&actuator_producible()), Ok(Some(_))) {
                 Kind::Param
             } else {
-                return finish_actuator(response, wanted, clock);
+                return finish_restricted(
+                    response,
+                    wanted,
+                    clock,
+                    &actuator_producible(),
+                    ACTUATOR_ACCEPT,
+                );
             }
         }
         _ if is_controller_json(&response) => Kind::Success,
@@ -143,17 +272,28 @@ pub fn finish(mut response: Response, wanted: &Wanted, clock: &dyn Clock) -> Res
     };
 
     if kind == Kind::Actuator {
-        return finish_actuator(response, wanted, clock);
+        return finish_restricted(
+            response,
+            wanted,
+            clock,
+            &actuator_producible(),
+            ACTUATOR_ACCEPT,
+        );
+    }
+    if kind == Kind::DocsJson {
+        let producible = [MediaType::new("application", "json")];
+        return finish_restricted(response, wanted, clock, &producible, "application/json");
+    }
+    if kind == Kind::DocsYaml {
+        let producible = [MediaType::new("application", "vnd.oai.openapi")];
+        return finish_restricted(response, wanted, clock, &producible, DOCS_YAML);
     }
     // 컨테이너가 끊은 요청은 `/error`로 가서 핸들러를 고른 뒤에야 본문을 쓴다.
     if kind == Kind::Boot && wanted.boot_prefers_html() {
         return fail(kind, response, carried, wanted, false, clock);
     }
     match wanted.select(&json_producible()) {
-        Ok(Some(media)) => {
-            response.headers.set("Content-Type", media.render());
-            response
-        }
+        Ok(Some(media)) => write_converted(response, &media, wanted),
         failed => {
             let parse_failed = failed.is_err();
             fail(kind, response, carried, wanted, parse_failed, clock)
@@ -161,27 +301,34 @@ pub fn finish(mut response: Response, wanted: &Wanted, clock: &dyn Clock) -> Res
     }
 }
 
-fn finish_actuator(mut response: Response, wanted: &Wanted, clock: &dyn Clock) -> Response {
-    match wanted.select(&actuator_producible()) {
+/// 핸들러 매핑의 `produces`가 정해 둔 타입만 응답할 수 있는 응답(액추에이터, springdoc YAML).
+/// 받을 수 없으면 406이고, 예외 처리기가 JSON을 쓸 수 있으면 JSON 406, 아니면 오류 페이지다.
+fn finish_restricted(
+    mut response: Response,
+    wanted: &Wanted,
+    clock: &dyn Clock,
+    producible: &[MediaType],
+    accept_header: &str,
+) -> Response {
+    match wanted.select(producible) {
         Ok(Some(media)) => {
+            // springdoc 문서는 컨버터를 거치지 않는지 확장자 방어 헤더가 붙지 않는다(java-3).
             response.headers.set("Content-Type", media.render());
             response
         }
         failed => {
-            // 406 예외를 처리기가 JSON으로 쓸 수 있으면 JSON 406, 아니면 오류 페이지.
             let parse_failed = failed.is_err();
             if let Ok(Some(media)) = wanted.select(&json_producible()) {
                 let body = chalkak_core::error::error_body(
                     chalkak_core::error::ErrorCode::BUSINESS_ERROR,
                     chalkak_core::error::messages::UNSUPPORTED_REQUEST,
                 );
-                let mut out = Response::new(406)
-                    .with_header("Content-Type", media.render())
-                    .with_body(body.into_bytes());
+                let mut out = Response::new(406).with_body(body.into_bytes());
+                out = write_converted(out, &media, wanted);
                 copy_common_headers(&response, &mut out);
                 return out;
             }
-            let carried = vec![("Accept".to_owned(), ACTUATOR_ACCEPT.to_owned())];
+            let carried = vec![("Accept".to_owned(), accept_header.to_owned())];
             let carried = if parse_failed { Vec::new() } else { carried };
             let mut base = response;
             base.status = 406;
@@ -259,7 +406,7 @@ fn fail(
         // 해석에 실패한 `Accept`로는 `/error` 디스패치가 실패해 처리기의 500이 그대로 남는다.
         Kind::Param if parse_failed => (original.status, Vec::new()),
         Kind::Param => (400, Vec::new()),
-        Kind::Actuator => (406, Vec::new()),
+        Kind::Actuator | Kind::DocsYaml | Kind::DocsJson => (406, Vec::new()),
     };
 
     let mut out = if wanted.accepts_html() {
@@ -458,6 +605,53 @@ mod tests {
     }
 
     // java-3: GET /api/v1/topics?date=2026-10-12&x=%zz 에 Accept를 바꿔 보낸 결과
+    // java-3: 확장자가 안전 목록에 없는 경로의 컨버터 응답에 Content-Disposition: inline;filename=f.txt
+    #[test]
+    fn 안전하지_않은_확장자_경로에만_content_disposition을_붙인다() {
+        for unsafe_path in [
+            "/api/v1/nothing.js",
+            "/api/v1/nothing.html",
+            "/swagger-ui/swagger-ui.css",
+            "/a.pdf",
+            "/a.zip",
+            "/v3/api-docs.yaml",
+            "/api/v1/topics;x.js",
+            "/a.x",
+        ] {
+            assert!(needs_disposition(unsafe_path), "{unsafe_path}");
+        }
+        for safe_path in [
+            "/api/v1/nothing",
+            "/api/v1/nothing.txt",
+            "/a.json",
+            "/a.PNG",
+            "/a.jpg",
+            "/a.webp",
+            "/a.svg",
+            "/a.mp3",
+            "/a.mp4",
+            "/a.yml",
+            "/a.csv",
+            "/api/v1/not.hing/x",
+            "/a.",
+            "/api/v1/topics;x",
+        ] {
+            assert!(!needs_disposition(safe_path), "{safe_path}");
+        }
+        let c = clock();
+        let mut req = Request::new(Method::Get, "/api/v1/nothing.js");
+        req.raw_path = "/api/v1/nothing.js".into();
+        let r = finish(json(404, Some(marker::SPRING)), &Wanted::of(&req), &c);
+        assert_eq!(
+            r.headers.get("content-disposition"),
+            Some("inline;filename=f.txt")
+        );
+        // 오류 페이지에는 붙지 않는다
+        req.headers.append("Accept", "text/html");
+        let r = finish(json(404, Some(marker::SPRING)), &Wanted::of(&req), &c);
+        assert!(!r.headers.contains("content-disposition"));
+    }
+
     #[test]
     fn 파라미터_읽기_실패는_json이면_500이고_아니면_400_페이지다() {
         let c = clock();

@@ -90,6 +90,7 @@ impl Normalizer {
             return jwt;
         }
         let s = self.whitelabel_created(s);
+        let s = self.yaml_times(&s);
         let s = self.presigned(s.as_str());
         self.replace_uuids(&s)
     }
@@ -113,6 +114,30 @@ impl Normalizer {
             }
             None => s.to_string(),
         }
+    }
+
+    /// `Accept: application/yaml` 응답의 시각 필드. YAML 매퍼는 날짜를 숫자로 쓴다: Boot 오류 본문의 `timestamp`는
+    /// 밀리초(13자리), `…At`(Instant)은 `초.나노초`다. 시나리오 시계 기준 상대 초로 바꾼다.
+    fn yaml_times(&self, s: &str) -> String {
+        if !s.starts_with("---\n") {
+            return s.to_string();
+        }
+        let mut out = Vec::new();
+        for line in s.split('\n') {
+            let rewritten = line.split_once(": ").and_then(|(key, value)| {
+                let epoch = if key == "timestamp" && value.len() == 13 {
+                    value.parse::<f64>().ok()? / 1000.0
+                } else if key.ends_with("At") && value.contains('.') {
+                    let (secs, nanos) = value.split_once('.')?;
+                    (secs.len() == 10 && nanos.len() == 9).then(|| value.parse::<f64>().ok())??
+                } else {
+                    return None;
+                };
+                Some(format!("{key}: {}", self.relative(epoch, "yaml-time")))
+            });
+            out.push(rewritten.unwrap_or_else(|| line.to_string()));
+        }
+        out.join("\n")
     }
 
     /// presigned URL(SigV4 쿼리 서명)의 `X-Amz-Date`와 `X-Amz-Signature`를 바꾼다. 서명 시각은 앱이 응답을 만든 순간이라
@@ -415,6 +440,16 @@ mod tests {
         assert_eq!(
             n.value(&v, &["refreshToken".into()], ""),
             json!({"refreshToken": "<opaque len=6>"})
+        );
+    }
+
+    #[test]
+    fn yaml_시각_필드를_상대_초로_바꾼다() {
+        let mut n = Normalizer::new(CLOCK);
+        let doc = "---\ntimestamp: 1791763201401\nstatus: 400\ncreatedAt: 1791763201.953659000\nnote: 1791763201401\n";
+        assert_eq!(
+            n.string(doc),
+            "---\ntimestamp: <t+0s yaml-time>\nstatus: 400\ncreatedAt: <t+0s yaml-time>\nnote: 1791763201401\n"
         );
     }
 

@@ -16,6 +16,12 @@ pub const HANDLER: &str = "handler";
 pub const BOOT: &str = "boot";
 /// 액추에이터 응답(자체 미디어 타입 협상을 한다).
 pub const ACTUATOR: &str = "actuator";
+/// springdoc의 YAML 문서(`/v3/api-docs.yaml`). 핸들러 매핑이 `application/vnd.oai.openapi`만 만든다고 선언한다.
+pub const DOCS_YAML: &str = "docs-yaml";
+/// springdoc의 JSON 문서·설정(응답 타입이 `application/json`으로 고정).
+pub const DOCS_JSON: &str = "docs-json";
+/// HTML 정적 리소스에서 난 오류라는 표시. 이 헤더가 있으면 `Content-Disposition` 확장자 방어에서 `.html`이 안전하다.
+pub const HTML_RESOURCE: &str = "x-chalkak-html-resource";
 /// 요청 파라미터를 읽다 컨테이너가 예외를 던진 응답(`Request.getParameter`의 `IllegalStateException`).
 /// 처리기가 JSON을 쓰면 500이지만, 쓰지 못하면 컨테이너가 파라미터 해석 실패로 둔 400이 남는다.
 pub const PARAM: &str = "param";

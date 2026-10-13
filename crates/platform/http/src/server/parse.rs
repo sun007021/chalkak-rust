@@ -34,6 +34,8 @@ pub(crate) struct Head {
     /// 퍼센트 디코딩 전 경로(쿼리 제외). 오류 응답 본문의 `path`와 접근 로그가 이 형태를 쓴다.
     pub raw_path: String,
     pub query: Vec<(String, String)>,
+    /// 디코딩 전 쿼리 문자열(`?` 뒤, 없으면 빈 문자열).
+    pub raw_query: String,
     /// 쿼리에 잘못된 퍼센트 인코딩이 있는가. Tomcat은 파라미터를 읽는 순간 예외를 던진다.
     pub query_malformed: bool,
     pub headers: Headers,
@@ -375,6 +377,7 @@ fn parse_head(raw: &[u8], limits: &Limits) -> Result<Head, ParseError> {
         path: target.path,
         raw_path: target.raw_path,
         query: target.query,
+        raw_query: target.raw_query,
         query_malformed: target.query_malformed,
         headers,
         version,
@@ -389,6 +392,7 @@ struct Target {
     path: String,
     raw_path: String,
     query: Vec<(String, String)>,
+    raw_query: String,
     query_malformed: bool,
 }
 
@@ -441,6 +445,7 @@ fn parse_target(method: &Method, target: &str) -> Result<Target, ParseError> {
             path: "*".to_string(),
             raw_path: "*".to_string(),
             query: Vec::new(),
+            raw_query: String::new(),
             query_malformed: false,
         });
     } else if let Some(rest) = strip_scheme(target) {
@@ -468,6 +473,7 @@ fn parse_target(method: &Method, target: &str) -> Result<Target, ParseError> {
         path,
         raw_path: raw_path.to_string(),
         query,
+        raw_query: raw_query.to_string(),
         query_malformed,
     })
 }
@@ -1015,6 +1021,18 @@ mod tests {
             let raw = format!("GET {target} HTTP/1.1\r\nHost: x\r\n\r\n");
             assert!(head(&raw).is_ok(), "{target}");
         }
+    }
+
+    #[test]
+    fn raw_query_keeps_the_encoded_text() {
+        let h = head("GET /a?x=%EA%B0%80&y=1+2 HTTP/1.1\r\nHost: x\r\n\r\n").unwrap();
+        assert_eq!(h.raw_query, "x=%EA%B0%80&y=1+2");
+        assert_eq!(
+            head("GET /a HTTP/1.1\r\nHost: x\r\n\r\n")
+                .unwrap()
+                .raw_query,
+            ""
+        );
     }
 
     #[test]

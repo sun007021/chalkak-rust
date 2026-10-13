@@ -1,0 +1,1154 @@
+name = "springdoc: OpenAPI 문서와 Swagger UI(non-prod)"
+tags = ["platform"]
+
+[setup]
+sql = ["INSERT INTO users (id, email, signature_original_storage_key) VALUES ('01990000-0000-7000-8000-000000000001', 'user1@test.chalkak', 'chalkak/signatures/user1/original.png')"]
+
+
+[[step]]
+name = 'GET /v3/api-docs'
+method = "GET"
+path = '/v3/api-docs'
+
+[[step]]
+name = 'GET /v3/api-docs 잘못된 토큰'
+method = "GET"
+path = '/v3/api-docs'
+headers = { "Authorization" = 'Bearer bad' }
+
+[[step]]
+name = 'GET /v3/api-docs.yaml'
+method = "GET"
+path = '/v3/api-docs.yaml'
+
+[[step]]
+name = 'GET /v3/api-docs.yaml 잘못된 토큰'
+method = "GET"
+path = '/v3/api-docs.yaml'
+headers = { "Authorization" = 'Bearer bad' }
+
+[[step]]
+name = 'GET /v3/api-docs/swagger-config'
+method = "GET"
+path = '/v3/api-docs/swagger-config'
+
+[[step]]
+name = 'GET /v3/api-docs/swagger-config 잘못된 토큰'
+method = "GET"
+path = '/v3/api-docs/swagger-config'
+headers = { "Authorization" = 'Bearer bad' }
+
+[[step]]
+name = 'GET /v3/api-docs/user-api'
+method = "GET"
+path = '/v3/api-docs/user-api'
+
+[[step]]
+name = 'GET /v3/api-docs/user-api 잘못된 토큰'
+method = "GET"
+path = '/v3/api-docs/user-api'
+headers = { "Authorization" = 'Bearer bad' }
+
+[[step]]
+name = 'GET /v3/api-docs/admin-api'
+method = "GET"
+path = '/v3/api-docs/admin-api'
+
+[[step]]
+name = 'GET /v3/api-docs/admin-api 잘못된 토큰'
+method = "GET"
+path = '/v3/api-docs/admin-api'
+headers = { "Authorization" = 'Bearer bad' }
+
+[[step]]
+name = 'GET /v3/api-docs/internal-api'
+method = "GET"
+path = '/v3/api-docs/internal-api'
+
+[[step]]
+name = 'GET /v3/api-docs/internal-api 잘못된 토큰'
+method = "GET"
+path = '/v3/api-docs/internal-api'
+headers = { "Authorization" = 'Bearer bad' }
+
+[[step]]
+name = 'GET /v3/api-docs Accept text/html'
+method = "GET"
+path = '/v3/api-docs'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'GET /v3/api-docs Accept application/xml'
+method = "GET"
+path = '/v3/api-docs'
+headers = { "Accept" = 'application/xml' }
+
+[[step]]
+name = 'GET /v3/api-docs Accept application/json'
+method = "GET"
+path = '/v3/api-docs'
+headers = { "Accept" = 'application/json' }
+
+[[step]]
+name = 'GET /v3/api-docs Accept application/yaml'
+method = "GET"
+path = '/v3/api-docs'
+headers = { "Accept" = 'application/yaml' }
+
+[[step]]
+name = 'GET /v3/api-docs Accept bad'
+method = "GET"
+path = '/v3/api-docs'
+headers = { "Accept" = 'bad' }
+
+[[step]]
+name = 'GET /v3/api-docs Accept */*'
+method = "GET"
+path = '/v3/api-docs'
+headers = { "Accept" = '*/*' }
+
+[[step]]
+name = 'GET /v3/api-docs Accept application/vnd.x+json'
+method = "GET"
+path = '/v3/api-docs'
+headers = { "Accept" = 'application/vnd.x+json' }
+
+[[step]]
+name = 'GET /v3/api-docs Accept application/*+json'
+method = "GET"
+path = '/v3/api-docs'
+headers = { "Accept" = 'application/*+json' }
+
+[[step]]
+name = 'GET /v3/api-docs Accept application/json;charset=UTF-8'
+method = "GET"
+path = '/v3/api-docs'
+headers = { "Accept" = 'application/json;charset=UTF-8' }
+
+[[step]]
+name = 'GET /v3/api-docs Accept application/*'
+method = "GET"
+path = '/v3/api-docs'
+headers = { "Accept" = 'application/*' }
+
+[[step]]
+name = 'GET /v3/api-docs Accept text/*'
+method = "GET"
+path = '/v3/api-docs'
+headers = { "Accept" = 'text/*' }
+
+[[step]]
+name = 'GET /v3/api-docs Accept application/json, text/html'
+method = "GET"
+path = '/v3/api-docs'
+headers = { "Accept" = 'application/json, text/html' }
+
+[[step]]
+name = 'GET /v3/api-docs Accept application/xml, application/json;q=0.1'
+method = "GET"
+path = '/v3/api-docs'
+headers = { "Accept" = 'application/xml, application/json;q=0.1' }
+
+[[step]]
+name = 'GET /v3/api-docs Accept application/vnd.oai.openapi'
+method = "GET"
+path = '/v3/api-docs'
+headers = { "Accept" = 'application/vnd.oai.openapi' }
+
+[[step]]
+name = 'GET /v3/api-docs Accept application/yaml, application/json;q=0.5'
+method = "GET"
+path = '/v3/api-docs'
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
+
+[[step]]
+name = 'HEAD /v3/api-docs'
+method = "HEAD"
+path = '/v3/api-docs'
+
+[[step]]
+name = 'OPTIONS /v3/api-docs'
+method = "OPTIONS"
+path = '/v3/api-docs'
+
+[[step]]
+name = 'POST /v3/api-docs'
+method = "POST"
+path = '/v3/api-docs'
+
+[[step]]
+name = 'DELETE /v3/api-docs'
+method = "DELETE"
+path = '/v3/api-docs'
+
+[[step]]
+name = 'GET /v3/api-docs.yaml Accept text/html'
+method = "GET"
+path = '/v3/api-docs.yaml'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'GET /v3/api-docs.yaml Accept application/xml'
+method = "GET"
+path = '/v3/api-docs.yaml'
+headers = { "Accept" = 'application/xml' }
+
+[[step]]
+name = 'GET /v3/api-docs.yaml Accept application/json'
+method = "GET"
+path = '/v3/api-docs.yaml'
+headers = { "Accept" = 'application/json' }
+
+[[step]]
+name = 'GET /v3/api-docs.yaml Accept application/yaml'
+method = "GET"
+path = '/v3/api-docs.yaml'
+headers = { "Accept" = 'application/yaml' }
+
+[[step]]
+name = 'GET /v3/api-docs.yaml Accept bad'
+method = "GET"
+path = '/v3/api-docs.yaml'
+headers = { "Accept" = 'bad' }
+
+[[step]]
+name = 'GET /v3/api-docs.yaml Accept */*'
+method = "GET"
+path = '/v3/api-docs.yaml'
+headers = { "Accept" = '*/*' }
+
+[[step]]
+name = 'GET /v3/api-docs.yaml Accept application/vnd.x+json'
+method = "GET"
+path = '/v3/api-docs.yaml'
+headers = { "Accept" = 'application/vnd.x+json' }
+
+[[step]]
+name = 'GET /v3/api-docs.yaml Accept application/*+json'
+method = "GET"
+path = '/v3/api-docs.yaml'
+headers = { "Accept" = 'application/*+json' }
+
+[[step]]
+name = 'GET /v3/api-docs.yaml Accept application/json;charset=UTF-8'
+method = "GET"
+path = '/v3/api-docs.yaml'
+headers = { "Accept" = 'application/json;charset=UTF-8' }
+
+[[step]]
+name = 'GET /v3/api-docs.yaml Accept application/*'
+method = "GET"
+path = '/v3/api-docs.yaml'
+headers = { "Accept" = 'application/*' }
+
+[[step]]
+name = 'GET /v3/api-docs.yaml Accept text/*'
+method = "GET"
+path = '/v3/api-docs.yaml'
+headers = { "Accept" = 'text/*' }
+
+[[step]]
+name = 'GET /v3/api-docs.yaml Accept application/json, text/html'
+method = "GET"
+path = '/v3/api-docs.yaml'
+headers = { "Accept" = 'application/json, text/html' }
+
+[[step]]
+name = 'GET /v3/api-docs.yaml Accept application/xml, application/json;q=0.1'
+method = "GET"
+path = '/v3/api-docs.yaml'
+headers = { "Accept" = 'application/xml, application/json;q=0.1' }
+
+[[step]]
+name = 'GET /v3/api-docs.yaml Accept application/vnd.oai.openapi'
+method = "GET"
+path = '/v3/api-docs.yaml'
+headers = { "Accept" = 'application/vnd.oai.openapi' }
+
+[[step]]
+name = 'GET /v3/api-docs.yaml Accept application/yaml, application/json;q=0.5'
+method = "GET"
+path = '/v3/api-docs.yaml'
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
+
+[[step]]
+name = 'HEAD /v3/api-docs.yaml'
+method = "HEAD"
+path = '/v3/api-docs.yaml'
+
+[[step]]
+name = 'OPTIONS /v3/api-docs.yaml'
+method = "OPTIONS"
+path = '/v3/api-docs.yaml'
+
+[[step]]
+name = 'POST /v3/api-docs.yaml'
+method = "POST"
+path = '/v3/api-docs.yaml'
+
+[[step]]
+name = 'DELETE /v3/api-docs.yaml'
+method = "DELETE"
+path = '/v3/api-docs.yaml'
+
+[[step]]
+name = 'GET /v3/api-docs/user-api Accept text/html'
+method = "GET"
+path = '/v3/api-docs/user-api'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'GET /v3/api-docs/user-api Accept application/xml'
+method = "GET"
+path = '/v3/api-docs/user-api'
+headers = { "Accept" = 'application/xml' }
+
+[[step]]
+name = 'GET /v3/api-docs/user-api Accept application/json'
+method = "GET"
+path = '/v3/api-docs/user-api'
+headers = { "Accept" = 'application/json' }
+
+[[step]]
+name = 'GET /v3/api-docs/user-api Accept application/yaml'
+method = "GET"
+path = '/v3/api-docs/user-api'
+headers = { "Accept" = 'application/yaml' }
+
+[[step]]
+name = 'GET /v3/api-docs/user-api Accept bad'
+method = "GET"
+path = '/v3/api-docs/user-api'
+headers = { "Accept" = 'bad' }
+
+[[step]]
+name = 'GET /v3/api-docs/user-api Accept */*'
+method = "GET"
+path = '/v3/api-docs/user-api'
+headers = { "Accept" = '*/*' }
+
+[[step]]
+name = 'GET /v3/api-docs/user-api Accept application/vnd.x+json'
+method = "GET"
+path = '/v3/api-docs/user-api'
+headers = { "Accept" = 'application/vnd.x+json' }
+
+[[step]]
+name = 'GET /v3/api-docs/user-api Accept application/*+json'
+method = "GET"
+path = '/v3/api-docs/user-api'
+headers = { "Accept" = 'application/*+json' }
+
+[[step]]
+name = 'GET /v3/api-docs/user-api Accept application/json;charset=UTF-8'
+method = "GET"
+path = '/v3/api-docs/user-api'
+headers = { "Accept" = 'application/json;charset=UTF-8' }
+
+[[step]]
+name = 'GET /v3/api-docs/user-api Accept application/*'
+method = "GET"
+path = '/v3/api-docs/user-api'
+headers = { "Accept" = 'application/*' }
+
+[[step]]
+name = 'GET /v3/api-docs/user-api Accept text/*'
+method = "GET"
+path = '/v3/api-docs/user-api'
+headers = { "Accept" = 'text/*' }
+
+[[step]]
+name = 'GET /v3/api-docs/user-api Accept application/json, text/html'
+method = "GET"
+path = '/v3/api-docs/user-api'
+headers = { "Accept" = 'application/json, text/html' }
+
+[[step]]
+name = 'GET /v3/api-docs/user-api Accept application/xml, application/json;q=0.1'
+method = "GET"
+path = '/v3/api-docs/user-api'
+headers = { "Accept" = 'application/xml, application/json;q=0.1' }
+
+[[step]]
+name = 'GET /v3/api-docs/user-api Accept application/vnd.oai.openapi'
+method = "GET"
+path = '/v3/api-docs/user-api'
+headers = { "Accept" = 'application/vnd.oai.openapi' }
+
+[[step]]
+name = 'GET /v3/api-docs/user-api Accept application/yaml, application/json;q=0.5'
+method = "GET"
+path = '/v3/api-docs/user-api'
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
+
+[[step]]
+name = 'HEAD /v3/api-docs/user-api'
+method = "HEAD"
+path = '/v3/api-docs/user-api'
+
+[[step]]
+name = 'OPTIONS /v3/api-docs/user-api'
+method = "OPTIONS"
+path = '/v3/api-docs/user-api'
+
+[[step]]
+name = 'POST /v3/api-docs/user-api'
+method = "POST"
+path = '/v3/api-docs/user-api'
+
+[[step]]
+name = 'DELETE /v3/api-docs/user-api'
+method = "DELETE"
+path = '/v3/api-docs/user-api'
+
+[[step]]
+name = 'GET /v3/api-docs/swagger-config Accept text/html'
+method = "GET"
+path = '/v3/api-docs/swagger-config'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'GET /v3/api-docs/swagger-config Accept application/xml'
+method = "GET"
+path = '/v3/api-docs/swagger-config'
+headers = { "Accept" = 'application/xml' }
+
+[[step]]
+name = 'GET /v3/api-docs/swagger-config Accept application/json'
+method = "GET"
+path = '/v3/api-docs/swagger-config'
+headers = { "Accept" = 'application/json' }
+
+[[step]]
+name = 'GET /v3/api-docs/swagger-config Accept application/yaml'
+method = "GET"
+path = '/v3/api-docs/swagger-config'
+headers = { "Accept" = 'application/yaml' }
+
+[[step]]
+name = 'GET /v3/api-docs/swagger-config Accept bad'
+method = "GET"
+path = '/v3/api-docs/swagger-config'
+headers = { "Accept" = 'bad' }
+
+[[step]]
+name = 'GET /v3/api-docs/swagger-config Accept */*'
+method = "GET"
+path = '/v3/api-docs/swagger-config'
+headers = { "Accept" = '*/*' }
+
+[[step]]
+name = 'GET /v3/api-docs/swagger-config Accept application/vnd.x+json'
+method = "GET"
+path = '/v3/api-docs/swagger-config'
+headers = { "Accept" = 'application/vnd.x+json' }
+
+[[step]]
+name = 'GET /v3/api-docs/swagger-config Accept application/*+json'
+method = "GET"
+path = '/v3/api-docs/swagger-config'
+headers = { "Accept" = 'application/*+json' }
+
+[[step]]
+name = 'GET /v3/api-docs/swagger-config Accept application/json;charset=UTF-8'
+method = "GET"
+path = '/v3/api-docs/swagger-config'
+headers = { "Accept" = 'application/json;charset=UTF-8' }
+
+[[step]]
+name = 'GET /v3/api-docs/swagger-config Accept application/*'
+method = "GET"
+path = '/v3/api-docs/swagger-config'
+headers = { "Accept" = 'application/*' }
+
+[[step]]
+name = 'GET /v3/api-docs/swagger-config Accept text/*'
+method = "GET"
+path = '/v3/api-docs/swagger-config'
+headers = { "Accept" = 'text/*' }
+
+[[step]]
+name = 'GET /v3/api-docs/swagger-config Accept application/json, text/html'
+method = "GET"
+path = '/v3/api-docs/swagger-config'
+headers = { "Accept" = 'application/json, text/html' }
+
+[[step]]
+name = 'GET /v3/api-docs/swagger-config Accept application/xml, application/json;q=0.1'
+method = "GET"
+path = '/v3/api-docs/swagger-config'
+headers = { "Accept" = 'application/xml, application/json;q=0.1' }
+
+[[step]]
+name = 'GET /v3/api-docs/swagger-config Accept application/vnd.oai.openapi'
+method = "GET"
+path = '/v3/api-docs/swagger-config'
+headers = { "Accept" = 'application/vnd.oai.openapi' }
+
+[[step]]
+name = 'GET /v3/api-docs/swagger-config Accept application/yaml, application/json;q=0.5'
+method = "GET"
+path = '/v3/api-docs/swagger-config'
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
+
+[[step]]
+name = 'HEAD /v3/api-docs/swagger-config'
+method = "HEAD"
+path = '/v3/api-docs/swagger-config'
+
+[[step]]
+name = 'OPTIONS /v3/api-docs/swagger-config'
+method = "OPTIONS"
+path = '/v3/api-docs/swagger-config'
+
+[[step]]
+name = 'POST /v3/api-docs/swagger-config'
+method = "POST"
+path = '/v3/api-docs/swagger-config'
+
+[[step]]
+name = 'DELETE /v3/api-docs/swagger-config'
+method = "DELETE"
+path = '/v3/api-docs/swagger-config'
+
+[[step]]
+name = 'GET /v3/api-docs/nope'
+method = "GET"
+path = '/v3/api-docs/nope'
+
+[[step]]
+name = 'GET /v3/api-docs/nope 인증됨'
+method = "GET"
+path = '/v3/api-docs/nope'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = 'POST /v3/api-docs/nope'
+method = "POST"
+path = '/v3/api-docs/nope'
+
+[[step]]
+name = 'GET /v3/api-docs/'
+method = "GET"
+path = '/v3/api-docs/'
+
+[[step]]
+name = 'GET /v3/api-docs/ 인증됨'
+method = "GET"
+path = '/v3/api-docs/'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = 'POST /v3/api-docs/'
+method = "POST"
+path = '/v3/api-docs/'
+
+[[step]]
+name = 'GET /v3/api-docs/a/b'
+method = "GET"
+path = '/v3/api-docs/a/b'
+
+[[step]]
+name = 'GET /v3/api-docs/a/b 인증됨'
+method = "GET"
+path = '/v3/api-docs/a/b'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = 'POST /v3/api-docs/a/b'
+method = "POST"
+path = '/v3/api-docs/a/b'
+
+[[step]]
+name = 'GET /v3/api-docs.yaml/'
+method = "GET"
+path = '/v3/api-docs.yaml/'
+
+[[step]]
+name = 'GET /v3/api-docs.yaml/ 인증됨'
+method = "GET"
+path = '/v3/api-docs.yaml/'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = 'POST /v3/api-docs.yaml/'
+method = "POST"
+path = '/v3/api-docs.yaml/'
+
+[[step]]
+name = 'GET /v3/api-docs.yaml/user-api'
+method = "GET"
+path = '/v3/api-docs.yaml/user-api'
+
+[[step]]
+name = 'POST /v3/api-docs.yaml/user-api'
+method = "POST"
+path = '/v3/api-docs.yaml/user-api'
+
+[[step]]
+name = 'GET /v3/api-docs/user-api/'
+method = "GET"
+path = '/v3/api-docs/user-api/'
+
+[[step]]
+name = 'GET /v3/api-docs/user-api/ 인증됨'
+method = "GET"
+path = '/v3/api-docs/user-api/'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = 'POST /v3/api-docs/user-api/'
+method = "POST"
+path = '/v3/api-docs/user-api/'
+
+[[step]]
+name = 'GET /V3/api-docs'
+method = "GET"
+path = '/V3/api-docs'
+
+[[step]]
+name = 'GET /V3/api-docs 인증됨'
+method = "GET"
+path = '/V3/api-docs'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = 'POST /V3/api-docs'
+method = "POST"
+path = '/V3/api-docs'
+
+[[step]]
+name = 'GET /v3/api-docs?x=1'
+method = "GET"
+path = '/v3/api-docs?x=1'
+
+[[step]]
+name = 'GET /v3/api-docs?x=1 인증됨'
+method = "GET"
+path = '/v3/api-docs?x=1'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = 'POST /v3/api-docs?x=1'
+method = "POST"
+path = '/v3/api-docs?x=1'
+
+[[step]]
+name = 'GET /v3/api-docs/user-api?x=1'
+method = "GET"
+path = '/v3/api-docs/user-api?x=1'
+
+[[step]]
+name = 'GET /v3/api-docs/user-api?x=1 인증됨'
+method = "GET"
+path = '/v3/api-docs/user-api?x=1'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = 'POST /v3/api-docs/user-api?x=1'
+method = "POST"
+path = '/v3/api-docs/user-api?x=1'
+
+[[step]]
+name = 'GET /v3/api-docs/swagger-config/'
+method = "GET"
+path = '/v3/api-docs/swagger-config/'
+
+[[step]]
+name = 'GET /v3/api-docs/swagger-config/ 인증됨'
+method = "GET"
+path = '/v3/api-docs/swagger-config/'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = 'POST /v3/api-docs/swagger-config/'
+method = "POST"
+path = '/v3/api-docs/swagger-config/'
+
+[[step]]
+name = 'GET /v3/api-docs/swagger-config.json'
+method = "GET"
+path = '/v3/api-docs/swagger-config.json'
+
+[[step]]
+name = 'GET /v3/api-docs/swagger-config.json 인증됨'
+method = "GET"
+path = '/v3/api-docs/swagger-config.json'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = 'POST /v3/api-docs/swagger-config.json'
+method = "POST"
+path = '/v3/api-docs/swagger-config.json'
+
+[[step]]
+name = 'GET /swagger-ui.html'
+method = "GET"
+path = '/swagger-ui.html'
+
+[[step]]
+name = 'GET /swagger-ui.html?x=1'
+method = "GET"
+path = '/swagger-ui.html?x=1'
+
+[[step]]
+name = 'HEAD /swagger-ui.html'
+method = "HEAD"
+path = '/swagger-ui.html'
+
+[[step]]
+name = 'POST /swagger-ui.html'
+method = "POST"
+path = '/swagger-ui.html'
+
+[[step]]
+name = 'OPTIONS /swagger-ui.html'
+method = "OPTIONS"
+path = '/swagger-ui.html'
+
+[[step]]
+name = 'GET /swagger-ui.html/'
+method = "GET"
+path = '/swagger-ui.html/'
+
+[[step]]
+name = 'GET /swagger-ui/index.html'
+method = "GET"
+path = '/swagger-ui/index.html'
+
+[[step]]
+name = 'HEAD /swagger-ui/index.html'
+method = "HEAD"
+path = '/swagger-ui/index.html'
+
+[[step]]
+name = 'GET /swagger-ui/index.css'
+method = "GET"
+path = '/swagger-ui/index.css'
+
+[[step]]
+name = 'HEAD /swagger-ui/index.css'
+method = "HEAD"
+path = '/swagger-ui/index.css'
+
+[[step]]
+name = 'GET /swagger-ui/swagger-initializer.js'
+method = "GET"
+path = '/swagger-ui/swagger-initializer.js'
+
+[[step]]
+name = 'HEAD /swagger-ui/swagger-initializer.js'
+method = "HEAD"
+path = '/swagger-ui/swagger-initializer.js'
+
+[[step]]
+name = 'GET /swagger-ui/oauth2-redirect.html'
+method = "GET"
+path = '/swagger-ui/oauth2-redirect.html'
+
+[[step]]
+name = 'HEAD /swagger-ui/oauth2-redirect.html'
+method = "HEAD"
+path = '/swagger-ui/oauth2-redirect.html'
+
+[[step]]
+name = 'GET /swagger-ui/swagger-ui.css'
+method = "GET"
+path = '/swagger-ui/swagger-ui.css'
+
+[[step]]
+name = 'HEAD /swagger-ui/swagger-ui.css'
+method = "HEAD"
+path = '/swagger-ui/swagger-ui.css'
+
+[[step]]
+name = 'GET /swagger-ui/swagger-ui-bundle.js'
+method = "GET"
+path = '/swagger-ui/swagger-ui-bundle.js'
+
+[[step]]
+name = 'HEAD /swagger-ui/swagger-ui-bundle.js'
+method = "HEAD"
+path = '/swagger-ui/swagger-ui-bundle.js'
+
+[[step]]
+name = 'GET /swagger-ui/swagger-ui-standalone-preset.js'
+method = "GET"
+path = '/swagger-ui/swagger-ui-standalone-preset.js'
+
+[[step]]
+name = 'HEAD /swagger-ui/swagger-ui-standalone-preset.js'
+method = "HEAD"
+path = '/swagger-ui/swagger-ui-standalone-preset.js'
+
+[[step]]
+name = 'GET /swagger-ui/favicon-32x32.png'
+method = "GET"
+path = '/swagger-ui/favicon-32x32.png'
+
+[[step]]
+name = 'HEAD /swagger-ui/favicon-32x32.png'
+method = "HEAD"
+path = '/swagger-ui/favicon-32x32.png'
+
+[[step]]
+name = 'GET /swagger-ui/favicon-16x16.png'
+method = "GET"
+path = '/swagger-ui/favicon-16x16.png'
+
+[[step]]
+name = 'HEAD /swagger-ui/favicon-16x16.png'
+method = "HEAD"
+path = '/swagger-ui/favicon-16x16.png'
+
+[[step]]
+name = 'GET /swagger-ui/'
+method = "GET"
+path = '/swagger-ui/'
+
+[[step]]
+name = 'GET /swagger-ui/ Accept html'
+method = "GET"
+path = '/swagger-ui/'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'POST /swagger-ui/'
+method = "POST"
+path = '/swagger-ui/'
+
+[[step]]
+name = 'GET /swagger-ui'
+method = "GET"
+path = '/swagger-ui'
+
+[[step]]
+name = 'GET /swagger-ui Accept html'
+method = "GET"
+path = '/swagger-ui'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'POST /swagger-ui'
+method = "POST"
+path = '/swagger-ui'
+
+[[step]]
+name = 'GET /swagger-ui/nope.js'
+method = "GET"
+path = '/swagger-ui/nope.js'
+
+[[step]]
+name = 'GET /swagger-ui/nope.js Accept html'
+method = "GET"
+path = '/swagger-ui/nope.js'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'POST /swagger-ui/nope.js'
+method = "POST"
+path = '/swagger-ui/nope.js'
+
+[[step]]
+name = 'GET /swagger-ui/nope'
+method = "GET"
+path = '/swagger-ui/nope'
+
+[[step]]
+name = 'GET /swagger-ui/nope Accept html'
+method = "GET"
+path = '/swagger-ui/nope'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'POST /swagger-ui/nope'
+method = "POST"
+path = '/swagger-ui/nope'
+
+[[step]]
+name = 'GET /swagger-ui/index.html/'
+method = "GET"
+path = '/swagger-ui/index.html/'
+
+[[step]]
+name = 'GET /swagger-ui/index.html/ Accept html'
+method = "GET"
+path = '/swagger-ui/index.html/'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'POST /swagger-ui/index.html/'
+method = "POST"
+path = '/swagger-ui/index.html/'
+
+[[step]]
+name = 'GET /swagger-ui/sub/index.html'
+method = "GET"
+path = '/swagger-ui/sub/index.html'
+
+[[step]]
+name = 'GET /swagger-ui/sub/index.html Accept html'
+method = "GET"
+path = '/swagger-ui/sub/index.html'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'POST /swagger-ui/sub/index.html'
+method = "POST"
+path = '/swagger-ui/sub/index.html'
+
+[[step]]
+name = 'GET /swagger-ui/%69ndex.html'
+method = "GET"
+path = '/swagger-ui/%69ndex.html'
+
+[[step]]
+name = 'GET /swagger-ui/%69ndex.html Accept html'
+method = "GET"
+path = '/swagger-ui/%69ndex.html'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'POST /swagger-ui/%69ndex.html'
+method = "POST"
+path = '/swagger-ui/%69ndex.html'
+
+[[step]]
+name = 'GET /swagger-ui/INDEX.HTML'
+method = "GET"
+path = '/swagger-ui/INDEX.HTML'
+
+[[step]]
+name = 'GET /swagger-ui/INDEX.HTML Accept html'
+method = "GET"
+path = '/swagger-ui/INDEX.HTML'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'POST /swagger-ui/INDEX.HTML'
+method = "POST"
+path = '/swagger-ui/INDEX.HTML'
+
+[[step]]
+name = 'GET /swagger-ui/index.html?x=1'
+method = "GET"
+path = '/swagger-ui/index.html?x=1'
+
+[[step]]
+name = 'GET /swagger-ui/index.html?x=1 Accept html'
+method = "GET"
+path = '/swagger-ui/index.html?x=1'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'POST /swagger-ui/index.html?x=1'
+method = "POST"
+path = '/swagger-ui/index.html?x=1'
+
+[[step]]
+name = 'GET /swagger-ui/../v3/api-docs'
+method = "GET"
+path = '/swagger-ui/../v3/api-docs'
+
+[[step]]
+name = 'GET /swagger-ui/../v3/api-docs Accept html'
+method = "GET"
+path = '/swagger-ui/../v3/api-docs'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'POST /swagger-ui/../v3/api-docs'
+method = "POST"
+path = '/swagger-ui/../v3/api-docs'
+
+[[step]]
+name = 'GET /swagger-ui//index.html'
+method = "GET"
+path = '/swagger-ui//index.html'
+
+[[step]]
+name = 'GET /swagger-ui//index.html Accept html'
+method = "GET"
+path = '/swagger-ui//index.html'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'POST /swagger-ui//index.html'
+method = "POST"
+path = '/swagger-ui//index.html'
+
+[[step]]
+name = 'swagger-ui Accept text/html'
+method = "GET"
+path = '/swagger-ui/index.html'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'swagger-ui Accept json'
+method = "GET"
+path = '/swagger-ui/index.html'
+headers = { "Accept" = 'application/json' }
+
+[[step]]
+name = 'swagger-ui.css Accept json'
+method = "GET"
+path = '/swagger-ui/swagger-ui.css'
+headers = { "Accept" = 'application/json' }
+
+[[step]]
+name = 'swagger-ui.css Origin'
+method = "GET"
+path = '/swagger-ui/swagger-ui.css'
+headers = { "Origin" = 'http://localhost:3000' }
+
+[[step]]
+name = "인증된 없는 경로 확장자 'js'"
+method = "GET"
+path = '/api/v1/nothing.js'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "인증된 없는 경로 확장자 'html'"
+method = "GET"
+path = '/api/v1/nothing.html'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "인증된 없는 경로 확장자 'css'"
+method = "GET"
+path = '/api/v1/nothing.css'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "인증된 없는 경로 확장자 'txt'"
+method = "GET"
+path = '/api/v1/nothing.txt'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "인증된 없는 경로 확장자 'json'"
+method = "GET"
+path = '/api/v1/nothing.json'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "인증된 없는 경로 확장자 'xml'"
+method = "GET"
+path = '/api/v1/nothing.xml'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "인증된 없는 경로 확장자 'png'"
+method = "GET"
+path = '/api/v1/nothing.png'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "인증된 없는 경로 확장자 'PNG'"
+method = "GET"
+path = '/api/v1/nothing.PNG'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "인증된 없는 경로 확장자 'jpg'"
+method = "GET"
+path = '/api/v1/nothing.jpg'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "인증된 없는 경로 확장자 'webp'"
+method = "GET"
+path = '/api/v1/nothing.webp'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "인증된 없는 경로 확장자 'svg'"
+method = "GET"
+path = '/api/v1/nothing.svg'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "인증된 없는 경로 확장자 'mp3'"
+method = "GET"
+path = '/api/v1/nothing.mp3'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "인증된 없는 경로 확장자 'mp4'"
+method = "GET"
+path = '/api/v1/nothing.mp4'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "인증된 없는 경로 확장자 'pdf'"
+method = "GET"
+path = '/api/v1/nothing.pdf'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "인증된 없는 경로 확장자 'zip'"
+method = "GET"
+path = '/api/v1/nothing.zip'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "인증된 없는 경로 확장자 'yaml'"
+method = "GET"
+path = '/api/v1/nothing.yaml'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "인증된 없는 경로 확장자 'yml'"
+method = "GET"
+path = '/api/v1/nothing.yml'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "인증된 없는 경로 확장자 'csv'"
+method = "GET"
+path = '/api/v1/nothing.csv'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "인증된 없는 경로 확장자 'x'"
+method = "GET"
+path = '/api/v1/nothing.x'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "인증된 없는 경로 확장자 ''"
+method = "GET"
+path = '/api/v1/nothing.'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '인증된 폴더에 점'
+method = "GET"
+path = '/api/v1/not.hing/x'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '인증된 메서드 없음 확장자'
+method = "DELETE"
+path = '/api/v1/topics.js'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '공개 경로 확장자'
+method = "GET"
+path = '/api/v1/topics.json?date=2026-10-12'
+
+[[step]]
+name = '공개 경로 확장자 js'
+method = "GET"
+path = '/api/v1/topics.js?date=2026-10-12'
+
+[[step]]
+name = '방화벽 경로 확장자'
+method = "GET"
+path = '/api/v1/topics;x.js'
+
+[[step]]
+name = 'actuator 확장자'
+method = "GET"
+path = '/actuator/health.js'
