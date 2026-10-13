@@ -1,88 +1,8 @@
 {
-  "db": {
-    "consumed_signup_tokens": [
-      "{\"expires_at\":\"<t+300s db +09:00>\",\"jti\":\"$uuid?\"}"
-    ],
-    "pending_apple_authorizations": [
-      "{\"created_at\":\"<t+0s db +09:00>\",\"encrypted_refresh_token\":\"<opaque len=64>\",\"expires_at\":\"<t+900s db +09:00>\",\"id\":\"$uuid?\",\"subject_hmac\":\"226b13f193d3ff032c873ddd1128a8b5576ba1a8ab0a9a2737b3981a1cc0659e\"}"
-    ],
-    "user_refresh_tokens": [
-      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t+0s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid5\"}"
-    ],
-    "users": [
-      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t+0s db +09:00>\",\"email\":\"withdrawn+$uuid5@chalkak.invalid\",\"id\":\"$uuid5\",\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"withdrawn/$uuid5\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"updated_at\":\"<t+0s db +09:00>\"}"
-    ]
-  },
-  "fakes": [
-    {
-      "body": {
-        "client_id": "test-apple-client-id",
-        "client_secret": "<jwt {\"alg\":\"ES256\",\"kid\":\"test-key-id\"} {\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\"}>",
-        "code": "code-a",
-        "grant_type": "authorization_code"
-      },
-      "contentType": "application/x-www-form-urlencoded",
-      "method": "POST",
-      "path": "/apple/auth/token",
-      "service": "apple_token"
-    },
-    {
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid3.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/original/$uuid3.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid3.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "body": {
-        "client_id": "test-apple-client-id",
-        "client_secret": "<jwt {\"alg\":\"ES256\",\"kid\":\"test-key-id\"} {\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\"}>",
-        "token": "refresh-token-of-a",
-        "token_type_hint": "refresh_token"
-      },
-      "contentType": "application/x-www-form-urlencoded",
-      "method": "POST",
-      "path": "/apple/auth/revoke",
-      "service": "apple_revoke"
-    },
-    {
-      "body": {
-        "client_id": "test-apple-client-id",
-        "client_secret": "<jwt {\"alg\":\"ES256\",\"kid\":\"test-key-id\"} {\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\"}>",
-        "token": "refresh-token-of-a",
-        "token_type_hint": "refresh_token"
-      },
-      "contentType": "application/x-www-form-urlencoded",
-      "method": "POST",
-      "path": "/apple/auth/revoke",
-      "service": "apple_revoke"
-    },
-    {
-      "body": {
-        "client_id": "test-apple-client-id",
-        "client_secret": "<jwt {\"alg\":\"ES256\",\"kid\":\"test-key-id\"} {\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\"}>",
-        "code": "code-a2",
-        "grant_type": "authorization_code"
-      },
-      "contentType": "application/x-www-form-urlencoded",
-      "method": "POST",
-      "path": "/apple/auth/token",
-      "service": "apple_token"
-    }
-  ],
   "steps": [
     {
-      "body": {
-        "status": "SIGN_UP_REQUIRED"
-      },
+      "step": "Apple 로그인(교환)",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -117,16 +37,13 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "Apple 로그인(교환)"
+      "body": {
+        "status": "SIGN_UP_REQUIRED"
+      }
     },
     {
-      "body": {
-        "expiresInSeconds": 300,
-        "signupToken": "<jwt {\"alg\":\"HS256\",\"typ\":\"JWT\"} {\"aud\":\"chalkak-social-signup\",\"email\":\"a@example.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"iss\":\"chalkak-backend\",\"jti\":\"<opaque len=36>\",\"provider\":\"APPLE\",\"purpose\":\"SOCIAL_SIGNUP\",\"sub\":\"apple-sub-a\",\"uploadId\":\"$uuid3\"}>",
-        "uploadId": "$uuid3",
-        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid3.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>"
-      },
+      "step": "업로드 URL 발급",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -161,17 +78,16 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "업로드 URL 발급"
+      "body": {
+        "uploadId": "$uuid3",
+        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid3.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
+        "expiresInSeconds": 300,
+        "signupToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"apple-sub-a\",\"aud\":\"chalkak-social-signup\",\"uploadId\":\"$uuid3\",\"purpose\":\"SOCIAL_SIGNUP\",\"provider\":\"APPLE\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\",\"email\":\"a@example.com\"}>"
+      }
     },
     {
-      "body": {
-        "accessToken": "<jwt {\"alg\":\"HS256\",\"typ\":\"JWT\"} {\"aud\":\"chalkak-access\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"iss\":\"chalkak-backend\",\"jti\":\"<opaque len=36>\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"sub\":\"$uuid5\"}>",
-        "expiresIn": 900,
-        "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000,
-        "userId": "$uuid5"
-      },
+      "step": "가입 완료",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -206,14 +122,17 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "가입 완료"
+      "body": {
+        "userId": "$uuid5",
+        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid5\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
+        "expiresIn": 900,
+        "refreshToken": "<opaque len=43>",
+        "refreshTokenExpiresIn": 2592000
+      }
     },
     {
-      "body": {
-        "errorCode": "INTERNAL_ERROR",
-        "message": "서버에서 요청을 처리하지 못했습니다."
-      },
+      "step": "폐기가 400이면 탈퇴 실패",
+      "status": 500,
       "headers": [
         [
           "cache-control",
@@ -248,11 +167,14 @@
           "0"
         ]
       ],
-      "status": 500,
-      "step": "폐기가 400이면 탈퇴 실패"
+      "body": {
+        "errorCode": "INTERNAL_ERROR",
+        "message": "서버에서 요청을 처리하지 못했습니다."
+      }
     },
     {
-      "body": "",
+      "step": "폐기가 성공하면 탈퇴",
+      "status": 204,
       "headers": [
         [
           "cache-control",
@@ -283,14 +205,11 @@
           "0"
         ]
       ],
-      "status": 204,
-      "step": "폐기가 성공하면 탈퇴"
+      "body": ""
     },
     {
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      },
+      "step": "탈퇴한 회원의 토큰으로 재탈퇴",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -325,13 +244,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "탈퇴한 회원의 토큰으로 재탈퇴"
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      }
     },
     {
-      "body": {
-        "status": "SIGN_UP_REQUIRED"
-      },
+      "step": "탈퇴 후 같은 Apple 계정 로그인",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -366,8 +286,88 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "탈퇴 후 같은 Apple 계정 로그인"
+      "body": {
+        "status": "SIGN_UP_REQUIRED"
+      }
+    }
+  ],
+  "db": {
+    "consumed_signup_tokens": [
+      "{\"jti\":\"$uuid?\",\"expires_at\":\"<t+300s db +09:00>\"}"
+    ],
+    "pending_apple_authorizations": [
+      "{\"id\":\"$uuid?\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+900s db +09:00>\",\"subject_hmac\":\"226b13f193d3ff032c873ddd1128a8b5576ba1a8ab0a9a2737b3981a1cc0659e\",\"encrypted_refresh_token\":\"<opaque len=64>\"}"
+    ],
+    "user_refresh_tokens": [
+      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid5\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"revoked_at\":\"<t+0s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}"
+    ],
+    "users": [
+      "{\"id\":\"$uuid5\",\"email\":\"withdrawn+$uuid5@chalkak.invalid\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t+0s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"withdrawn/$uuid5\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}"
+    ]
+  },
+  "fakes": [
+    {
+      "service": "apple_token",
+      "method": "POST",
+      "path": "/apple/auth/token",
+      "contentType": "application/x-www-form-urlencoded",
+      "body": {
+        "client_id": "test-apple-client-id",
+        "client_secret": "<jwt {\"kid\":\"test-key-id\",\"alg\":\"ES256\"} {\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\",\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\"}>",
+        "code": "code-a",
+        "grant_type": "authorization_code"
+      }
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid3.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/original/$uuid3.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid3.png"
+    },
+    {
+      "service": "apple_revoke",
+      "method": "POST",
+      "path": "/apple/auth/revoke",
+      "contentType": "application/x-www-form-urlencoded",
+      "body": {
+        "client_id": "test-apple-client-id",
+        "client_secret": "<jwt {\"kid\":\"test-key-id\",\"alg\":\"ES256\"} {\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\",\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\"}>",
+        "token": "refresh-token-of-a",
+        "token_type_hint": "refresh_token"
+      }
+    },
+    {
+      "service": "apple_revoke",
+      "method": "POST",
+      "path": "/apple/auth/revoke",
+      "contentType": "application/x-www-form-urlencoded",
+      "body": {
+        "client_id": "test-apple-client-id",
+        "client_secret": "<jwt {\"kid\":\"test-key-id\",\"alg\":\"ES256\"} {\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\",\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\"}>",
+        "token": "refresh-token-of-a",
+        "token_type_hint": "refresh_token"
+      }
+    },
+    {
+      "service": "apple_token",
+      "method": "POST",
+      "path": "/apple/auth/token",
+      "contentType": "application/x-www-form-urlencoded",
+      "body": {
+        "client_id": "test-apple-client-id",
+        "client_secret": "<jwt {\"kid\":\"test-key-id\",\"alg\":\"ES256\"} {\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\",\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\"}>",
+        "code": "code-a2",
+        "grant_type": "authorization_code"
+      }
     }
   ]
 }

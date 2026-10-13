@@ -1,12 +1,8 @@
 {
-  "db": null,
-  "fakes": [],
   "steps": [
     {
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      },
+      "step": "본문 없음",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -41,14 +37,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "본문 없음"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      },
+      }
+    },
+    {
+      "step": "본문이 JSON이 아님",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -83,14 +79,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "본문이 JSON이 아님"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      },
+      }
+    },
+    {
+      "step": "본문이 배열",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -125,14 +121,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "본문이 배열"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
-        "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      },
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      }
+    },
+    {
+      "step": "Content-Type이 JSON이 아님",
+      "status": 415,
       "headers": [
         [
           "cache-control",
@@ -167,14 +163,14 @@
           "0"
         ]
       ],
-      "status": 415,
-      "step": "Content-Type이 JSON이 아님"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
-        "message": "rawNonce는 필수입니다."
-      },
+        "message": "지원하지 않는 요청 방식이거나 형식입니다."
+      }
+    },
+    {
+      "step": "rawNonce가 null",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -209,14 +205,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "rawNonce가 null"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
-        "message": "소셜 로그인 제공자는 필수입니다."
-      },
+        "message": "rawNonce는 필수입니다."
+      }
+    },
+    {
+      "step": "제공자 없음",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -251,14 +247,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "제공자 없음"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "소셜 로그인 제공자는 필수입니다."
-      },
+      }
+    },
+    {
+      "step": "제공자가 null",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -293,14 +289,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "제공자가 null"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      },
+        "message": "소셜 로그인 제공자는 필수입니다."
+      }
+    },
+    {
+      "step": "제공자가 빈 문자열",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -335,14 +331,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "제공자가 빈 문자열"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      },
+      }
+    },
+    {
+      "step": "제공자 이름이 소문자",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -377,14 +373,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "제공자 이름이 소문자"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      },
+      }
+    },
+    {
+      "step": "모르는 제공자",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -419,13 +415,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "모르는 제공자"
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      }
     },
     {
-      "body": {
-        "status": "SIGN_UP_REQUIRED"
-      },
+      "step": "제공자 이름 앞뒤 공백은 잘라서 읽는다",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -460,13 +457,13 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "제공자 이름 앞뒤 공백은 잘라서 읽는다"
-    },
-    {
       "body": {
         "status": "SIGN_UP_REQUIRED"
-      },
+      }
+    },
+    {
+      "step": "제공자를 서수(0)로 보냄",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -501,13 +498,13 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "제공자를 서수(0)로 보냄"
-    },
-    {
       "body": {
         "status": "SIGN_UP_REQUIRED"
-      },
+      }
+    },
+    {
+      "step": "제공자를 서수 문자열로 보냄",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -542,14 +539,13 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "제공자를 서수 문자열로 보냄"
+      "body": {
+        "status": "SIGN_UP_REQUIRED"
+      }
     },
     {
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      },
+      "step": "범위 밖 서수",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -584,14 +580,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "범위 밖 서수"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      },
+      }
+    },
+    {
+      "step": "음수 서수",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -626,14 +622,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "음수 서수"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      },
+      }
+    },
+    {
+      "step": "제공자가 실수",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -668,14 +664,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "제공자가 실수"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      },
+      }
+    },
+    {
+      "step": "제공자가 불리언",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -710,14 +706,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "제공자가 불리언"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      },
+      }
+    },
+    {
+      "step": "제공자가 배열",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -752,14 +748,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "제공자가 배열"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      },
+      }
+    },
+    {
+      "step": "제공자가 객체",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -794,14 +790,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "제공자가 객체"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
-        "message": "ID Token은 필수입니다."
-      },
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      }
+    },
+    {
+      "step": "idToken 없음",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -836,14 +832,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "idToken 없음"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "ID Token은 필수입니다."
-      },
+      }
+    },
+    {
+      "step": "idToken 공백",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -878,14 +874,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "idToken 공백"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
-        "message": "rawNonce는 필수입니다."
-      },
+        "message": "ID Token은 필수입니다."
+      }
+    },
+    {
+      "step": "rawNonce 없음",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -920,14 +916,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "rawNonce 없음"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "rawNonce는 필수입니다."
-      },
+      }
+    },
+    {
+      "step": "rawNonce 공백",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -962,14 +958,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "rawNonce 공백"
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "rawNonce는 필수입니다."
+      }
     },
     {
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 GOOGLE ID Token입니다."
-      },
+      "step": "idToken이 숫자(문자열로 바뀌어 형식 오류 토큰)",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -1004,14 +1000,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "idToken이 숫자(문자열로 바뀌어 형식 오류 토큰)"
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 GOOGLE ID Token입니다."
+      }
     },
     {
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      },
+      "step": "idToken이 객체",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -1046,14 +1042,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "idToken이 객체"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
-        "message": "Authorization Code는 APPLE 로그인에만 필요합니다."
-      },
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      }
+    },
+    {
+      "step": "구글에 authorizationCode를 보내면 거절",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -1088,14 +1084,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "구글에 authorizationCode를 보내면 거절"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "Authorization Code는 APPLE 로그인에만 필요합니다."
-      },
+      }
+    },
+    {
+      "step": "구글에 빈 authorizationCode도 거절",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -1130,13 +1126,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "구글에 빈 authorizationCode도 거절"
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "Authorization Code는 APPLE 로그인에만 필요합니다."
+      }
     },
     {
-      "body": {
-        "status": "SIGN_UP_REQUIRED"
-      },
+      "step": "구글에 null authorizationCode는 통과",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -1171,14 +1168,13 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "구글에 null authorizationCode는 통과"
+      "body": {
+        "status": "SIGN_UP_REQUIRED"
+      }
     },
     {
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "Authorization Code는 APPLE 로그인에만 필요합니다."
-      },
+      "step": "Apple은 authorizationCode가 필요",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -1213,14 +1209,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "Apple은 authorizationCode가 필요"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "Authorization Code는 APPLE 로그인에만 필요합니다."
-      },
+      }
+    },
+    {
+      "step": "Apple의 공백 authorizationCode도 거절",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -1255,13 +1251,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "Apple의 공백 authorizationCode도 거절"
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "Authorization Code는 APPLE 로그인에만 필요합니다."
+      }
     },
     {
-      "body": {
-        "status": "SIGN_UP_REQUIRED"
-      },
+      "step": "알 수 없는 필드는 무시하고 정상 로그인",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -1296,14 +1293,13 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "알 수 없는 필드는 무시하고 정상 로그인"
+      "body": {
+        "status": "SIGN_UP_REQUIRED"
+      }
     },
     {
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "소셜 로그인 제공자는 필수입니다."
-      },
+      "step": "업로드 URL: 제공자 없음",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -1338,14 +1334,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "업로드 URL: 제공자 없음"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
-        "message": "ID Token은 필수입니다."
-      },
+        "message": "소셜 로그인 제공자는 필수입니다."
+      }
+    },
+    {
+      "step": "업로드 URL: idToken 공백",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -1380,14 +1376,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "업로드 URL: idToken 공백"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
-        "message": "rawNonce는 필수입니다."
-      },
+        "message": "ID Token은 필수입니다."
+      }
+    },
+    {
+      "step": "업로드 URL: rawNonce 없음",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -1422,16 +1418,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "업로드 URL: rawNonce 없음"
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "rawNonce는 필수입니다."
+      }
     },
     {
-      "body": {
-        "expiresInSeconds": 300,
-        "signupToken": "<jwt {\"alg\":\"HS256\",\"typ\":\"JWT\"} {\"aud\":\"chalkak-social-signup\",\"email\":\"validation@example.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"iss\":\"chalkak-backend\",\"jti\":\"<opaque len=36>\",\"provider\":\"GOOGLE\",\"purpose\":\"SOCIAL_SIGNUP\",\"sub\":\"google-sub-validation\",\"uploadId\":\"$uuid36\"}>",
-        "uploadId": "$uuid36",
-        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid36.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>"
-      },
+      "step": "업로드 URL: authorizationCode는 받지 않으므로 무시",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -1466,14 +1460,16 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "업로드 URL: authorizationCode는 받지 않으므로 무시"
+      "body": {
+        "uploadId": "$uuid36",
+        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid36.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
+        "expiresInSeconds": 300,
+        "signupToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"google-sub-validation\",\"aud\":\"chalkak-social-signup\",\"uploadId\":\"$uuid36\",\"purpose\":\"SOCIAL_SIGNUP\",\"provider\":\"GOOGLE\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\",\"email\":\"validation@example.com\"}>"
+      }
     },
     {
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      },
+      "step": "업로드 URL: 제공자가 잘못된 서수",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -1508,14 +1504,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "업로드 URL: 제공자가 잘못된 서수"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      },
+      }
+    },
+    {
+      "step": "가입: 본문 없음",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -1550,14 +1546,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "가입: 본문 없음"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
-        "message": "회원가입 토큰은 필수입니다."
-      },
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      }
+    },
+    {
+      "step": "가입: 토큰 없음",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -1592,14 +1588,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "가입: 토큰 없음"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "회원가입 토큰은 필수입니다."
-      },
+      }
+    },
+    {
+      "step": "가입: 토큰 공백",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -1634,14 +1630,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "가입: 토큰 공백"
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "회원가입 토큰은 필수입니다."
+      }
     },
     {
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 회원가입 정보입니다."
-      },
+      "step": "가입: 형식이 틀린 토큰은 401",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -1676,14 +1672,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "가입: 형식이 틀린 토큰은 401"
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 회원가입 정보입니다."
+      }
     },
     {
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      },
+      "step": "가입: 토큰이 객체",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -1718,14 +1714,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "가입: 토큰이 객체"
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      }
     },
     {
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 회원가입 정보입니다."
-      },
+      "step": "가입: 액세스 토큰은 회원가입 토큰이 아니다",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -1760,14 +1756,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "가입: 액세스 토큰은 회원가입 토큰이 아니다"
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 회원가입 정보입니다."
+      }
     },
     {
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      },
+      "step": "GET은 허용되지 않음",
+      "status": 405,
       "headers": [
         [
           "cache-control",
@@ -1802,14 +1798,14 @@
           "0"
         ]
       ],
-      "status": 405,
-      "step": "GET은 허용되지 않음"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      },
+      }
+    },
+    {
+      "step": "로그아웃: GET은 허용되지 않음",
+      "status": 405,
       "headers": [
         [
           "cache-control",
@@ -1844,8 +1840,12 @@
           "0"
         ]
       ],
-      "status": 405,
-      "step": "로그아웃: GET은 허용되지 않음"
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "지원하지 않는 요청 방식이거나 형식입니다."
+      }
     }
-  ]
+  ],
+  "db": null,
+  "fakes": []
 }

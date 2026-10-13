@@ -1,64 +1,8 @@
 {
-  "db": {
-    "users": [
-      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t+0s db +09:00>\",\"email\":null,\"id\":\"$uuid?\",\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid?.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid?.png\",\"status\":\"ACTIVE\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"a@example.com\",\"id\":\"$uuid?\",\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid36.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid36.png\",\"status\":\"ACTIVE\",\"updated_at\":\"<t+440s db +09:00>\"}",
-      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"b@example.com\",\"id\":\"$uuid?\",\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid4.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid4.png\",\"status\":\"BANNED\",\"updated_at\":\"<t+0s db +09:00>\"}"
-    ]
-  },
-  "fakes": [
-    {
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid9.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/original/$uuid9.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid9.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid9.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid9.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid9.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid36.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/original/$uuid36.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    },
-    {
-      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid36.png",
-      "method": "HEAD",
-      "service": "s3_head"
-    }
-  ],
   "steps": [
     {
-      "body": {
-        "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid2.png",
-        "signatureThumbnailImageUrl": "https://cdn.test.chalkak/signatures/local/thumbnail/$uuid2.png"
-      },
+      "step": "정상 회원의 사인 조회",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -93,14 +37,14 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "정상 회원의 사인 조회"
+      "body": {
+        "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid2.png",
+        "signatureThumbnailImageUrl": "https://cdn.test.chalkak/signatures/local/thumbnail/$uuid2.png"
+      }
     },
     {
-      "body": {
-        "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid4.png",
-        "signatureThumbnailImageUrl": "https://cdn.test.chalkak/signatures/local/thumbnail/$uuid4.png"
-      },
+      "step": "정지 회원도 사인은 조회할 수 있다(validateExisting)",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -135,14 +79,14 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "정지 회원도 사인은 조회할 수 있다(validateExisting)"
+      "body": {
+        "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid4.png",
+        "signatureThumbnailImageUrl": "https://cdn.test.chalkak/signatures/local/thumbnail/$uuid4.png"
+      }
     },
     {
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      },
+      "step": "탈퇴 회원은 401",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -177,14 +121,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "탈퇴 회원은 401"
-    },
-    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 인증 정보입니다."
-      },
+      }
+    },
+    {
+      "step": "없는 회원은 401",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -219,14 +163,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "없는 회원은 401"
-    },
-    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 인증 정보입니다."
-      },
+      }
+    },
+    {
+      "step": "토큰 없이 조회하면 401",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -265,15 +209,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "토큰 없이 조회하면 401"
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      }
     },
     {
-      "body": {
-        "expiresInSeconds": 300,
-        "uploadId": "$uuid9",
-        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid9.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>"
-      },
+      "step": "사인 변경용 업로드 URL 발급",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -308,14 +251,15 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "사인 변경용 업로드 URL 발급"
+      "body": {
+        "uploadId": "$uuid9",
+        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid9.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
+        "expiresInSeconds": 300
+      }
     },
     {
-      "body": {
-        "errorCode": "FORBIDDEN",
-        "message": "차단된 회원입니다."
-      },
+      "step": "정지 회원은 업로드 URL을 받을 수 없다(validateUsable)",
+      "status": 403,
       "headers": [
         [
           "cache-control",
@@ -350,14 +294,14 @@
           "0"
         ]
       ],
-      "status": 403,
-      "step": "정지 회원은 업로드 URL을 받을 수 없다(validateUsable)"
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "차단된 회원입니다."
+      }
     },
     {
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      },
+      "step": "탈퇴 회원의 업로드 URL 발급은 401",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -392,14 +336,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "탈퇴 회원의 업로드 URL 발급은 401"
-    },
-    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 인증 정보입니다."
-      },
+      }
+    },
+    {
+      "step": "없는 회원의 업로드 URL 발급은 401",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -434,14 +378,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "없는 회원의 업로드 URL 발급은 401"
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      }
     },
     {
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      },
+      "step": "본문 없이 변경",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -476,14 +420,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "본문 없이 변경"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
-        "message": "사인 이미지 업로드 정보가 올바르지 않습니다."
-      },
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      }
+    },
+    {
+      "step": "업로드 ID가 없음",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -518,14 +462,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "업로드 ID가 없음"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "사인 이미지 업로드 정보가 올바르지 않습니다."
-      },
+      }
+    },
+    {
+      "step": "업로드 ID가 null",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -560,14 +504,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "업로드 ID가 null"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "사인 이미지 업로드 정보가 올바르지 않습니다."
-      },
+      }
+    },
+    {
+      "step": "업로드 ID가 빈 문자열",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -602,14 +546,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "업로드 ID가 빈 문자열"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      },
+        "message": "사인 이미지 업로드 정보가 올바르지 않습니다."
+      }
+    },
+    {
+      "step": "업로드 ID 형식 오류",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -644,14 +588,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "업로드 ID 형식 오류"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      },
+      }
+    },
+    {
+      "step": "업로드 ID가 숫자",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -686,14 +630,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "업로드 ID가 숫자"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      },
+      }
+    },
+    {
+      "step": "업로드 ID가 하이픈 없는 32자",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -728,14 +672,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "업로드 ID가 하이픈 없는 32자"
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      }
     },
     {
-      "body": {
-        "errorCode": "FORBIDDEN",
-        "message": "차단된 회원입니다."
-      },
+      "step": "정지 회원의 변경은 형식이 맞아도 403",
+      "status": 403,
       "headers": [
         [
           "cache-control",
@@ -770,14 +714,14 @@
           "0"
         ]
       ],
-      "status": 403,
-      "step": "정지 회원의 변경은 형식이 맞아도 403"
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "차단된 회원입니다."
+      }
     },
     {
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "사인 이미지 업로드 정보가 올바르지 않습니다."
-      },
+      "step": "정지 회원의 변경도 형식이 틀리면 400이 먼저",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -812,14 +756,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "정지 회원의 변경도 형식이 틀리면 400이 먼저"
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "사인 이미지 업로드 정보가 올바르지 않습니다."
+      }
     },
     {
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      },
+      "step": "탈퇴 회원의 변경은 401",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -854,14 +798,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "탈퇴 회원의 변경은 401"
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      }
     },
     {
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "업로드한 사인 이미지를 찾을 수 없습니다."
-      },
+      "step": "업로드한 이미지가 없음",
+      "status": 404,
       "headers": [
         [
           "cache-control",
@@ -896,14 +840,14 @@
           "0"
         ]
       ],
-      "status": 404,
-      "step": "업로드한 이미지가 없음"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
-        "message": "사용할 수 없는 사인 이미지입니다."
-      },
+        "message": "업로드한 사인 이미지를 찾을 수 없습니다."
+      }
+    },
+    {
+      "step": "PNG가 아닌 이미지",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -938,14 +882,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "PNG가 아닌 이미지"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "사용할 수 없는 사인 이미지입니다."
-      },
+      }
+    },
+    {
+      "step": "1MiB를 넘는 이미지",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -980,13 +924,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "1MiB를 넘는 이미지"
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "사용할 수 없는 사인 이미지입니다."
+      }
     },
     {
-      "body": {
-        "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid2.png"
-      },
+      "step": "정확히 1MiB인 PNG는 처리 시작",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -1021,13 +966,13 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "정확히 1MiB인 PNG는 처리 시작"
-    },
-    {
       "body": {
         "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid2.png"
-      },
+      }
+    },
+    {
+      "step": "처리 중에 같은 업로드 ID로 다시 변경하면 같은 응답",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -1062,14 +1007,13 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "처리 중에 같은 업로드 ID로 다시 변경하면 같은 응답"
+      "body": {
+        "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid2.png"
+      }
     },
     {
-      "body": {
-        "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid2.png",
-        "signatureThumbnailImageUrl": "https://cdn.test.chalkak/signatures/local/thumbnail/$uuid2.png"
-      },
+      "step": "처리 중에도 이전 사인은 조회된다",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -1104,14 +1048,14 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "처리 중에도 이전 사인은 조회된다"
-    },
-    {
       "body": {
         "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid2.png",
         "signatureThumbnailImageUrl": "https://cdn.test.chalkak/signatures/local/thumbnail/$uuid2.png"
-      },
+      }
+    },
+    {
+      "step": "처리 시작 6분 50초 뒤는 아직 유효",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -1146,14 +1090,14 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "처리 시작 6분 50초 뒤는 아직 유효"
-    },
-    {
       "body": {
         "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid2.png",
         "signatureThumbnailImageUrl": "https://cdn.test.chalkak/signatures/local/thumbnail/$uuid2.png"
-      },
+      }
+    },
+    {
+      "step": "7분 20초가 지나면 다시 등록해야 한다(조회)",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -1188,14 +1132,14 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "7분 20초가 지나면 다시 등록해야 한다(조회)"
+      "body": {
+        "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid2.png",
+        "signatureThumbnailImageUrl": "https://cdn.test.chalkak/signatures/local/thumbnail/$uuid2.png"
+      }
     },
     {
-      "body": {
-        "errorCode": "SIGNATURE_REUPLOAD_REQUIRED",
-        "message": "사인 이미지 처리에 실패했습니다. 새로운 업로드 ID를 발급받아 이미지를 다시 업로드해 주세요."
-      },
+      "step": "시간이 지난 업로드 ID로 변경하면 재업로드 필요",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -1230,13 +1174,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "시간이 지난 업로드 ID로 변경하면 재업로드 필요"
+      "body": {
+        "errorCode": "SIGNATURE_REUPLOAD_REQUIRED",
+        "message": "사인 이미지 처리에 실패했습니다. 새로운 업로드 ID를 발급받아 이미지를 다시 업로드해 주세요."
+      }
     },
     {
-      "body": {
-        "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid2.png"
-      },
+      "step": "현재 사인과 같은 업로드 ID는 처리 상태만 정리하고 성공",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -1271,14 +1216,13 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "현재 사인과 같은 업로드 ID는 처리 상태만 정리하고 성공"
+      "body": {
+        "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid2.png"
+      }
     },
     {
-      "body": {
-        "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid2.png",
-        "signatureThumbnailImageUrl": "https://cdn.test.chalkak/signatures/local/thumbnail/$uuid2.png"
-      },
+      "step": "정리 뒤 조회는 다시 가능",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -1313,14 +1257,14 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "정리 뒤 조회는 다시 가능"
+      "body": {
+        "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid2.png",
+        "signatureThumbnailImageUrl": "https://cdn.test.chalkak/signatures/local/thumbnail/$uuid2.png"
+      }
     },
     {
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "업로드한 사인 이미지를 찾을 수 없습니다."
-      },
+      "step": "다른 회원이 쓰는 사인 이미지의 업로드 ID는 찾을 수 없음",
+      "status": 404,
       "headers": [
         [
           "cache-control",
@@ -1355,15 +1299,14 @@
           "0"
         ]
       ],
-      "status": 404,
-      "step": "다른 회원이 쓰는 사인 이미지의 업로드 ID는 찾을 수 없음"
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "업로드한 사인 이미지를 찾을 수 없습니다."
+      }
     },
     {
-      "body": {
-        "expiresInSeconds": 300,
-        "uploadId": "$uuid36",
-        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid36.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+420s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>"
-      },
+      "step": "새 업로드 ID 발급",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -1398,13 +1341,15 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "새 업로드 ID 발급"
+      "body": {
+        "uploadId": "$uuid36",
+        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid36.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+420s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
+        "expiresInSeconds": 300
+      }
     },
     {
-      "body": {
-        "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid36.png"
-      },
+      "step": "original과 thumbnail이 모두 있으면 바로 완료",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -1439,14 +1384,13 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "original과 thumbnail이 모두 있으면 바로 완료"
+      "body": {
+        "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid36.png"
+      }
     },
     {
-      "body": {
-        "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid36.png",
-        "signatureThumbnailImageUrl": "https://cdn.test.chalkak/signatures/local/thumbnail/$uuid36.png"
-      },
+      "step": "완료 뒤 조회는 새 사인",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -1481,13 +1425,14 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "완료 뒤 조회는 새 사인"
+      "body": {
+        "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid36.png",
+        "signatureThumbnailImageUrl": "https://cdn.test.chalkak/signatures/local/thumbnail/$uuid36.png"
+      }
     },
     {
-      "body": {
-        "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid36.png"
-      },
+      "step": "대문자·공백이 섞인 업로드 ID도 같은 UUID로 읽힌다",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -1522,8 +1467,63 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "대문자·공백이 섞인 업로드 ID도 같은 UUID로 읽힌다"
+      "body": {
+        "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid36.png"
+      }
+    }
+  ],
+  "db": {
+    "users": [
+      "{\"id\":\"$uuid?\",\"email\":\"a@example.com\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+440s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid36.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid36.png\"}",
+      "{\"id\":\"$uuid?\",\"email\":\"b@example.com\",\"status\":\"BANNED\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid4.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid4.png\"}",
+      "{\"id\":\"$uuid?\",\"email\":null,\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t+0s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid?.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid?.png\"}"
+    ]
+  },
+  "fakes": [
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid9.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/original/$uuid9.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid9.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid9.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid9.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid9.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid36.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/original/$uuid36.png"
+    },
+    {
+      "service": "s3_head",
+      "method": "HEAD",
+      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid36.png"
     }
   ]
 }

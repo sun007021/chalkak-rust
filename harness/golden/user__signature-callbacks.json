@@ -1,18 +1,8 @@
 {
-  "db": {
-    "users": [
-      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"a@example.com\",\"id\":\"$uuid?\",\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid23.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid23.png\",\"status\":\"ACTIVE\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"b@example.com\",\"id\":\"$uuid?\",\"pending_signature_upload_id\":\"$uuid?\",\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid?.png\",\"signature_processing_started_at\":\"<t-480s db +09:00>\",\"signature_processing_status\":\"FAILED\",\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid?.png\",\"status\":\"ACTIVE\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"c@example.com\",\"id\":\"$uuid?\",\"pending_signature_upload_id\":\"$uuid?\",\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid?.png\",\"signature_processing_started_at\":\"<t+0s db +09:00>\",\"signature_processing_status\":\"FAILED\",\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid?.png\",\"status\":\"ACTIVE\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"e@example.com\",\"id\":\"$uuid?\",\"pending_signature_upload_id\":\"$uuid?\",\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid?.png\",\"signature_processing_started_at\":\"<t+0s db +09:00>\",\"signature_processing_status\":\"FAILED\",\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid?.png\",\"status\":\"ACTIVE\",\"updated_at\":\"<t+0s db +09:00>\"}"
-    ]
-  },
   "steps": [
     {
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 이미지 처리 콜백입니다."
-      },
+      "step": "헤더가 모두 없으면 401",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -47,14 +37,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "헤더가 모두 없으면 401"
-    },
-    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 이미지 처리 콜백입니다."
-      },
+      }
+    },
+    {
+      "step": "타임스탬프만 없음",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -89,14 +79,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "타임스탬프만 없음"
-    },
-    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 이미지 처리 콜백입니다."
-      },
+      }
+    },
+    {
+      "step": "서명만 없음",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -131,14 +121,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "서명만 없음"
-    },
-    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 이미지 처리 콜백입니다."
-      },
+      }
+    },
+    {
+      "step": "타임스탬프가 숫자가 아님",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -173,14 +163,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "타임스탬프가 숫자가 아님"
-    },
-    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 이미지 처리 콜백입니다."
-      },
+      }
+    },
+    {
+      "step": "다른 비밀키로 서명",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -215,14 +205,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "다른 비밀키로 서명"
-    },
-    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 이미지 처리 콜백입니다."
-      },
+      }
+    },
+    {
+      "step": "다른 환경(audience)으로 서명",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -257,14 +247,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "다른 환경(audience)으로 서명"
-    },
-    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 이미지 처리 콜백입니다."
-      },
+      }
+    },
+    {
+      "step": "다른 콜백 경로의 서명을 재사용",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -299,14 +289,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "다른 콜백 경로의 서명을 재사용"
-    },
-    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 이미지 처리 콜백입니다."
-      },
+      }
+    },
+    {
+      "step": "서명 접두어(v1=)가 없음",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -341,14 +331,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "서명 접두어(v1=)가 없음"
-    },
-    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 이미지 처리 콜백입니다."
-      },
+      }
+    },
+    {
+      "step": "서명이 16진수가 아님",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -383,14 +373,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "서명이 16진수가 아님"
-    },
-    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 이미지 처리 콜백입니다."
-      },
+      }
+    },
+    {
+      "step": "서명이 틀림",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -425,14 +415,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "서명이 틀림"
-    },
-    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 이미지 처리 콜백입니다."
-      },
+      }
+    },
+    {
+      "step": "300초 전 타임스탬프는 통과(없는 업로드라 204)",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -467,14 +457,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "300초 전 타임스탬프는 통과(없는 업로드라 204)"
-    },
-    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 이미지 처리 콜백입니다."
-      },
+      }
+    },
+    {
+      "step": "301초 전은 거절",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -509,11 +499,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "301초 전은 거절"
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 이미지 처리 콜백입니다."
+      }
     },
     {
-      "body": "",
+      "step": "30초 뒤 타임스탬프는 통과",
+      "status": 204,
       "headers": [
         [
           "cache-control",
@@ -544,11 +537,11 @@
           "0"
         ]
       ],
-      "status": 204,
-      "step": "30초 뒤 타임스탬프는 통과"
+      "body": ""
     },
     {
-      "body": "",
+      "step": "31초 뒤는 거절",
+      "status": 204,
       "headers": [
         [
           "cache-control",
@@ -579,14 +572,11 @@
           "0"
         ]
       ],
-      "status": 204,
-      "step": "31초 뒤는 거절"
+      "body": ""
     },
     {
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 이미지 처리 콜백입니다."
-      },
+      "step": "관리자 토큰이 있어도 콜백 인증은 서명으로만 한다",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -621,14 +611,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "관리자 토큰이 있어도 콜백 인증은 서명으로만 한다"
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 이미지 처리 콜백입니다."
+      }
     },
     {
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "ID 형식이 올바르지 않습니다."
-      },
+      "step": "업로드 ID 형식이 틀리면 인증보다 먼저 400",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -663,14 +653,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "업로드 ID 형식이 틀리면 인증보다 먼저 400"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "ID 형식이 올바르지 않습니다."
-      },
+      }
+    },
+    {
+      "step": "하이픈 없는 업로드 ID는 표준형이 아니라 400",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -705,14 +695,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "하이픈 없는 업로드 ID는 표준형이 아니라 400"
-    },
-    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "ID 형식이 올바르지 않습니다."
-      },
+      }
+    },
+    {
+      "step": "자리수가 짧은 UUID(UUID.fromString은 받지만 표준형이 아님)도 400",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -747,16 +737,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "자리수가 짧은 UUID(UUID.fromString은 받지만 표준형이 아님)도 400"
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "ID 형식이 올바르지 않습니다."
+      }
     },
     {
-      "body": {
-        "cacheControl": "public, max-age=86400",
-        "contentType": "image/png",
-        "originalUploadUrl": "http://test-bucket.fakes:9000/chalkak/signatures/local/original/$uuid20.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=cache-control%3Bcontent-type%3Bhost%3Bif-none-match&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
-        "thumbnailUploadUrl": "http://test-bucket.fakes:9000/chalkak/signatures/local/thumbnail/$uuid20.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=cache-control%3Bcontent-type%3Bhost%3Bif-none-match&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>"
-      },
+      "step": "대문자 업로드 ID는 표준형으로 읽고 소문자 경로로 서명한다",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -791,14 +779,16 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "대문자 업로드 ID는 표준형으로 읽고 소문자 경로로 서명한다"
+      "body": {
+        "originalUploadUrl": "http://test-bucket.fakes:9000/chalkak/signatures/local/original/$uuid20.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=cache-control%3Bcontent-type%3Bhost%3Bif-none-match&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
+        "thumbnailUploadUrl": "http://test-bucket.fakes:9000/chalkak/signatures/local/thumbnail/$uuid20.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=cache-control%3Bcontent-type%3Bhost%3Bif-none-match&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
+        "contentType": "image/png",
+        "cacheControl": "public, max-age=86400"
+      }
     },
     {
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 이미지 처리 콜백입니다."
-      },
+      "step": "대문자 경로 그대로 서명하면 거절",
+      "status": 401,
       "headers": [
         [
           "cache-control",
@@ -833,16 +823,14 @@
           "0"
         ]
       ],
-      "status": 401,
-      "step": "대문자 경로 그대로 서명하면 거절"
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 이미지 처리 콜백입니다."
+      }
     },
     {
-      "body": {
-        "cacheControl": "public, max-age=86400",
-        "contentType": "image/png",
-        "originalUploadUrl": "http://test-bucket.fakes:9000/chalkak/signatures/local/original/$uuid23.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=cache-control%3Bcontent-type%3Bhost%3Bif-none-match&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
-        "thumbnailUploadUrl": "http://test-bucket.fakes:9000/chalkak/signatures/local/thumbnail/$uuid23.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=cache-control%3Bcontent-type%3Bhost%3Bif-none-match&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>"
-      },
+      "step": "처리용 업로드 URL 발급",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -877,16 +865,16 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "처리용 업로드 URL 발급"
+      "body": {
+        "originalUploadUrl": "http://test-bucket.fakes:9000/chalkak/signatures/local/original/$uuid23.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=cache-control%3Bcontent-type%3Bhost%3Bif-none-match&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
+        "thumbnailUploadUrl": "http://test-bucket.fakes:9000/chalkak/signatures/local/thumbnail/$uuid23.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=cache-control%3Bcontent-type%3Bhost%3Bif-none-match&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
+        "contentType": "image/png",
+        "cacheControl": "public, max-age=86400"
+      }
     },
     {
-      "body": {
-        "cacheControl": "public, max-age=86400",
-        "contentType": "image/png",
-        "originalUploadUrl": "http://test-bucket.fakes:9000/chalkak/signatures/local/original/$uuid20.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=cache-control%3Bcontent-type%3Bhost%3Bif-none-match&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
-        "thumbnailUploadUrl": "http://test-bucket.fakes:9000/chalkak/signatures/local/thumbnail/$uuid20.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=cache-control%3Bcontent-type%3Bhost%3Bif-none-match&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>"
-      },
+      "step": "회원이 없는 업로드 ID도 URL은 발급된다",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -921,14 +909,16 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "회원이 없는 업로드 ID도 URL은 발급된다"
+      "body": {
+        "originalUploadUrl": "http://test-bucket.fakes:9000/chalkak/signatures/local/original/$uuid20.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=cache-control%3Bcontent-type%3Bhost%3Bif-none-match&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
+        "thumbnailUploadUrl": "http://test-bucket.fakes:9000/chalkak/signatures/local/thumbnail/$uuid20.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=cache-control%3Bcontent-type%3Bhost%3Bif-none-match&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
+        "contentType": "image/png",
+        "cacheControl": "public, max-age=86400"
+      }
     },
     {
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      },
+      "step": "GET은 허용되지 않음",
+      "status": 405,
       "headers": [
         [
           "cache-control",
@@ -963,11 +953,14 @@
           "0"
         ]
       ],
-      "status": 405,
-      "step": "GET은 허용되지 않음"
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "지원하지 않는 요청 방식이거나 형식입니다."
+      }
     },
     {
-      "body": "",
+      "step": "처리 중인 회원의 완료 콜백",
+      "status": 204,
       "headers": [
         [
           "cache-control",
@@ -998,11 +991,11 @@
           "0"
         ]
       ],
-      "status": 204,
-      "step": "처리 중인 회원의 완료 콜백"
+      "body": ""
     },
     {
-      "body": "",
+      "step": "완료 콜백을 다시 받아도 204",
+      "status": 204,
       "headers": [
         [
           "cache-control",
@@ -1033,14 +1026,11 @@
           "0"
         ]
       ],
-      "status": 204,
-      "step": "완료 콜백을 다시 받아도 204"
+      "body": ""
     },
     {
-      "body": {
-        "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid23.png",
-        "signatureThumbnailImageUrl": "https://cdn.test.chalkak/signatures/local/thumbnail/$uuid23.png"
-      },
+      "step": "완료 뒤 사인 조회는 새 이미지",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -1075,11 +1065,14 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "완료 뒤 사인 조회는 새 이미지"
+      "body": {
+        "signatureOriginalImageUrl": "https://cdn.test.chalkak/signatures/local/original/$uuid23.png",
+        "signatureThumbnailImageUrl": "https://cdn.test.chalkak/signatures/local/thumbnail/$uuid23.png"
+      }
     },
     {
-      "body": "",
+      "step": "처리 시간이 지난 회원의 완료 콜백은 무시",
+      "status": 204,
       "headers": [
         [
           "cache-control",
@@ -1110,11 +1103,11 @@
           "0"
         ]
       ],
-      "status": 204,
-      "step": "처리 시간이 지난 회원의 완료 콜백은 무시"
+      "body": ""
     },
     {
-      "body": "",
+      "step": "실패한 회원의 완료 콜백은 무시",
+      "status": 204,
       "headers": [
         [
           "cache-control",
@@ -1145,11 +1138,11 @@
           "0"
         ]
       ],
-      "status": 204,
-      "step": "실패한 회원의 완료 콜백은 무시"
+      "body": ""
     },
     {
-      "body": "",
+      "step": "없는 업로드 ID의 완료 콜백도 204",
+      "status": 204,
       "headers": [
         [
           "cache-control",
@@ -1180,11 +1173,11 @@
           "0"
         ]
       ],
-      "status": 204,
-      "step": "없는 업로드 ID의 완료 콜백도 204"
+      "body": ""
     },
     {
-      "body": "",
+      "step": "처리 중인 회원의 실패 콜백",
+      "status": 204,
       "headers": [
         [
           "cache-control",
@@ -1215,14 +1208,11 @@
           "0"
         ]
       ],
-      "status": 204,
-      "step": "처리 중인 회원의 실패 콜백"
+      "body": ""
     },
     {
-      "body": {
-        "errorCode": "SIGNATURE_REGISTRATION_REQUIRED",
-        "message": "사인 이미지 처리에 실패했습니다. 사인을 다시 등록해 주세요."
-      },
+      "step": "실패 뒤 사인 조회는 다시 등록 필요",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -1257,14 +1247,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "실패 뒤 사인 조회는 다시 등록 필요"
+      "body": {
+        "errorCode": "SIGNATURE_REGISTRATION_REQUIRED",
+        "message": "사인 이미지 처리에 실패했습니다. 사인을 다시 등록해 주세요."
+      }
     },
     {
-      "body": {
-        "errorCode": "SIGNATURE_REUPLOAD_REQUIRED",
-        "message": "사인 이미지 처리에 실패했습니다. 새로운 업로드 ID를 발급받아 이미지를 다시 업로드해 주세요."
-      },
+      "step": "실패 뒤 같은 업로드 ID로 변경하면 재업로드 필요",
+      "status": 400,
       "headers": [
         [
           "cache-control",
@@ -1299,11 +1289,14 @@
           "0"
         ]
       ],
-      "status": 400,
-      "step": "실패 뒤 같은 업로드 ID로 변경하면 재업로드 필요"
+      "body": {
+        "errorCode": "SIGNATURE_REUPLOAD_REQUIRED",
+        "message": "사인 이미지 처리에 실패했습니다. 새로운 업로드 ID를 발급받아 이미지를 다시 업로드해 주세요."
+      }
     },
     {
-      "body": "",
+      "step": "실패 콜백을 다시 받아도 204",
+      "status": 204,
       "headers": [
         [
           "cache-control",
@@ -1334,11 +1327,11 @@
           "0"
         ]
       ],
-      "status": 204,
-      "step": "실패 콜백을 다시 받아도 204"
+      "body": ""
     },
     {
-      "body": "",
+      "step": "시간이 지난 처리의 실패 콜백은 FAILED로 바꾼다",
+      "status": 204,
       "headers": [
         [
           "cache-control",
@@ -1369,11 +1362,11 @@
           "0"
         ]
       ],
-      "status": 204,
-      "step": "시간이 지난 처리의 실패 콜백은 FAILED로 바꾼다"
+      "body": ""
     },
     {
-      "body": "",
+      "step": "없는 업로드 ID의 실패 콜백도 204",
+      "status": 204,
       "headers": [
         [
           "cache-control",
@@ -1404,8 +1397,15 @@
           "0"
         ]
       ],
-      "status": 204,
-      "step": "없는 업로드 ID의 실패 콜백도 204"
+      "body": ""
     }
-  ]
+  ],
+  "db": {
+    "users": [
+      "{\"id\":\"$uuid?\",\"email\":\"a@example.com\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid23.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid23.png\"}",
+      "{\"id\":\"$uuid?\",\"email\":\"b@example.com\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":\"$uuid?\",\"signature_processing_status\":\"FAILED\",\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid?.png\",\"signature_processing_started_at\":\"<t-480s db +09:00>\",\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid?.png\"}",
+      "{\"id\":\"$uuid?\",\"email\":\"c@example.com\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":\"$uuid?\",\"signature_processing_status\":\"FAILED\",\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid?.png\",\"signature_processing_started_at\":\"<t+0s db +09:00>\",\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid?.png\"}",
+      "{\"id\":\"$uuid?\",\"email\":\"e@example.com\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":\"$uuid?\",\"signature_processing_status\":\"FAILED\",\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid?.png\",\"signature_processing_started_at\":\"<t+0s db +09:00>\",\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid?.png\"}"
+    ]
+  }
 }

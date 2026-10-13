@@ -1,19 +1,8 @@
 {
-  "db": {
-    "topics": [
-      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t+43210s db +09:00>\",\"id\":\"$uuid2\",\"starts_at\":\"<t+10s db +09:00>\",\"title\":\"9시에 열리는 주제\",\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t+0s db +09:00>\"}"
-    ]
-  },
   "steps": [
     {
-      "body": {
-        "endsAt": "<t+43210s iso Z>",
-        "id": "$uuid2",
-        "phase": "BEFORE_OPEN",
-        "startsAt": "<t+10s iso Z>",
-        "title": "9시에 열리는 주제",
-        "topicDate": "2026-10-12"
-      },
+      "step": "열리기 전",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -48,18 +37,18 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "열리기 전"
+      "body": {
+        "id": "$uuid2",
+        "title": "9시에 열리는 주제",
+        "topicDate": "2026-10-12",
+        "startsAt": "<t+10s iso Z>",
+        "endsAt": "<t+43210s iso Z>",
+        "phase": "BEFORE_OPEN"
+      }
     },
     {
-      "body": {
-        "endsAt": "<t+43210s iso Z>",
-        "id": "$uuid2",
-        "phase": "OPEN",
-        "startsAt": "<t+10s iso Z>",
-        "title": "9시에 열리는 주제",
-        "topicDate": "2026-10-12"
-      },
+      "step": "20초 뒤 열림",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -94,18 +83,18 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "20초 뒤 열림"
+      "body": {
+        "id": "$uuid2",
+        "title": "9시에 열리는 주제",
+        "topicDate": "2026-10-12",
+        "startsAt": "<t+10s iso Z>",
+        "endsAt": "<t+43210s iso Z>",
+        "phase": "OPEN"
+      }
     },
     {
-      "body": {
-        "endsAt": "<t+43210s iso Z>",
-        "id": "$uuid2",
-        "phase": "CLOSED",
-        "startsAt": "<t+10s iso Z>",
-        "title": "9시에 열리는 주제",
-        "topicDate": "2026-10-12"
-      },
+      "step": "12시간 뒤 마감",
+      "status": 200,
       "headers": [
         [
           "cache-control",
@@ -140,8 +129,19 @@
           "0"
         ]
       ],
-      "status": 200,
-      "step": "12시간 뒤 마감"
+      "body": {
+        "id": "$uuid2",
+        "title": "9시에 열리는 주제",
+        "topicDate": "2026-10-12",
+        "startsAt": "<t+10s iso Z>",
+        "endsAt": "<t+43210s iso Z>",
+        "phase": "CLOSED"
+      }
     }
-  ]
+  ],
+  "db": {
+    "topics": [
+      "{\"id\":\"$uuid2\",\"title\":\"9시에 열리는 주제\",\"ends_at\":\"<t+43210s db +09:00>\",\"starts_at\":\"<t+10s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ]
+  }
 }
