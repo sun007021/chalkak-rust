@@ -1,0 +1,147 @@
+name = "게시물: 업로드 발급 - 작성 - 처리 콜백 - 반려 후 재작성"
+tags = ["p19", "post", "photo"]
+clock = "2026-10-12T09:00:00+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO users (id, email, signature_original_storage_key) VALUES
+  ('01990000-0000-7000-8000-000000000001', 'u1@test.chalkak', 'chalkak/signatures/u1/original.png'),
+  ('01990000-0000-7000-8000-000000000002', 'u2@test.chalkak', 'chalkak/signatures/u2/original.png'),
+  ('01990000-0000-7000-8000-000000000003', 'u3@test.chalkak', 'chalkak/signatures/u3/original.png');
+INSERT INTO topics (id, title, topic_date, starts_at, ends_at) VALUES
+  ('01990000-0000-7000-8000-0000000000f1', '가을 하늘', '2026-10-12', '2026-10-12T00:00:00+09:00', '2026-10-13T00:00:00+09:00')
+"""]
+
+[[step]]
+name = "업로드 URL 발급"
+method = "POST"
+path = "/api/v1/posts/uploads"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+capture = { uploadId = "uploadId" }
+
+[[step]]
+name = "사진을 올리기 전에는 작성할 수 없다"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"${uploadId}","title":"가을"}'''
+
+[[step]]
+name = "staging 사진이 있으면 VALIDATING으로 작성된다"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"${uploadId}","title":"가을"}'''
+capture = { postId = "postId" }
+[step.fakes.s3."chalkak/staging/local/posts/${uploadId}.webp"]
+size = 2048
+content_type = "image/webp"
+
+[[step]]
+name = "내 오늘 게시물 상태"
+method = "GET"
+path = "/api/v1/posts/today"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "같은 주제에 다시 작성할 수 없다"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"${uploadId}","title":"또"}'''
+
+[[step]]
+name = "처리 완료 콜백이 게시물을 검수 대기로 올린다"
+method = "POST"
+path = "/internal/v1/post-image-processing/${uploadId}/complete"
+body = '''{"width":4032,"height":3024,"byteSize":183423,"location":{"latitude":37.5665,"longitude":126.978},"capturedAt":"2026-10-12T08:30:00+09:00","metaAttributes":{"make":"Apple","iso":100}}'''
+callback = {}
+
+[[step]]
+name = "같은 콜백을 다시 보내도 같다"
+method = "POST"
+path = "/internal/v1/post-image-processing/${uploadId}/complete"
+body = '''{"width":4032,"height":3024,"byteSize":183423}'''
+callback = {}
+
+[[step]]
+name = "작성자는 검수 대기 게시물을 본다"
+method = "GET"
+path = "/api/v1/posts/${postId}"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "다른 회원은 검수 대기 게시물을 못 본다"
+method = "GET"
+path = "/api/v1/posts/${postId}"
+auth = { user = "01990000-0000-7000-8000-000000000002" }
+
+[[step]]
+name = "다른 회원의 업로드 발급"
+method = "POST"
+path = "/api/v1/posts/uploads"
+auth = { user = "01990000-0000-7000-8000-000000000002" }
+capture = { uploadId2 = "uploadId" }
+
+[[step]]
+name = "게시물보다 먼저 처리 완료"
+method = "POST"
+path = "/internal/v1/post-image-processing/${uploadId2}/complete"
+body = '''{"width":100,"height":200}'''
+callback = {}
+
+[[step]]
+name = "처리가 끝난 업로드로 작성하면 바로 검수 대기다"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000002" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"${uploadId2}"}'''
+capture = { postId2 = "postId" }
+
+[[step]]
+name = "세 번째 회원 업로드 발급"
+method = "POST"
+path = "/api/v1/posts/uploads"
+auth = { user = "01990000-0000-7000-8000-000000000003" }
+capture = { uploadId3 = "uploadId" }
+
+[[step]]
+name = "세 번째 회원 작성"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000003" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"${uploadId3}","title":"반려"}'''
+capture = { postId3 = "postId" }
+[step.fakes.s3."chalkak/staging/local/posts/${uploadId3}.webp"]
+size = 10
+content_type = "image/webp"
+
+[[step]]
+name = "처리 실패 콜백이 게시물을 반려한다"
+method = "POST"
+path = "/internal/v1/post-image-processing/${uploadId3}/failed"
+body = '''{"reason":"UNSUPPORTED_FORMAT"}'''
+callback = {}
+
+[[step]]
+name = "반려된 게시물 상태"
+method = "GET"
+path = "/api/v1/posts/today"
+auth = { user = "01990000-0000-7000-8000-000000000003" }
+
+[[step]]
+name = "반려 뒤에는 다시 업로드해 작성할 수 있다"
+method = "POST"
+path = "/api/v1/posts/uploads"
+auth = { user = "01990000-0000-7000-8000-000000000003" }
+capture = { uploadId4 = "uploadId" }
+
+[[step]]
+name = "재작성"
+method = "POST"
+path = "/api/v1/posts"
+auth = { user = "01990000-0000-7000-8000-000000000003" }
+body = '''{"topicId":"01990000-0000-7000-8000-0000000000f1","photoUploadId":"${uploadId4}"}'''
+[step.fakes.s3."chalkak/staging/local/posts/${uploadId4}.webp"]
+size = 10
+content_type = "image/webp"

@@ -10,6 +10,7 @@ use chalkak_aws::S3Endpoint;
 use chalkak_core::config::{ConfigError, Env};
 
 use crate::common::hex_decode;
+use crate::post::PostSettings;
 
 /// `chalkak.auth.*`의 발급자·대상. 원본 `application.yml`의 고정값이다.
 pub const TOKEN_ISSUER: &str = "chalkak-backend";
@@ -68,16 +69,9 @@ pub struct ImageSettings {
 }
 
 #[derive(Clone, Debug)]
-pub struct CallbackSettings {
-    pub secret: String,
-    pub max_body_bytes: u64,
-}
-
-#[derive(Clone, Debug)]
 pub struct AppSettings {
     pub auth: AuthSettings,
     pub image: ImageSettings,
-    pub callback: CallbackSettings,
     /// `chalkak.user.signature-processing-timeout`.
     pub signature_processing_timeout: Duration,
 }
@@ -118,12 +112,10 @@ impl AppSettings {
     /// 익명 접근이 기본 켜진다(`application-local.yml`).
     pub fn from_env(
         env: &Env,
-        image_environment: &str,
+        post: &PostSettings,
         access_token_key: Vec<u8>,
         access_token_expiration: Duration,
     ) -> Result<AppSettings, ConfigError> {
-        let local = image_environment == "local";
-
         let refresh_inactivity = positive(env, "REFRESH_TOKEN_INACTIVITY_EXPIRATION")?;
         let refresh_absolute = positive(env, "REFRESH_TOKEN_ABSOLUTE_EXPIRATION")?;
         if refresh_inactivity > refresh_absolute {
@@ -192,54 +184,29 @@ impl AppSettings {
             },
         };
 
-        let pick = |key: &str, local_default: &str| -> Result<String, ConfigError> {
-            if local {
-                Ok(env.string_or(key, local_default).to_owned())
-            } else {
-                Ok(env.required(key)?.to_owned())
-            }
-        };
-        let root_prefix = pick("S3_PREFIX", "chalkak")?;
-        if root_prefix.is_empty() || root_prefix.split('/').any(str::is_empty) {
-            return Err(invalid(
-                "S3_PREFIX",
-                "root-prefix는 앞뒤 슬래시와 빈 구간 없이 작성해야 합니다",
-            ));
+        // 버킷·접두사·CDN 주소·익명 접근·S3 엔드포인트·콜백 비밀키와 본문 상한은 게시물 흐름과 같은 값이다.
+        // 읽고 검증하는 곳을 `PostSettings` 하나로 두고 여기서는 가져다 쓴다.
+        let endpoint = match post.s3_endpoint_url.as_deref() {
+            Some(url) => S3Endpoint::custom(url, false),
+            None => Ok(S3Endpoint::aws()),
         }
-        let endpoint = S3Endpoint::from_env(&|name| env.get(name).map(str::to_owned))
-            .map_err(|e| invalid("AWS_ENDPOINT_URL_S3", &e.to_string()))?;
+        .map_err(|e| invalid("AWS_ENDPOINT_URL_S3", &e.to_string()))?;
         let image = ImageSettings {
-            bucket: pick("S3_BUCKET", "chalkak-local-images")?,
-            region: env.string_or("AWS_REGION", "ap-northeast-2").to_owned(),
-            base_url: pick("CLOUDFRONT_BASE_URL", "http://localhost:4566")?,
-            root_prefix,
-            environment: image_environment.to_owned(),
+            bucket: post.image.bucket.clone(),
+            region: post.image.region.clone(),
+            base_url: post.cloudfront_base_url.clone(),
+            root_prefix: post.image.root_prefix.clone(),
+            environment: post.image.environment.clone(),
             signature_max_bytes: 1_048_576,
             signature_content_types: vec!["image/png".to_owned()],
             signature_cache_control: "public, max-age=86400".to_owned(),
-            anonymous_access: env.bool_or("CHALKAK_IMAGE_ANONYMOUSACCESS", local)?,
+            anonymous_access: post.image.anonymous_access,
             endpoint,
         };
-
-        let secret = env.required("IMAGE_PROCESSOR_CALLBACK_SECRET")?;
-        if secret.chars().count() < 32 {
-            return Err(invalid(
-                "IMAGE_PROCESSOR_CALLBACK_SECRET",
-                "32자 이상이어야 합니다",
-            ));
-        }
-        let max_body_bytes: u64 = env.required_parsed("CALLBACK_MAX_BODY_BYTES")?;
-        if max_body_bytes == 0 {
-            return Err(invalid("CALLBACK_MAX_BODY_BYTES", "0보다 커야 합니다"));
-        }
 
         Ok(AppSettings {
             auth,
             image,
-            callback: CallbackSettings {
-                secret: secret.to_owned(),
-                max_body_bytes,
-            },
             signature_processing_timeout: positive(env, "SIGNATURE_PROCESSING_TIMEOUT")?,
         })
     }
@@ -247,7 +214,7 @@ impl AppSettings {
 
 /// 테스트가 `Settings::from_env`에 넘길 수 있는 최소 환경변수(auth·user 도메인 필수 값). 실제 비밀값이 아니다.
 #[doc(hidden)]
-pub const TEST_ENV: [(&str, &str); 17] = [
+pub const TEST_ENV: [(&str, &str); 19] = [
     (
         "SOCIAL_SIGNUP_TOKEN_SECRET",
         "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
@@ -278,9 +245,23 @@ pub const TEST_ENV: [(&str, &str); 17] = [
         "test-callback-secret-with-enough-length",
     ),
     ("CALLBACK_MAX_BODY_BYTES", "65536"),
+    ("CLOUDFRONT_ORIGIN_PATH", "/chalkak"),
+    ("POST_IMAGE_PROCESSING_TIMEOUT", "7m"),
     ("SIGNATURE_PROCESSING_TIMEOUT", "7m"),
     ("CHALKAK_IMAGE_ANONYMOUSACCESS", "false"),
 ];
+
+/// 통합 시험용: [`TEST_ENV`]로 만든 설정. 게시물 설정은 호출자가 이미 가진 것을 쓴다.
+#[doc(hidden)]
+pub fn test_settings(post: &PostSettings) -> AppSettings {
+    AppSettings::from_env(
+        &Env::from_pairs(TEST_ENV),
+        post,
+        vec![0x00, 0x11],
+        Duration::from_secs(900),
+    )
+    .expect("시험 환경변수는 항상 유효하다")
+}
 
 #[cfg(test)]
 mod tests {
@@ -293,7 +274,8 @@ mod tests {
     }
 
     fn parse(env: &Env, profile: &str) -> Result<AppSettings, ConfigError> {
-        AppSettings::from_env(env, profile, vec![0], Duration::from_secs(900))
+        let post = PostSettings::from_env(env, profile)?;
+        AppSettings::from_env(env, &post, vec![0], Duration::from_secs(900))
     }
 
     // application.yml / application-local.yml
@@ -314,7 +296,6 @@ mod tests {
         assert_eq!(s.image.root_prefix, "chalkak");
         assert_eq!(s.image.signature_max_bytes, 1_048_576);
         assert_eq!(s.signature_processing_timeout, Duration::from_secs(420));
-        assert_eq!(s.callback.max_body_bytes, 65536);
     }
 
     #[test]

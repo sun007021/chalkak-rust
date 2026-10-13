@@ -8,7 +8,6 @@ use std::sync::Arc;
 use crate::AppContext;
 use crate::auth::UsableUserPolicy;
 use crate::auth::apple::{AppleHttpTokenClient, AppleTokenClient};
-use crate::auth::callback::ProcessingCallbackAuthenticator;
 use crate::auth::domain::RefreshTokenPolicy;
 use crate::auth::oidc::SocialIdentityVerifier;
 use crate::auth::refresh::UserRefreshTokenService;
@@ -21,6 +20,7 @@ use crate::auth::tokens::{
     AccessTokenIssuer, AppleCipher, AppleClientSecret, IdentityFingerprint, SignupTokens,
 };
 use crate::config::{ACCESS_TOKEN_AUDIENCE, SIGNUP_TOKEN_AUDIENCE, SIGNUP_TOKEN_LIFETIME};
+use crate::post::ProcessingCallbackAuthenticator;
 use crate::user::domain::SignatureImagePolicy;
 use crate::user::service::{SignatureProcessingPolicy, UserService, UserWithdrawalService};
 use crate::user::storage::{
@@ -152,11 +152,8 @@ impl Components {
             apple_client,
         ));
         let withdrawal = UserWithdrawalService::new(revoker, users.clone());
-        let callback_auth = ProcessingCallbackAuthenticator::new(
-            &settings.callback.secret,
-            &settings.image.environment,
-            clock,
-        )?;
+        // 사인 콜백과 게시물 이미지 콜백은 같은 인증기(같은 비밀키·환경)를 쓴다(원본 `ProcessingCallbackAuthenticator`).
+        let callback_auth = ctx.post.authenticator(ctx);
 
         Ok(Components {
             policy: UsableUserPolicy::new(pool),

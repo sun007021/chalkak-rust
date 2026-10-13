@@ -126,6 +126,10 @@ content_type = "image/png"
 - Apple 요청 본문은 폼 필드로 풀어 이름순으로 비교하고, `client_secret`(ES256 JWT)은 헤더·클레임으로 풀어 비교한다. **서명 검증은 하지 않는다**(허용 목록에 `p256`이 없다).
 - presigned URL은 `X-Amz-Date`를 시나리오 시계 기준 60초 칸의 상대값으로, `X-Amz-Signature`를 길이로 바꾼다(서명 시각이 초 단위로 흔들려서). 나머지는 그대로 비교한다.
 - 외부 연동을 선언하지 않았고 받은 요청도 없는 시나리오는 결과 형식이 이전과 같아 기존 golden이 그대로 유효하다.
+- **내부 콜백 서명:** `/internal/v1/post-image-processing/...` 단계는 `callback = {}`를 적으면 러너가 경로(쿼리 제외)와 본문으로
+  `X-Chalkak-Callback-Timestamp`·`X-Chalkak-Callback-Signature`(`v1=<HMAC-SHA256 hex>`)를 만든다. 시각은 앱 시계(시나리오 시계 + 앱 오프셋)이고
+  비밀키 `test-callback-secret-with-enough-length`, 대상 `local`이 기본이다. 틀린 서명·시각·헤더 누락은 같은 표에서 바꾼다:
+  `timestamp_offset`(초), `secret`, `audience`, `sign_body`(서명에 쓸 다른 본문), `signature`(서명을 통째로 지정), `omit = ["timestamp"|"signature"]`.
 
 ## 원본 정보 수집
 

@@ -1,12 +1,11 @@
 //! 시나리오 하나를 대상 하나에 실행하고, 정규화된 결과(Outcome)를 만든다.
 
-use crate::callback;
 use crate::http::{self, Request};
 use crate::normalize::Normalizer;
 use crate::scenario::FakesSpec;
 use crate::scenario::{Auth, Scenario};
 use crate::target::{self, Target};
-use crate::{fakes, idtoken};
+use crate::{callback, fakes, idtoken};
 use crate::{time, token};
 use serde_json::{Value, json};
 use std::collections::HashMap;
@@ -126,25 +125,31 @@ fn run_once(target: &Target, scenario: &Scenario) -> Result<Value, String> {
             ));
         }
         let path = subst(&step.path, &vars);
+        let body = match (&step.body, step.body_size) {
+            (Some(b), None) => Some(subst(b, &vars).into_bytes()),
+            (None, Some(n)) => Some(vec![b'a'; n]),
+            (None, None) => None,
+            (Some(_), Some(_)) => {
+                return Err(format!(
+                    "{}: body와 body_size는 함께 쓸 수 없습니다",
+                    step.name
+                ));
+            }
+        };
         if let Some(spec) = &step.callback {
-            let route = path.split('?').next().unwrap_or(&path);
-            headers.extend(callback::headers(spec, clock + app_offset, route));
+            let signed_path = path.split('?').next().unwrap_or(&path);
+            headers.extend(callback::headers(
+                spec,
+                signed_path,
+                body.as_deref().unwrap_or_default(),
+                clock + app_offset,
+            ));
         }
         let req = Request {
             method: step.method.clone(),
             path,
             headers,
-            body: match (&step.body, step.body_size) {
-                (Some(b), None) => Some(subst(b, &vars).into_bytes()),
-                (None, Some(n)) => Some(vec![b'a'; n]),
-                (None, None) => None,
-                (Some(_), Some(_)) => {
-                    return Err(format!(
-                        "{}: body와 body_size는 함께 쓸 수 없습니다",
-                        step.name
-                    ));
-                }
-            },
+            body,
         };
         let res = http::send(&target.base_url, &req)
             .map_err(|e| format!("[{}] {}: {e}", target.name, step.name))?;

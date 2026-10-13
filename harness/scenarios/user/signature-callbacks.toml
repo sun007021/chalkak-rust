@@ -27,20 +27,20 @@ path = "/internal/v1/signature-processing/0198f6c1-0000-7000-8000-000000000001/c
 name = "타임스탬프만 없음"
 method = "POST"
 path = "/internal/v1/signature-processing/0198f6c1-0000-7000-8000-000000000001/complete"
-callback = { omit_timestamp = true }
+callback = { omit = ["timestamp"] }
 
 [[step]]
 name = "서명만 없음"
 method = "POST"
 path = "/internal/v1/signature-processing/0198f6c1-0000-7000-8000-000000000001/complete"
-callback = { omit_signature = true }
+callback = { omit = ["signature"] }
 
 [[step]]
 name = "타임스탬프가 숫자가 아님"
 method = "POST"
 path = "/internal/v1/signature-processing/0198f6c1-0000-7000-8000-000000000001/complete"
 headers = { "X-Chalkak-Callback-Timestamp" = "abc" }
-callback = { omit_timestamp = true }
+callback = { omit = ["timestamp"] }
 
 [[step]]
 name = "다른 비밀키로 서명"

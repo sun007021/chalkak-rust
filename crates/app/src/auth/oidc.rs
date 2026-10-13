@@ -679,9 +679,10 @@ mod tests {
 
     fn auth_settings() -> crate::config::AuthSettings {
         let env = chalkak_core::config::Env::from_pairs(crate::config::TEST_ENV.to_vec());
+        let post = crate::post::PostSettings::from_env(&env, "local").unwrap();
         crate::config::AppSettings::from_env(
             &env,
-            "local",
+            &post,
             vec![0],
             std::time::Duration::from_secs(900),
         )
@@ -727,9 +728,11 @@ mod tests {
             .filter(|(k, _)| *k != "APPLE_OIDC_CLIENT_ID")
             .collect();
         pairs.push(("APPLE_OIDC_CLIENT_ID", ""));
+        let env = chalkak_core::config::Env::from_pairs(pairs);
+        let post = crate::post::PostSettings::from_env(&env, "local").unwrap();
         let result = crate::config::AppSettings::from_env(
-            &chalkak_core::config::Env::from_pairs(pairs),
-            "local",
+            &env,
+            &post,
             vec![0],
             std::time::Duration::from_secs(900),
         );

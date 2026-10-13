@@ -49,9 +49,6 @@
 //! content_type = "image/png"
 //! ```
 //!
-//! 이미지 처리 콜백(`/internal/v1/**`) 단계는 `callback = { }`로 HMAC 헤더를 붙인다(타임스탬프는 단계 시각).
-//! `timestamp_offset`, `sign_path`, `secret`, `audience`, `signature`, `omit_timestamp`, `omit_signature`로 잘못된 요청을 만든다.
-//!
 //! DB에 무작위 값이 들어가는 컬럼(암호문 등)은 최상위에 `db_opaque = ["encrypted_refresh_token"]`처럼 적어 길이만 비교한다.
 //!
 //! 시나리오가 끝나면 가짜 서버가 받은 요청(JWKS 조회 제외)을 정규화해 결과의 `fakes`에 넣어 비교한다.
@@ -104,7 +101,7 @@ pub struct Step {
     #[serde(default)]
     pub headers: BTreeMap<String, String>,
     pub body: Option<String>,
-    /// 본문 대신 `a`를 이 바이트 수만큼 채운 본문을 보낸다(크기 제한 시험용). `body`와 함께 쓸 수 없다.
+    /// 지정한 바이트 수만큼 `a`로 채운 본문을 보낸다(본문 크기 제한 시나리오). `body`와 함께 쓸 수 없다.
     pub body_size: Option<usize>,
     pub auth: Option<Auth>,
     #[serde(default)]
@@ -115,28 +112,27 @@ pub struct Step {
     pub advance_seconds: Option<i64>,
     /// 이 단계 요청을 보내기 전에 가짜 서버 응답을 덧씌운다(항목 단위로 덮고 s3 키는 합친다).
     pub fakes: Option<FakesSpec>,
-    /// 이미지 처리 콜백 HMAC 헤더를 붙인다. 생략하면 헤더 없이 보낸다.
-    pub callback: Option<CallbackSign>,
+    /// 이미지 처리 콜백 서명 헤더를 붙인다(`/internal/v1/...`). 시각은 단계 시작 시 앱 시각이다.
+    pub callback: Option<CallbackSpec>,
 }
 
-/// 이미지 처리 콜백 서명 지정. 모든 필드를 생략하면 올바른 서명이 붙는다(`callback = {}`).
-#[derive(Debug, Default, Deserialize)]
+/// 콜백 서명 지정. 필드를 생략하면 올바른 서명(비밀키·audience는 하네스 기본값)이다.
+#[derive(Debug, Clone, Default, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
-pub struct CallbackSign {
-    /// 서명 비밀키. 생략하면 `oracle.env`의 값.
-    pub secret: Option<String>,
-    /// 서명에 넣는 audience(앱의 이미지 환경). 생략하면 `local`.
-    pub audience: Option<String>,
-    /// 타임스탬프 헤더를 단계 시각에서 이 초만큼 옮긴다.
+pub struct CallbackSpec {
+    /// 타임스탬프를 앱 시각에서 이 초만큼 옮긴다(음수면 과거).
     pub timestamp_offset: Option<i64>,
-    /// 서명 대상 경로. 생략하면 요청 경로(쿼리 제외).
+    pub secret: Option<String>,
+    pub audience: Option<String>,
+    /// 서명 대상 경로를 실제 요청 경로 대신 이 값으로 한다(다른 콜백 경로의 서명 재사용 시나리오).
     pub sign_path: Option<String>,
-    /// 서명 헤더 값을 직접 지정한다.
+    /// 서명 대상 본문을 실제 본문 대신 이 문자열로 한다(본문 변조 시나리오).
+    pub sign_body: Option<String>,
+    /// 서명 헤더 값을 통째로 덮는다.
     pub signature: Option<String>,
+    /// 보내지 않을 헤더(`timestamp`, `signature`).
     #[serde(default)]
-    pub omit_timestamp: bool,
-    #[serde(default)]
-    pub omit_signature: bool,
+    pub omit: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]

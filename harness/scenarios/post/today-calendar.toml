@@ -1,0 +1,212 @@
+name = "게시물: 오늘 상태와 캘린더"
+tags = ["p19", "post"]
+clock = "2026-10-12T09:00:00+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO users (id, email, status, signature_original_storage_key, signature_thumbnail_storage_key) VALUES
+  ('01990000-0000-7000-8000-000000000001', 'u1@test.chalkak', 'ACTIVE', 'chalkak/signatures/u1/original.png', 'chalkak/signatures/u1/thumbnail.png'),
+  ('01990000-0000-7000-8000-000000000002', 'u2@test.chalkak', 'ACTIVE', 'chalkak/signatures/u2/original.png', 'chalkak/signatures/u2/thumbnail.png'),
+  ('01990000-0000-7000-8000-000000000003', 'u3@test.chalkak', 'ACTIVE', 'chalkak/signatures/u3/original.png', 'chalkak/signatures/u3/thumbnail.png'),
+  ('01990000-0000-7000-8000-000000000004', 'u4@test.chalkak', 'BANNED', 'chalkak/signatures/u4/original.png', 'chalkak/signatures/u4/thumbnail.png'),
+  ('01990000-0000-7000-8000-000000000005', 'u5@test.chalkak', 'ACTIVE', 'chalkak/signatures/u5/original.png', 'chalkak/signatures/u5/thumbnail.png'),
+  ('01990000-0000-7000-8000-000000000006', 'u6@test.chalkak', 'ACTIVE', 'chalkak/signatures/u6/original.png', 'chalkak/signatures/u6/thumbnail.png'),
+  ('01990000-0000-7000-8000-000000000007', 'u7@test.chalkak', 'ACTIVE', 'chalkak/signatures/u7/original.png', 'chalkak/signatures/u7/thumbnail.png'),
+  ('01990000-0000-7000-8000-000000000008', 'u8@test.chalkak', 'ACTIVE', 'chalkak/signatures/u8/original.png', 'chalkak/signatures/u8/thumbnail.png');
+INSERT INTO topics (id, title, topic_date, starts_at, ends_at) VALUES
+  ('01990000-0000-7000-8000-0000000000f0', '그제', '2026-10-10', '2026-10-10T00:00:00+09:00', ('2026-10-10'::date + 1)::timestamp AT TIME ZONE 'Asia/Seoul'),
+  ('01990000-0000-7000-8000-0000000000f1', '오늘', '2026-10-12', '2026-10-12T00:00:00+09:00', ('2026-10-12'::date + 1)::timestamp AT TIME ZONE 'Asia/Seoul'),
+  ('01990000-0000-7000-8000-0000000000f2', '어제', '2026-10-11', '2026-10-11T00:00:00+09:00', ('2026-10-11'::date + 1)::timestamp AT TIME ZONE 'Asia/Seoul'),
+  ('01990000-0000-7000-8000-0000000000f9', '지난달', '2026-09-30', '2026-09-30T00:00:00+09:00', ('2026-09-30'::date + 1)::timestamp AT TIME ZONE 'Asia/Seoul');
+INSERT INTO photos (id, original_storage_key, thumbnail_storage_key, metadata) VALUES
+  ('01990000-0000-7000-8000-000000000201', 'chalkak/posts/local/original/p1.webp', 'chalkak/posts/local/thumbnail/p1.webp', '{"width":4032,"height":3024,"byteSize":183423,"location":{"latitude":37.5665,"longitude":126.978},"capturedAt":"2026-10-12T08:00:00+09:00","metaAttributes":{"make":"Apple","iso":100}}'),
+  ('01990000-0000-7000-8000-000000000202', 'chalkak/posts/local/original/p2.webp', 'chalkak/posts/local/thumbnail/p2.webp', '{"width":4032,"height":3024,"byteSize":183423,"location":{"latitude":37.5665,"longitude":126.978},"capturedAt":"2026-10-12T08:00:00+09:00","metaAttributes":{"make":"Apple","iso":100}}'),
+  ('01990000-0000-7000-8000-000000000203', 'chalkak/posts/local/original/p3.webp', 'chalkak/posts/local/thumbnail/p3.webp', '{"width":4032,"height":3024,"byteSize":183423,"location":{"latitude":37.5665,"longitude":126.978},"capturedAt":"2026-10-12T08:00:00+09:00","metaAttributes":{"make":"Apple","iso":100}}'),
+  ('01990000-0000-7000-8000-000000000204', 'chalkak/posts/local/original/p4.webp', 'chalkak/posts/local/thumbnail/p4.webp', '{"width":4032,"height":3024,"byteSize":183423,"location":{"latitude":37.5665,"longitude":126.978},"capturedAt":"2026-10-12T08:00:00+09:00","metaAttributes":{"make":"Apple","iso":100}}'),
+  ('01990000-0000-7000-8000-000000000205', 'chalkak/posts/local/original/p5.webp', 'chalkak/posts/local/thumbnail/p5.webp', '{"width":4032,"height":3024,"byteSize":183423,"location":{"latitude":37.5665,"longitude":126.978},"capturedAt":"2026-10-12T08:00:00+09:00","metaAttributes":{"make":"Apple","iso":100}}'),
+  ('01990000-0000-7000-8000-000000000206', 'chalkak/posts/local/original/p6.webp', 'chalkak/posts/local/thumbnail/p6.webp', '{"width":4032,"height":3024,"byteSize":183423,"location":{"latitude":37.5665,"longitude":126.978},"capturedAt":"2026-10-12T08:00:00+09:00","metaAttributes":{"make":"Apple","iso":100}}'),
+  ('01990000-0000-7000-8000-000000000207', 'chalkak/posts/local/original/p7.webp', 'chalkak/posts/local/thumbnail/p7.webp', '{"width":4032,"height":3024,"byteSize":183423,"location":{"latitude":37.5665,"longitude":126.978},"capturedAt":"2026-10-12T08:00:00+09:00","metaAttributes":{"make":"Apple","iso":100}}'),
+  ('01990000-0000-7000-8000-000000000208', 'chalkak/posts/local/original/p8.webp', 'chalkak/posts/local/thumbnail/p8.webp', '{"width":4032,"height":3024,"byteSize":183423,"location":{"latitude":37.5665,"longitude":126.978},"capturedAt":"2026-10-12T08:00:00+09:00","metaAttributes":{"make":"Apple","iso":100}}'),
+  ('01990000-0000-7000-8000-000000000209', 'chalkak/posts/local/original/p9.webp', 'chalkak/posts/local/thumbnail/p9.webp', '{"width":4032,"height":3024,"byteSize":183423,"location":{"latitude":37.5665,"longitude":126.978},"capturedAt":"2026-10-12T08:00:00+09:00","metaAttributes":{"make":"Apple","iso":100}}'),
+  ('01990000-0000-7000-8000-000000000210', 'chalkak/posts/local/original/p10.webp', 'chalkak/posts/local/thumbnail/p10.webp', '{"width":4032,"height":3024,"byteSize":183423,"location":{"latitude":37.5665,"longitude":126.978},"capturedAt":"2026-10-12T08:00:00+09:00","metaAttributes":{"make":"Apple","iso":100}}'),
+  ('01990000-0000-7000-8000-000000000211', 'chalkak/posts/local/original/p11.webp', 'chalkak/posts/local/thumbnail/p11.webp', '{"width":4032,"height":3024,"byteSize":183423,"location":{"latitude":37.5665,"longitude":126.978},"capturedAt":"2026-10-12T08:00:00+09:00","metaAttributes":{"make":"Apple","iso":100}}'),
+  ('01990000-0000-7000-8000-000000000212', 'chalkak/posts/local/original/p12.webp', 'chalkak/posts/local/thumbnail/p12.webp', '{"width":4032,"height":3024,"byteSize":183423,"location":{"latitude":37.5665,"longitude":126.978},"capturedAt":"2026-10-12T08:00:00+09:00","metaAttributes":{"make":"Apple","iso":100}}');
+INSERT INTO posts (id, user_id, topic_id, photo_id, title, moderation_status, moderated_at, created_at, updated_at, deleted_at) VALUES
+  ('01990000-0000-7000-8000-000000000301', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-000000000201', '하나', 'APPROVED', '2026-10-12T08:00:00+09:00', '2026-10-12T08:00:00+09:00', '2026-10-12T08:00:00+09:00', NULL),
+  ('01990000-0000-7000-8000-000000000302', '01990000-0000-7000-8000-000000000002', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-000000000202', NULL, 'APPROVED', '2026-10-12T08:10:00+09:00', '2026-10-12T08:10:00+09:00', '2026-10-12T08:10:00+09:00', NULL),
+  ('01990000-0000-7000-8000-000000000303', '01990000-0000-7000-8000-000000000003', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-000000000203', '셋', 'APPROVED', '2026-10-12T08:20:00+09:00', '2026-10-12T08:20:00+09:00', '2026-10-12T08:20:00+09:00', NULL),
+  ('01990000-0000-7000-8000-000000000304', '01990000-0000-7000-8000-000000000004', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-000000000204', '차단', 'APPROVED', '2026-10-12T08:30:00+09:00', '2026-10-12T08:30:00+09:00', '2026-10-12T08:30:00+09:00', NULL),
+  ('01990000-0000-7000-8000-000000000305', '01990000-0000-7000-8000-000000000005', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-000000000205', '대기', 'PENDING', NULL, '2026-10-12T08:40:00+09:00', '2026-10-12T08:40:00+09:00', NULL),
+  ('01990000-0000-7000-8000-000000000306', '01990000-0000-7000-8000-000000000006', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-000000000206', '반려', 'REJECTED', '2026-10-12T08:50:00+09:00', '2026-10-12T08:50:00+09:00', '2026-10-12T08:50:00+09:00', NULL),
+  ('01990000-0000-7000-8000-000000000307', '01990000-0000-7000-8000-000000000007', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-000000000207', '검증', 'VALIDATING', NULL, '2026-10-12T08:55:00+09:00', '2026-10-12T08:55:00+09:00', NULL),
+  ('01990000-0000-7000-8000-000000000308', '01990000-0000-7000-8000-000000000008', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-000000000208', '삭제', 'APPROVED', '2026-10-12T08:56:00+09:00', '2026-10-12T08:56:00+09:00', '2026-10-12T08:56:00+09:00', '2026-10-12T08:56:00+09:00'),
+  ('01990000-0000-7000-8000-000000000309', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000000f2', '01990000-0000-7000-8000-000000000209', '어제', 'APPROVED', '2026-10-11T10:00:00+09:00', '2026-10-11T10:00:00+09:00', '2026-10-11T10:00:00+09:00', NULL),
+  ('01990000-0000-7000-8000-000000000310', '01990000-0000-7000-8000-000000000002', '01990000-0000-7000-8000-0000000000f2', '01990000-0000-7000-8000-000000000210', '어제2', 'APPROVED', '2026-10-11T11:00:00+09:00', '2026-10-11T11:00:00+09:00', '2026-10-11T11:00:00+09:00', NULL),
+  ('01990000-0000-7000-8000-000000000311', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000000f0', '01990000-0000-7000-8000-000000000211', '그제', 'APPROVED', '2026-10-10T10:00:00+09:00', '2026-10-10T10:00:00+09:00', '2026-10-10T10:00:00+09:00', NULL),
+  ('01990000-0000-7000-8000-000000000312', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000000f9', '01990000-0000-7000-8000-000000000212', '지난달', 'PENDING', NULL, '2026-09-30T10:00:00+09:00', '2026-09-30T10:00:00+09:00', NULL);
+INSERT INTO post_likes (post_id, user_id, created_at) VALUES
+  ('01990000-0000-7000-8000-000000000301', '01990000-0000-7000-8000-000000000002', '2026-10-12T08:59:00+09:00'),
+  ('01990000-0000-7000-8000-000000000301', '01990000-0000-7000-8000-000000000003', '2026-10-12T08:59:00+09:00'),
+  ('01990000-0000-7000-8000-000000000301', '01990000-0000-7000-8000-000000000004', '2026-10-12T08:59:00+09:00'),
+  ('01990000-0000-7000-8000-000000000302', '01990000-0000-7000-8000-000000000001', '2026-10-12T08:59:00+09:00'),
+  ('01990000-0000-7000-8000-000000000309', '01990000-0000-7000-8000-000000000002', '2026-10-12T08:59:00+09:00')
+"""]
+
+[[step]]
+name = "오늘 상태: 인증 없음"
+method = "GET"
+path = "/api/v1/posts/today"
+
+[[step]]
+name = "오늘 상태: 승인"
+method = "GET"
+path = "/api/v1/posts/today"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "오늘 상태: 검수 대기"
+method = "GET"
+path = "/api/v1/posts/today"
+auth = { user = "01990000-0000-7000-8000-000000000005" }
+
+[[step]]
+name = "오늘 상태: 반려"
+method = "GET"
+path = "/api/v1/posts/today"
+auth = { user = "01990000-0000-7000-8000-000000000006" }
+
+[[step]]
+name = "오늘 상태: 검증 중"
+method = "GET"
+path = "/api/v1/posts/today"
+auth = { user = "01990000-0000-7000-8000-000000000007" }
+
+[[step]]
+name = "오늘 상태: 삭제"
+method = "GET"
+path = "/api/v1/posts/today"
+auth = { user = "01990000-0000-7000-8000-000000000008" }
+
+[[step]]
+name = "오늘 상태: 승인(다른)"
+method = "GET"
+path = "/api/v1/posts/today"
+auth = { user = "01990000-0000-7000-8000-000000000003" }
+
+[[step]]
+name = "오늘 상태: 차단된 회원"
+method = "GET"
+path = "/api/v1/posts/today"
+auth = { user = "01990000-0000-7000-8000-000000000004" }
+
+[[step]]
+name = "오늘 상태: 없는 회원"
+method = "GET"
+path = "/api/v1/posts/today"
+auth = { user = "01990000-0000-7000-8000-000000000099" }
+
+[[step]]
+name = "캘린더: 인증 없음"
+method = "GET"
+path = "/api/v1/posts/calendar?year=2026&month=10"
+
+[[step]]
+name = "캘린더: 10월"
+method = "GET"
+path = "/api/v1/posts/calendar?year=2026&month=10"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "캘린더: 9월"
+method = "GET"
+path = "/api/v1/posts/calendar?year=2026&month=9"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "캘린더: 게시물 없는 달"
+method = "GET"
+path = "/api/v1/posts/calendar?year=2026&month=1"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "캘린더: 다른 회원"
+method = "GET"
+path = "/api/v1/posts/calendar?year=2026&month=10"
+auth = { user = "01990000-0000-7000-8000-000000000002" }
+
+[[step]]
+name = "캘린더: 월 0"
+method = "GET"
+path = "/api/v1/posts/calendar?year=2026&month=0"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "캘린더: 월 13"
+method = "GET"
+path = "/api/v1/posts/calendar?year=2026&month=13"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "캘린더: 연도 0"
+method = "GET"
+path = "/api/v1/posts/calendar?year=0&month=1"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "캘린더: 연도 누락"
+method = "GET"
+path = "/api/v1/posts/calendar?month=1"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "캘린더: 월 누락"
+method = "GET"
+path = "/api/v1/posts/calendar?year=2026"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "캘린더: 숫자 아님"
+method = "GET"
+path = "/api/v1/posts/calendar?year=abc&month=1"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "캘린더: 큰 연도"
+method = "GET"
+path = "/api/v1/posts/calendar?year=9999&month=12"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "캘린더: 범위 밖 연도"
+method = "GET"
+path = "/api/v1/posts/calendar?year=10000&month=1"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "캘린더: 차단된 회원"
+method = "GET"
+path = "/api/v1/posts/calendar?year=2026&month=10"
+auth = { user = "01990000-0000-7000-8000-000000000004" }
+
+[[step]]
+name = "캘린더 월 목록: 인증 없음"
+method = "GET"
+path = "/api/v1/posts/calendar/months"
+
+[[step]]
+name = "캘린더 월 목록"
+method = "GET"
+path = "/api/v1/posts/calendar/months"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "캘린더 월 목록: 게시물 없는 회원"
+method = "GET"
+path = "/api/v1/posts/calendar/months"
+auth = { user = "01990000-0000-7000-8000-000000000003" }
+
+[[step]]
+name = "캘린더 월 목록: 차단된 회원"
+method = "GET"
+path = "/api/v1/posts/calendar/months"
+auth = { user = "01990000-0000-7000-8000-000000000004" }

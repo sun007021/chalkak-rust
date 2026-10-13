@@ -12,6 +12,7 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 use chalkak_app::config::AppSettings;
+use chalkak_app::post::PostSettings;
 use chalkak_core::config::{ConfigError, Env};
 use chalkak_db::DbConfig;
 
@@ -42,6 +43,15 @@ impl Profile {
         }
     }
 
+    /// 프로필 이름(`application-{name}.yml`).
+    pub fn name(self) -> &'static str {
+        match self {
+            Profile::Local => "local",
+            Profile::Dev => "dev",
+            Profile::Prod => "prod",
+        }
+    }
+
     /// JSON 파일 로그를 남기는 프로필(`logback-spring.xml`의 `dev | prod`).
     pub fn writes_json_log_file(self) -> bool {
         matches!(self, Profile::Dev | Profile::Prod)
@@ -64,6 +74,7 @@ pub struct Settings {
     pub log_file: PathBuf,
     /// auth·user 도메인 설정(OIDC, Apple, 이미지 저장소, 콜백).
     pub app: AppSettings,
+    pub post: PostSettings,
 }
 
 impl Settings {
@@ -85,13 +96,10 @@ impl Settings {
             Profile::Dev | Profile::Prod => false,
         };
 
+        let post = PostSettings::from_env(env, profile.name())?;
         let app = AppSettings::from_env(
             env,
-            match profile {
-                Profile::Local => "local",
-                Profile::Dev => "dev",
-                Profile::Prod => "prod",
-            },
+            &post,
             access_token_key.clone(),
             access_token_expiration,
         )?;
@@ -111,6 +119,7 @@ impl Settings {
                 env.string_or("CHALKAK_LOGGING_FILE", chalkak_core::log::DEFAULT_LOG_FILE),
             ),
             app,
+            post,
         })
     }
 }
@@ -180,6 +189,7 @@ mod tests {
         let mut pairs = vec![
             ("ACCESS_TOKEN_SECRET", "0011"),
             ("ACCESS_TOKEN_EXPIRATION", "15m"),
+            ("S3_PREFIX", "chalkak"),
         ];
         pairs.extend_from_slice(&chalkak_app::config::TEST_ENV);
         pairs.extend_from_slice(extra);

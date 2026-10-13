@@ -536,9 +536,11 @@ impl World {
         let clock: Arc<dyn chalkak_core::Clock> = self.clock.clone();
         let mut pairs = TEST_ENV.to_vec();
         pairs.push(("S3_PREFIX", "chalkak"));
+        let env = Env::from_pairs(pairs);
+        let post_settings = chalkak_app::post::PostSettings::from_env(&env, "dev").unwrap();
         let settings = AppSettings::from_env(
-            &Env::from_pairs(pairs),
-            "dev",
+            &env,
+            &post_settings,
             ACCESS_KEY.to_vec(),
             Duration::from_secs(900),
         )
@@ -553,6 +555,11 @@ impl World {
             clock: Arc::clone(&clock),
             logger: Arc::clone(&logger),
             settings: Arc::new(settings),
+            post: chalkak_app::post::PostWiring::new(
+                post_settings,
+                Arc::new(NoObjects),
+                Arc::new(chalkak_app::post::NoopPostModerationPendingListener),
+            ),
         };
         let components = Components {
             policy: UsableUserPolicy::new(self.pool.clone()),
@@ -568,9 +575,9 @@ impl World {
         chalkak_app::user::api::register(routes, &ctx, &components).into_router()
     }
 
-    pub fn callback_auth(&self) -> chalkak_app::auth::callback::ProcessingCallbackAuthenticator {
+    pub fn callback_auth(&self) -> chalkak_app::post::ProcessingCallbackAuthenticator {
         let clock: Arc<dyn chalkak_core::Clock> = self.clock.clone();
-        chalkak_app::auth::callback::ProcessingCallbackAuthenticator::new(
+        chalkak_app::post::ProcessingCallbackAuthenticator::new(
             "test-callback-secret-with-enough-length",
             "dev",
             clock,
@@ -833,4 +840,26 @@ pub fn assert_lower_hex_64(value: &str) {
                 .all(|c| c.is_ascii_digit() || ('a'..='f').contains(&c)),
         "{value}"
     );
+}
+
+/// 컨트롤러 계층 시험에서 게시물 흐름이 S3를 부르지 않는다는 표시.
+struct NoObjects;
+
+impl chalkak_app::post::ObjectStore for NoObjects {
+    fn object_exists(
+        &self,
+        _bucket: &str,
+        _key: &str,
+    ) -> Result<bool, chalkak_app::post::storage::StorageError> {
+        Ok(false)
+    }
+
+    fn presign_put(
+        &self,
+        _request: &chalkak_app::post::storage::PresignPut,
+    ) -> Result<String, chalkak_app::post::storage::StorageError> {
+        Err(chalkak_app::post::storage::StorageError(
+            "시험에서는 S3를 부르지 않습니다.".to_owned(),
+        ))
+    }
 }

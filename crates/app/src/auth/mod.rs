@@ -3,7 +3,6 @@
 
 pub mod api;
 pub mod apple;
-pub mod callback;
 pub mod domain;
 pub mod oidc;
 pub mod refresh;
