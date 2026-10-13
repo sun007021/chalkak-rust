@@ -4,6 +4,7 @@ pub mod binding;
 pub mod context;
 pub mod error;
 pub mod json;
+pub mod marker;
 mod routes;
 
 pub use error::ApiError;

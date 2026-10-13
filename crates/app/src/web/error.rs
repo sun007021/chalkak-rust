@@ -24,7 +24,7 @@ use chalkak_core::log::{Logger, fields};
 use chalkak_db::DbError;
 use chalkak_http::Response;
 
-use super::json_response;
+use super::{json_response, marker};
 
 const LOGGER_NAME: &str = "com.chalkak.backend.exception.GlobalExceptionHandler";
 
@@ -114,10 +114,20 @@ impl ApiError {
         }
     }
 
-    /// 오류 응답을 만들고 로그를 남긴다.
+    /// 오류 응답을 만들고 로그를 남긴다. 콘텐츠 협상 계층이 읽는 출처 표지가 붙는다([`marker`]).
     pub fn into_response(self, logger: &Logger) -> Response {
         self.log(logger);
-        self.to_response()
+        let origin = match self {
+            ApiError::App(_) | ApiError::Internal(_) => marker::HANDLER,
+            _ => marker::SPRING,
+        };
+        let response = self.to_response().with_header(marker::ORIGIN, origin);
+        match self {
+            ApiError::UnsupportedMediaType => {
+                response.with_header(marker::CARRY_ACCEPT, marker::SUPPORTED_BODY_TYPES)
+            }
+            _ => response,
+        }
     }
 
     /// 로그 없이 응답만 만든다.

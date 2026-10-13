@@ -8,7 +8,7 @@ use std::sync::Arc;
 use chalkak_core::log::Logger;
 use chalkak_http::{Method, Request, Response, Router};
 
-use super::{ApiError, ApiResult, context};
+use super::{ApiError, ApiResult, context, marker};
 
 pub struct Routes {
     router: Router,
@@ -82,7 +82,16 @@ impl Routes {
                     return options_response(allowed);
                 }
                 // 원본 405 응답에는 Allow 헤더가 없다(harness/golden/platform__method-not-allowed.json).
-                ApiError::MethodNotSupported.into_response(&logger_405)
+                // `Accept: text/html`처럼 JSON을 받지 않는 요청에는 컨테이너 오류 페이지가 `Allow`를 싣는다.
+                let allow = allowed
+                    .iter()
+                    .filter(|m| **m != Method::Head)
+                    .map(Method::as_str)
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                ApiError::MethodNotSupported
+                    .into_response(&logger_405)
+                    .with_header(marker::CARRY_ALLOW, allow)
             })
     }
 }

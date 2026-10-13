@@ -14,7 +14,7 @@
 
 use std::sync::Arc;
 
-use chalkak_app::web::ApiError;
+use chalkak_app::web::{ApiError, marker};
 use chalkak_core::Clock;
 use chalkak_core::log::Logger;
 use chalkak_http::{Method, Request, Response};
@@ -92,6 +92,7 @@ impl Actuator {
         boot::closing(
             Response::new(500)
                 .with_header("Content-Type", "application/json")
+                .with_header(marker::ORIGIN, marker::BOOT)
                 .with_body(body.into_bytes()),
         )
     }
@@ -100,6 +101,7 @@ impl Actuator {
 fn json(status: u16, body: String) -> Response {
     Response::new(status)
         .with_header("Content-Type", ACTUATOR_CONTENT_TYPE)
+        .with_header(marker::ORIGIN, marker::ACTUATOR)
         .with_body(body.into_bytes())
 }
 

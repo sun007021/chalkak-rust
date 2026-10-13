@@ -7,6 +7,7 @@ use chalkak_core::Clock;
 use chalkak_http::{Handler, Method, Middleware, Request, Response};
 
 use super::boot;
+use super::negotiate::{self, Wanted};
 
 /// Tomcat이 `Allow`에 싣는 고정 목록.
 const TRACE_ALLOW: &str = "HEAD, DELETE, POST, GET, OPTIONS, PUT";
@@ -24,8 +25,10 @@ impl Tomcat {
 impl Middleware for Tomcat {
     fn handle(&self, req: Request, next: &dyn Handler) -> Response {
         if req.method == Method::Trace {
-            return boot::error_response(&*self.clock, 405, "Method Not Allowed", &req.path)
+            let wanted = Wanted::of(&req);
+            let response = boot::error_response(&*self.clock, 405, "Method Not Allowed", &req.raw_path)
                 .with_header("Allow", TRACE_ALLOW);
+            return negotiate::finish(response, &wanted, &*self.clock);
         }
         next.handle(req)
     }

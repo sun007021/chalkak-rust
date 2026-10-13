@@ -89,8 +89,30 @@ impl Normalizer {
         if let Some(jwt) = self.jwt(s) {
             return jwt;
         }
-        let s = self.presigned(s);
+        let s = self.whitelabel_created(s);
+        let s = self.presigned(s.as_str());
         self.replace_uuids(&s)
+    }
+
+    /// Spring Boot Whitelabel 페이지의 `<div id='created'>Tue Oct 13 10:02:35 UTC 2026</div>`(`Date.toString()`)를
+    /// 시나리오 시계 기준 상대 초로 바꾼다. 페이지를 만든 순간의 시각이라 앱마다 초 단위로 달라진다.
+    fn whitelabel_created(&self, s: &str) -> String {
+        const OPEN: &str = "<div id='created'>";
+        let Some(at) = s.find(OPEN) else {
+            return s.to_string();
+        };
+        let start = at + OPEN.len();
+        let Some(len) = s[start..].find("</div>") else {
+            return s.to_string();
+        };
+        match java_date_epoch(&s[start..start + len]) {
+            Some(epoch) => {
+                let mut out = s.to_string();
+                out.replace_range(start..start + len, &self.relative(epoch, "java-date"));
+                out
+            }
+            None => s.to_string(),
+        }
     }
 
     /// presigned URL(SigV4 쿼리 서명)의 `X-Amz-Date`와 `X-Amz-Signature`를 바꾼다. 서명 시각은 앱이 응답을 만든 순간이라
@@ -183,6 +205,34 @@ fn fraction_style(s: &str, digits: usize) -> String {
     } else {
         format!("f{digits}")
     }
+}
+
+/// `Tue Oct 13 10:02:35 UTC 2026`(`Date.toString()`, UTC 기준)을 epoch 초로 바꾼다.
+fn java_date_epoch(s: &str) -> Option<f64> {
+    let mut parts = s.split_whitespace();
+    let (_dow, month, day, clock, zone, year) = (
+        parts.next()?,
+        parts.next()?,
+        parts.next()?,
+        parts.next()?,
+        parts.next()?,
+        parts.next()?,
+    );
+    if zone != "UTC" || parts.next().is_some() {
+        return None;
+    }
+    const MONTHS: [&str; 12] = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    ];
+    let month = MONTHS.iter().position(|m| *m == month)? as u32 + 1;
+    let mut hms = clock.split(':');
+    let (h, m, sec) = (
+        hms.next()?.parse::<i64>().ok()?,
+        hms.next()?.parse::<i64>().ok()?,
+        hms.next()?.parse::<i64>().ok()?,
+    );
+    let days = time::days_from_civil(year.parse().ok()?, month, day.parse().ok()?);
+    Some((days * 86_400 + h * 3600 + m * 60 + sec) as f64)
 }
 
 /// `20261012T000005Z` 형식(SigV4 날짜)을 epoch 초로 바꾼다.
@@ -280,6 +330,21 @@ mod tests {
     use serde_json::json;
 
     const CLOCK: f64 = 1_791_763_200.0; // 2026-10-12T00:00:00Z
+
+    #[test]
+    fn whitelabel_생성_시각을_시계_기준으로_바꾼다() {
+        let mut n = Normalizer::new(CLOCK);
+        let page = "<html><body><div id='created'>Mon Oct 12 00:00:07 UTC 2026</div><div>x</div></body></html>";
+        assert_eq!(
+            n.string(page),
+            "<html><body><div id='created'><t+5s java-date></div><div>x</div></body></html>"
+        );
+        // 같은 5초 칸이면 같은 값
+        assert_eq!(
+            n.string("<div id='created'>Mon Oct 12 00:00:09 UTC 2026</div>"),
+            "<div id='created'><t+5s java-date></div>"
+        );
+    }
 
     #[test]
     fn 같은_uuid는_같은_기호로_묶는다() {

@@ -1,0 +1,104 @@
+name = "Whitelabel 오류 페이지의 Content-Language"
+tags = ["platform"]
+
+[setup]
+sql = ["INSERT INTO users (id, email, signature_original_storage_key) VALUES ('01990000-0000-7000-8000-000000000001', 'user1@test.chalkak', 'chalkak/signatures/user1/original.png')"]
+
+
+[[step]]
+name = 'Accept-Language ko'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html', "Accept-Language" = 'ko' }
+
+[[step]]
+name = 'Accept-Language ko-KR'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html', "Accept-Language" = 'ko-KR' }
+
+[[step]]
+name = 'Accept-Language en-GB'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html', "Accept-Language" = 'en-GB' }
+
+[[step]]
+name = 'Accept-Language fr, en;q=0.5'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html', "Accept-Language" = 'fr, en;q=0.5' }
+
+[[step]]
+name = 'Accept-Language *'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html', "Accept-Language" = '*' }
+
+[[step]]
+name = 'Accept-Language xx-YY'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html', "Accept-Language" = 'xx-YY' }
+
+[[step]]
+name = 'Accept-Language bad lang!!'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html', "Accept-Language" = 'bad lang!!' }
+
+[[step]]
+name = 'Accept-Language ko;q=0'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html', "Accept-Language" = 'ko;q=0' }
+
+[[step]]
+name = 'Accept-Language zh-Hant-TW'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html', "Accept-Language" = 'zh-Hant-TW' }
+
+[[step]]
+name = 'Accept-Language en_US'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html', "Accept-Language" = 'en_US' }
+
+[[step]]
+name = 'Accept-Language en;q=0.3, ko;q=0.9'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html', "Accept-Language" = 'en;q=0.3, ko;q=0.9' }
+
+[[step]]
+name = 'Accept-Language EN-us'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html', "Accept-Language" = 'EN-us' }
+
+[[step]]
+name = 'Accept-Language ko-kr'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html', "Accept-Language" = 'ko-kr' }
+
+[[step]]
+name = 'Accept-Language de-DE-1996'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html', "Accept-Language" = 'de-DE-1996' }

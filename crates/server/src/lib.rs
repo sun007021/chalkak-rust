@@ -37,6 +37,7 @@ use web::callback_limit::CallbackBodyLimit;
 use web::cors::AdminCors;
 use web::dispatch::Dispatcher;
 use web::firewall::Firewall;
+use web::negotiate::Negotiate;
 use web::security_headers::SecurityHeaders;
 use web::tomcat::Tomcat;
 
@@ -60,6 +61,7 @@ pub fn build_chain(
     Chain::new(Dispatcher::new(router, actuator))
         .layer(Tomcat::new(Arc::clone(&clock)))
         .layer(AccessLog::new(Arc::clone(&logger)))
+        .layer(Negotiate::new(Arc::clone(&clock)))
         .layer(CallbackBodyLimit::new(
             settings.post.callback_max_body_bytes,
         ))
