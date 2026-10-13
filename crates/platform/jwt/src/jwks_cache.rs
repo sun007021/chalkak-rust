@@ -121,11 +121,24 @@ struct State {
     remaining: u32,
 }
 
+/// 조회가 정상 흐름을 벗어난 순간을 받는 쪽(원본 `OidcJwkSetEventLogger`가 받는 Nimbus 이벤트).
+/// 호출은 캐시 잠금 안에서 일어나므로 빨리 돌아와야 한다.
+pub trait JwksEvents: Send + Sync {
+    /// 첫 조회가 실패해 한 번 더 시도한다(`RetryingJWKSetSource.RetrialEvent`).
+    fn retrial(&self, cause: &str);
+    /// 조회가 끝내 실패해 이전에 받은 목록을 쓴다(`OutageTolerantJWKSetSource.OutageEvent`).
+    /// `remaining_ms`는 그 목록을 더 쓸 수 있는 밀리초.
+    fn outage(&self, remaining_ms: i64, cause: &str);
+    /// 재조회 제한에 걸려 제공자에 요청하지 않았다(`RateLimitedJWKSetSource.RateLimitedEvent`).
+    fn rate_limited(&self);
+}
+
 pub struct JwksCache {
     source: Arc<dyn JwksSource>,
     clock: Arc<dyn Clock>,
     config: JwksCacheConfig,
     state: Mutex<State>,
+    events: Option<Arc<dyn JwksEvents>>,
 }
 
 fn ms(d: Duration) -> i64 {
@@ -162,7 +175,13 @@ impl JwksCache {
                 window_end: -1,
                 remaining: 0,
             }),
+            events: None,
         })
+    }
+
+    /// 조회 알림을 받을 쪽을 정한다. 쓰기 전에(캐시를 공유하기 전에) 한 번 부른다.
+    pub fn set_events(&mut self, events: Arc<dyn JwksEvents>) {
+        self.events = Some(events);
     }
 
     fn lock(&self) -> MutexGuard<'_, State> {
@@ -201,6 +220,9 @@ impl JwksCache {
                 if now >= *usable_until {
                     return Err(error);
                 }
+                if let Some(events) = &self.events {
+                    events.outage(*usable_until - now, &error.to_string());
+                }
                 // 같은 키의 새 복사본. 호출자가 들고 있던 목록과 다른 객체라 그대로 돌려줘도 된다.
                 let copy = Arc::new((**good).clone());
                 state.cached = Some(Cached {
@@ -219,6 +241,9 @@ impl JwksCache {
             state.remaining = self.config.rate_limit_requests - 1;
             Ok(())
         } else if state.remaining == 0 {
+            if let Some(events) = &self.events {
+                events.rate_limited();
+            }
             Err(JwksError::RateLimited)
         } else {
             state.remaining -= 1;
@@ -228,7 +253,12 @@ impl JwksCache {
 
     fn fetch_with_retry(&self) -> Result<Jwks, JwksError> {
         // RetryingJWKSetSource: 조회 실패(통신·해석)는 한 번 더 시도한다.
-        self.fetch_once().or_else(|_| self.fetch_once())
+        self.fetch_once().or_else(|first| {
+            if let Some(events) = &self.events {
+                events.retrial(&first.to_string());
+            }
+            self.fetch_once()
+        })
     }
 
     fn fetch_once(&self) -> Result<Jwks, JwksError> {

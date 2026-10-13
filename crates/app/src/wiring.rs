@@ -89,7 +89,11 @@ impl Components {
             access_tokens.clone(),
         );
         let fingerprint = IdentityFingerprint::new(auth.social_identity_key.clone());
-        let verifier = SocialIdentityVerifier::from_settings(auth, Arc::clone(&clock))?;
+        let verifier = SocialIdentityVerifier::from_settings(
+            auth,
+            Arc::clone(&clock),
+            Arc::clone(&ctx.logger),
+        )?;
 
         let (cipher, apple_client) = apple_parts(auth, Arc::clone(&clock))?;
         let apple_signup = AppleSignupAuthorizationService::new(
