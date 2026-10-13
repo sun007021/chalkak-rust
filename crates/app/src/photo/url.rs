@@ -63,11 +63,17 @@ impl CloudFrontUrlProvider {
             ));
         }
         let public_path = self.remove_origin_path(normalized)?;
-        let mut url = format!("{}{}", self.origin, self.base_path);
-        for segment in public_path
+        let segments: Vec<&str> = public_path
             .split('/')
             .filter(|s| !s.chars().all(is_java_whitespace_char))
-        {
+            .collect();
+        // Spring은 구간을 붙일 때 기존 경로 끝의 `/`를 하나 지운다(`removeTrailingSlash`).
+        let base_path = match segments.is_empty() {
+            true => self.base_path.as_str(),
+            false => self.base_path.strip_suffix('/').unwrap_or(&self.base_path),
+        };
+        let mut url = format!("{}{}", self.origin, base_path);
+        for segment in segments {
             url.push('/');
             url.push_str(&encode_path_segment(segment));
         }
@@ -192,5 +198,21 @@ mod tests {
             p.get_url(Some("/a//b/c.webp")).unwrap().as_deref(),
             Some("https://cdn.example.com/a/b/c.webp")
         );
+    }
+
+    // Spring `CompositePathComponentBuilder.addPathSegments`가 기존 경로의 끝 `/` 하나를 지운다.
+    #[test]
+    fn 기준_주소가_슬래시로_끝나도_구간_앞_슬래시는_하나다() {
+        for base in [
+            "https://cdn.example.com/",
+            "https://cdn.example.com/static/",
+        ] {
+            let p = CloudFrontUrlProvider::new(base, "/chalkak");
+            let expected = format!("{}posts/a.webp", base);
+            assert_eq!(
+                p.get_url(Some("chalkak/posts/a.webp")).unwrap(),
+                Some(expected)
+            );
+        }
     }
 }

@@ -132,6 +132,9 @@ impl Fx {
             pool: db.pool(8),
             clock: clock.clone(),
             logger,
+            admin: chalkak_app::admin::AdminConfig::for_tests(
+                b"0123456789abcdef0123456789abcdef".to_vec(),
+            ),
             settings: Arc::new(chalkak_app::config::test_settings(&settings())),
             post: wiring.clone(),
         };

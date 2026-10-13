@@ -11,6 +11,8 @@ pub mod web;
 use std::error::Error;
 use std::sync::Arc;
 
+use chalkak_app::admin::AdminConfig;
+use chalkak_app::admin::bootstrap::AdminAccount;
 use chalkak_app::notification::slack::{
     NotificationMessageFactory, PostModerationPendingNotifier,
     SlackIncomingWebhookNotificationSender,
@@ -77,6 +79,19 @@ pub fn build_chain(
         ))
 }
 
+/// 관리자 도메인이 쓰는 설정을 `Settings`에서 뽑는다.
+pub fn admin_config(settings: &Settings) -> AdminConfig {
+    AdminConfig {
+        access_token_key: settings.access_token_key.clone(),
+        access_token_issuer: ACCESS_TOKEN_ISSUER.to_owned(),
+        access_token_audience: ACCESS_TOKEN_AUDIENCE.to_owned(),
+        access_token_expiration: settings.access_token_expiration,
+        refresh_token_inactivity: settings.app.auth.refresh_inactivity,
+        refresh_token_absolute: settings.app.auth.refresh_absolute,
+        development_bypass: settings.admin_development_bypass,
+    }
+}
+
 /// 검수 대기 구독자. 관리자 알림 전달이 켜져 있을 때만 Slack 발송기를 붙이고, 꺼져 있으면 아무것도 하지 않는다
 /// (원본 `NotificationConfiguration`은 `delivery-enabled=true`일 때만 리스너 빈을 만든다).
 fn moderation_pending_listener(
@@ -112,6 +127,7 @@ pub fn build_handler(
         pool: pool.clone(),
         clock: Arc::clone(&clock),
         logger: Arc::clone(&logger),
+        admin: admin_config(settings),
         settings: Arc::new(settings.app.clone()),
         post: PostWiring::new(
             settings.post.clone(),
@@ -136,6 +152,7 @@ pub fn run(settings: &Settings, shutdown: ShutdownSignal) -> Result<(), Box<dyn 
 
     let pool = Pool::connect(&settings.db, settings.db_pool_size)?;
     migrate(settings, &pool, &logger)?;
+    ensure_admin_account(&pool, settings)?;
 
     let handler = build_handler(settings, pool.clone(), clock, Arc::clone(&logger));
     let server = Server::bind(
@@ -153,6 +170,23 @@ pub fn run(settings: &Settings, shutdown: ShutdownSignal) -> Result<(), Box<dyn 
         .info("com.chalkak.backend.BackendApplication")
         .log("서버를 종료했습니다");
     result.map_err(Into::into)
+}
+
+/// 시작할 때 관리자 계정을 보장한다(`AdminAccountBootstrap`, `DevelopmentAdminBootstrap`).
+fn ensure_admin_account(pool: &Pool, settings: &Settings) -> Result<(), Box<dyn Error>> {
+    let account = settings
+        .admin_account
+        .as_ref()
+        .map(|(username, password_hash)| AdminAccount {
+            username: username.clone(),
+            password_hash: password_hash.clone(),
+        });
+    chalkak_app::admin::bootstrap::ensure_admin_account(
+        pool,
+        &admin_config(settings),
+        account.as_ref(),
+    )
+    .map_err(Into::into)
 }
 
 fn migrate(settings: &Settings, pool: &Pool, logger: &Logger) -> Result<(), Box<dyn Error>> {

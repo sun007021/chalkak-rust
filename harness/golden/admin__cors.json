@@ -1,0 +1,745 @@
+{
+  "db": {
+    "admin_audit_logs": [
+      "{\"action\":\"POST_APPROVED\",\"actor_admin_id\":\"$uuid2\",\"after_state\":{\"moderatedAt\":\"<t-50400s db Z>\",\"moderatedBy\":\"$uuid2\",\"moderationStatus\":\"APPROVED\"},\"before_state\":{\"moderatedAt\":null,\"moderationStatus\":\"PENDING\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-50400s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid?\",\"target_id\":\"$uuid?\",\"target_type\":\"POST\"}",
+      "{\"action\":\"POST_REJECTED\",\"actor_admin_id\":\"$uuid?\",\"after_state\":{\"moderatedAt\":\"<t-46800s db Z>\",\"moderatedBy\":\"$uuid?\",\"moderationStatus\":\"REJECTED\"},\"before_state\":{\"moderatedAt\":null,\"moderationStatus\":\"PENDING\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-46800s db +09:00>\",\"reason\":\"정책 위반\",\"request_id\":\"$uuid?\",\"target_id\":\"$uuid?\",\"target_type\":\"POST\"}",
+      "{\"action\":\"USER_BANNED\",\"actor_admin_id\":\"$uuid2\",\"after_state\":{\"status\":\"BANNED\"},\"before_state\":{\"status\":\"ACTIVE\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-43200s db +09:00>\",\"reason\":\"반복 위반\",\"request_id\":\"$uuid?\",\"target_id\":\"$uuid12\",\"target_type\":\"USER\"}"
+    ],
+    "admin_refresh_tokens": [
+      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"admin_id\":\"$uuid2\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":null,\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\"}"
+    ],
+    "admins": [
+      "{\"created_at\":\"<t-3456000s db +09:00>\",\"id\":\"$uuid?\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"updated_at\":\"<t-3456000s db +09:00>\",\"username\":\"reviewer\"}",
+      "{\"created_at\":\"<t-3542400s db +09:00>\",\"id\":\"$uuid2\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"updated_at\":\"<t-3542400s db +09:00>\",\"username\":\"operator\"}"
+    ],
+    "feedbacks": [
+      "{\"content\":\"버그 신고\",\"created_at\":\"<t-43200s db +09:00>\",\"id\":\"$uuid?\",\"user_id\":\"$uuid?\"}",
+      "{\"content\":\"앱이 좋아요\",\"created_at\":\"<t-172800s db +09:00>\",\"id\":\"$uuid?\",\"user_id\":\"$uuid?\"}",
+      "{\"content\":\"탈퇴 전에 남긴 의견\",\"created_at\":\"<t-86400s db +09:00>\",\"id\":\"$uuid?\",\"user_id\":\"$uuid?\"}"
+    ],
+    "photos": [
+      "{\"created_at\":\"<t-104400s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"byteSize\":77,\"height\":240,\"width\":320},\"original_storage_key\":\"chalkak/posts/p7/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p7/thumbnail.webp\",\"updated_at\":\"<t-104400s db +09:00>\"}",
+      "{\"created_at\":\"<t-108000s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"byteSize\":99,\"height\":480,\"width\":640},\"original_storage_key\":\"chalkak/posts/p6/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p6/thumbnail.webp\",\"updated_at\":\"<t-108000s db +09:00>\"}",
+      "{\"created_at\":\"<t-10800s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/p4/original.webp\",\"thumbnail_storage_key\":null,\"updated_at\":\"<t-10800s db +09:00>\"}",
+      "{\"created_at\":\"<t-111600s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/p3/original.webp\",\"thumbnail_storage_key\":null,\"updated_at\":\"<t-111600s db +09:00>\"}",
+      "{\"created_at\":\"<t-115200s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"height\":\"tall\",\"width\":1000.9},\"original_storage_key\":\"chalkak/posts/p2/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p2/thumbnail.webp\",\"updated_at\":\"<t-115200s db +09:00>\"}",
+      "{\"created_at\":\"<t-14400s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"byteSize\":2048,\"camera\":\"private\",\"height\":3000,\"width\":4000},\"original_storage_key\":\"chalkak/posts/p1/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p1/thumbnail.webp\",\"updated_at\":\"<t-14400s db +09:00>\"}",
+      "{\"created_at\":\"<t-7200s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid14\",\"metadata\":{\"byteSize\":30,\"height\":20,\"width\":10},\"original_storage_key\":\"chalkak/posts/p5/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p5/thumbnail.webp\",\"updated_at\":\"<t-7200s db +09:00>\"}"
+    ],
+    "post_image_uploads": [
+      "{\"claimed_at\":\"<t-115200s db +09:00>\",\"created_at\":\"<t-115800s db +09:00>\",\"expires_at\":\"<t-86400s db +09:00>\",\"id\":\"$uuid?\",\"image_metadata\":{\"width\":1000},\"rejection_reason\":null,\"status\":\"READY\",\"updated_at\":\"<t-115200s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"claimed_at\":\"<t-14400s db +09:00>\",\"created_at\":\"<t-15000s db +09:00>\",\"expires_at\":\"<t+0s db +09:00>\",\"id\":\"$uuid?\",\"image_metadata\":{\"width\":4000},\"rejection_reason\":null,\"status\":\"READY\",\"updated_at\":\"<t-14400s db +09:00>\",\"user_id\":\"$uuid?\"}"
+    ],
+    "post_likes": [
+      "{\"created_at\":\"<t-41400s db +09:00>\",\"id\":\"$uuid?\",\"post_id\":\"$uuid?\",\"user_id\":\"$uuid12\"}",
+      "{\"created_at\":\"<t-43200s db +09:00>\",\"id\":\"$uuid?\",\"post_id\":\"$uuid?\",\"user_id\":\"$uuid?\"}"
+    ],
+    "posts": [
+      "{\"created_at\":\"<t-104400s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"탈퇴\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t-104400s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-108000s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"대기\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t-108000s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-10800s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"VALIDATING\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"처리중\",\"topic_id\":\"$uuid13\",\"updated_at\":\"<t-10800s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-111600s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":\"<t-46800s db +09:00>\",\"moderation_status\":\"REJECTED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"거절\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t-46800s db +09:00>\",\"user_id\":\"$uuid12\"}",
+      "{\"created_at\":\"<t-115200s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":\"<t-50400s db +09:00>\",\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":\"$uuid?\",\"title\":null,\"topic_id\":\"$uuid?\",\"updated_at\":\"<t-50400s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-14400s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":\"$uuid?\",\"title\":\"하늘\",\"topic_id\":\"$uuid13\",\"updated_at\":\"<t-14400s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-7200s db +09:00>\",\"deleted_at\":\"<t-3600s db +09:00>\",\"id\":\"$uuid11\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"photo_id\":\"$uuid14\",\"post_image_upload_id\":null,\"title\":null,\"topic_id\":\"$uuid13\",\"updated_at\":\"<t-7200s db +09:00>\",\"user_id\":\"$uuid12\"}"
+    ],
+    "social_accounts": [
+      "{\"created_at\":\"<t-777600s db +09:00>\",\"id\":\"$uuid?\",\"provider\":\"KAKAO\",\"subject_hmac\":\"3333333333333333333333333333333333333333333333333333333333333333\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-864000s db +09:00>\",\"id\":\"$uuid?\",\"provider\":\"APPLE\",\"subject_hmac\":\"2222222222222222222222222222222222222222222222222222222222222222\",\"user_id\":\"$uuid12\"}",
+      "{\"created_at\":\"<t-950400s db +09:00>\",\"id\":\"$uuid?\",\"provider\":\"GOOGLE\",\"subject_hmac\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"user_id\":\"$uuid?\"}"
+    ],
+    "topics": [
+      "{\"created_at\":\"<t-691200s db +09:00>\",\"deleted_at\":\"<t-604800s db +09:00>\",\"ends_at\":\"<t-205200s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-291600s db +09:00>\",\"title\":\"지워진 주제\",\"topic_date\":\"2026-10-09\",\"updated_at\":\"<t-691200s db +09:00>\"}",
+      "{\"created_at\":\"<t-777600s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t+140400s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t+54000s db +09:00>\",\"title\":\"내일의 주제\",\"topic_date\":\"2026-10-13\",\"updated_at\":\"<t-777600s db +09:00>\"}",
+      "{\"created_at\":\"<t-864000s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t-32400s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-118800s db +09:00>\",\"title\":\"어제의 주제\",\"topic_date\":\"2026-10-11\",\"updated_at\":\"<t-864000s db +09:00>\"}",
+      "{\"created_at\":\"<t-950400s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t+54000s db +09:00>\",\"id\":\"$uuid13\",\"starts_at\":\"<t-32400s db +09:00>\",\"title\":\"가을 하늘\",\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t-950400s db +09:00>\"}"
+    ],
+    "users": [
+      "{\"app_version\":\"1.0.0\",\"created_at\":\"<t-777600s db +09:00>\",\"deleted_at\":\"<t-604800s db +09:00>\",\"email\":\"withdrawn+$uuid?@chalkak.invalid\",\"id\":\"$uuid?\",\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"withdrawn/$uuid?\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"updated_at\":\"<t-604800s db +09:00>\"}",
+      "{\"app_version\":\"1.2.0\",\"created_at\":\"<t-950400s db +09:00>\",\"deleted_at\":null,\"email\":\"Alice@Test.Chalkak\",\"id\":\"$uuid?\",\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u1/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u1/thumbnail.png\",\"status\":\"ACTIVE\",\"updated_at\":\"<t-950400s db +09:00>\"}",
+      "{\"app_version\":\"2.0.0\",\"created_at\":\"<t-691200s db +09:00>\",\"deleted_at\":null,\"email\":null,\"id\":\"$uuid?\",\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u4/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u4/thumbnail.png\",\"status\":\"ACTIVE\",\"updated_at\":\"<t-691200s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t-864000s db +09:00>\",\"deleted_at\":null,\"email\":\"bob@test.chalkak\",\"id\":\"$uuid12\",\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u2/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"BANNED\",\"updated_at\":\"<t-864000s db +09:00>\"}"
+    ]
+  },
+  "steps": [
+    {
+      "body": {
+        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid2\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"ADMIN\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
+        "adminId": "$uuid2",
+        "expiresIn": 900,
+        "refreshToken": "<opaque len=43>",
+        "refreshTokenExpiresIn": 2592000,
+        "username": "operator"
+      },
+      "headers": [
+        [
+          "access-control-allow-origin",
+          "http://localhost:3000"
+        ],
+        [
+          "access-control-expose-headers",
+          "X-Request-Id"
+        ],
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "허용 Origin 로그인"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "access-control-allow-headers",
+          "content-type"
+        ],
+        [
+          "access-control-allow-methods",
+          "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+        ],
+        [
+          "access-control-allow-origin",
+          "http://localhost:3000"
+        ],
+        [
+          "access-control-expose-headers",
+          "X-Request-Id"
+        ],
+        [
+          "access-control-max-age",
+          "3600"
+        ],
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid3"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "로그인 preflight"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "access-control-allow-headers",
+          "authorization, content-type"
+        ],
+        [
+          "access-control-allow-methods",
+          "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+        ],
+        [
+          "access-control-allow-origin",
+          "http://localhost:3000"
+        ],
+        [
+          "access-control-expose-headers",
+          "X-Request-Id"
+        ],
+        [
+          "access-control-max-age",
+          "3600"
+        ],
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid4"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "사용자 상태 변경 preflight"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "access-control-allow-headers",
+          "authorization, content-type"
+        ],
+        [
+          "access-control-allow-methods",
+          "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+        ],
+        [
+          "access-control-allow-origin",
+          "http://localhost:3000"
+        ],
+        [
+          "access-control-expose-headers",
+          "X-Request-Id"
+        ],
+        [
+          "access-control-max-age",
+          "3600"
+        ],
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid5"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "검수 preflight"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "access-control-allow-headers",
+          "authorization, content-type"
+        ],
+        [
+          "access-control-allow-methods",
+          "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+        ],
+        [
+          "access-control-allow-origin",
+          "http://localhost:3000"
+        ],
+        [
+          "access-control-expose-headers",
+          "X-Request-Id"
+        ],
+        [
+          "access-control-max-age",
+          "3600"
+        ],
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid6"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "게시물 삭제 preflight"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "access-control-allow-headers",
+          "authorization, content-type"
+        ],
+        [
+          "access-control-allow-methods",
+          "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+        ],
+        [
+          "access-control-allow-origin",
+          "http://localhost:3000"
+        ],
+        [
+          "access-control-expose-headers",
+          "X-Request-Id"
+        ],
+        [
+          "access-control-max-age",
+          "3600"
+        ],
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid7"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "주제 삭제 preflight"
+    },
+    {
+      "body": "Invalid CORS request",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid8"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 403,
+      "step": "허용하지 않는 Origin 검수 preflight"
+    },
+    {
+      "body": "Invalid CORS request",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid9"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 403,
+      "step": "허용 밖 메서드 preflight"
+    },
+    {
+      "body": {
+        "currentPage": 1,
+        "hasNext": true,
+        "pageSize": 1,
+        "posts": [
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-7200s iso Z>",
+            "deletedAt": "<t-3600s iso Z>",
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "photoId": "$uuid14",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "postId": "$uuid11",
+            "title": null,
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid13"
+            }
+          }
+        ]
+      },
+      "headers": [
+        [
+          "access-control-allow-origin",
+          "http://localhost:3000"
+        ],
+        [
+          "access-control-expose-headers",
+          "X-Request-Id"
+        ],
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid10"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "허용 Origin 실제 요청"
+    },
+    {
+      "body": "Invalid CORS request",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid15"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 403,
+      "step": "허용하지 않는 Origin 실제 요청"
+    },
+    {
+      "body": "Invalid CORS request",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid16"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 403,
+      "step": "허용하지 않는 Origin 토큰 없음"
+    }
+  ]
+}

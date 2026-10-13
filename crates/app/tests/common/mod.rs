@@ -555,6 +555,9 @@ impl World {
             clock: Arc::clone(&clock),
             logger: Arc::clone(&logger),
             settings: Arc::new(settings),
+            admin: chalkak_app::admin::AdminConfig::for_tests(
+                b"0123456789abcdef0123456789abcdef".to_vec(),
+            ),
             post: chalkak_app::post::PostWiring::new(
                 post_settings,
                 Arc::new(NoObjects),

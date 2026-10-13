@@ -1,0 +1,538 @@
+name = "관리자 게시물: 목록 조건, 상세, 검수, 삭제"
+tags = ["admin-api", "post"]
+clock = "2026-10-12T09:00:00+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO admins (id, username, password, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000000a1', 'operator', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-01T00:00:00Z', '2026-09-01T00:00:00Z'),
+  ('01990000-0000-7000-8000-0000000000a2', 'reviewer', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-02T00:00:00Z', '2026-09-02T00:00:00Z');
+INSERT INTO users (id, email, status, signature_original_storage_key, signature_thumbnail_storage_key, app_version, created_at, updated_at, deleted_at) VALUES
+  ('01990000-0000-7000-8000-000000000001', 'Alice@Test.Chalkak', 'ACTIVE', 'chalkak/signatures/u1/original.png', 'chalkak/signatures/u1/thumbnail.png', '1.2.0', '2026-10-01T00:00:00Z', '2026-10-01T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-000000000002', 'bob@test.chalkak', 'BANNED', 'chalkak/signatures/u2/original.png', NULL, NULL, '2026-10-02T00:00:00Z', '2026-10-02T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-000000000003', 'withdrawn+01990000-0000-7000-8000-000000000003@chalkak.invalid', 'ACTIVE', 'withdrawn/01990000-0000-7000-8000-000000000003', NULL, '1.0.0', '2026-10-03T00:00:00Z', '2026-10-05T00:00:00Z', '2026-10-05T00:00:00Z'),
+  ('01990000-0000-7000-8000-000000000004', NULL, 'ACTIVE', 'chalkak/signatures/u4/original.png', 'chalkak/signatures/u4/thumbnail.png', '2.0.0', '2026-10-04T00:00:00Z', '2026-10-04T00:00:00Z', NULL);
+INSERT INTO social_accounts (id, user_id, provider, subject_hmac, created_at) VALUES
+  ('01990000-0000-7000-8000-0000000001a1', '01990000-0000-7000-8000-000000000001', 'GOOGLE', '1111111111111111111111111111111111111111111111111111111111111111', '2026-10-01T00:00:00Z'),
+  ('01990000-0000-7000-8000-0000000001a2', '01990000-0000-7000-8000-000000000002', 'APPLE', '2222222222222222222222222222222222222222222222222222222222222222', '2026-10-02T00:00:00Z'),
+  ('01990000-0000-7000-8000-0000000001a3', '01990000-0000-7000-8000-000000000003', 'KAKAO', '3333333333333333333333333333333333333333333333333333333333333333', '2026-10-03T00:00:00Z');
+INSERT INTO topics (id, title, topic_date, starts_at, ends_at, created_at, updated_at, deleted_at) VALUES
+  ('01990000-0000-7000-8000-0000000000f1', '가을 하늘', '2026-10-12', '2026-10-11T15:00:00Z', '2026-10-12T15:00:00Z', '2026-10-01T00:00:00Z', '2026-10-01T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000000f2', '어제의 주제', '2026-10-11', '2026-10-10T15:00:00Z', '2026-10-11T15:00:00Z', '2026-10-02T00:00:00Z', '2026-10-02T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000000f3', '내일의 주제', '2026-10-13', '2026-10-12T15:00:00Z', '2026-10-13T15:00:00Z', '2026-10-03T00:00:00Z', '2026-10-03T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000000f4', '지워진 주제', '2026-10-09', '2026-10-08T15:00:00Z', '2026-10-09T15:00:00Z', '2026-10-04T00:00:00Z', '2026-10-04T00:00:00Z', '2026-10-05T00:00:00Z');
+INSERT INTO photos (id, original_storage_key, thumbnail_storage_key, metadata, created_at, updated_at, deleted_at) VALUES
+  ('01990000-0000-7000-8000-0000000002a1', 'chalkak/posts/p1/original.webp', 'chalkak/posts/p1/thumbnail.webp', '{"width": 4000, "height": 3000, "byteSize": 2048, "camera": "private"}', '2026-10-11T20:00:00Z', '2026-10-11T20:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000002a2', 'chalkak/posts/p2/original.webp', 'chalkak/posts/p2/thumbnail.webp', '{"width": 1000.9, "height": "tall"}', '2026-10-10T16:00:00Z', '2026-10-10T16:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000002a3', 'chalkak/posts/p3/original.webp', NULL, '{}', '2026-10-10T17:00:00Z', '2026-10-10T17:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000002a4', 'chalkak/posts/p4/original.webp', NULL, '{}', '2026-10-11T21:00:00Z', '2026-10-11T21:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000002a5', 'chalkak/posts/p5/original.webp', 'chalkak/posts/p5/thumbnail.webp', '{"width": 10, "height": 20, "byteSize": 30}', '2026-10-11T22:00:00Z', '2026-10-11T22:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000002a6', 'chalkak/posts/p6/original.webp', 'chalkak/posts/p6/thumbnail.webp', '{"width": 640, "height": 480, "byteSize": 99}', '2026-10-10T18:00:00Z', '2026-10-10T18:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000002a7', 'chalkak/posts/p7/original.webp', 'chalkak/posts/p7/thumbnail.webp', '{"width": 320, "height": 240, "byteSize": 77}', '2026-10-10T19:00:00Z', '2026-10-10T19:00:00Z', NULL);
+INSERT INTO post_image_uploads (id, user_id, status, rejection_reason, image_metadata, expires_at, claimed_at, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000003a1', '01990000-0000-7000-8000-000000000001', 'READY', NULL, '{"width": 4000}', '2026-10-12T00:00:00Z', '2026-10-11T20:00:00Z', '2026-10-11T19:50:00Z', '2026-10-11T20:00:00Z'),
+  ('01990000-0000-7000-8000-0000000003a2', '01990000-0000-7000-8000-000000000001', 'READY', NULL, '{"width": 1000}', '2026-10-11T00:00:00Z', '2026-10-10T16:00:00Z', '2026-10-10T15:50:00Z', '2026-10-10T16:00:00Z');
+INSERT INTO posts (id, user_id, topic_id, photo_id, post_image_upload_id, title, moderation_status, moderated_at, created_at, updated_at, deleted_at) VALUES
+  ('01990000-0000-7000-8000-0000000004a1', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-0000000002a1', '01990000-0000-7000-8000-0000000003a1', '하늘', 'PENDING', NULL, '2026-10-11T20:00:00Z', '2026-10-11T20:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000004a2', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000000f2', '01990000-0000-7000-8000-0000000002a2', '01990000-0000-7000-8000-0000000003a2', NULL, 'APPROVED', '2026-10-11T10:00:00Z', '2026-10-10T16:00:00Z', '2026-10-11T10:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000004a3', '01990000-0000-7000-8000-000000000002', '01990000-0000-7000-8000-0000000000f2', '01990000-0000-7000-8000-0000000002a3', NULL, '거절', 'REJECTED', '2026-10-11T11:00:00Z', '2026-10-10T17:00:00Z', '2026-10-11T11:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000004a4', '01990000-0000-7000-8000-000000000004', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-0000000002a4', NULL, '처리중', 'VALIDATING', NULL, '2026-10-11T21:00:00Z', '2026-10-11T21:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000004a5', '01990000-0000-7000-8000-000000000002', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-0000000002a5', NULL, NULL, 'PENDING', NULL, '2026-10-11T22:00:00Z', '2026-10-11T22:00:00Z', '2026-10-11T23:00:00Z'),
+  ('01990000-0000-7000-8000-0000000004a6', '01990000-0000-7000-8000-000000000004', '01990000-0000-7000-8000-0000000000f2', '01990000-0000-7000-8000-0000000002a6', NULL, '대기', 'PENDING', NULL, '2026-10-10T18:00:00Z', '2026-10-10T18:00:00Z', NULL),
+  ('01990000-0000-7000-8000-0000000004a7', '01990000-0000-7000-8000-000000000003', '01990000-0000-7000-8000-0000000000f2', '01990000-0000-7000-8000-0000000002a7', NULL, '탈퇴', 'PENDING', NULL, '2026-10-10T19:00:00Z', '2026-10-10T19:00:00Z', NULL);
+INSERT INTO post_likes (id, post_id, user_id, created_at) VALUES
+  ('01990000-0000-7000-8000-0000000005a1', '01990000-0000-7000-8000-0000000004a2', '01990000-0000-7000-8000-000000000001', '2026-10-11T12:00:00Z'),
+  ('01990000-0000-7000-8000-0000000005a2', '01990000-0000-7000-8000-0000000004a2', '01990000-0000-7000-8000-000000000002', '2026-10-11T12:30:00Z');
+INSERT INTO feedbacks (id, user_id, content, created_at) VALUES
+  ('01990000-0000-7000-8000-0000000006a1', '01990000-0000-7000-8000-000000000001', '앱이 좋아요', '2026-10-10T00:00:00Z'),
+  ('01990000-0000-7000-8000-0000000006a2', '01990000-0000-7000-8000-000000000003', '탈퇴 전에 남긴 의견', '2026-10-11T00:00:00Z'),
+  ('01990000-0000-7000-8000-0000000006a3', '01990000-0000-7000-8000-000000000004', '버그 신고', '2026-10-11T12:00:00Z');
+INSERT INTO admin_audit_logs (id, actor_admin_id, action, target_type, target_id, reason, before_state, after_state, occurred_at, request_id) VALUES
+  ('01990000-0000-7000-8000-0000000007a1', '01990000-0000-7000-8000-0000000000a1', 'POST_APPROVED', 'POST', '01990000-0000-7000-8000-0000000004a2', NULL, '{"moderationStatus": "PENDING", "moderatedAt": null}', '{"moderationStatus": "APPROVED", "moderatedAt": "2026-10-11T10:00:00Z", "moderatedBy": "01990000-0000-7000-8000-0000000000a1"}', '2026-10-11T10:00:00Z', '11111111-1111-4111-8111-111111111111'),
+  ('01990000-0000-7000-8000-0000000007a2', '01990000-0000-7000-8000-0000000000a2', 'POST_REJECTED', 'POST', '01990000-0000-7000-8000-0000000004a3', '정책 위반', '{"moderationStatus": "PENDING", "moderatedAt": null}', '{"moderationStatus": "REJECTED", "moderatedAt": "2026-10-11T11:00:00Z", "moderatedBy": "01990000-0000-7000-8000-0000000000a2"}', '2026-10-11T11:00:00Z', '22222222-2222-4222-8222-222222222222'),
+  ('01990000-0000-7000-8000-0000000007a3', '01990000-0000-7000-8000-0000000000a1', 'USER_BANNED', 'USER', '01990000-0000-7000-8000-000000000002', '반복 위반', '{"status": "ACTIVE"}', '{"status": "BANNED"}', '2026-10-11T12:00:00Z', '33333333-3333-4333-8333-333333333333');
+"""]
+
+[[step]]
+name = "posts status validating"
+method = "GET"
+path = "/api/v1/admin/posts?status=VALIDATING"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts status bogus"
+method = "GET"
+path = "/api/v1/admin/posts?status=bogus"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts topicId bad"
+method = "GET"
+path = "/api/v1/admin/posts?topicId=xyz"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts topicDate bad"
+method = "GET"
+path = "/api/v1/admin/posts?topicDate=2026-13-01"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts createdAtFrom date only"
+method = "GET"
+path = "/api/v1/admin/posts?createdAtFrom=2026-10-01"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts createdAtFrom ok"
+method = "GET"
+path = "/api/v1/admin/posts?createdAtFrom=2026-10-11T00:00:00Z&createdAtTo=2026-10-12T00:00:00.5Z"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts createdAtFrom offset"
+method = "GET"
+path = "/api/v1/admin/posts?createdAtFrom=2026-10-11T09:00:00%2B09:00"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts createdAtFrom lower"
+method = "GET"
+path = "/api/v1/admin/posts?createdAtFrom=2026-10-11t00:00:00z"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts createdAtFrom nosec"
+method = "GET"
+path = "/api/v1/admin/posts?createdAtFrom=2026-10-11T00:00Z"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts range inverted"
+method = "GET"
+path = "/api/v1/admin/posts?createdAtFrom=2026-10-12T00:00:00Z&createdAtTo=2026-10-11T00:00:00Z"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts userId upper"
+method = "GET"
+path = "/api/v1/admin/posts?userId=01990000-0000-7000-8000-000000000001"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts userId short"
+method = "GET"
+path = "/api/v1/admin/posts?userId=1-2-3-4-5"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts empty uuid"
+method = "GET"
+path = "/api/v1/admin/posts?userId=&topicId="
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts topicDate offset"
+method = "GET"
+path = "/api/v1/admin/posts?topicDate=2026-10-11%2B09:00"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "post id bad"
+method = "GET"
+path = "/api/v1/admin/posts/nope"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "post validating detail"
+method = "GET"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a4"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "moderation empty"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a1/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{}'''
+
+[[step]]
+name = "moderation validating"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a1/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"VALIDATING"}'''
+
+[[step]]
+name = "moderation pending"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a1/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"PENDING"}'''
+
+[[step]]
+name = "moderation approve with reason"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a1/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"APPROVED","rejectionReason":"x"}'''
+
+[[step]]
+name = "moderation reject no reason"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a1/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"REJECTED"}'''
+
+[[step]]
+name = "moderation reject blank"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a1/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"REJECTED","rejectionReason":"   "}'''
+
+[[step]]
+name = "moderation reject long"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a1/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"REJECTED","rejectionReason":"가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가"}'''
+
+[[step]]
+name = "moderation already approved"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a2/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"APPROVED"}'''
+
+[[step]]
+name = "moderation deleted post"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a5/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"APPROVED"}'''
+
+[[step]]
+name = "moderation missing"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004ff/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"APPROVED"}'''
+
+[[step]]
+name = "moderation reject sensitive"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a1/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"REJECTED","rejectionReason":"https://x.test/a.png"}'''
+
+[[step]]
+name = "delete empty"
+method = "DELETE"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a1"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{}'''
+
+[[step]]
+name = "delete blank"
+method = "DELETE"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a1"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"reason":" "}'''
+
+[[step]]
+name = "delete long"
+method = "DELETE"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a1"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"reason":"가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가"}'''
+
+[[step]]
+name = "delete validating"
+method = "DELETE"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a4"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"reason":"x"}'''
+
+[[step]]
+name = "delete missing"
+method = "DELETE"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004ff"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"reason":"x"}'''
+
+[[step]]
+name = "posts list"
+method = "GET"
+path = "/api/v1/admin/posts?sort=createdAtAsc&pageSize=3&page=2"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+
+[[step]]
+name = "post detail"
+method = "GET"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a1"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+
+[[step]]
+name = "post detail approved"
+method = "GET"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a2"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+
+[[step]]
+name = "post detail deleted"
+method = "GET"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a5"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+
+[[step]]
+name = "post detail withdrawn"
+method = "GET"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a7"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+
+[[step]]
+name = "post detail noupload"
+method = "GET"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a6"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+
+[[step]]
+name = "posts userId space"
+method = "GET"
+path = "/api/v1/admin/posts?userId=%20"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts topicDate space"
+method = "GET"
+path = "/api/v1/admin/posts?topicDate=%20"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts createdAtFrom space"
+method = "GET"
+path = "/api/v1/admin/posts?createdAtFrom=%20"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts createdAtFrom nozone"
+method = "GET"
+path = "/api/v1/admin/posts?createdAtFrom=2026-10-11T00:00:00"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts createdAtFrom 12 digits"
+method = "GET"
+path = "/api/v1/admin/posts?createdAtFrom=2026-10-11T00:00:00.123456789012Z"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts createdAtFrom sec 60"
+method = "GET"
+path = "/api/v1/admin/posts?createdAtFrom=2026-10-11T00:00:60Z"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts createdAtFrom hour 24"
+method = "GET"
+path = "/api/v1/admin/posts?createdAtFrom=2026-10-11T24:00:00Z"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts createdAtFrom leap"
+method = "GET"
+path = "/api/v1/admin/posts?createdAtFrom=2026-06-30T23:59:60Z"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts createdAtFrom lead space"
+method = "GET"
+path = "/api/v1/admin/posts?createdAtFrom=%202026-10-11T00:00:00Z"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts topicDate datetime"
+method = "GET"
+path = "/api/v1/admin/posts?topicDate=2026-10-11T00:00:00"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts topicDate compact"
+method = "GET"
+path = "/api/v1/admin/posts?topicDate=20261011"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts topicId upper"
+method = "GET"
+path = "/api/v1/admin/posts?topicId=01990000-0000-7000-8000-0000000000F1"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts userId nonhex"
+method = "GET"
+path = "/api/v1/admin/posts?userId=zzzzzzzz-0000-7000-8000-000000000001"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts userId 36plus"
+method = "GET"
+path = "/api/v1/admin/posts?userId=01990000-0000-7000-8000-0000000000011"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts userId plus"
+method = "GET"
+path = "/api/v1/admin/posts?userId=%2B1990000-0000-7000-8000-000000000001"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts status lowercase"
+method = "GET"
+path = "/api/v1/admin/posts?status=pending"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts status space"
+method = "GET"
+path = "/api/v1/admin/posts?status=%20PENDING"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts two binding errors"
+method = "GET"
+path = "/api/v1/admin/posts?userId=q&topicId=r&status=x"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "posts binding then range"
+method = "GET"
+path = "/api/v1/admin/posts?createdAtFrom=2026-10-12T00:00:00Z&createdAtTo=bad"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "moderation ordinal"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a5/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":2}'''
+
+[[step]]
+name = "moderation string ordinal"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a5/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"2"}'''
+
+[[step]]
+name = "moderation lead space"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a5/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":" APPROVED"}'''
+
+[[step]]
+name = "moderation lowercase"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a5/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"approved"}'''
+
+[[step]]
+name = "moderation empty string"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a5/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":""}'''
+
+[[step]]
+name = "moderation float"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a5/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":2.0}'''
+
+[[step]]
+name = "moderation bool"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a5/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":true}'''
+
+[[step]]
+name = "moderation reason num"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a5/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"APPROVED","rejectionReason":5}'''
+
+[[step]]
+name = "moderation reason empty"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a5/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"APPROVED","rejectionReason":""}'''
+
+[[step]]
+name = "moderation null reason"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a5/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"APPROVED","rejectionReason":null}'''
+
+[[step]]
+name = "moderation reject trimmed 500"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a5/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"REJECTED","rejectionReason":" aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa "}'''
+
+[[step]]
+name = "moderation reject nbsp"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a5/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"REJECTED","rejectionReason":"\u00a0"}'''
+
+[[step]]
+name = "moderation reject 0x1f"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000004a5/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"REJECTED","rejectionReason":"\u001f"}'''
