@@ -4,13 +4,15 @@
 //! 검증 실패는 모두 401이다(원본은 `JwtException`을 `UnauthorizedException`으로 바꾼다).
 
 use std::sync::Arc;
+use std::sync::atomic::{AtomicI64, Ordering};
 
 use chalkak_core::Clock;
 use chalkak_core::error::{AppError, ErrorCode};
+use chalkak_core::log::Logger;
 use chalkak_http::client::HttpClient;
 use chalkak_jwt::{
     Claims, JWKS_ACCEPT, JWKS_CONNECT_TIMEOUT, JWKS_READ_TIMEOUT, JwksCache, JwksCacheConfig,
-    JwksFetchError, JwksSource, Validator,
+    JwksEvents, JwksFetchError, JwksSource, Validator,
 };
 use serde_json::Value;
 
@@ -55,6 +57,7 @@ impl SocialIdentityVerifier {
     pub fn from_settings(
         auth: &AuthSettings,
         clock: Arc<dyn Clock>,
+        logger: Arc<Logger>,
     ) -> Result<SocialIdentityVerifier, String> {
         let mut verifiers: Vec<Arc<dyn IdTokenVerifier>> = Vec::new();
         for (provider, settings) in [
@@ -62,12 +65,15 @@ impl SocialIdentityVerifier {
             (SocialProvider::Kakao, &auth.kakao),
             (SocialProvider::Apple, &auth.apple_oidc),
         ] {
-            verifiers.push(Arc::new(OidcIdTokenVerifier::new(
-                provider,
-                settings,
-                email_policy_for(provider),
-                Arc::clone(&clock),
-            )?));
+            verifiers.push(Arc::new(
+                OidcIdTokenVerifier::new(
+                    provider,
+                    settings,
+                    email_policy_for(provider),
+                    Arc::clone(&clock),
+                )?
+                .with_logger(Arc::clone(&logger)),
+            ));
         }
         SocialIdentityVerifier::new(verifiers)
     }
@@ -194,6 +200,70 @@ impl chalkak_jwt::Clock for JwksClock {
     }
 }
 
+const EVENT_LOGGER_NAME: &str =
+    "com.chalkak.backend.auth.infrastructure.infra.oidc.OidcJwkSetEventLogger";
+
+/// 재조회 제한 알림을 이 간격마다 한 번만 남긴다(원본 `JWK_SET_REFETCH_INTERVAL`).
+const RATE_LIMITED_LOG_INTERVAL_MS: i64 = 30_000;
+
+/// 원본 `OidcJwkSetEventLogger`. 공개키 목록 조회가 정상 흐름을 벗어난 순간을 제공자 이름과 함께 경고로 남긴다.
+/// 검증 실패는 401로만 바뀌어 원인이 남지 않으므로, 재시도·이전 목록 사용·재조회 제한을 운영 중에 구분하게 한다.
+/// 재시도와 이전 목록 사용은 재조회 제한 아래에서만 일어나 횟수가 제한되지만, 재조회 제한 알림은 넘친 요청마다
+/// 오므로 임의 kid 토큰을 반복해 보내도 로그가 쌓이지 않게 구간마다 한 번만 남긴다.
+struct OidcJwkSetEventLogger {
+    provider: SocialProvider,
+    logger: Arc<Logger>,
+    clock: Arc<dyn Clock>,
+    next_rate_limited_log_at: AtomicI64,
+}
+
+impl OidcJwkSetEventLogger {
+    fn new(provider: SocialProvider, logger: Arc<Logger>, clock: Arc<dyn Clock>) -> Self {
+        OidcJwkSetEventLogger {
+            provider,
+            logger,
+            clock,
+            next_rate_limited_log_at: AtomicI64::new(i64::MIN),
+        }
+    }
+}
+
+impl JwksEvents for OidcJwkSetEventLogger {
+    fn retrial(&self, cause: &str) {
+        self.logger.warn(EVENT_LOGGER_NAME).log(&format!(
+            "{} 공개키 목록 조회에 실패해 한 번 더 시도합니다. cause={cause}",
+            self.provider.name()
+        ));
+    }
+
+    fn outage(&self, remaining_ms: i64, cause: &str) {
+        self.logger.warn(EVENT_LOGGER_NAME).log(&format!(
+            "{} 공개키 목록을 받지 못해 이전에 받은 목록을 사용합니다. remainingMillis={remaining_ms}, cause={cause}",
+            self.provider.name()
+        ));
+    }
+
+    fn rate_limited(&self) {
+        let now = self.clock.now().as_millisecond();
+        let next = self.next_rate_limited_log_at.load(Ordering::SeqCst);
+        if now < next {
+            return;
+        }
+        let following = now.saturating_add(RATE_LIMITED_LOG_INTERVAL_MS);
+        if self
+            .next_rate_limited_log_at
+            .compare_exchange(next, following, Ordering::SeqCst, Ordering::SeqCst)
+            .is_err()
+        {
+            return;
+        }
+        self.logger.warn(EVENT_LOGGER_NAME).log(&format!(
+            "{} 공개키 목록 재조회 제한에 걸려 조회 없이 ID Token 검증에 실패했습니다.",
+            self.provider.name()
+        ));
+    }
+}
+
 pub struct OidcIdTokenVerifier {
     provider: SocialProvider,
     cache: JwksCache,
@@ -203,6 +273,13 @@ pub struct OidcIdTokenVerifier {
 }
 
 impl OidcIdTokenVerifier {
+    /// 공개키 목록 조회의 재시도·이전 목록 사용·재조회 제한을 경고 로그로 남긴다.
+    pub fn with_logger(mut self, logger: Arc<Logger>) -> Self {
+        let events = OidcJwkSetEventLogger::new(self.provider, logger, Arc::clone(&self.clock));
+        self.cache.set_events(Arc::new(events));
+        self
+    }
+
     pub fn new(
         provider: SocialProvider,
         settings: &OidcProvider,
@@ -324,6 +401,7 @@ pub fn constant_time_eq(a: &[u8], b: &[u8]) -> bool {
 mod tests {
     use super::*;
     use chalkak_core::FixedClock;
+    use chalkak_core::log::Level;
     use serde_json::json;
 
     const EMAIL: &str = "user@chalkak.test";
@@ -690,10 +768,64 @@ mod tests {
         .auth
     }
 
+    /// 줄 단위로 모아 두는 로그 출력.
+    #[derive(Clone, Default)]
+    struct Capture(Arc<std::sync::Mutex<Vec<u8>>>);
+
+    impl std::io::Write for Capture {
+        fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+            self.0.lock().unwrap().extend_from_slice(buf);
+            Ok(buf.len())
+        }
+        fn flush(&mut self) -> std::io::Result<()> {
+            Ok(())
+        }
+    }
+
+    impl Capture {
+        fn lines(&self) -> usize {
+            String::from_utf8(self.0.lock().unwrap().clone())
+                .unwrap()
+                .lines()
+                .count()
+        }
+    }
+
+    // OidcJwkSetEventLoggerTest#logRateLimited_repeatedAcrossInterval_logsOncePerInterval
+    #[test]
+    fn log_rate_limited_repeated_across_interval_logs_once_per_interval() {
+        let clock = Arc::new(FixedClock::new("2026-10-12T00:00:00Z".parse().unwrap()));
+        let capture = Capture::default();
+        let logger = Arc::new(Logger::new(
+            Box::new(capture.clone()),
+            Level::Info,
+            clock.clone(),
+        ));
+        let events = OidcJwkSetEventLogger::new(SocialProvider::Kakao, logger, clock.clone());
+
+        events.rate_limited();
+        clock.advance(std::time::Duration::from_millis(29_999));
+        events.rate_limited();
+        let before_interval = capture.lines();
+        clock.advance(std::time::Duration::from_millis(1));
+        events.rate_limited();
+
+        assert_eq!(before_interval, 1);
+        assert_eq!(capture.lines(), 2);
+    }
+
     #[test]
     fn create_valid_properties_registers_decoders_and_verifiers() {
         let clock = Arc::new(FixedClock::new("2026-10-12T00:00:00Z".parse().unwrap()));
-        let v = SocialIdentityVerifier::from_settings(&auth_settings(), clock).unwrap();
+        let v = SocialIdentityVerifier::from_settings(
+            &auth_settings(),
+            clock,
+            Arc::new(Logger::stdout(
+                Level::Info,
+                Arc::new(FixedClock::new("2026-10-12T00:00:00Z".parse().unwrap())),
+            )),
+        )
+        .unwrap();
         assert_eq!(
             v.providers(),
             vec![

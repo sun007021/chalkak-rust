@@ -11,7 +11,7 @@ use std::io::{self, Read};
 use super::headers::Headers;
 use super::limits::Limits;
 use super::method::{Method, is_token_byte};
-use super::query::{decode_path, parse_query};
+use super::query::{decode_path, parse_query_checked};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum Version {
@@ -31,7 +31,13 @@ pub(crate) enum BodyKind {
 pub(crate) struct Head {
     pub method: Method,
     pub path: String,
+    /// 퍼센트 디코딩 전 경로(쿼리 제외). 오류 응답 본문의 `path`와 접근 로그가 이 형태를 쓴다.
+    pub raw_path: String,
     pub query: Vec<(String, String)>,
+    /// 디코딩 전 쿼리 문자열(`?` 뒤, 없으면 빈 문자열).
+    pub raw_query: String,
+    /// 쿼리에 잘못된 퍼센트 인코딩이 있는가. Tomcat은 파라미터를 읽는 순간 예외를 던진다.
+    pub query_malformed: bool,
     pub headers: Headers,
     pub version: Version,
     pub body: BodyKind,
@@ -61,8 +67,8 @@ impl ParseError {
     pub fn status(&self) -> Option<u16> {
         Some(match self {
             ParseError::BadRequest(_) => 400,
-            ParseError::UriTooLong => 414,
-            ParseError::HeaderTooLarge => 431,
+            // Tomcat은 요청 줄·헤더가 너무 길면 414·431 대신 400으로 답한다.
+            ParseError::UriTooLong | ParseError::HeaderTooLarge => 400,
             ParseError::BodyTooLarge => 413,
             ParseError::VersionNotSupported => 505,
             ParseError::NotImplemented(_) => 501,
@@ -146,7 +152,7 @@ impl<R: Read> Conn<R> {
                 self.consume(2);
             }
             let avail = self.avail();
-            // 요청 줄 하나만으로 상한을 넘으면 414, 헤더까지 합쳐 넘으면 431.
+            // 요청 줄 하나만으로 상한을 넘거나 헤더까지 합쳐 넘으면 거절한다(둘 다 400).
             let line_len = find(avail, b"\r\n").unwrap_or(avail.len());
             if line_len + 2 > limits.max_header_bytes {
                 return Err(ParseError::UriTooLong);
@@ -357,7 +363,7 @@ fn parse_head(raw: &[u8], limits: &Limits) -> Result<Head, ParseError> {
 
     let request_line = lines.next().unwrap_or_default();
     let request_line = request_line.strip_suffix(b"\r").unwrap_or(request_line);
-    let (method, path, query, version) = parse_request_line(request_line)?;
+    let (method, target, version) = parse_request_line(request_line)?;
 
     let mut headers = Headers::new();
     for line in lines {
@@ -368,8 +374,11 @@ fn parse_head(raw: &[u8], limits: &Limits) -> Result<Head, ParseError> {
     let info = analyze(&headers, version, limits)?;
     Ok(Head {
         method,
-        path,
-        query,
+        path: target.path,
+        raw_path: target.raw_path,
+        query: target.query,
+        raw_query: target.raw_query,
+        query_malformed: target.query_malformed,
         headers,
         version,
         body: info.body,
@@ -378,7 +387,16 @@ fn parse_head(raw: &[u8], limits: &Limits) -> Result<Head, ParseError> {
     })
 }
 
-type RequestLine = (Method, String, Vec<(String, String)>, Version);
+/// 요청 대상을 해석한 결과.
+struct Target {
+    path: String,
+    raw_path: String,
+    query: Vec<(String, String)>,
+    raw_query: String,
+    query_malformed: bool,
+}
+
+type RequestLine = (Method, Target, Version);
 
 fn parse_request_line(line: &[u8]) -> Result<RequestLine, ParseError> {
     if line
@@ -403,8 +421,8 @@ fn parse_request_line(line: &[u8]) -> Result<RequestLine, ParseError> {
         v if is_http_version(v) => return Err(ParseError::VersionNotSupported),
         _ => return Err(ParseError::BadRequest("invalid HTTP version")),
     };
-    let (path, query) = parse_target(&method, target)?;
-    Ok((method, path, query, version))
+    let target = parse_target(&method, target)?;
+    Ok((method, target, version))
 }
 
 fn is_http_version(v: &str) -> bool {
@@ -416,17 +434,20 @@ fn is_http_version(v: &str) -> bool {
         && b[7].is_ascii_digit()
 }
 
-fn parse_target(
-    method: &Method,
-    target: &str,
-) -> Result<(String, Vec<(String, String)>), ParseError> {
-    if target.is_empty() || target.contains('#') {
+fn parse_target(method: &Method, target: &str) -> Result<Target, ParseError> {
+    if target.is_empty() || !target.bytes().all(is_target_byte) {
         return Err(ParseError::BadRequest("invalid request target"));
     }
     let origin_form = if target.starts_with('/') {
         target
     } else if target == "*" && *method == Method::Options {
-        return Ok(("*".to_string(), Vec::new()));
+        return Ok(Target {
+            path: "*".to_string(),
+            raw_path: "*".to_string(),
+            query: Vec::new(),
+            raw_query: String::new(),
+            query_malformed: false,
+        });
     } else if let Some(rest) = strip_scheme(target) {
         // absolute-form: 호스트는 버리고 경로·쿼리만 쓴다.
         match rest.find(['/', '?']) {
@@ -444,7 +465,46 @@ fn parse_target(
     let raw_path = if raw_path.is_empty() { "/" } else { raw_path };
     let path =
         decode_path(raw_path).ok_or(ParseError::BadRequest("invalid percent-encoding in path"))?;
-    Ok((path, parse_query(raw_query)))
+    if climbs_above_root(&path) {
+        return Err(ParseError::BadRequest("path climbs above the root"));
+    }
+    let (query, query_malformed) = parse_query_checked(raw_query);
+    Ok(Target {
+        path,
+        raw_path: raw_path.to_string(),
+        query,
+        raw_query: raw_query.to_string(),
+        query_malformed,
+    })
+}
+
+/// 요청 대상에 쓸 수 있는 바이트(Tomcat 기본 설정): 인쇄 가능한 ASCII에서 `\"<>[\\]^`{|}`와 `#`을 뺀 것.
+/// 제어 문자·공백·ASCII 밖 바이트·조각(`#`)은 Tomcat 파서가 400으로 거절한다.
+fn is_target_byte(b: u8) -> bool {
+    matches!(b, 0x21..=0x7e)
+        && !matches!(
+            b,
+            b'"' | b'<' | b'>' | b'[' | b'\\' | b']' | b'^' | b'`' | b'{' | b'|' | b'}' | b'#'
+        )
+}
+
+/// 디코딩한 경로의 `..`가 루트 위로 올라가는지. Tomcat `CoyoteAdapter.normalize`가 이런 경로를 400으로 거절한다.
+/// (`//`와 `.` 조각은 정규화하면 그만이라 여기서는 거절하지 않는다. 그쪽은 방화벽 몫이다.)
+fn climbs_above_root(path: &str) -> bool {
+    let mut depth = 0usize;
+    for segment in path.split('/') {
+        match segment {
+            "" | "." => {}
+            ".." => {
+                if depth == 0 {
+                    return true;
+                }
+                depth -= 1;
+            }
+            _ => depth += 1,
+        }
+    }
+    false
 }
 
 fn strip_scheme(target: &str) -> Option<&str> {
@@ -588,6 +648,14 @@ mod tests {
     }
 
     #[test]
+    fn raw_path_keeps_percent_encoding() {
+        // Tomcat getRequestURI(): 오류 응답 본문의 path와 접근 로그가 쓰는 디코딩 전 경로
+        let h = head("GET /caf%C3%A9/%3Bx?a=1 HTTP/1.1\r\nHost: x\r\n\r\n").unwrap();
+        assert_eq!(h.path, "/café/;x");
+        assert_eq!(h.raw_path, "/caf%C3%A9/%3Bx");
+    }
+
+    #[test]
     fn trailing_slash_and_case_are_preserved() {
         // platform__unknown-path.json: 끝 슬래시·대소문자는 다른 경로다.
         assert_eq!(
@@ -705,7 +773,7 @@ mod tests {
     }
 
     #[test]
-    fn header_size_limit_is_431_and_long_request_line_is_414() {
+    fn header_size_limit_and_long_request_line_are_rejected() {
         let l = Limits {
             max_header_bytes: 64,
             ..limits()
@@ -745,7 +813,7 @@ mod tests {
     }
 
     #[test]
-    fn header_count_limit_is_431() {
+    fn header_count_limit_is_rejected() {
         let l = Limits {
             max_headers: 3,
             ..limits()
@@ -903,7 +971,7 @@ mod tests {
     }
 
     #[test]
-    fn chunked_trailers_over_header_limit_is_431() {
+    fn chunked_trailers_over_header_limit_is_rejected() {
         let l = Limits {
             max_headers: 2,
             ..limits()
@@ -912,6 +980,68 @@ mod tests {
         let mut c = Conn::new(Cursor::new(raw.as_bytes().to_vec()));
         let h = c.read_head(&l).unwrap().unwrap();
         assert_eq!(c.read_body(&h, &l).unwrap_err(), ParseError::HeaderTooLarge);
+    }
+
+    // 원본(java-3, Tomcat 10.1) 실측: 아래 문자가 요청 대상(경로·쿼리)에 있으면 파서가 400으로 거절한다.
+    #[test]
+    fn target_with_characters_tomcat_rejects_is_bad_request() {
+        for c in [
+            '"', '<', '>', '[', ']', '\\', '^', '`', '{', '|', '}', 'ß', '가', '\t',
+        ] {
+            for target in [format!("/a{c}b"), format!("/a?x={c}")] {
+                let raw = format!("GET {target} HTTP/1.1\r\nHost: x\r\n\r\n");
+                assert!(
+                    matches!(head(&raw), Err(ParseError::BadRequest(_))),
+                    "{target:?}"
+                );
+            }
+        }
+        // 허용되는 문자는 그대로 통과한다.
+        let ok = head("GET /a-b_c.d~e;f=g/h?x=1&y=a+b,c:d@e!$'()*%20 HTTP/1.1\r\nHost: x\r\n\r\n");
+        assert!(ok.is_ok());
+    }
+
+    #[test]
+    fn path_climbing_above_the_root_is_bad_request() {
+        for target in [
+            "/..",
+            "/../a",
+            "/%2e%2e/a",
+            "/a/../../b",
+            "/a/%2E%2E/%2e%2e",
+        ] {
+            let raw = format!("GET {target} HTTP/1.1\r\nHost: x\r\n\r\n");
+            assert!(
+                matches!(head(&raw), Err(ParseError::BadRequest(_))),
+                "{target}"
+            );
+        }
+        // 루트 안에서 끝나는 `..`·`.`·`//`는 파서가 거절하지 않는다(방화벽이 따로 거절한다).
+        for target in ["/a/../b", "/./a", "//a", "/a/%2e%2e/b"] {
+            let raw = format!("GET {target} HTTP/1.1\r\nHost: x\r\n\r\n");
+            assert!(head(&raw).is_ok(), "{target}");
+        }
+    }
+
+    #[test]
+    fn raw_query_keeps_the_encoded_text() {
+        let h = head("GET /a?x=%EA%B0%80&y=1+2 HTTP/1.1\r\nHost: x\r\n\r\n").unwrap();
+        assert_eq!(h.raw_query, "x=%EA%B0%80&y=1+2");
+        assert_eq!(
+            head("GET /a HTTP/1.1\r\nHost: x\r\n\r\n")
+                .unwrap()
+                .raw_query,
+            ""
+        );
+    }
+
+    #[test]
+    fn malformed_percent_in_query_is_flagged_not_rejected() {
+        let h = head("GET /a?x=%zz&y=1 HTTP/1.1\r\nHost: x\r\n\r\n").unwrap();
+        assert!(h.query_malformed);
+        assert_eq!(h.query, [("y".into(), "1".into())]);
+        let h = head("GET /a?x=%20 HTTP/1.1\r\nHost: x\r\n\r\n").unwrap();
+        assert!(!h.query_malformed);
     }
 
     // --- keep-alive / Expect ---
@@ -1045,8 +1175,9 @@ mod tests {
     #[test]
     fn error_statuses() {
         assert_eq!(ParseError::BadRequest("x").status(), Some(400));
-        assert_eq!(ParseError::UriTooLong.status(), Some(414));
-        assert_eq!(ParseError::HeaderTooLarge.status(), Some(431));
+        // 원본(Tomcat 10.1)은 요청 줄·헤더가 너무 길 때 414·431이 아니라 400으로 답한다.
+        assert_eq!(ParseError::UriTooLong.status(), Some(400));
+        assert_eq!(ParseError::HeaderTooLarge.status(), Some(400));
         assert_eq!(ParseError::BodyTooLarge.status(), Some(413));
         assert_eq!(ParseError::VersionNotSupported.status(), Some(505));
         assert_eq!(ParseError::NotImplemented("x").status(), Some(501));

@@ -107,7 +107,7 @@ impl Middleware for BearerAuth {
                     &*self.clock,
                     500,
                     "Internal Server Error",
-                    &req.path,
+                    &req.raw_path,
                 ))
             }
         }
@@ -369,6 +369,7 @@ mod tests {
         let t = token_with(payload(json!({"aud": "__DEL__"})));
         let mut req = request(Some(&format!("Bearer {t}")));
         req.path = "/api/v1/topics".into();
+        req.raw_path = "/api/v1/topics".into();
         let next = |_: Request| Response::new(200);
         let r = auth().handle(req, &next);
         assert_eq!(r.status, 500);

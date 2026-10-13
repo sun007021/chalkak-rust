@@ -1,0 +1,751 @@
+name = "Tomcat 단계 요청 거절: 허용되지 않는 문자와 잘못된 퍼센트 인코딩"
+tags = ["platform"]
+
+[setup]
+sql = ["INSERT INTO users (id, email, signature_original_storage_key) VALUES ('01990000-0000-7000-8000-000000000001', 'user1@test.chalkak', 'chalkak/signatures/user1/original.png')"]
+
+
+[[step]]
+name = "쿼리에 '\"'"
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x="'
+
+[[step]]
+name = "경로에 '\"'"
+method = "GET"
+path = '/api/v1/to"pics?date=2026-10-12'
+
+[[step]]
+name = "쿼리에 '<'"
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=<'
+
+[[step]]
+name = "경로에 '<'"
+method = "GET"
+path = '/api/v1/to<pics?date=2026-10-12'
+
+[[step]]
+name = "쿼리에 '>'"
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=>'
+
+[[step]]
+name = "경로에 '>'"
+method = "GET"
+path = '/api/v1/to>pics?date=2026-10-12'
+
+[[step]]
+name = "쿼리에 '['"
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=['
+
+[[step]]
+name = "경로에 '['"
+method = "GET"
+path = '/api/v1/to[pics?date=2026-10-12'
+
+[[step]]
+name = "쿼리에 ']'"
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=]'
+
+[[step]]
+name = "경로에 ']'"
+method = "GET"
+path = '/api/v1/to]pics?date=2026-10-12'
+
+[[step]]
+name = "쿼리에 '\\\\'"
+method = "GET"
+path = "/api/v1/topics?date=2026-10-12&x=\\"
+
+[[step]]
+name = "경로에 '\\\\'"
+method = "GET"
+path = "/api/v1/to\\pics?date=2026-10-12"
+
+[[step]]
+name = "쿼리에 '^'"
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=^'
+
+[[step]]
+name = "경로에 '^'"
+method = "GET"
+path = '/api/v1/to^pics?date=2026-10-12'
+
+[[step]]
+name = "쿼리에 '`'"
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=`'
+
+[[step]]
+name = "경로에 '`'"
+method = "GET"
+path = '/api/v1/to`pics?date=2026-10-12'
+
+[[step]]
+name = "쿼리에 '{'"
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x={'
+
+[[step]]
+name = "경로에 '{'"
+method = "GET"
+path = '/api/v1/to{pics?date=2026-10-12'
+
+[[step]]
+name = "쿼리에 '|'"
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=|'
+
+[[step]]
+name = "경로에 '|'"
+method = "GET"
+path = '/api/v1/to|pics?date=2026-10-12'
+
+[[step]]
+name = "쿼리에 '}'"
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=}'
+
+[[step]]
+name = "경로에 '}'"
+method = "GET"
+path = '/api/v1/to}pics?date=2026-10-12'
+
+[[step]]
+name = "쿼리에 'ß'"
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=ß'
+
+[[step]]
+name = "경로에 'ß'"
+method = "GET"
+path = '/api/v1/toßpics?date=2026-10-12'
+
+[[step]]
+name = "쿼리에 '가'"
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=가'
+
+[[step]]
+name = "경로에 '가'"
+method = "GET"
+path = '/api/v1/to가pics?date=2026-10-12'
+
+[[step]]
+name = '쿼리 %zz 공개'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=%zz'
+
+[[step]]
+name = '쿼리 %zz 인증 후 회원 경로'
+method = "GET"
+path = '/api/v1/notifications?x=%zz'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '쿼리 %zz 인증 없음 보호 경로'
+method = "GET"
+path = '/api/v1/notifications?x=%zz'
+
+[[step]]
+name = '쿼리 %zz 없는 경로 인증됨'
+method = "GET"
+path = '/api/v1/nothing?x=%zz'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '쿼리 %zz 405'
+method = "DELETE"
+path = '/api/v1/topics?x=%zz'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '쿼리 %zz actuator'
+method = "GET"
+path = '/actuator/health?x=%zz'
+
+[[step]]
+name = '쿼리 %4 공개'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=%4'
+
+[[step]]
+name = '쿼리 %4 인증 후 회원 경로'
+method = "GET"
+path = '/api/v1/notifications?x=%4'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '쿼리 %4 인증 없음 보호 경로'
+method = "GET"
+path = '/api/v1/notifications?x=%4'
+
+[[step]]
+name = '쿼리 %4 없는 경로 인증됨'
+method = "GET"
+path = '/api/v1/nothing?x=%4'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '쿼리 %4 405'
+method = "DELETE"
+path = '/api/v1/topics?x=%4'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '쿼리 %4 actuator'
+method = "GET"
+path = '/actuator/health?x=%4'
+
+[[step]]
+name = '쿼리 % 공개'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=%'
+
+[[step]]
+name = '쿼리 % 인증 후 회원 경로'
+method = "GET"
+path = '/api/v1/notifications?x=%'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '쿼리 % 인증 없음 보호 경로'
+method = "GET"
+path = '/api/v1/notifications?x=%'
+
+[[step]]
+name = '쿼리 % 없는 경로 인증됨'
+method = "GET"
+path = '/api/v1/nothing?x=%'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '쿼리 % 405'
+method = "DELETE"
+path = '/api/v1/topics?x=%'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '쿼리 % actuator'
+method = "GET"
+path = '/actuator/health?x=%'
+
+[[step]]
+name = '쿼리 %2 공개'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=%2'
+
+[[step]]
+name = '쿼리 %2 인증 후 회원 경로'
+method = "GET"
+path = '/api/v1/notifications?x=%2'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '쿼리 %2 인증 없음 보호 경로'
+method = "GET"
+path = '/api/v1/notifications?x=%2'
+
+[[step]]
+name = '쿼리 %2 없는 경로 인증됨'
+method = "GET"
+path = '/api/v1/nothing?x=%2'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '쿼리 %2 405'
+method = "DELETE"
+path = '/api/v1/topics?x=%2'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '쿼리 %2 actuator'
+method = "GET"
+path = '/actuator/health?x=%2'
+
+[[step]]
+name = '쿼리 %G0 공개'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=%G0'
+
+[[step]]
+name = '쿼리 %G0 인증 후 회원 경로'
+method = "GET"
+path = '/api/v1/notifications?x=%G0'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '쿼리 %G0 인증 없음 보호 경로'
+method = "GET"
+path = '/api/v1/notifications?x=%G0'
+
+[[step]]
+name = '쿼리 %G0 없는 경로 인증됨'
+method = "GET"
+path = '/api/v1/nothing?x=%G0'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '쿼리 %G0 405'
+method = "DELETE"
+path = '/api/v1/topics?x=%G0'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '쿼리 %G0 actuator'
+method = "GET"
+path = '/actuator/health?x=%G0'
+
+[[step]]
+name = '경로 /api/v1/topics%2Fx'
+method = "GET"
+path = '/api/v1/topics%2Fx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '경로 /api/v1/topics%2Fx Accept html'
+method = "GET"
+path = '/api/v1/topics%2Fx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '경로 /api/v1/topics%2fx'
+method = "GET"
+path = '/api/v1/topics%2fx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '경로 /api/v1/topics%2fx Accept html'
+method = "GET"
+path = '/api/v1/topics%2fx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '경로 /api/v1/topics%5Cx'
+method = "GET"
+path = '/api/v1/topics%5Cx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '경로 /api/v1/topics%5Cx Accept html'
+method = "GET"
+path = '/api/v1/topics%5Cx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '경로 /api/v1/to%00pics'
+method = "GET"
+path = '/api/v1/to%00pics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '경로 /api/v1/to%00pics Accept html'
+method = "GET"
+path = '/api/v1/to%00pics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '경로 /api/v1/topics/%'
+method = "GET"
+path = '/api/v1/topics/%'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '경로 /api/v1/topics/% Accept html'
+method = "GET"
+path = '/api/v1/topics/%'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '경로 /api/v1/topics/%zz'
+method = "GET"
+path = '/api/v1/topics/%zz'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '경로 /api/v1/topics/%zz Accept html'
+method = "GET"
+path = '/api/v1/topics/%zz'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '경로 /api/v1/topics/%FF'
+method = "GET"
+path = '/api/v1/topics/%FF'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '경로 /api/v1/topics/%FF Accept html'
+method = "GET"
+path = '/api/v1/topics/%FF'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '경로 /%2e%2e/api/v1/topics'
+method = "GET"
+path = '/%2e%2e/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '경로 /%2e%2e/api/v1/topics Accept html'
+method = "GET"
+path = '/%2e%2e/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '경로 /api/v1/topics/%2E%2E/x'
+method = "GET"
+path = '/api/v1/topics/%2E%2E/x'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '경로 /api/v1/topics/%2E%2E/x Accept html'
+method = "GET"
+path = '/api/v1/topics/%2E%2E/x'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '경로 /api/v1/topics//x'
+method = "GET"
+path = '/api/v1/topics//x'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '경로 /api/v1/topics//x Accept html'
+method = "GET"
+path = '/api/v1/topics//x'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '경로 /api/v1//topics'
+method = "GET"
+path = '/api/v1//topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '경로 /api/v1//topics Accept html'
+method = "GET"
+path = '/api/v1//topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '쿼리 %FF topics'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&%FF'
+
+[[step]]
+name = '쿼리 %C3 topics'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&%C3'
+
+[[step]]
+name = '쿼리 %zz=1 topics'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&%zz=1'
+
+[[step]]
+name = '쿼리 =%zz topics'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&=%zz'
+
+[[step]]
+name = '쿼리 a=1&&b=%zz topics'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&a=1&&b=%zz'
+
+[[step]]
+name = '쿼리 %e4%b8 topics'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&%e4%b8'
+
+[[step]]
+name = '쿼리 a=%u0041 topics'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&a=%u0041'
+
+[[step]]
+name = '쿼리 %zz /api/v1/posts'
+method = "GET"
+path = '/api/v1/posts?x=%zz'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '쿼리 %zz /api/v1/posts/calendar'
+method = "GET"
+path = '/api/v1/posts/calendar?x=%zz'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '쿼리 %zz /api/v1/posts/today'
+method = "GET"
+path = '/api/v1/posts/today?x=%zz'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '쿼리 %zz /api/v1/notifications/unread-status'
+method = "GET"
+path = '/api/v1/notifications/unread-status?x=%zz'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = '쿼리 %zz /api/v1/admin/audit-logs'
+method = "GET"
+path = '/api/v1/admin/audit-logs?x=%zz'
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = '쿼리 %zz /api/v1/admin/feedbacks'
+method = "GET"
+path = '/api/v1/admin/feedbacks?x=%zz'
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = '쿼리 %zz /api/v1/admin/posts'
+method = "GET"
+path = '/api/v1/admin/posts?x=%zz'
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = '쿼리 %zz /api/v1/admin/topics'
+method = "GET"
+path = '/api/v1/admin/topics?x=%zz'
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = '쿼리 %zz /api/v1/admin/users'
+method = "GET"
+path = '/api/v1/admin/users?x=%zz'
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = '쿼리 %zz /api/v1/admin/auth/me'
+method = "GET"
+path = '/api/v1/admin/auth/me?x=%zz'
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = '쿼리 %zz HEAD topics'
+method = "HEAD"
+path = '/api/v1/topics?date=2026-10-12&x=%zz'
+
+[[step]]
+name = '쿼리 %zz /actuator'
+method = "GET"
+path = '/actuator?x=%zz'
+
+[[step]]
+name = '쿼리 %zz /actuator/info'
+method = "GET"
+path = '/actuator/info?x=%zz'
+
+[[step]]
+name = '쿼리 %zz /actuator/health/liveness'
+method = "GET"
+path = '/actuator/health/liveness?x=%zz'
+
+[[step]]
+name = '쿼리 %zz /actuator/health/nothing'
+method = "GET"
+path = '/actuator/health/nothing?x=%zz'
+
+[[step]]
+name = '쿼리 %zz /actuator/env'
+method = "GET"
+path = '/actuator/env?x=%zz'
+
+[[step]]
+name = '쿼리 %zz actuator Accept html'
+method = "GET"
+path = '/actuator/health?x=%zz'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '쿼리 %zz topics Accept html'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=%zz'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'OPTIONS *'
+method = "OPTIONS"
+path = '*'
+
+[[step]]
+name = 'OPTIONS * Accept html'
+method = "OPTIONS"
+path = '*'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '루트 위로 올라가는 경로'
+method = "GET"
+path = '/../api/v1/topics'
+
+[[step]]
+name = '루트 안에서 끝나는 .. 경로'
+method = "GET"
+path = '/api/v1/../v1/topics'
+
+[[step]]
+name = '쿼리 %zz topics Accept text/html'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=%zz'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '쿼리 %zz actuator Accept text/html'
+method = "GET"
+path = '/actuator/health?x=%zz'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '쿼리 %zz topics Accept text/*'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=%zz'
+headers = { "Accept" = 'text/*' }
+
+[[step]]
+name = '쿼리 %zz actuator Accept text/*'
+method = "GET"
+path = '/actuator/health?x=%zz'
+headers = { "Accept" = 'text/*' }
+
+[[step]]
+name = '쿼리 %zz topics Accept application/xml'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=%zz'
+headers = { "Accept" = 'application/xml' }
+
+[[step]]
+name = '쿼리 %zz actuator Accept application/xml'
+method = "GET"
+path = '/actuator/health?x=%zz'
+headers = { "Accept" = 'application/xml' }
+
+[[step]]
+name = '쿼리 %zz topics Accept bad'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=%zz'
+headers = { "Accept" = 'bad' }
+
+[[step]]
+name = '쿼리 %zz actuator Accept bad'
+method = "GET"
+path = '/actuator/health?x=%zz'
+headers = { "Accept" = 'bad' }
+
+[[step]]
+name = '쿼리 %zz topics Accept */*'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=%zz'
+headers = { "Accept" = '*/*' }
+
+[[step]]
+name = '쿼리 %zz actuator Accept */*'
+method = "GET"
+path = '/actuator/health?x=%zz'
+headers = { "Accept" = '*/*' }
+
+[[step]]
+name = '쿼리 %zz topics Accept application/json'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=%zz'
+headers = { "Accept" = 'application/json' }
+
+[[step]]
+name = '쿼리 %zz actuator Accept application/json'
+method = "GET"
+path = '/actuator/health?x=%zz'
+headers = { "Accept" = 'application/json' }
+
+[[step]]
+name = '쿼리 %zz topics Accept application/vnd.spring-boot.actuator.v3+json'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=%zz'
+headers = { "Accept" = 'application/vnd.spring-boot.actuator.v3+json' }
+
+[[step]]
+name = '쿼리 %zz actuator Accept application/vnd.spring-boot.actuator.v3+json'
+method = "GET"
+path = '/actuator/health?x=%zz'
+headers = { "Accept" = 'application/vnd.spring-boot.actuator.v3+json' }
+
+[[step]]
+name = '쿼리 %zz topics Accept application/problem+json, text/html'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=%zz'
+headers = { "Accept" = 'application/problem+json, text/html' }
+
+[[step]]
+name = '쿼리 %zz actuator Accept application/problem+json, text/html'
+method = "GET"
+path = '/actuator/health?x=%zz'
+headers = { "Accept" = 'application/problem+json, text/html' }
+
+[[step]]
+name = '쿼리 %zz topics Accept text/html, application/json;q=0.5'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12&x=%zz'
+headers = { "Accept" = 'text/html, application/json;q=0.5' }
+
+[[step]]
+name = '쿼리 %zz actuator Accept text/html, application/json;q=0.5'
+method = "GET"
+path = '/actuator/health?x=%zz'
+headers = { "Accept" = 'text/html, application/json;q=0.5' }
+
+[[step]]
+name = '쿼리 %zz POST'
+method = "POST"
+path = '/api/v1/feedbacks?x=%zz'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Content-Type" = 'application/json' }
+body = '{"content":"좋아요"}'
+
+[[step]]
+name = '쿼리 %4 POST'
+method = "POST"
+path = '/api/v1/feedbacks?x=%4'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Content-Type" = 'application/json' }
+body = '{"content":"좋아요"}'
+
+[[step]]
+name = '쿼리 % POST'
+method = "POST"
+path = '/api/v1/feedbacks?x=%'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Content-Type" = 'application/json' }
+body = '{"content":"좋아요"}'
+
+[[step]]
+name = '쿼리 %2 POST'
+method = "POST"
+path = '/api/v1/feedbacks?x=%2'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Content-Type" = 'application/json' }
+body = '{"content":"좋아요"}'
+
+[[step]]
+name = '쿼리 %G0 POST'
+method = "POST"
+path = '/api/v1/feedbacks?x=%G0'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Content-Type" = 'application/json' }
+body = '{"content":"좋아요"}'

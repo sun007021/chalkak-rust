@@ -7,6 +7,7 @@
 //! - `/actuator`: `_links` 목록(요청의 Host로 만든 절대 주소).
 //! - 그 밖의 `/actuator/health/*`: 본문 없는 404. 다른 `/actuator/*`은 일반 JSON 404로 넘어간다.
 //! - GET·HEAD가 아닌 메서드는 405 JSON.
+//! - 쿼리에 잘못된 퍼센트 인코딩이 있으면 어느 엔드포인트든 500 JSON(핸들러가 파라미터를 읽다 실패한다).
 //!
 //! 끝 슬래시는 무시한다. 공개 경로는 `/actuator/health`, `/actuator/info`뿐이라 나머지는 인가 단계에서 회원 토큰을 요구한다.
 //!
@@ -14,7 +15,7 @@
 
 use std::sync::Arc;
 
-use chalkak_app::web::ApiError;
+use chalkak_app::web::{ApiError, marker, unreadable_query_response};
 use chalkak_core::Clock;
 use chalkak_core::log::Logger;
 use chalkak_http::{Method, Request, Response};
@@ -62,6 +63,13 @@ impl Actuator {
         if !matches!(req.method, Method::Get | Method::Head) {
             return Some(ApiError::MethodNotSupported.into_response(&self.logger));
         }
+        // 엔드포인트 핸들러가 파라미터 맵을 읽다 Tomcat 예외로 500이 된다(java-3 실측: /actuator/health?x=%zz).
+        if req.query_malformed {
+            return Some(unreadable_query_response(
+                &self.logger,
+                marker::ACTUATOR_PARAM,
+            ));
+        }
         Some(match path {
             "/actuator" => json(200, links(req)),
             "/actuator/health" => self.health(),
@@ -92,6 +100,7 @@ impl Actuator {
         boot::closing(
             Response::new(500)
                 .with_header("Content-Type", "application/json")
+                .with_header(marker::ORIGIN, marker::BOOT)
                 .with_body(body.into_bytes()),
         )
     }
@@ -100,6 +109,7 @@ impl Actuator {
 fn json(status: u16, body: String) -> Response {
     Response::new(status)
         .with_header("Content-Type", ACTUATOR_CONTENT_TYPE)
+        .with_header(marker::ORIGIN, marker::ACTUATOR)
         .with_body(body.into_bytes())
 }
 
@@ -138,5 +148,29 @@ mod tests {
         assert!(is_actuator_path("/actuator/health"));
         assert!(!is_actuator_path("/actuatorx"));
         assert!(!is_actuator_path("/api/actuator"));
+    }
+
+    // java-3: GET /actuator/health?x=%zz -> 500 INTERNAL_ERROR, 405는 그대로 405
+    #[test]
+    fn 잘못된_퍼센트_쿼리는_엔드포인트에서_500이다() {
+        use chalkak_core::FixedClock;
+        use chalkak_core::log::Level;
+        let clock: Arc<dyn Clock> =
+            Arc::new(FixedClock::new("2026-10-12T00:00:00Z".parse().unwrap()));
+        let logger = Arc::new(Logger::new(
+            Box::new(std::io::sink()),
+            Level::Error,
+            Arc::clone(&clock),
+        ));
+        let actuator = Actuator::new(Arc::new(|| true), clock, logger);
+        let mut req = Request::new(Method::Get, "/actuator/health");
+        req.query_malformed = true;
+        assert_eq!(actuator.handle(&req).unwrap().status, 500);
+        let mut post = Request::new(Method::Post, "/actuator/health");
+        post.query_malformed = true;
+        assert_eq!(actuator.handle(&post).unwrap().status, 405);
+        let mut other = Request::new(Method::Get, "/actuator/env");
+        other.query_malformed = true;
+        assert!(actuator.handle(&other).is_none());
     }
 }

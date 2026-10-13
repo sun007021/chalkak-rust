@@ -3,8 +3,8 @@
 //! 원본 `OidcIdTokenDecoderFactoryTest`, `OidcIdTokenAudienceValidatorTest`, `OidcIdTokenClaimsValidatorTest`를 옮겼다.
 //! 원본은 `JwtDecoder.decode`가 `JwtException`을 던지는지 보지만, 여기서는 검증기가 같은 토큰을 401(`유효하지 않은
 //! GOOGLE ID Token입니다.`)로 거절하는지 본다. 시각은 `FixedClock`이라 재조회 제한 구간(30초)이 흐르지 않는다.
-//! 경고 로그 문구를 확인하는 원본 테스트(재조회 제한 로그, 이전 목록 사용 로그, `OidcJwkSetEventLoggerTest`)는
-//! 옮기지 않았다: 러스트 JWKS 캐시는 이 로그를 남기지 않는다.
+//! 경고 로그(재시도, 이전 목록 사용, 재조회 제한)는 `OidcIdTokenVerifier::with_logger`로 켠다. 구간 간격 규칙
+//! (`OidcJwkSetEventLoggerTest`)은 `auth/oidc.rs`의 단위 테스트가 본다.
 
 #[path = "../../platform/jwt/tests/common/mod.rs"]
 mod jwt_common;
@@ -20,6 +20,7 @@ use chalkak_app::auth::domain::SocialProvider;
 use chalkak_app::auth::oidc::{EmailPolicy, HttpJwksSource, IdTokenVerifier, OidcIdTokenVerifier};
 use chalkak_app::config::OidcProvider;
 use chalkak_core::FixedClock;
+use chalkak_core::log::{Level, Logger};
 use chalkak_jwt::{JwksFetchError, JwksSource};
 use jiff::Timestamp;
 use serde_json::{Value, json};
@@ -335,7 +336,7 @@ fn create_decoder_rotated_key_id_refetches_jwk_set_and_decodes() {
     assert_eq!(f.source.retrieval_count(), 2);
 }
 
-// OidcIdTokenDecoderFactoryTest#createDecoder_transientRetrievalFailure_retriesAndDecodes (재시도 로그는 확인하지 않는다)
+// OidcIdTokenDecoderFactoryTest#createDecoder_transientRetrievalFailure_retriesAndDecodes
 #[test]
 fn create_decoder_transient_retrieval_failure_retries_and_decodes() {
     let f = fixture();
@@ -412,6 +413,119 @@ fn create_decoder_jwk_set_uri_fetches_jwk_set_over_http() {
     assert_eq!(
         accept.lock().unwrap().as_deref(),
         Some("application/json, application/jwk-set+json")
+    );
+}
+
+/// 로그 한 줄씩을 모아 두는 출력.
+#[derive(Clone, Default)]
+struct LogBuf(Arc<Mutex<Vec<u8>>>);
+
+impl Write for LogBuf {
+    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+        self.0.lock().unwrap().extend_from_slice(buf);
+        Ok(buf.len())
+    }
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
+    }
+}
+
+impl LogBuf {
+    /// 모아 둔 로그 줄의 `message`.
+    fn messages(&self) -> Vec<String> {
+        String::from_utf8(self.0.lock().unwrap().clone())
+            .unwrap()
+            .lines()
+            .map(|l| {
+                let json: Value = serde_json::from_str(l).unwrap();
+                assert_eq!(json["level"], "WARN");
+                json["message"].as_str().unwrap().to_owned()
+            })
+            .collect()
+    }
+}
+
+/// 시계를 밖에서 움직일 수 있고 경고 로그를 모아 두는 검증기.
+fn logged_fixture() -> (Fixture, Arc<FixedClock>, LogBuf) {
+    let source = CountingSource::new(jwk_set(&[KEY_ID]));
+    let clock = Arc::new(FixedClock::new(NOW.parse().unwrap()));
+    let log = LogBuf::default();
+    let logger = Arc::new(Logger::new(
+        Box::new(log.clone()),
+        Level::Info,
+        clock.clone(),
+    ));
+    let verifier = OidcIdTokenVerifier::with_source(
+        SocialProvider::Google,
+        &settings(),
+        EmailPolicy::VerifiedOnly,
+        source.clone(),
+        clock.clone(),
+    )
+    .unwrap()
+    .with_logger(logger);
+    (Fixture { source, verifier }, clock, log)
+}
+
+// OidcIdTokenDecoderFactoryTest#createDecoder_refetchLimitReachedRepeatedly_logsWarningOncePerWindow
+#[test]
+fn create_decoder_refetch_limit_reached_repeatedly_logs_warning_once_per_window() {
+    let (f, _clock, log) = logged_fixture();
+    f.decode(&sign(KEY_ID, &valid_claims(&[])));
+    let unknown = sign("unknown-key", &valid_claims(&[]));
+
+    for _ in 0..4 {
+        f.assert_rejects(&unknown);
+    }
+
+    let limited: Vec<_> = log
+        .messages()
+        .into_iter()
+        .filter(|m| m.contains("재조회 제한"))
+        .collect();
+    assert_eq!(
+        limited,
+        ["GOOGLE 공개키 목록 재조회 제한에 걸려 조회 없이 ID Token 검증에 실패했습니다."]
+    );
+}
+
+// OidcIdTokenDecoderFactoryTest#createDecoder_transientRetrievalFailure_retriesAndDecodes (재시도 알림)
+#[test]
+fn create_decoder_transient_retrieval_failure_logs_retrial() {
+    let (f, _clock, log) = logged_fixture();
+    f.source.fail_next(1);
+
+    f.decode(&sign(KEY_ID, &valid_claims(&[])));
+
+    let messages = log.messages();
+    assert_eq!(messages.len(), 1);
+    assert!(messages[0].starts_with("GOOGLE 공개키 목록 조회에 실패해 한 번 더 시도합니다."));
+}
+
+// OidcIdTokenDecoderFactoryTest#createJwkSource_refreshFailuresBeforeCacheExpiry_keepsServingPreviousJwkSet
+#[test]
+fn create_jwk_source_refresh_failures_before_cache_expiry_keeps_serving_previous_jwk_set() {
+    let (f, clock, log) = logged_fixture();
+    let long_lived = valid_claims(&[("exp", json!(now_seconds() + 3_600))]);
+    f.decode(&sign(KEY_ID, &long_lived));
+    clock.advance(std::time::Duration::from_secs(299));
+    f.source.fail_next(4);
+    let unknown = sign("unknown-key", &long_lived);
+    for _ in 0..2 {
+        f.assert_rejects(&unknown);
+    }
+    // 세 번째는 재조회 제한이라 제공자에 요청하지 않는다.
+    f.assert_rejects(&unknown);
+
+    // 캐시 원래 만료(첫 조회 + 300초)를 지난 뒤에도, 이전 목록이 다시 캐시되어 있어 조회 없이 통과한다.
+    clock.advance(std::time::Duration::from_secs(2));
+    assert_eq!(f.decode(&sign(KEY_ID, &long_lived)), "provider-subject");
+
+    assert_eq!(f.source.retrieval_count(), 5);
+    assert!(
+        log.messages()
+            .iter()
+            .any(|m| m.starts_with("GOOGLE 공개키 목록을 받지 못해 이전에 받은 목록을 사용합니다."))
     );
 }
 

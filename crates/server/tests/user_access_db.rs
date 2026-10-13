@@ -1,8 +1,8 @@
 //! 회원 상태에 따른 접근 정책을 실제 체인(인증, 인가, 콜백 본문 제한)과 DB로 확인한다. `CHALKAK_TEST_DB_URL`이 없으면
 //! 건너뛴다.
 //!
-//! 원본 `SuspendedUserAccessTest`, `WithdrawnUserAccessTest`, `CallbackBodySizeLimitFilterTest` 중 auth·user 도메인
-//! 엔드포인트(사인 업로드·교체·조회, 탈퇴)와 콜백 필터를 옮겼다. 게시물·좋아요·피드백 행은 각 도메인에서 옮긴다.
+//! 원본 `SuspendedUserAccessTest`, `WithdrawnUserAccessTest`, `CallbackBodySizeLimitFilterTest`를 옮겼다. 사인·탈퇴,
+//! 게시물·좋아요 엔드포인트와 콜백 필터를 본다(피드백 제출 행은 `feedback_db.rs`).
 //! 원본처럼 회원 행은 SQL로 직접 넣고, 토큰은 서명한 액세스 토큰을 쓴다.
 
 use std::sync::Arc;
@@ -20,6 +20,8 @@ const SECRET_HEX: &str = "fedcba9876543210fedcba9876543210fedcba9876543210fedcba
 const NOW: &str = "2026-10-12T03:00:00Z";
 const NOW_SECONDS: i64 = 1_791_774_000;
 const UPLOAD_ID: &str = "0198f6c1-62ba-7d30-8b12-0f733b6570e1";
+const POST_ID: &str = "0198f6c1-62ba-7d30-8b12-0f733b6570d4";
+const CREATE_POST_BODY: &str = r#"{"topicId":"0198f6c1-62ba-7d30-8b12-0f733b6570b2","photoUploadId":"0198f6c1-62ba-7d30-8b12-0f733b6570d4","title":"제목"}"#;
 
 fn handler(db: &TestDb) -> Arc<dyn Handler> {
     let mut pairs = vec![
@@ -81,7 +83,18 @@ fn call(
     bearer: Option<&str>,
     body: Option<&str>,
 ) -> Response {
+    // `?` 뒤는 쿼리(값은 디코딩된 문자열)로 나눠 넣는다.
+    let (path, query) = path.split_once('?').unwrap_or((path, ""));
     let mut req = Request::new(method, path);
+    req.raw_query = query.to_owned();
+    req.query = query
+        .split('&')
+        .filter(|pair| !pair.is_empty())
+        .map(|pair| {
+            let (name, value) = pair.split_once('=').unwrap_or((pair, ""));
+            (name.to_owned(), value.to_owned())
+        })
+        .collect();
     if let Some(t) = bearer {
         req.headers.append("Authorization", format!("Bearer {t}"));
     }
@@ -190,6 +203,187 @@ fn get_signature_suspended_user_is_not_forbidden() {
     assert_not_suspended(&r);
 }
 
+// SuspendedUserAccessTest#createPostImageUpload_suspendedUser_returnsForbidden
+#[test]
+fn create_post_image_upload_suspended_user_returns_forbidden() {
+    let Some(db) = TestDb::create() else { return };
+    let token = insert_user(&db, "BANNED", false);
+    let h = handler(&db);
+
+    let r = call(
+        &h,
+        Method::Post,
+        "/api/v1/posts/uploads",
+        Some(&token),
+        None,
+    );
+
+    assert_suspended(&r);
+}
+
+// SuspendedUserAccessTest#createPost_suspendedUser_returnsForbidden
+#[test]
+fn create_post_suspended_user_returns_forbidden() {
+    let Some(db) = TestDb::create() else { return };
+    let token = insert_user(&db, "BANNED", false);
+    let h = handler(&db);
+
+    let r = call(
+        &h,
+        Method::Post,
+        "/api/v1/posts",
+        Some(&token),
+        Some(CREATE_POST_BODY),
+    );
+
+    assert_suspended(&r);
+}
+
+// SuspendedUserAccessTest#updatePost_suspendedUser_returnsForbidden
+#[test]
+fn update_post_suspended_user_returns_forbidden() {
+    let Some(db) = TestDb::create() else { return };
+    let token = insert_user(&db, "BANNED", false);
+    let h = handler(&db);
+
+    let r = call(
+        &h,
+        Method::Put,
+        &format!("/api/v1/posts/{POST_ID}"),
+        Some(&token),
+        Some(r#"{"title":"수정 제목"}"#),
+    );
+
+    assert_suspended(&r);
+}
+
+// SuspendedUserAccessTest#likePost_suspendedUser_returnsForbidden
+#[test]
+fn like_post_suspended_user_returns_forbidden() {
+    let Some(db) = TestDb::create() else { return };
+    let token = insert_user(&db, "BANNED", false);
+    let h = handler(&db);
+
+    let r = call(
+        &h,
+        Method::Put,
+        &format!("/api/v1/posts/{POST_ID}/likes"),
+        Some(&token),
+        None,
+    );
+
+    assert_suspended(&r);
+}
+
+// SuspendedUserAccessTest#unlikePost_suspendedUser_isNotForbidden
+#[test]
+fn unlike_post_suspended_user_is_not_forbidden() {
+    let Some(db) = TestDb::create() else { return };
+    let token = insert_user(&db, "BANNED", false);
+    let h = handler(&db);
+
+    let r = call(
+        &h,
+        Method::Delete,
+        &format!("/api/v1/posts/{POST_ID}/likes"),
+        Some(&token),
+        None,
+    );
+
+    assert_not_suspended(&r);
+}
+
+// SuspendedUserAccessTest#deletePost_suspendedUser_isNotForbidden
+#[test]
+fn delete_post_suspended_user_is_not_forbidden() {
+    let Some(db) = TestDb::create() else { return };
+    let token = insert_user(&db, "BANNED", false);
+    let h = handler(&db);
+
+    let r = call(
+        &h,
+        Method::Delete,
+        &format!("/api/v1/posts/{POST_ID}"),
+        Some(&token),
+        None,
+    );
+
+    assert_not_suspended(&r);
+}
+
+// SuspendedUserAccessTest#getMyPostCalendar_suspendedUser_isNotForbidden
+#[test]
+fn get_my_post_calendar_suspended_user_is_not_forbidden() {
+    let Some(db) = TestDb::create() else { return };
+    let token = insert_user(&db, "BANNED", false);
+    let h = handler(&db);
+
+    let r = call(
+        &h,
+        Method::Get,
+        "/api/v1/posts/calendar?year=2026&month=8",
+        Some(&token),
+        None,
+    );
+
+    assert_not_suspended(&r);
+}
+
+// SuspendedUserAccessTest#getPosts_suspendedUser_isNotForbidden
+#[test]
+fn get_posts_suspended_user_is_not_forbidden() {
+    let Some(db) = TestDb::create() else { return };
+    let token = insert_user(&db, "BANNED", false);
+    let h = handler(&db);
+
+    let r = call(
+        &h,
+        Method::Get,
+        "/api/v1/posts?topicDate=2026-08-12",
+        Some(&token),
+        None,
+    );
+
+    assert_not_suspended(&r);
+}
+
+// SuspendedUserAccessTest#getPost_suspendedUser_isNotForbidden
+#[test]
+fn get_post_suspended_user_is_not_forbidden() {
+    let Some(db) = TestDb::create() else { return };
+    let token = insert_user(&db, "BANNED", false);
+    let h = handler(&db);
+
+    let r = call(
+        &h,
+        Method::Get,
+        &format!("/api/v1/posts/{POST_ID}"),
+        Some(&token),
+        None,
+    );
+
+    assert_not_suspended(&r);
+}
+
+// SuspendedUserAccessTest#getMyPostCalendarMonths_suspendedUser_returnsOk
+#[test]
+fn get_my_post_calendar_months_suspended_user_returns_ok() {
+    let Some(db) = TestDb::create() else { return };
+    let token = insert_user(&db, "BANNED", false);
+    let h = handler(&db);
+
+    let r = call(
+        &h,
+        Method::Get,
+        "/api/v1/posts/calendar/months",
+        Some(&token),
+        None,
+    );
+
+    assert_eq!(r.status, 200);
+    assert_eq!(json_body(&r)["months"], json!([]));
+}
+
 // ---------------------------------------------------------------------------------------------
 // WithdrawnUserAccessTest
 // ---------------------------------------------------------------------------------------------
@@ -258,6 +452,83 @@ fn get_signature_withdrawn_user_returns_unauthorized() {
     );
 
     assert_withdrawn(&r);
+}
+
+/// 탈퇴 회원이 게시물 계열 엔드포인트에서 모두 401을 받는지 한 요청씩 본다.
+fn assert_withdrawn_gets_unauthorized(method: Method, path: &str, body: Option<&str>) {
+    let Some(db) = TestDb::create() else { return };
+    let token = insert_user(&db, "ACTIVE", true);
+    let h = handler(&db);
+
+    let r = call(&h, method, path, Some(&token), body);
+
+    assert_withdrawn(&r);
+}
+
+// WithdrawnUserAccessTest#createPostImageUpload_withdrawnUser_returnsUnauthorized
+#[test]
+fn create_post_image_upload_withdrawn_user_returns_unauthorized() {
+    assert_withdrawn_gets_unauthorized(Method::Post, "/api/v1/posts/uploads", None);
+}
+
+// WithdrawnUserAccessTest#createPost_withdrawnUser_returnsUnauthorized
+#[test]
+fn create_post_withdrawn_user_returns_unauthorized() {
+    assert_withdrawn_gets_unauthorized(Method::Post, "/api/v1/posts", Some(CREATE_POST_BODY));
+}
+
+// WithdrawnUserAccessTest#likePost_withdrawnUser_returnsUnauthorized
+#[test]
+fn like_post_withdrawn_user_returns_unauthorized() {
+    assert_withdrawn_gets_unauthorized(
+        Method::Put,
+        &format!("/api/v1/posts/{POST_ID}/likes"),
+        None,
+    );
+}
+
+// WithdrawnUserAccessTest#unlikePost_withdrawnUser_returnsUnauthorized
+#[test]
+fn unlike_post_withdrawn_user_returns_unauthorized() {
+    assert_withdrawn_gets_unauthorized(
+        Method::Delete,
+        &format!("/api/v1/posts/{POST_ID}/likes"),
+        None,
+    );
+}
+
+// WithdrawnUserAccessTest#deletePost_withdrawnUser_returnsUnauthorized
+#[test]
+fn delete_post_withdrawn_user_returns_unauthorized() {
+    assert_withdrawn_gets_unauthorized(Method::Delete, &format!("/api/v1/posts/{POST_ID}"), None);
+}
+
+// WithdrawnUserAccessTest#getMyPostCalendar_withdrawnUser_returnsUnauthorized
+#[test]
+fn get_my_post_calendar_withdrawn_user_returns_unauthorized() {
+    assert_withdrawn_gets_unauthorized(
+        Method::Get,
+        "/api/v1/posts/calendar?year=2026&month=8",
+        None,
+    );
+}
+
+// WithdrawnUserAccessTest#getMyPostCalendarMonths_withdrawnUser_returnsUnauthorized
+#[test]
+fn get_my_post_calendar_months_withdrawn_user_returns_unauthorized() {
+    assert_withdrawn_gets_unauthorized(Method::Get, "/api/v1/posts/calendar/months", None);
+}
+
+// WithdrawnUserAccessTest#getPost_withdrawnUser_returnsUnauthorized
+#[test]
+fn get_post_withdrawn_user_returns_unauthorized() {
+    assert_withdrawn_gets_unauthorized(Method::Get, &format!("/api/v1/posts/{POST_ID}"), None);
+}
+
+// WithdrawnUserAccessTest#getPosts_withdrawnUser_returnsUnauthorized
+#[test]
+fn get_posts_withdrawn_user_returns_unauthorized() {
+    assert_withdrawn_gets_unauthorized(Method::Get, "/api/v1/posts?topicDate=2026-08-12", None);
 }
 
 // ---------------------------------------------------------------------------------------------

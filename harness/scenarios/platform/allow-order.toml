@@ -1,0 +1,285 @@
+name = "405 Allow 헤더의 메서드 순서(Accept: text/html)"
+tags = ["platform"]
+
+[setup]
+sql = ["INSERT INTO users (id, email, signature_original_storage_key) VALUES ('01990000-0000-7000-8000-000000000001', 'user1@test.chalkak', 'chalkak/signatures/user1/original.png')"]
+
+
+[[step]]
+name = 'PATCH /api/v1/admin/audit-logs (등록: GET)'
+method = "PATCH"
+path = '/api/v1/admin/audit-logs'
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/admin/auth/login (등록: POST)'
+method = "PATCH"
+path = '/api/v1/admin/auth/login'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/admin/auth/logout (등록: POST)'
+method = "PATCH"
+path = '/api/v1/admin/auth/logout'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/admin/auth/me (등록: GET)'
+method = "PATCH"
+path = '/api/v1/admin/auth/me'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/admin/auth/refresh (등록: POST)'
+method = "PATCH"
+path = '/api/v1/admin/auth/refresh'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/admin/feedbacks (등록: GET)'
+method = "PATCH"
+path = '/api/v1/admin/feedbacks'
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/admin/posts (등록: GET)'
+method = "PATCH"
+path = '/api/v1/admin/posts'
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/admin/posts/{postId} (등록: DELETE,GET)'
+method = "PATCH"
+path = '/api/v1/admin/posts/01990000-0000-7000-8000-0000000000aa'
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/admin/posts/{postId}/moderation (등록: PUT)'
+method = "PATCH"
+path = '/api/v1/admin/posts/01990000-0000-7000-8000-0000000000aa/moderation'
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/admin/topics (등록: GET,POST)'
+method = "PATCH"
+path = '/api/v1/admin/topics'
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/admin/topics/{topicId} (등록: DELETE,GET,PUT)'
+method = "PATCH"
+path = '/api/v1/admin/topics/01990000-0000-7000-8000-0000000000aa'
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/admin/users (등록: GET)'
+method = "PATCH"
+path = '/api/v1/admin/users'
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/admin/users/{userId} (등록: GET)'
+method = "PATCH"
+path = '/api/v1/admin/users/01990000-0000-7000-8000-0000000000aa'
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PUT /api/v1/admin/users/{userId}/status (등록: PATCH)'
+method = "PUT"
+path = '/api/v1/admin/users/01990000-0000-7000-8000-0000000000aa/status'
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/auth/logout (등록: POST)'
+method = "PATCH"
+path = '/api/v1/auth/logout'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/auth/refresh (등록: POST)'
+method = "PATCH"
+path = '/api/v1/auth/refresh'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/auth/social-login (등록: POST)'
+method = "PATCH"
+path = '/api/v1/auth/social-login'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/auth/social-signup (등록: POST)'
+method = "PATCH"
+path = '/api/v1/auth/social-signup'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/auth/social-signup/signature/uploads (등록: POST)'
+method = "PATCH"
+path = '/api/v1/auth/social-signup/signature/uploads'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/feedbacks (등록: POST)'
+method = "PATCH"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/notifications (등록: GET)'
+method = "PATCH"
+path = '/api/v1/notifications'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PUT /api/v1/notifications/read-all (등록: PATCH)'
+method = "PUT"
+path = '/api/v1/notifications/read-all'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/notifications/unread-status (등록: GET)'
+method = "PATCH"
+path = '/api/v1/notifications/unread-status'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/notifications/{notificationId} (등록: GET)'
+method = "PATCH"
+path = '/api/v1/notifications/01990000-0000-7000-8000-0000000000aa'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PUT /api/v1/notifications/{notificationId}/read (등록: PATCH)'
+method = "PUT"
+path = '/api/v1/notifications/01990000-0000-7000-8000-0000000000aa/read'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/posts (등록: GET,POST)'
+method = "PATCH"
+path = '/api/v1/posts'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/posts/calendar (등록: GET)'
+method = "PATCH"
+path = '/api/v1/posts/calendar'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/posts/calendar/months (등록: GET)'
+method = "PATCH"
+path = '/api/v1/posts/calendar/months'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/posts/today (등록: GET)'
+method = "PATCH"
+path = '/api/v1/posts/today'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/posts/uploads (등록: POST)'
+method = "PATCH"
+path = '/api/v1/posts/uploads'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/posts/{postId} (등록: DELETE,GET,PUT)'
+method = "PATCH"
+path = '/api/v1/posts/01990000-0000-7000-8000-0000000000aa'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/posts/{postId}/likes (등록: DELETE,PUT)'
+method = "PATCH"
+path = '/api/v1/posts/01990000-0000-7000-8000-0000000000aa/likes'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/topics (등록: GET)'
+method = "PATCH"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/users/me (등록: DELETE)'
+method = "PATCH"
+path = '/api/v1/users/me'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/users/me/signature (등록: GET,PUT)'
+method = "PATCH"
+path = '/api/v1/users/me/signature'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /api/v1/users/me/signature/uploads (등록: POST)'
+method = "PATCH"
+path = '/api/v1/users/me/signature/uploads'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /internal/v1/post-image-processing/{uploadId}/complete (등록: POST)'
+method = "PATCH"
+path = '/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000aa/complete'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /internal/v1/post-image-processing/{uploadId}/failed (등록: POST)'
+method = "PATCH"
+path = '/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000aa/failed'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /internal/v1/post-image-processing/{uploadId}/upload-urls (등록: POST)'
+method = "PATCH"
+path = '/internal/v1/post-image-processing/01990000-0000-7000-8000-0000000000aa/upload-urls'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /internal/v1/signature-processing/{uploadId}/complete (등록: POST)'
+method = "PATCH"
+path = '/internal/v1/signature-processing/01990000-0000-7000-8000-0000000000aa/complete'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /internal/v1/signature-processing/{uploadId}/failed (등록: POST)'
+method = "PATCH"
+path = '/internal/v1/signature-processing/01990000-0000-7000-8000-0000000000aa/failed'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'PATCH /internal/v1/signature-processing/{uploadId}/upload-urls (등록: POST)'
+method = "PATCH"
+path = '/internal/v1/signature-processing/01990000-0000-7000-8000-0000000000aa/upload-urls'
+headers = { "Accept" = 'text/html' }
