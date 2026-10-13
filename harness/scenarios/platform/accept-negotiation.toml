@@ -1,0 +1,1172 @@
+name = "Accept 협상: 응답 종류와 Accept 조합"
+tags = ["platform"]
+
+[setup]
+sql = ["INSERT INTO users (id, email, signature_original_storage_key) VALUES ('01990000-0000-7000-8000-000000000001', 'user1@test.chalkak', 'chalkak/signatures/user1/original.png')"]
+
+
+[[step]]
+name = '성공 200 / Accept text/html'
+method = "GET"
+path = '/api/v1/notifications'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '성공 200 / Accept text/*'
+method = "GET"
+path = '/api/v1/notifications'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/*' }
+
+[[step]]
+name = '성공 200 / Accept application/xml'
+method = "GET"
+path = '/api/v1/notifications'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/xml' }
+
+[[step]]
+name = '성공 200 / Accept bad'
+method = "GET"
+path = '/api/v1/notifications'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'bad' }
+
+[[step]]
+name = '성공 200 / Accept text/html, application/json;q=0.5'
+method = "GET"
+path = '/api/v1/notifications'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html, application/json;q=0.5' }
+
+[[step]]
+name = '성공 200 / Accept application/json;charset=UTF-8'
+method = "GET"
+path = '/api/v1/notifications'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/json;charset=UTF-8' }
+
+[[step]]
+name = '성공 200 / Accept application/vnd.x+json'
+method = "GET"
+path = '/api/v1/notifications'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/vnd.x+json' }
+
+[[step]]
+name = '성공 200 / Accept application/*+json;charset=UTF-8'
+method = "GET"
+path = '/api/v1/notifications'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/*+json;charset=UTF-8' }
+
+[[step]]
+name = '성공 200 / Accept */*;q=0'
+method = "GET"
+path = '/api/v1/notifications'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = '*/*;q=0' }
+
+[[step]]
+name = '성공 200 / Accept application/json;q=2'
+method = "GET"
+path = '/api/v1/notifications'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/json;q=2' }
+
+[[step]]
+name = '성공 200 / Accept text/html;q=0, application/xml'
+method = "GET"
+path = '/api/v1/notifications'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html;q=0, application/xml' }
+
+[[step]]
+name = '성공 200 / Accept application/problem+json, text/html'
+method = "GET"
+path = '/api/v1/notifications'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/problem+json, text/html' }
+
+[[step]]
+name = '성공 200 / Accept application/yaml'
+method = "GET"
+path = '/api/v1/notifications'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml' }
+
+[[step]]
+name = '성공 200 / Accept application/yaml, application/json;q=0.5'
+method = "GET"
+path = '/api/v1/notifications'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
+
+[[step]]
+name = 'Spring 예외 400 / Accept text/html'
+method = "GET"
+path = '/api/v1/topics?date=bad'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'Spring 예외 400 / Accept text/*'
+method = "GET"
+path = '/api/v1/topics?date=bad'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/*' }
+
+[[step]]
+name = 'Spring 예외 400 / Accept application/xml'
+method = "GET"
+path = '/api/v1/topics?date=bad'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/xml' }
+
+[[step]]
+name = 'Spring 예외 400 / Accept bad'
+method = "GET"
+path = '/api/v1/topics?date=bad'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'bad' }
+
+[[step]]
+name = 'Spring 예외 400 / Accept text/html, application/json;q=0.5'
+method = "GET"
+path = '/api/v1/topics?date=bad'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html, application/json;q=0.5' }
+
+[[step]]
+name = 'Spring 예외 400 / Accept application/json;charset=UTF-8'
+method = "GET"
+path = '/api/v1/topics?date=bad'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/json;charset=UTF-8' }
+
+[[step]]
+name = 'Spring 예외 400 / Accept application/vnd.x+json'
+method = "GET"
+path = '/api/v1/topics?date=bad'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/vnd.x+json' }
+
+[[step]]
+name = 'Spring 예외 400 / Accept application/*+json;charset=UTF-8'
+method = "GET"
+path = '/api/v1/topics?date=bad'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/*+json;charset=UTF-8' }
+
+[[step]]
+name = 'Spring 예외 400 / Accept */*;q=0'
+method = "GET"
+path = '/api/v1/topics?date=bad'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = '*/*;q=0' }
+
+[[step]]
+name = 'Spring 예외 400 / Accept application/json;q=2'
+method = "GET"
+path = '/api/v1/topics?date=bad'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/json;q=2' }
+
+[[step]]
+name = 'Spring 예외 400 / Accept text/html;q=0, application/xml'
+method = "GET"
+path = '/api/v1/topics?date=bad'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html;q=0, application/xml' }
+
+[[step]]
+name = 'Spring 예외 400 / Accept application/problem+json, text/html'
+method = "GET"
+path = '/api/v1/topics?date=bad'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/problem+json, text/html' }
+
+[[step]]
+name = 'Spring 예외 400 / Accept application/yaml'
+method = "GET"
+path = '/api/v1/topics?date=bad'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml' }
+
+[[step]]
+name = 'Spring 예외 400 / Accept application/yaml, application/json;q=0.5'
+method = "GET"
+path = '/api/v1/topics?date=bad'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
+
+[[step]]
+name = '도메인 예외 404 / Accept text/html'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '도메인 예외 404 / Accept text/*'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/*' }
+
+[[step]]
+name = '도메인 예외 404 / Accept application/xml'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/xml' }
+
+[[step]]
+name = '도메인 예외 404 / Accept bad'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'bad' }
+
+[[step]]
+name = '도메인 예외 404 / Accept text/html, application/json;q=0.5'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html, application/json;q=0.5' }
+
+[[step]]
+name = '도메인 예외 404 / Accept application/json;charset=UTF-8'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/json;charset=UTF-8' }
+
+[[step]]
+name = '도메인 예외 404 / Accept application/vnd.x+json'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/vnd.x+json' }
+
+[[step]]
+name = '도메인 예외 404 / Accept application/*+json;charset=UTF-8'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/*+json;charset=UTF-8' }
+
+[[step]]
+name = '도메인 예외 404 / Accept */*;q=0'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = '*/*;q=0' }
+
+[[step]]
+name = '도메인 예외 404 / Accept application/json;q=2'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/json;q=2' }
+
+[[step]]
+name = '도메인 예외 404 / Accept text/html;q=0, application/xml'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html;q=0, application/xml' }
+
+[[step]]
+name = '도메인 예외 404 / Accept application/problem+json, text/html'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/problem+json, text/html' }
+
+[[step]]
+name = '도메인 예외 404 / Accept application/yaml'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml' }
+
+[[step]]
+name = '도메인 예외 404 / Accept application/yaml, application/json;q=0.5'
+method = "GET"
+path = '/api/v1/topics?date=2026-10-12'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
+
+[[step]]
+name = '경로 없음 404 / Accept text/html'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '경로 없음 404 / Accept text/*'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/*' }
+
+[[step]]
+name = '경로 없음 404 / Accept application/xml'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/xml' }
+
+[[step]]
+name = '경로 없음 404 / Accept bad'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'bad' }
+
+[[step]]
+name = '경로 없음 404 / Accept text/html, application/json;q=0.5'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html, application/json;q=0.5' }
+
+[[step]]
+name = '경로 없음 404 / Accept application/json;charset=UTF-8'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/json;charset=UTF-8' }
+
+[[step]]
+name = '경로 없음 404 / Accept application/vnd.x+json'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/vnd.x+json' }
+
+[[step]]
+name = '경로 없음 404 / Accept application/*+json;charset=UTF-8'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/*+json;charset=UTF-8' }
+
+[[step]]
+name = '경로 없음 404 / Accept */*;q=0'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = '*/*;q=0' }
+
+[[step]]
+name = '경로 없음 404 / Accept application/json;q=2'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/json;q=2' }
+
+[[step]]
+name = '경로 없음 404 / Accept text/html;q=0, application/xml'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html;q=0, application/xml' }
+
+[[step]]
+name = '경로 없음 404 / Accept application/problem+json, text/html'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/problem+json, text/html' }
+
+[[step]]
+name = '경로 없음 404 / Accept application/yaml'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml' }
+
+[[step]]
+name = '경로 없음 404 / Accept application/yaml, application/json;q=0.5'
+method = "GET"
+path = '/api/v1/nothing'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
+
+[[step]]
+name = '메서드 없음 405 / Accept text/html'
+method = "DELETE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '메서드 없음 405 / Accept text/*'
+method = "DELETE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/*' }
+
+[[step]]
+name = '메서드 없음 405 / Accept application/xml'
+method = "DELETE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/xml' }
+
+[[step]]
+name = '메서드 없음 405 / Accept bad'
+method = "DELETE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'bad' }
+
+[[step]]
+name = '메서드 없음 405 / Accept text/html, application/json;q=0.5'
+method = "DELETE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html, application/json;q=0.5' }
+
+[[step]]
+name = '메서드 없음 405 / Accept application/json;charset=UTF-8'
+method = "DELETE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/json;charset=UTF-8' }
+
+[[step]]
+name = '메서드 없음 405 / Accept application/vnd.x+json'
+method = "DELETE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/vnd.x+json' }
+
+[[step]]
+name = '메서드 없음 405 / Accept application/*+json;charset=UTF-8'
+method = "DELETE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/*+json;charset=UTF-8' }
+
+[[step]]
+name = '메서드 없음 405 / Accept */*;q=0'
+method = "DELETE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = '*/*;q=0' }
+
+[[step]]
+name = '메서드 없음 405 / Accept application/json;q=2'
+method = "DELETE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/json;q=2' }
+
+[[step]]
+name = '메서드 없음 405 / Accept text/html;q=0, application/xml'
+method = "DELETE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html;q=0, application/xml' }
+
+[[step]]
+name = '메서드 없음 405 / Accept application/problem+json, text/html'
+method = "DELETE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/problem+json, text/html' }
+
+[[step]]
+name = '메서드 없음 405 / Accept application/yaml'
+method = "DELETE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml' }
+
+[[step]]
+name = '메서드 없음 405 / Accept application/yaml, application/json;q=0.5'
+method = "DELETE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
+
+[[step]]
+name = '방화벽 400 / Accept text/html'
+method = "GET"
+path = '/api/v1/topics%3Bx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '방화벽 400 / Accept text/*'
+method = "GET"
+path = '/api/v1/topics%3Bx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/*' }
+
+[[step]]
+name = '방화벽 400 / Accept application/xml'
+method = "GET"
+path = '/api/v1/topics%3Bx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/xml' }
+
+[[step]]
+name = '방화벽 400 / Accept bad'
+method = "GET"
+path = '/api/v1/topics%3Bx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'bad' }
+
+[[step]]
+name = '방화벽 400 / Accept text/html, application/json;q=0.5'
+method = "GET"
+path = '/api/v1/topics%3Bx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html, application/json;q=0.5' }
+
+[[step]]
+name = '방화벽 400 / Accept application/json;charset=UTF-8'
+method = "GET"
+path = '/api/v1/topics%3Bx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/json;charset=UTF-8' }
+
+[[step]]
+name = '방화벽 400 / Accept application/vnd.x+json'
+method = "GET"
+path = '/api/v1/topics%3Bx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/vnd.x+json' }
+
+[[step]]
+name = '방화벽 400 / Accept application/*+json;charset=UTF-8'
+method = "GET"
+path = '/api/v1/topics%3Bx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/*+json;charset=UTF-8' }
+
+[[step]]
+name = '방화벽 400 / Accept */*;q=0'
+method = "GET"
+path = '/api/v1/topics%3Bx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = '*/*;q=0' }
+
+[[step]]
+name = '방화벽 400 / Accept application/json;q=2'
+method = "GET"
+path = '/api/v1/topics%3Bx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/json;q=2' }
+
+[[step]]
+name = '방화벽 400 / Accept text/html;q=0, application/xml'
+method = "GET"
+path = '/api/v1/topics%3Bx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html;q=0, application/xml' }
+
+[[step]]
+name = '방화벽 400 / Accept application/problem+json, text/html'
+method = "GET"
+path = '/api/v1/topics%3Bx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/problem+json, text/html' }
+
+[[step]]
+name = '방화벽 400 / Accept application/yaml'
+method = "GET"
+path = '/api/v1/topics%3Bx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml' }
+
+[[step]]
+name = '방화벽 400 / Accept application/yaml, application/json;q=0.5'
+method = "GET"
+path = '/api/v1/topics%3Bx'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
+
+[[step]]
+name = 'TRACE / Accept text/html'
+method = "TRACE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'TRACE / Accept text/*'
+method = "TRACE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/*' }
+
+[[step]]
+name = 'TRACE / Accept application/xml'
+method = "TRACE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/xml' }
+
+[[step]]
+name = 'TRACE / Accept bad'
+method = "TRACE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'bad' }
+
+[[step]]
+name = 'TRACE / Accept text/html, application/json;q=0.5'
+method = "TRACE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html, application/json;q=0.5' }
+
+[[step]]
+name = 'TRACE / Accept application/json;charset=UTF-8'
+method = "TRACE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/json;charset=UTF-8' }
+
+[[step]]
+name = 'TRACE / Accept application/vnd.x+json'
+method = "TRACE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/vnd.x+json' }
+
+[[step]]
+name = 'TRACE / Accept application/*+json;charset=UTF-8'
+method = "TRACE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/*+json;charset=UTF-8' }
+
+[[step]]
+name = 'TRACE / Accept */*;q=0'
+method = "TRACE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = '*/*;q=0' }
+
+[[step]]
+name = 'TRACE / Accept application/json;q=2'
+method = "TRACE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/json;q=2' }
+
+[[step]]
+name = 'TRACE / Accept text/html;q=0, application/xml'
+method = "TRACE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html;q=0, application/xml' }
+
+[[step]]
+name = 'TRACE / Accept application/problem+json, text/html'
+method = "TRACE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/problem+json, text/html' }
+
+[[step]]
+name = 'TRACE / Accept application/yaml'
+method = "TRACE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml' }
+
+[[step]]
+name = 'TRACE / Accept application/yaml, application/json;q=0.5'
+method = "TRACE"
+path = '/api/v1/topics'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
+
+[[step]]
+name = '깨진 JSON 400 / Accept text/html'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+body = '{"content": '
+
+[[step]]
+name = '깨진 JSON 400 / Accept text/*'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/*' }
+body = '{"content": '
+
+[[step]]
+name = '깨진 JSON 400 / Accept application/xml'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/xml' }
+body = '{"content": '
+
+[[step]]
+name = '깨진 JSON 400 / Accept bad'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'bad' }
+body = '{"content": '
+
+[[step]]
+name = '깨진 JSON 400 / Accept text/html, application/json;q=0.5'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html, application/json;q=0.5' }
+body = '{"content": '
+
+[[step]]
+name = '깨진 JSON 400 / Accept application/json;charset=UTF-8'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/json;charset=UTF-8' }
+body = '{"content": '
+
+[[step]]
+name = '깨진 JSON 400 / Accept application/vnd.x+json'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/vnd.x+json' }
+body = '{"content": '
+
+[[step]]
+name = '깨진 JSON 400 / Accept application/*+json;charset=UTF-8'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/*+json;charset=UTF-8' }
+body = '{"content": '
+
+[[step]]
+name = '깨진 JSON 400 / Accept */*;q=0'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = '*/*;q=0' }
+body = '{"content": '
+
+[[step]]
+name = '깨진 JSON 400 / Accept application/json;q=2'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/json;q=2' }
+body = '{"content": '
+
+[[step]]
+name = '깨진 JSON 400 / Accept text/html;q=0, application/xml'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html;q=0, application/xml' }
+body = '{"content": '
+
+[[step]]
+name = '깨진 JSON 400 / Accept application/problem+json, text/html'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/problem+json, text/html' }
+body = '{"content": '
+
+[[step]]
+name = '깨진 JSON 400 / Accept application/yaml'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml' }
+body = '{"content": '
+
+[[step]]
+name = '깨진 JSON 400 / Accept application/yaml, application/json;q=0.5'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
+body = '{"content": '
+
+[[step]]
+name = '검증 400 / Accept text/html'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+body = '{}'
+
+[[step]]
+name = '검증 400 / Accept text/*'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/*' }
+body = '{}'
+
+[[step]]
+name = '검증 400 / Accept application/xml'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/xml' }
+body = '{}'
+
+[[step]]
+name = '검증 400 / Accept bad'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'bad' }
+body = '{}'
+
+[[step]]
+name = '검증 400 / Accept text/html, application/json;q=0.5'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html, application/json;q=0.5' }
+body = '{}'
+
+[[step]]
+name = '검증 400 / Accept application/json;charset=UTF-8'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/json;charset=UTF-8' }
+body = '{}'
+
+[[step]]
+name = '검증 400 / Accept application/vnd.x+json'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/vnd.x+json' }
+body = '{}'
+
+[[step]]
+name = '검증 400 / Accept application/*+json;charset=UTF-8'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/*+json;charset=UTF-8' }
+body = '{}'
+
+[[step]]
+name = '검증 400 / Accept */*;q=0'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = '*/*;q=0' }
+body = '{}'
+
+[[step]]
+name = '검증 400 / Accept application/json;q=2'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/json;q=2' }
+body = '{}'
+
+[[step]]
+name = '검증 400 / Accept text/html;q=0, application/xml'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html;q=0, application/xml' }
+body = '{}'
+
+[[step]]
+name = '검증 400 / Accept application/problem+json, text/html'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/problem+json, text/html' }
+body = '{}'
+
+[[step]]
+name = '검증 400 / Accept application/yaml'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml' }
+body = '{}'
+
+[[step]]
+name = '검증 400 / Accept application/yaml, application/json;q=0.5'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
+body = '{}'
+
+[[step]]
+name = '생성 201 / Accept text/html'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+body = '{"content": "좋아요"}'
+
+[[step]]
+name = '생성 201 / Accept text/*'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/*' }
+body = '{"content": "좋아요"}'
+
+[[step]]
+name = '생성 201 / Accept application/xml'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/xml' }
+body = '{"content": "좋아요"}'
+
+[[step]]
+name = '생성 201 / Accept bad'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'bad' }
+body = '{"content": "좋아요"}'
+
+[[step]]
+name = '생성 201 / Accept text/html, application/json;q=0.5'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html, application/json;q=0.5' }
+body = '{"content": "좋아요"}'
+
+[[step]]
+name = '생성 201 / Accept application/json;charset=UTF-8'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/json;charset=UTF-8' }
+body = '{"content": "좋아요"}'
+
+[[step]]
+name = '생성 201 / Accept application/vnd.x+json'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/vnd.x+json' }
+body = '{"content": "좋아요"}'
+
+[[step]]
+name = '생성 201 / Accept application/*+json;charset=UTF-8'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/*+json;charset=UTF-8' }
+body = '{"content": "좋아요"}'
+
+[[step]]
+name = '생성 201 / Accept */*;q=0'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = '*/*;q=0' }
+body = '{"content": "좋아요"}'
+
+[[step]]
+name = '생성 201 / Accept application/json;q=2'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/json;q=2' }
+body = '{"content": "좋아요"}'
+
+[[step]]
+name = '생성 201 / Accept text/html;q=0, application/xml'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html;q=0, application/xml' }
+body = '{"content": "좋아요"}'
+
+[[step]]
+name = '생성 201 / Accept application/problem+json, text/html'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/problem+json, text/html' }
+body = '{"content": "좋아요"}'
+
+[[step]]
+name = '생성 201 / Accept application/yaml'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml' }
+body = '{"content": "좋아요"}'
+
+[[step]]
+name = '생성 201 / Accept application/yaml, application/json;q=0.5'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/yaml, application/json;q=0.5' }
+body = '{"content": "좋아요"}'
+
+[[step]]
+name = 'Accept 없음 / 성공 200'
+method = "GET"
+path = '/api/v1/notifications'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = 'Accept 빈 값 / 성공 200'
+method = "GET"
+path = '/api/v1/notifications'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = '' }
+
+[[step]]
+name = '인증 없음 401 / Accept text/html'
+method = "GET"
+path = '/api/v1/notifications'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '토큰 없음 401 / Accept application/xml'
+method = "GET"
+path = '/api/v1/notifications'
+headers = { "Accept" = 'application/xml' }
+
+[[step]]
+name = '관리자 경로 회원 토큰 403 / Accept text/html'
+method = "GET"
+path = '/api/v1/admin/users'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'Content-Type text/plain 415 / Accept text/html'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'text/html', "Content-Type" = 'text/plain' }
+body = 'x'
+
+[[step]]
+name = 'Content-Type text/plain 415 / Accept application/xml'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Accept" = 'application/xml', "Content-Type" = 'text/plain' }
+body = 'x'
+
+[[step]]
+name = 'Content-Type text/plain 415 / Accept 없음'
+method = "POST"
+path = '/api/v1/feedbacks'
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Content-Type" = 'text/plain' }
+body = 'x'
+
+[[step]]
+name = 'actuator health / Accept 없음'
+method = "GET"
+path = '/actuator/health'
+
+[[step]]
+name = 'actuator health / Accept application/json'
+method = "GET"
+path = '/actuator/health'
+headers = { "Accept" = 'application/json' }
+
+[[step]]
+name = 'actuator health / Accept application/*'
+method = "GET"
+path = '/actuator/health'
+headers = { "Accept" = 'application/*' }
+
+[[step]]
+name = 'actuator health / Accept application/vnd.spring-boot.actuator.v2+json'
+method = "GET"
+path = '/actuator/health'
+headers = { "Accept" = 'application/vnd.spring-boot.actuator.v2+json' }
+
+[[step]]
+name = 'actuator health / Accept application/*+json'
+method = "GET"
+path = '/actuator/health'
+headers = { "Accept" = 'application/*+json' }
+
+[[step]]
+name = 'actuator health / Accept text/html'
+method = "GET"
+path = '/actuator/health'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = 'actuator health / Accept application/xml'
+method = "GET"
+path = '/actuator/health'
+headers = { "Accept" = 'application/xml' }
+
+[[step]]
+name = 'actuator health / Accept bad'
+method = "GET"
+path = '/actuator/health'
+headers = { "Accept" = 'bad' }
+
+[[step]]
+name = 'actuator health / Accept application/vnd.x+json'
+method = "GET"
+path = '/actuator/health'
+headers = { "Accept" = 'application/vnd.x+json' }
+
+[[step]]
+name = 'actuator health / Accept text/html,application/json;q=0.5'
+method = "GET"
+path = '/actuator/health'
+headers = { "Accept" = 'text/html,application/json;q=0.5' }
+
+[[step]]
+name = '/error / Accept 없음'
+method = "GET"
+path = '/error'
+
+[[step]]
+name = '/error / Accept application/json'
+method = "GET"
+path = '/error'
+headers = { "Accept" = 'application/json' }
+
+[[step]]
+name = '/error / Accept text/html'
+method = "GET"
+path = '/error'
+headers = { "Accept" = 'text/html' }
+
+[[step]]
+name = '/error / Accept application/xml'
+method = "GET"
+path = '/error'
+headers = { "Accept" = 'application/xml' }
+
+[[step]]
+name = '/error / Accept bad'
+method = "GET"
+path = '/error'
+headers = { "Accept" = 'bad' }

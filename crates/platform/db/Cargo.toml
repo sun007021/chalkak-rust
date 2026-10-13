@@ -11,3 +11,5 @@ workspace = true
 
 [dependencies]
 postgres = { workspace = true }
+tokio-postgres-rustls = { workspace = true }
+rustls = { workspace = true }

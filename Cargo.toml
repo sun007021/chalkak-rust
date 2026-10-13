@@ -24,6 +24,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["raw_value"] }
 toml = "0.9"
 postgres = "0.19"
+tokio-postgres-rustls = "0.13"
 hmac = "0.12"
 sha2 = "0.10"
 p256 = { version = "0.13", default-features = false }

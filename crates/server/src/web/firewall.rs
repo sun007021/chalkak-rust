@@ -54,7 +54,7 @@ impl Middleware for Firewall {
                 &*self.clock,
                 400,
                 "Bad Request",
-                &req.path,
+                &req.raw_path,
             ));
         }
         next.handle(req)

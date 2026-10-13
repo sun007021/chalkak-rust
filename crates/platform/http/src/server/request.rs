@@ -11,8 +11,14 @@ pub struct Request {
     pub method: Method,
     /// 퍼센트 디코딩된 경로(쿼리 제외). 끝 슬래시를 그대로 보존한다.
     pub path: String,
+    /// 디코딩 전 경로(쿼리 제외). Tomcat `getRequestURI()`에 해당한다.
+    pub raw_path: String,
     /// 디코딩된 쿼리. 같은 이름이 여러 번 나오면 순서대로 모두 남는다.
     pub query: Vec<(String, String)>,
+    /// 디코딩 전 쿼리 문자열(`?` 뒤, 없으면 빈 문자열).
+    pub raw_query: String,
+    /// 쿼리에 잘못된 퍼센트 인코딩이 있다. 파라미터를 읽는 핸들러는 원본처럼 500으로 답해야 한다.
+    pub query_malformed: bool,
     pub headers: Headers,
     pub body: Vec<u8>,
     pub remote_addr: SocketAddr,
@@ -25,10 +31,14 @@ pub struct Request {
 impl Request {
     /// 테스트·미들웨어 합성용 간이 생성자. `remote_addr`은 `0.0.0.0:0`.
     pub fn new(method: Method, path: impl Into<String>) -> Self {
+        let path = path.into();
         Request {
             method,
-            path: path.into(),
+            raw_path: path.clone(),
+            path,
             query: Vec::new(),
+            raw_query: String::new(),
+            query_malformed: false,
             headers: Headers::new(),
             body: Vec::new(),
             remote_addr: SocketAddr::from((Ipv4Addr::UNSPECIFIED, 0)),

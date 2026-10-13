@@ -7,7 +7,7 @@
 mod common;
 
 use chalkak_jwt::{
-    Clock, JwksCache, JwksCacheConfig, JwksError, JwksFetchError, JwksSource, JwtError,
+    Clock, JwksCache, JwksCacheConfig, JwksError, JwksEvents, JwksFetchError, JwksSource, JwtError,
 };
 use common::*;
 use serde_json::{Value, json};
@@ -383,4 +383,86 @@ fn 여러_스레드가_동시에_와도_조회는_한_번이다() {
         assert!(h.join().unwrap());
     }
     assert_eq!(script.calls(), 1);
+}
+
+/// 받은 알림을 문자열로 모아 둔다.
+#[derive(Default)]
+struct Recorder(Mutex<Vec<String>>);
+
+impl Recorder {
+    fn events(&self) -> Vec<String> {
+        self.0.lock().unwrap().clone()
+    }
+}
+
+impl JwksEvents for Recorder {
+    fn retrial(&self, cause: &str) {
+        self.0.lock().unwrap().push(format!("retrial:{cause}"));
+    }
+    fn outage(&self, remaining_ms: i64, cause: &str) {
+        self.0
+            .lock()
+            .unwrap()
+            .push(format!("outage:{remaining_ms}:{cause}"));
+    }
+    fn rate_limited(&self) {
+        self.0.lock().unwrap().push("rate_limited".into());
+    }
+}
+
+fn observed(script: &Arc<Script>, clock: &Arc<FakeClock>) -> (JwksCache, Arc<Recorder>) {
+    let recorder = Arc::new(Recorder::default());
+    let mut cache = cache(script, clock);
+    cache.set_events(recorder.clone());
+    (cache, recorder)
+}
+
+// OidcIdTokenDecoderFactory#createJwkSource: RetryingJWKSetSource의 재시도 알림(OidcJwkSetEventLogger#logRetrial)
+#[test]
+fn 첫_조회가_실패해_다시_시도하면_재시도_알림을_보낸다() {
+    let (script, clock) = (Script::new(jwks(&["k1"])), FakeClock::new());
+    script.fail(1);
+    let (cache, recorder) = observed(&script, &clock);
+    assert!(cache.verify(&token("k1")).is_ok());
+    assert_eq!(
+        recorder.events(),
+        ["retrial:Couldn't retrieve JWK set: connection refused"]
+    );
+}
+
+// OidcIdTokenDecoderFactory#createJwkSource: OutageTolerantJWKSetSource의 이전 목록 사용 알림(#logOutage)
+#[test]
+fn 이전_목록을_쓰면_남은_시간과_함께_장애_알림을_보낸다() {
+    let (script, clock) = (Script::new(jwks(&["k1"])), FakeClock::new());
+    let (cache, recorder) = observed(&script, &clock);
+    assert!(cache.verify(&token("k1")).is_ok());
+    script.fail(2);
+    clock.set(5 * MIN);
+    assert!(cache.verify(&token("k1")).is_ok());
+    // 재시도 알림 한 번, 이어서 마지막 성공(t=0)에서 50분 중 45분이 남았다는 알림.
+    assert_eq!(
+        recorder.events(),
+        [
+            "retrial:Couldn't retrieve JWK set: connection refused".to_owned(),
+            format!(
+                "outage:{}:Couldn't retrieve JWK set: connection refused",
+                45 * MIN
+            )
+        ]
+    );
+}
+
+// OidcIdTokenDecoderFactory#createJwkSource: RateLimitedJWKSetSource의 제한 알림(#logRateLimited)
+#[test]
+fn 재조회_제한에_걸릴_때마다_제한_알림을_보낸다() {
+    let (script, clock) = (Script::new(jwks(&["k1"])), FakeClock::new());
+    let (cache, recorder) = observed(&script, &clock);
+    assert!(cache.verify(&token("k1")).is_ok());
+    clock.set(SEC);
+    assert_eq!(cache.verify(&token("x1")), Err(JwtError::NoMatchingKey));
+    assert!(recorder.events().is_empty());
+    clock.set(2 * SEC);
+    assert!(cache.verify(&token("x2")).is_err());
+    assert!(cache.verify(&token("x3")).is_err());
+    assert_eq!(recorder.events(), ["rate_limited", "rate_limited"]);
 }

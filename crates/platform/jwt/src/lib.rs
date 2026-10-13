@@ -24,6 +24,6 @@ pub use hs256::{hs256_decode, hs256_encode};
 pub use jwks::{Jwk, Jwks, rs256_verify};
 pub use jwks_cache::{
     Clock, JWKS_ACCEPT, JWKS_CONNECT_TIMEOUT, JWKS_READ_TIMEOUT, JwksCache, JwksCacheConfig,
-    JwksFetchError, JwksSource, SystemClock,
+    JwksEvents, JwksFetchError, JwksSource, SystemClock,
 };
 pub use validator::{ClaimError, Validator};

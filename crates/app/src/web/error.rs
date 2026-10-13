@@ -24,7 +24,7 @@ use chalkak_core::log::{Logger, fields};
 use chalkak_db::DbError;
 use chalkak_http::Response;
 
-use super::json_response;
+use super::{json_response, marker};
 
 const LOGGER_NAME: &str = "com.chalkak.backend.exception.GlobalExceptionHandler";
 
@@ -45,6 +45,15 @@ pub enum ApiError {
     NotFound,
     /// 처리되지 않은 실패. 값은 로그에만 남는 원인 설명이다(응답에는 나가지 않는다).
     Internal(String),
+}
+
+/// 쿼리에 잘못된 퍼센트 인코딩이 있어 파라미터를 읽다 실패한 요청의 응답. `origin`은 [`marker::PARAM`] 또는
+/// [`marker::ACTUATOR_PARAM`]이다. Tomcat이 던진 `IllegalStateException`이 처리되지 않은 예외로 500이 되는 경로다.
+pub fn unreadable_query_response(logger: &Logger, origin: &str) -> Response {
+    let cause = "잘못된 퍼센트 인코딩이 든 쿼리 파라미터를 읽을 수 없습니다.";
+    let mut response = ApiError::Internal(cause.to_owned()).into_response(logger);
+    response.headers.set(marker::ORIGIN, origin);
+    response
 }
 
 impl ApiError {
@@ -114,10 +123,20 @@ impl ApiError {
         }
     }
 
-    /// 오류 응답을 만들고 로그를 남긴다.
+    /// 오류 응답을 만들고 로그를 남긴다. 콘텐츠 협상 계층이 읽는 출처 표지가 붙는다([`marker`]).
     pub fn into_response(self, logger: &Logger) -> Response {
         self.log(logger);
-        self.to_response()
+        let origin = match self {
+            ApiError::App(_) | ApiError::Internal(_) => marker::HANDLER,
+            _ => marker::SPRING,
+        };
+        let response = self.to_response().with_header(marker::ORIGIN, origin);
+        match self {
+            ApiError::UnsupportedMediaType => {
+                response.with_header(marker::CARRY_ACCEPT, marker::SUPPORTED_BODY_TYPES)
+            }
+            _ => response,
+        }
     }
 
     /// 로그 없이 응답만 만든다.

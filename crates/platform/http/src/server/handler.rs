@@ -9,6 +9,12 @@ use super::response::Response;
 /// 핸들러가 패닉하면 서버가 500으로 응답하고 그 연결을 닫는다.
 pub trait Handler: Send + Sync {
     fn handle(&self, req: Request) -> Response;
+
+    /// 요청을 파싱하다 거절한 경우(핸들러에 닿기 전)에 돌려줄 응답. 기본은 본문 없는 `status` 응답이다.
+    /// 서버가 응답 뒤에 연결을 닫으므로 `Connection: close`는 직렬화 단계에서 붙는다.
+    fn reject(&self, status: u16) -> Response {
+        Response::new(status)
+    }
 }
 
 impl<F> Handler for F
@@ -23,6 +29,10 @@ where
 impl Handler for Arc<dyn Handler> {
     fn handle(&self, req: Request) -> Response {
         (**self).handle(req)
+    }
+
+    fn reject(&self, status: u16) -> Response {
+        (**self).reject(status)
     }
 }
 
@@ -49,6 +59,7 @@ where
 pub struct Chain {
     layers: Vec<Arc<dyn Middleware>>,
     endpoint: Arc<dyn Handler>,
+    rejection: Option<Arc<dyn Fn(u16) -> Response + Send + Sync>>,
 }
 
 impl Chain {
@@ -56,7 +67,14 @@ impl Chain {
         Chain {
             layers: Vec::new(),
             endpoint: Arc::new(endpoint),
+            rejection: None,
         }
+    }
+
+    /// 파싱 단계에서 거절한 요청의 응답을 만드는 함수를 정한다([`Handler::reject`]).
+    pub fn on_reject(mut self, f: impl Fn(u16) -> Response + Send + Sync + 'static) -> Self {
+        self.rejection = Some(Arc::new(f));
+        self
     }
 
     pub fn layer(mut self, middleware: impl Middleware + 'static) -> Self {
@@ -92,6 +110,13 @@ impl Handler for Chain {
             index: 0,
         }
         .handle(req)
+    }
+
+    fn reject(&self, status: u16) -> Response {
+        match &self.rejection {
+            Some(f) => f(status),
+            None => Response::new(status),
+        }
     }
 }
 
@@ -154,6 +179,16 @@ mod tests {
                 next.handle(r)
             });
         assert_eq!(chain.handle(req()).body, b"/rewritten");
+    }
+
+    #[test]
+    fn rejection_defaults_to_an_empty_response_and_can_be_replaced() {
+        let plain = Chain::new(|_r: Request| Response::new(200));
+        let r = plain.reject(400);
+        assert_eq!((r.status, r.body.len()), (400, 0));
+        let custom = Chain::new(|_r: Request| Response::new(200))
+            .on_reject(|s| Response::new(s).with_body(b"page".to_vec()));
+        assert_eq!(custom.reject(505).body, b"page");
     }
 
     #[test]

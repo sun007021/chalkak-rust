@@ -11,7 +11,7 @@ fn main() {
         .next()
         .map_or_else(|| PathBuf::from("migrations"), PathBuf::from);
     let config = DbConfig::from_url(&url).expect("url");
-    let mut client = config.pg.connect(postgres::NoTls).expect("connect");
+    let mut client = chalkak_db::connect(&config.pg).expect("connect");
     let report = Migrator::from_dir(&dir)
         .expect("load")
         .migrate(&mut client)

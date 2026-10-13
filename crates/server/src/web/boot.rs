@@ -2,6 +2,7 @@
 //! `/error` 디스패치가 만들어 주는 본문이다(`{"timestamp","status","error","path"}`). 애플리케이션 오류 응답
 //! (`{"errorCode","message"}`)과 모양이 다르다.
 
+use chalkak_app::web::marker;
 use chalkak_core::Clock;
 use chalkak_http::Response;
 use jiff::Timestamp;
@@ -30,10 +31,11 @@ pub fn body(at: Timestamp, status: u16, error: &str, path: Option<&str>) -> Stri
     out
 }
 
-/// `Content-Type: application/json`(charset 없음) 오류 응답.
+/// `Content-Type: application/json`(charset 없음) 오류 응답. 콘텐츠 협상 계층이 `Accept`에 맞춰 바로잡는다.
 pub fn error_response(clock: &dyn Clock, status: u16, reason: &str, path: &str) -> Response {
     Response::new(status)
         .with_header("Content-Type", "application/json")
+        .with_header(marker::ORIGIN, marker::BOOT)
         .with_body(body(clock.now(), status, reason, Some(path)).into_bytes())
 }
 

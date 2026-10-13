@@ -30,7 +30,7 @@ use chalkak_db::Pool;
 use chalkak_db::migrate::Migrator;
 use chalkak_http::{Chain, Handler, Limits, Router, Server};
 
-use settings::{ACCESS_TOKEN_AUDIENCE, ACCESS_TOKEN_ISSUER, Settings};
+use settings::{ACCESS_TOKEN_AUDIENCE, ACCESS_TOKEN_ISSUER, Profile, Settings};
 use web::access::AccessLog;
 use web::actuator::{Actuator, DatabaseCheck};
 use web::authorize::Authorize;
@@ -39,7 +39,10 @@ use web::callback_limit::CallbackBodyLimit;
 use web::cors::AdminCors;
 use web::dispatch::Dispatcher;
 use web::firewall::Firewall;
+use web::forwarded::ForwardedHeaders;
+use web::negotiate::Negotiate;
 use web::security_headers::SecurityHeaders;
+use web::springdoc::Springdoc;
 use web::tomcat::Tomcat;
 
 /// 풀에서 연결을 빌려 `SELECT 1`이 되는지 본다(`DataSourceHealthIndicator`).
@@ -62,11 +65,19 @@ pub fn build_chain(
     Chain::new(Dispatcher::new(router, actuator))
         .layer(Tomcat::new(Arc::clone(&clock)))
         .layer(AccessLog::new(Arc::clone(&logger)))
+        .layer(Negotiate::new(Arc::clone(&clock)))
+        // dev 프로필만: `server.forward-headers-strategy: framework`
+        .layer(ForwardedHeaders::new(settings.profile == Profile::Dev))
         .layer(CallbackBodyLimit::new(
             settings.post.callback_max_body_bytes,
         ))
         .layer(Firewall::new(Arc::clone(&clock)))
-        .layer(SecurityHeaders)
+        .layer(SecurityHeaders::new(settings.profile == Profile::Dev))
+        // springdoc은 별도 보안 체인이라 인증·CORS 앞에서 맡은 경로를 끝낸다(prod에서는 꺼짐)
+        .layer(Springdoc::new(
+            settings.profile != Profile::Prod,
+            Arc::clone(&logger),
+        ))
         .layer(AdminCors::new(&settings.admin_cors_allowed_origins))
         .layer(BearerAuth::new(
             settings.access_token_key.clone(),
@@ -79,6 +90,8 @@ pub fn build_chain(
             settings.admin_development_bypass,
             Arc::clone(&logger),
         ))
+        // 핸들러에 닿기 전 파서가 거절한 요청은 Tomcat 오류 페이지로 답한다.
+        .on_reject(web::whitelabel::tomcat_page)
 }
 
 /// 관리자 도메인이 쓰는 설정을 `Settings`에서 뽑는다.

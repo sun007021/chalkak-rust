@@ -4,9 +4,10 @@ pub mod binding;
 pub mod context;
 pub mod error;
 pub mod json;
+pub mod marker;
 mod routes;
 
-pub use error::ApiError;
+pub use error::{ApiError, unreadable_query_response};
 pub use routes::Routes;
 
 use chalkak_http::Response;
