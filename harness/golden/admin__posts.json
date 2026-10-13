@@ -1,8 +1,69 @@
 {
+  "db": {
+    "admin_audit_logs": [
+      "{\"action\":\"POST_APPROVED\",\"actor_admin_id\":\"$uuid56\",\"after_state\":{\"moderatedAt\":\"<t-50400s db Z>\",\"moderatedBy\":\"$uuid56\",\"moderationStatus\":\"APPROVED\"},\"before_state\":{\"moderatedAt\":null,\"moderationStatus\":\"PENDING\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-50400s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid?\",\"target_id\":\"$uuid19\",\"target_type\":\"POST\"}",
+      "{\"action\":\"POST_REJECTED\",\"actor_admin_id\":\"$uuid?\",\"after_state\":{\"moderatedAt\":\"<t-46800s db Z>\",\"moderatedBy\":\"$uuid?\",\"moderationStatus\":\"REJECTED\"},\"before_state\":{\"moderatedAt\":null,\"moderationStatus\":\"PENDING\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-46800s db +09:00>\",\"reason\":\"정책 위반\",\"request_id\":\"$uuid?\",\"target_id\":\"$uuid30\",\"target_type\":\"POST\"}",
+      "{\"action\":\"USER_BANNED\",\"actor_admin_id\":\"$uuid56\",\"after_state\":{\"status\":\"BANNED\"},\"before_state\":{\"status\":\"ACTIVE\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-43200s db +09:00>\",\"reason\":\"반복 위반\",\"request_id\":\"$uuid?\",\"target_id\":\"$uuid8\",\"target_type\":\"USER\"}"
+    ],
+    "admins": [
+      "{\"created_at\":\"<t-3456000s db +09:00>\",\"id\":\"$uuid?\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"updated_at\":\"<t-3456000s db +09:00>\",\"username\":\"reviewer\"}",
+      "{\"created_at\":\"<t-3542400s db +09:00>\",\"id\":\"$uuid56\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"updated_at\":\"<t-3542400s db +09:00>\",\"username\":\"operator\"}"
+    ],
+    "feedbacks": [
+      "{\"content\":\"버그 신고\",\"created_at\":\"<t-43200s db +09:00>\",\"id\":\"$uuid?\",\"user_id\":\"$uuid28\"}",
+      "{\"content\":\"앱이 좋아요\",\"created_at\":\"<t-172800s db +09:00>\",\"id\":\"$uuid?\",\"user_id\":\"$uuid12\"}",
+      "{\"content\":\"탈퇴 전에 남긴 의견\",\"created_at\":\"<t-86400s db +09:00>\",\"id\":\"$uuid?\",\"user_id\":\"$uuid25\"}"
+    ],
+    "photos": [
+      "{\"created_at\":\"<t-104400s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid26\",\"metadata\":{\"byteSize\":77,\"height\":240,\"width\":320},\"original_storage_key\":\"chalkak/posts/p7/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p7/thumbnail.webp\",\"updated_at\":\"<t-104400s db +09:00>\"}",
+      "{\"created_at\":\"<t-108000s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid29\",\"metadata\":{\"byteSize\":99,\"height\":480,\"width\":640},\"original_storage_key\":\"chalkak/posts/p6/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p6/thumbnail.webp\",\"updated_at\":\"<t-108000s db +09:00>\"}",
+      "{\"created_at\":\"<t-10800s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/p4/original.webp\",\"thumbnail_storage_key\":null,\"updated_at\":\"<t-10800s db +09:00>\"}",
+      "{\"created_at\":\"<t-111600s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid31\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/p3/original.webp\",\"thumbnail_storage_key\":null,\"updated_at\":\"<t-111600s db +09:00>\"}",
+      "{\"created_at\":\"<t-115200s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid21\",\"metadata\":{\"height\":\"tall\",\"width\":1000.9},\"original_storage_key\":\"chalkak/posts/p2/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p2/thumbnail.webp\",\"updated_at\":\"<t-115200s db +09:00>\"}",
+      "{\"created_at\":\"<t-14400s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid13\",\"metadata\":{\"byteSize\":2048,\"camera\":\"private\",\"height\":3000,\"width\":4000},\"original_storage_key\":\"chalkak/posts/p1/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p1/thumbnail.webp\",\"updated_at\":\"<t-14400s db +09:00>\"}",
+      "{\"created_at\":\"<t-7200s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid10\",\"metadata\":{\"byteSize\":30,\"height\":20,\"width\":10},\"original_storage_key\":\"chalkak/posts/p5/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p5/thumbnail.webp\",\"updated_at\":\"<t-7200s db +09:00>\"}"
+    ],
+    "post_image_uploads": [
+      "{\"claimed_at\":\"<t-115200s db +09:00>\",\"created_at\":\"<t-115800s db +09:00>\",\"expires_at\":\"<t-86400s db +09:00>\",\"id\":\"$uuid55\",\"image_metadata\":{\"width\":1000},\"rejection_reason\":null,\"status\":\"READY\",\"updated_at\":\"<t-115200s db +09:00>\",\"user_id\":\"$uuid12\"}",
+      "{\"claimed_at\":\"<t-14400s db +09:00>\",\"created_at\":\"<t-15000s db +09:00>\",\"expires_at\":\"<t+0s db +09:00>\",\"id\":\"$uuid53\",\"image_metadata\":{\"width\":4000},\"rejection_reason\":null,\"status\":\"READY\",\"updated_at\":\"<t-14400s db +09:00>\",\"user_id\":\"$uuid12\"}"
+    ],
+    "post_likes": [
+      "{\"created_at\":\"<t-41400s db +09:00>\",\"id\":\"$uuid?\",\"post_id\":\"$uuid19\",\"user_id\":\"$uuid8\"}",
+      "{\"created_at\":\"<t-43200s db +09:00>\",\"id\":\"$uuid?\",\"post_id\":\"$uuid19\",\"user_id\":\"$uuid12\"}"
+    ],
+    "posts": [
+      "{\"created_at\":\"<t-104400s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid24\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"photo_id\":\"$uuid26\",\"post_image_upload_id\":null,\"title\":\"탈퇴\",\"topic_id\":\"$uuid20\",\"updated_at\":\"<t-104400s db +09:00>\",\"user_id\":\"$uuid25\"}",
+      "{\"created_at\":\"<t-108000s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid27\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"photo_id\":\"$uuid29\",\"post_image_upload_id\":null,\"title\":\"대기\",\"topic_id\":\"$uuid20\",\"updated_at\":\"<t-108000s db +09:00>\",\"user_id\":\"$uuid28\"}",
+      "{\"created_at\":\"<t-10800s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"VALIDATING\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"처리중\",\"topic_id\":\"$uuid9\",\"updated_at\":\"<t-10800s db +09:00>\",\"user_id\":\"$uuid28\"}",
+      "{\"created_at\":\"<t-111600s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid30\",\"moderated_at\":\"<t-46800s db +09:00>\",\"moderation_status\":\"REJECTED\",\"photo_id\":\"$uuid31\",\"post_image_upload_id\":null,\"title\":\"거절\",\"topic_id\":\"$uuid20\",\"updated_at\":\"<t-46800s db +09:00>\",\"user_id\":\"$uuid8\"}",
+      "{\"created_at\":\"<t-115200s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid19\",\"moderated_at\":\"<t-50400s db +09:00>\",\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid21\",\"post_image_upload_id\":\"$uuid55\",\"title\":null,\"topic_id\":\"$uuid20\",\"updated_at\":\"<t-50400s db +09:00>\",\"user_id\":\"$uuid12\"}",
+      "{\"created_at\":\"<t-14400s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid11\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"photo_id\":\"$uuid13\",\"post_image_upload_id\":\"$uuid53\",\"title\":\"하늘\",\"topic_id\":\"$uuid9\",\"updated_at\":\"<t-14400s db +09:00>\",\"user_id\":\"$uuid12\"}",
+      "{\"created_at\":\"<t-7200s db +09:00>\",\"deleted_at\":\"<t-3600s db +09:00>\",\"id\":\"$uuid7\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"photo_id\":\"$uuid10\",\"post_image_upload_id\":null,\"title\":null,\"topic_id\":\"$uuid9\",\"updated_at\":\"<t-7200s db +09:00>\",\"user_id\":\"$uuid8\"}"
+    ],
+    "social_accounts": [
+      "{\"created_at\":\"<t-777600s db +09:00>\",\"id\":\"$uuid?\",\"provider\":\"KAKAO\",\"subject_hmac\":\"3333333333333333333333333333333333333333333333333333333333333333\",\"user_id\":\"$uuid25\"}",
+      "{\"created_at\":\"<t-864000s db +09:00>\",\"id\":\"$uuid?\",\"provider\":\"APPLE\",\"subject_hmac\":\"2222222222222222222222222222222222222222222222222222222222222222\",\"user_id\":\"$uuid8\"}",
+      "{\"created_at\":\"<t-950400s db +09:00>\",\"id\":\"$uuid?\",\"provider\":\"GOOGLE\",\"subject_hmac\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"user_id\":\"$uuid12\"}"
+    ],
+    "topics": [
+      "{\"created_at\":\"<t-691200s db +09:00>\",\"deleted_at\":\"<t-604800s db +09:00>\",\"ends_at\":\"<t-205200s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-291600s db +09:00>\",\"title\":\"지워진 주제\",\"topic_date\":\"2026-10-09\",\"updated_at\":\"<t-691200s db +09:00>\"}",
+      "{\"created_at\":\"<t-777600s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t+140400s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t+54000s db +09:00>\",\"title\":\"내일의 주제\",\"topic_date\":\"2026-10-13\",\"updated_at\":\"<t-777600s db +09:00>\"}",
+      "{\"created_at\":\"<t-864000s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t-32400s db +09:00>\",\"id\":\"$uuid20\",\"starts_at\":\"<t-118800s db +09:00>\",\"title\":\"어제의 주제\",\"topic_date\":\"2026-10-11\",\"updated_at\":\"<t-864000s db +09:00>\"}",
+      "{\"created_at\":\"<t-950400s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t+54000s db +09:00>\",\"id\":\"$uuid9\",\"starts_at\":\"<t-32400s db +09:00>\",\"title\":\"가을 하늘\",\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t-950400s db +09:00>\"}"
+    ],
+    "users": [
+      "{\"app_version\":\"1.0.0\",\"created_at\":\"<t-777600s db +09:00>\",\"deleted_at\":\"<t-604800s db +09:00>\",\"email\":\"withdrawn+$uuid25@chalkak.invalid\",\"id\":\"$uuid25\",\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"withdrawn/$uuid25\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"updated_at\":\"<t-604800s db +09:00>\"}",
+      "{\"app_version\":\"1.2.0\",\"created_at\":\"<t-950400s db +09:00>\",\"deleted_at\":null,\"email\":\"Alice@Test.Chalkak\",\"id\":\"$uuid12\",\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u1/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u1/thumbnail.png\",\"status\":\"ACTIVE\",\"updated_at\":\"<t-950400s db +09:00>\"}",
+      "{\"app_version\":\"2.0.0\",\"created_at\":\"<t-691200s db +09:00>\",\"deleted_at\":null,\"email\":null,\"id\":\"$uuid28\",\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u4/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u4/thumbnail.png\",\"status\":\"ACTIVE\",\"updated_at\":\"<t-691200s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t-864000s db +09:00>\",\"deleted_at\":null,\"email\":\"bob@test.chalkak\",\"id\":\"$uuid8\",\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u2/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"BANNED\",\"updated_at\":\"<t-864000s db +09:00>\"}"
+    ]
+  },
   "steps": [
     {
-      "step": "posts status validating",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "status: 요청 값의 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -49,14 +110,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "posts status validating"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "status: 요청 값의 형식이 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "posts status bogus",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -103,14 +164,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "status: 요청 값의 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "posts status bogus"
     },
     {
-      "step": "posts topicId bad",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "topicId: 요청 값의 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -157,14 +218,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "topicId: 요청 값의 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "posts topicId bad"
     },
     {
-      "step": "posts topicDate bad",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "topicDate: 요청 값의 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -211,14 +272,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "topicDate: 요청 값의 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "posts topicDate bad"
     },
     {
-      "step": "posts createdAtFrom date only",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "createdAtFrom: 요청 값의 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -265,14 +326,67 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "createdAtFrom: 요청 값의 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "posts createdAtFrom date only"
     },
     {
-      "step": "posts createdAtFrom ok",
-      "status": 200,
+      "body": {
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20,
+        "posts": [
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "userId": "$uuid8"
+            },
+            "createdAt": "<t-7200s iso Z>",
+            "deletedAt": "<t-3600s iso Z>",
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "photoId": "$uuid10",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "postId": "$uuid7",
+            "title": null,
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-14400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "photoId": "$uuid13",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "postId": "$uuid11",
+            "title": "하늘",
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          }
+        ]
+      },
       "headers": [
         [
           "cache-control",
@@ -319,67 +433,67 @@
           "0"
         ]
       ],
-      "body": {
-        "currentPage": 1,
-        "pageSize": 20,
-        "hasNext": false,
-        "posts": [
-          {
-            "postId": "$uuid7",
-            "title": null,
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid8",
-              "email": "bob@test.chalkak",
-              "status": "BANNED",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid10",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-7200s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": "<t-3600s iso Z>"
-          },
-          {
-            "postId": "$uuid11",
-            "title": "하늘",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid13",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-14400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          }
-        ]
-      }
+      "status": 200,
+      "step": "posts createdAtFrom ok"
     },
     {
-      "step": "posts createdAtFrom offset",
-      "status": 200,
+      "body": {
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20,
+        "posts": [
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "userId": "$uuid8"
+            },
+            "createdAt": "<t-7200s iso Z>",
+            "deletedAt": "<t-3600s iso Z>",
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "photoId": "$uuid10",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "postId": "$uuid7",
+            "title": null,
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-14400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "photoId": "$uuid13",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "postId": "$uuid11",
+            "title": "하늘",
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          }
+        ]
+      },
       "headers": [
         [
           "cache-control",
@@ -426,67 +540,67 @@
           "0"
         ]
       ],
-      "body": {
-        "currentPage": 1,
-        "pageSize": 20,
-        "hasNext": false,
-        "posts": [
-          {
-            "postId": "$uuid7",
-            "title": null,
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid8",
-              "email": "bob@test.chalkak",
-              "status": "BANNED",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid10",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-7200s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": "<t-3600s iso Z>"
-          },
-          {
-            "postId": "$uuid11",
-            "title": "하늘",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid13",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-14400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          }
-        ]
-      }
+      "status": 200,
+      "step": "posts createdAtFrom offset"
     },
     {
-      "step": "posts createdAtFrom lower",
-      "status": 200,
+      "body": {
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20,
+        "posts": [
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "userId": "$uuid8"
+            },
+            "createdAt": "<t-7200s iso Z>",
+            "deletedAt": "<t-3600s iso Z>",
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "photoId": "$uuid10",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "postId": "$uuid7",
+            "title": null,
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-14400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "photoId": "$uuid13",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "postId": "$uuid11",
+            "title": "하늘",
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          }
+        ]
+      },
       "headers": [
         [
           "cache-control",
@@ -533,67 +647,67 @@
           "0"
         ]
       ],
-      "body": {
-        "currentPage": 1,
-        "pageSize": 20,
-        "hasNext": false,
-        "posts": [
-          {
-            "postId": "$uuid7",
-            "title": null,
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid8",
-              "email": "bob@test.chalkak",
-              "status": "BANNED",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid10",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-7200s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": "<t-3600s iso Z>"
-          },
-          {
-            "postId": "$uuid11",
-            "title": "하늘",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid13",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-14400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          }
-        ]
-      }
+      "status": 200,
+      "step": "posts createdAtFrom lower"
     },
     {
-      "step": "posts createdAtFrom nosec",
-      "status": 200,
+      "body": {
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20,
+        "posts": [
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "userId": "$uuid8"
+            },
+            "createdAt": "<t-7200s iso Z>",
+            "deletedAt": "<t-3600s iso Z>",
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "photoId": "$uuid10",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "postId": "$uuid7",
+            "title": null,
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-14400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "photoId": "$uuid13",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "postId": "$uuid11",
+            "title": "하늘",
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          }
+        ]
+      },
       "headers": [
         [
           "cache-control",
@@ -640,67 +754,14 @@
           "0"
         ]
       ],
-      "body": {
-        "currentPage": 1,
-        "pageSize": 20,
-        "hasNext": false,
-        "posts": [
-          {
-            "postId": "$uuid7",
-            "title": null,
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid8",
-              "email": "bob@test.chalkak",
-              "status": "BANNED",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid10",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-7200s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": "<t-3600s iso Z>"
-          },
-          {
-            "postId": "$uuid11",
-            "title": "하늘",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid13",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-14400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          }
-        ]
-      }
+      "status": 200,
+      "step": "posts createdAtFrom nosec"
     },
     {
-      "step": "posts range inverted",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "등록 시각 범위가 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -747,14 +808,67 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "등록 시각 범위가 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "posts range inverted"
     },
     {
-      "step": "posts userId upper",
-      "status": 200,
+      "body": {
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20,
+        "posts": [
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-14400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "photoId": "$uuid13",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "postId": "$uuid11",
+            "title": "하늘",
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-115200s iso Z>",
+            "deletedAt": null,
+            "likeCount": 2,
+            "moderatedAt": "<t-50400s iso Z>",
+            "moderationStatus": "APPROVED",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
+              "photoId": "$uuid21",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
+            },
+            "postId": "$uuid19",
+            "title": null,
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          }
+        ]
+      },
       "headers": [
         [
           "cache-control",
@@ -801,67 +915,16 @@
           "0"
         ]
       ],
-      "body": {
-        "currentPage": 1,
-        "pageSize": 20,
-        "hasNext": false,
-        "posts": [
-          {
-            "postId": "$uuid11",
-            "title": "하늘",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid13",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-14400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid19",
-            "title": null,
-            "moderationStatus": "APPROVED",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid21",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
-            },
-            "likeCount": 2,
-            "createdAt": "<t-115200s iso Z>",
-            "moderatedAt": "<t-50400s iso Z>",
-            "deletedAt": null
-          }
-        ]
-      }
+      "status": 200,
+      "step": "posts userId upper"
     },
     {
-      "step": "posts userId short",
-      "status": 200,
+      "body": {
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20,
+        "posts": []
+      },
       "headers": [
         [
           "cache-control",
@@ -908,16 +971,167 @@
           "0"
         ]
       ],
-      "body": {
-        "currentPage": 1,
-        "pageSize": 20,
-        "hasNext": false,
-        "posts": []
-      }
+      "status": 200,
+      "step": "posts userId short"
     },
     {
-      "step": "posts empty uuid",
-      "status": 200,
+      "body": {
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20,
+        "posts": [
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "userId": "$uuid8"
+            },
+            "createdAt": "<t-7200s iso Z>",
+            "deletedAt": "<t-3600s iso Z>",
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "photoId": "$uuid10",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "postId": "$uuid7",
+            "title": null,
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-14400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "photoId": "$uuid13",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "postId": "$uuid11",
+            "title": "하늘",
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": "<t-604800s iso Z>",
+              "email": "withdrawn+$uuid25@chalkak.invalid",
+              "status": "ACTIVE",
+              "userId": "$uuid25"
+            },
+            "createdAt": "<t-104400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
+              "photoId": "$uuid26",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
+            },
+            "postId": "$uuid24",
+            "title": "탈퇴",
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": null,
+              "status": "ACTIVE",
+              "userId": "$uuid28"
+            },
+            "createdAt": "<t-108000s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
+              "photoId": "$uuid29",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp"
+            },
+            "postId": "$uuid27",
+            "title": "대기",
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "userId": "$uuid8"
+            },
+            "createdAt": "<t-111600s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": "<t-46800s iso Z>",
+            "moderationStatus": "REJECTED",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p3/original.webp",
+              "photoId": "$uuid31",
+              "thumbnailImageUrl": null
+            },
+            "postId": "$uuid30",
+            "title": "거절",
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-115200s iso Z>",
+            "deletedAt": null,
+            "likeCount": 2,
+            "moderatedAt": "<t-50400s iso Z>",
+            "moderationStatus": "APPROVED",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
+              "photoId": "$uuid21",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
+            },
+            "postId": "$uuid19",
+            "title": null,
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          }
+        ]
+      },
       "headers": [
         [
           "cache-control",
@@ -964,167 +1178,117 @@
           "0"
         ]
       ],
-      "body": {
-        "currentPage": 1,
-        "pageSize": 20,
-        "hasNext": false,
-        "posts": [
-          {
-            "postId": "$uuid7",
-            "title": null,
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid8",
-              "email": "bob@test.chalkak",
-              "status": "BANNED",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid10",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-7200s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": "<t-3600s iso Z>"
-          },
-          {
-            "postId": "$uuid11",
-            "title": "하늘",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid13",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-14400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid24",
-            "title": "탈퇴",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid25",
-              "email": "withdrawn+$uuid25@chalkak.invalid",
-              "status": "ACTIVE",
-              "deletedAt": "<t-604800s iso Z>"
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid26",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-104400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid27",
-            "title": "대기",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid28",
-              "email": null,
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid29",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-108000s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid30",
-            "title": "거절",
-            "moderationStatus": "REJECTED",
-            "author": {
-              "userId": "$uuid8",
-              "email": "bob@test.chalkak",
-              "status": "BANNED",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid31",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p3/original.webp",
-              "thumbnailImageUrl": null
-            },
-            "likeCount": 0,
-            "createdAt": "<t-111600s iso Z>",
-            "moderatedAt": "<t-46800s iso Z>",
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid19",
-            "title": null,
-            "moderationStatus": "APPROVED",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid21",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
-            },
-            "likeCount": 2,
-            "createdAt": "<t-115200s iso Z>",
-            "moderatedAt": "<t-50400s iso Z>",
-            "deletedAt": null
-          }
-        ]
-      }
+      "status": 200,
+      "step": "posts empty uuid"
     },
     {
-      "step": "posts topicDate offset",
-      "status": 200,
+      "body": {
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20,
+        "posts": [
+          {
+            "author": {
+              "deletedAt": "<t-604800s iso Z>",
+              "email": "withdrawn+$uuid25@chalkak.invalid",
+              "status": "ACTIVE",
+              "userId": "$uuid25"
+            },
+            "createdAt": "<t-104400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
+              "photoId": "$uuid26",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
+            },
+            "postId": "$uuid24",
+            "title": "탈퇴",
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": null,
+              "status": "ACTIVE",
+              "userId": "$uuid28"
+            },
+            "createdAt": "<t-108000s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
+              "photoId": "$uuid29",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp"
+            },
+            "postId": "$uuid27",
+            "title": "대기",
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "userId": "$uuid8"
+            },
+            "createdAt": "<t-111600s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": "<t-46800s iso Z>",
+            "moderationStatus": "REJECTED",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p3/original.webp",
+              "photoId": "$uuid31",
+              "thumbnailImageUrl": null
+            },
+            "postId": "$uuid30",
+            "title": "거절",
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-115200s iso Z>",
+            "deletedAt": null,
+            "likeCount": 2,
+            "moderatedAt": "<t-50400s iso Z>",
+            "moderationStatus": "APPROVED",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
+              "photoId": "$uuid21",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
+            },
+            "postId": "$uuid19",
+            "title": null,
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          }
+        ]
+      },
       "headers": [
         [
           "cache-control",
@@ -1171,117 +1335,14 @@
           "0"
         ]
       ],
-      "body": {
-        "currentPage": 1,
-        "pageSize": 20,
-        "hasNext": false,
-        "posts": [
-          {
-            "postId": "$uuid24",
-            "title": "탈퇴",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid25",
-              "email": "withdrawn+$uuid25@chalkak.invalid",
-              "status": "ACTIVE",
-              "deletedAt": "<t-604800s iso Z>"
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid26",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-104400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid27",
-            "title": "대기",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid28",
-              "email": null,
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid29",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-108000s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid30",
-            "title": "거절",
-            "moderationStatus": "REJECTED",
-            "author": {
-              "userId": "$uuid8",
-              "email": "bob@test.chalkak",
-              "status": "BANNED",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid31",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p3/original.webp",
-              "thumbnailImageUrl": null
-            },
-            "likeCount": 0,
-            "createdAt": "<t-111600s iso Z>",
-            "moderatedAt": "<t-46800s iso Z>",
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid19",
-            "title": null,
-            "moderationStatus": "APPROVED",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid21",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
-            },
-            "likeCount": 2,
-            "createdAt": "<t-115200s iso Z>",
-            "moderatedAt": "<t-50400s iso Z>",
-            "deletedAt": null
-          }
-        ]
-      }
+      "status": 200,
+      "step": "posts topicDate offset"
     },
     {
-      "step": "post id bad",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "ID 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1328,14 +1389,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "ID 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "post id bad"
     },
     {
-      "step": "post validating detail",
-      "status": 404,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "게시물을 찾을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1382,14 +1443,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "게시물을 찾을 수 없습니다."
-      }
+      "status": 404,
+      "step": "post validating detail"
     },
     {
-      "step": "moderation empty",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "검수 상태가 필요합니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1436,14 +1497,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "검수 상태가 필요합니다."
-      }
+      "status": 400,
+      "step": "moderation empty"
     },
     {
-      "step": "moderation validating",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "승인 요청에는 거절 사유를 입력할 수 없고, 거절 요청에는 500자 이하의 사유가 필요합니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1490,14 +1551,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "moderation validating"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "승인 요청에는 거절 사유를 입력할 수 없고, 거절 요청에는 500자 이하의 사유가 필요합니다."
-      }
-    },
-    {
-      "step": "moderation pending",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -1544,14 +1605,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "moderation pending"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "승인 요청에는 거절 사유를 입력할 수 없고, 거절 요청에는 500자 이하의 사유가 필요합니다."
-      }
-    },
-    {
-      "step": "moderation approve with reason",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -1598,14 +1659,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "moderation approve with reason"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "승인 요청에는 거절 사유를 입력할 수 없고, 거절 요청에는 500자 이하의 사유가 필요합니다."
-      }
-    },
-    {
-      "step": "moderation reject no reason",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -1652,14 +1713,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "moderation reject no reason"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "승인 요청에는 거절 사유를 입력할 수 없고, 거절 요청에는 500자 이하의 사유가 필요합니다."
-      }
-    },
-    {
-      "step": "moderation reject blank",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -1706,14 +1767,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "moderation reject blank"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "승인 요청에는 거절 사유를 입력할 수 없고, 거절 요청에는 500자 이하의 사유가 필요합니다."
-      }
-    },
-    {
-      "step": "moderation reject long",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -1760,14 +1821,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "승인 요청에는 거절 사유를 입력할 수 없고, 거절 요청에는 500자 이하의 사유가 필요합니다."
-      }
+      "status": 400,
+      "step": "moderation reject long"
     },
     {
-      "step": "moderation already approved",
-      "status": 400,
+      "body": {
+        "errorCode": "RESOURCE_STATE_CHANGED",
+        "message": "대기 중인 게시물만 검수할 수 있습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1814,14 +1875,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "RESOURCE_STATE_CHANGED",
-        "message": "대기 중인 게시물만 검수할 수 있습니다."
-      }
+      "status": 400,
+      "step": "moderation already approved"
     },
     {
-      "step": "moderation deleted post",
-      "status": 404,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "게시물을 찾을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1868,14 +1929,14 @@
           "0"
         ]
       ],
+      "status": 404,
+      "step": "moderation deleted post"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "게시물을 찾을 수 없습니다."
-      }
-    },
-    {
-      "step": "moderation missing",
-      "status": 404,
+      },
       "headers": [
         [
           "cache-control",
@@ -1922,14 +1983,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "게시물을 찾을 수 없습니다."
-      }
+      "status": 404,
+      "step": "moderation missing"
     },
     {
-      "step": "moderation reject sensitive",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "민감한 정보는 관리자 감사 로그에 저장할 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1976,14 +2037,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "민감한 정보는 관리자 감사 로그에 저장할 수 없습니다."
-      }
+      "status": 400,
+      "step": "moderation reject sensitive"
     },
     {
-      "step": "delete empty",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "삭제 사유가 필요합니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -2030,14 +2091,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "delete empty"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "삭제 사유가 필요합니다."
-      }
-    },
-    {
-      "step": "delete blank",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -2084,14 +2145,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "삭제 사유가 필요합니다."
-      }
+      "status": 400,
+      "step": "delete blank"
     },
     {
-      "step": "delete long",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "삭제 사유는 500자 이하여야 합니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -2138,14 +2199,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "삭제 사유는 500자 이하여야 합니다."
-      }
+      "status": 400,
+      "step": "delete long"
     },
     {
-      "step": "delete validating",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 중인 게시물은 삭제할 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -2192,14 +2253,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미지 처리 중인 게시물은 삭제할 수 없습니다."
-      }
+      "status": 400,
+      "step": "delete validating"
     },
     {
-      "step": "delete missing",
-      "status": 404,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "게시물을 찾을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -2246,14 +2307,92 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "게시물을 찾을 수 없습니다."
-      }
+      "status": 404,
+      "step": "delete missing"
     },
     {
-      "step": "posts list",
-      "status": 200,
+      "body": {
+        "currentPage": 2,
+        "hasNext": false,
+        "pageSize": 3,
+        "posts": [
+          {
+            "author": {
+              "deletedAt": "<t-604800s iso Z>",
+              "email": "withdrawn+$uuid25@chalkak.invalid",
+              "status": "ACTIVE",
+              "userId": "$uuid25"
+            },
+            "createdAt": "<t-104400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
+              "photoId": "$uuid26",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
+            },
+            "postId": "$uuid24",
+            "title": "탈퇴",
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-14400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "photoId": "$uuid13",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "postId": "$uuid11",
+            "title": "하늘",
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "userId": "$uuid8"
+            },
+            "createdAt": "<t-7200s iso Z>",
+            "deletedAt": "<t-3600s iso Z>",
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "photoId": "$uuid10",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "postId": "$uuid7",
+            "title": null,
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          }
+        ]
+      },
       "headers": [
         [
           "cache-control",
@@ -2300,92 +2439,56 @@
           "0"
         ]
       ],
-      "body": {
-        "currentPage": 2,
-        "pageSize": 3,
-        "hasNext": false,
-        "posts": [
-          {
-            "postId": "$uuid24",
-            "title": "탈퇴",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid25",
-              "email": "withdrawn+$uuid25@chalkak.invalid",
-              "status": "ACTIVE",
-              "deletedAt": "<t-604800s iso Z>"
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid26",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-104400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid11",
-            "title": "하늘",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid13",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-14400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid7",
-            "title": null,
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid8",
-              "email": "bob@test.chalkak",
-              "status": "BANNED",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid10",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-7200s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": "<t-3600s iso Z>"
-          }
-        ]
-      }
+      "status": 200,
+      "step": "posts list"
     },
     {
-      "step": "post detail",
-      "status": 200,
+      "body": {
+        "author": {
+          "deletedAt": null,
+          "email": "Alice@Test.Chalkak",
+          "status": "ACTIVE",
+          "userId": "$uuid12"
+        },
+        "createdAt": "<t-14400s iso Z>",
+        "deletedAt": null,
+        "imageUpload": {
+          "createdAt": "<t-15000s iso Z>",
+          "rejectionReason": null,
+          "status": "READY",
+          "updatedAt": "<t-14400s iso Z>",
+          "uploadId": "$uuid53"
+        },
+        "likeCount": 0,
+        "moderatedAt": null,
+        "moderatedBy": null,
+        "moderationStatus": "PENDING",
+        "photo": {
+          "createdAt": "<t-14400s iso Z>",
+          "deletedAt": null,
+          "metadata": {
+            "byteSize": 2048,
+            "height": 3000,
+            "width": 4000
+          },
+          "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+          "photoId": "$uuid13",
+          "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
+          "updatedAt": "<t-14400s iso Z>"
+        },
+        "postId": "$uuid11",
+        "rejectionReason": null,
+        "title": "하늘",
+        "topic": {
+          "deletedAt": null,
+          "endsAt": "<t+54000s iso Z>",
+          "startsAt": "<t-32400s iso Z>",
+          "title": "가을 하늘",
+          "topicDate": "2026-10-12",
+          "topicId": "$uuid9"
+        },
+        "updatedAt": "<t-14400s iso Z>"
+      },
       "headers": [
         [
           "cache-control",
@@ -2432,56 +2535,54 @@
           "0"
         ]
       ],
-      "body": {
-        "postId": "$uuid11",
-        "title": "하늘",
-        "moderationStatus": "PENDING",
-        "author": {
-          "userId": "$uuid12",
-          "email": "Alice@Test.Chalkak",
-          "status": "ACTIVE",
-          "deletedAt": null
-        },
-        "topic": {
-          "topicId": "$uuid9",
-          "title": "가을 하늘",
-          "topicDate": "2026-10-12",
-          "startsAt": "<t-32400s iso Z>",
-          "endsAt": "<t+54000s iso Z>",
-          "deletedAt": null
-        },
-        "photo": {
-          "photoId": "$uuid13",
-          "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
-          "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
-          "metadata": {
-            "width": 4000,
-            "height": 3000,
-            "byteSize": 2048
-          },
-          "createdAt": "<t-14400s iso Z>",
-          "updatedAt": "<t-14400s iso Z>",
-          "deletedAt": null
-        },
-        "imageUpload": {
-          "uploadId": "$uuid53",
-          "status": "READY",
-          "rejectionReason": null,
-          "createdAt": "<t-15000s iso Z>",
-          "updatedAt": "<t-14400s iso Z>"
-        },
-        "likeCount": 0,
-        "createdAt": "<t-14400s iso Z>",
-        "updatedAt": "<t-14400s iso Z>",
-        "moderatedAt": null,
-        "moderatedBy": null,
-        "rejectionReason": null,
-        "deletedAt": null
-      }
+      "status": 200,
+      "step": "post detail"
     },
     {
-      "step": "post detail approved",
-      "status": 200,
+      "body": {
+        "author": {
+          "deletedAt": null,
+          "email": "Alice@Test.Chalkak",
+          "status": "ACTIVE",
+          "userId": "$uuid12"
+        },
+        "createdAt": "<t-115200s iso Z>",
+        "deletedAt": null,
+        "imageUpload": {
+          "createdAt": "<t-115800s iso Z>",
+          "rejectionReason": null,
+          "status": "READY",
+          "updatedAt": "<t-115200s iso Z>",
+          "uploadId": "$uuid55"
+        },
+        "likeCount": 2,
+        "moderatedAt": "<t-50400s iso Z>",
+        "moderatedBy": "$uuid56",
+        "moderationStatus": "APPROVED",
+        "photo": {
+          "createdAt": "<t-115200s iso Z>",
+          "deletedAt": null,
+          "metadata": {
+            "width": 1000
+          },
+          "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
+          "photoId": "$uuid21",
+          "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
+          "updatedAt": "<t-115200s iso Z>"
+        },
+        "postId": "$uuid19",
+        "rejectionReason": null,
+        "title": null,
+        "topic": {
+          "deletedAt": null,
+          "endsAt": "<t-32400s iso Z>",
+          "startsAt": "<t-118800s iso Z>",
+          "title": "어제의 주제",
+          "topicDate": "2026-10-11",
+          "topicId": "$uuid20"
+        },
+        "updatedAt": "<t-50400s iso Z>"
+      },
       "headers": [
         [
           "cache-control",
@@ -2528,54 +2629,50 @@
           "0"
         ]
       ],
-      "body": {
-        "postId": "$uuid19",
-        "title": null,
-        "moderationStatus": "APPROVED",
-        "author": {
-          "userId": "$uuid12",
-          "email": "Alice@Test.Chalkak",
-          "status": "ACTIVE",
-          "deletedAt": null
-        },
-        "topic": {
-          "topicId": "$uuid20",
-          "title": "어제의 주제",
-          "topicDate": "2026-10-11",
-          "startsAt": "<t-118800s iso Z>",
-          "endsAt": "<t-32400s iso Z>",
-          "deletedAt": null
-        },
-        "photo": {
-          "photoId": "$uuid21",
-          "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
-          "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
-          "metadata": {
-            "width": 1000
-          },
-          "createdAt": "<t-115200s iso Z>",
-          "updatedAt": "<t-115200s iso Z>",
-          "deletedAt": null
-        },
-        "imageUpload": {
-          "uploadId": "$uuid55",
-          "status": "READY",
-          "rejectionReason": null,
-          "createdAt": "<t-115800s iso Z>",
-          "updatedAt": "<t-115200s iso Z>"
-        },
-        "likeCount": 2,
-        "createdAt": "<t-115200s iso Z>",
-        "updatedAt": "<t-50400s iso Z>",
-        "moderatedAt": "<t-50400s iso Z>",
-        "moderatedBy": "$uuid56",
-        "rejectionReason": null,
-        "deletedAt": null
-      }
+      "status": 200,
+      "step": "post detail approved"
     },
     {
-      "step": "post detail deleted",
-      "status": 200,
+      "body": {
+        "author": {
+          "deletedAt": null,
+          "email": "bob@test.chalkak",
+          "status": "BANNED",
+          "userId": "$uuid8"
+        },
+        "createdAt": "<t-7200s iso Z>",
+        "deletedAt": "<t-3600s iso Z>",
+        "imageUpload": null,
+        "likeCount": 0,
+        "moderatedAt": null,
+        "moderatedBy": null,
+        "moderationStatus": "PENDING",
+        "photo": {
+          "createdAt": "<t-7200s iso Z>",
+          "deletedAt": null,
+          "metadata": {
+            "byteSize": 30,
+            "height": 20,
+            "width": 10
+          },
+          "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+          "photoId": "$uuid10",
+          "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp",
+          "updatedAt": "<t-7200s iso Z>"
+        },
+        "postId": "$uuid7",
+        "rejectionReason": null,
+        "title": null,
+        "topic": {
+          "deletedAt": null,
+          "endsAt": "<t+54000s iso Z>",
+          "startsAt": "<t-32400s iso Z>",
+          "title": "가을 하늘",
+          "topicDate": "2026-10-12",
+          "topicId": "$uuid9"
+        },
+        "updatedAt": "<t-7200s iso Z>"
+      },
       "headers": [
         [
           "cache-control",
@@ -2622,50 +2719,50 @@
           "0"
         ]
       ],
-      "body": {
-        "postId": "$uuid7",
-        "title": null,
-        "moderationStatus": "PENDING",
-        "author": {
-          "userId": "$uuid8",
-          "email": "bob@test.chalkak",
-          "status": "BANNED",
-          "deletedAt": null
-        },
-        "topic": {
-          "topicId": "$uuid9",
-          "title": "가을 하늘",
-          "topicDate": "2026-10-12",
-          "startsAt": "<t-32400s iso Z>",
-          "endsAt": "<t+54000s iso Z>",
-          "deletedAt": null
-        },
-        "photo": {
-          "photoId": "$uuid10",
-          "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
-          "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp",
-          "metadata": {
-            "width": 10,
-            "height": 20,
-            "byteSize": 30
-          },
-          "createdAt": "<t-7200s iso Z>",
-          "updatedAt": "<t-7200s iso Z>",
-          "deletedAt": null
-        },
-        "imageUpload": null,
-        "likeCount": 0,
-        "createdAt": "<t-7200s iso Z>",
-        "updatedAt": "<t-7200s iso Z>",
-        "moderatedAt": null,
-        "moderatedBy": null,
-        "rejectionReason": null,
-        "deletedAt": "<t-3600s iso Z>"
-      }
+      "status": 200,
+      "step": "post detail deleted"
     },
     {
-      "step": "post detail withdrawn",
-      "status": 200,
+      "body": {
+        "author": {
+          "deletedAt": "<t-604800s iso Z>",
+          "email": "withdrawn+$uuid25@chalkak.invalid",
+          "status": "ACTIVE",
+          "userId": "$uuid25"
+        },
+        "createdAt": "<t-104400s iso Z>",
+        "deletedAt": null,
+        "imageUpload": null,
+        "likeCount": 0,
+        "moderatedAt": null,
+        "moderatedBy": null,
+        "moderationStatus": "PENDING",
+        "photo": {
+          "createdAt": "<t-104400s iso Z>",
+          "deletedAt": null,
+          "metadata": {
+            "byteSize": 77,
+            "height": 240,
+            "width": 320
+          },
+          "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
+          "photoId": "$uuid26",
+          "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp",
+          "updatedAt": "<t-104400s iso Z>"
+        },
+        "postId": "$uuid24",
+        "rejectionReason": null,
+        "title": "탈퇴",
+        "topic": {
+          "deletedAt": null,
+          "endsAt": "<t-32400s iso Z>",
+          "startsAt": "<t-118800s iso Z>",
+          "title": "어제의 주제",
+          "topicDate": "2026-10-11",
+          "topicId": "$uuid20"
+        },
+        "updatedAt": "<t-104400s iso Z>"
+      },
       "headers": [
         [
           "cache-control",
@@ -2712,50 +2809,50 @@
           "0"
         ]
       ],
-      "body": {
-        "postId": "$uuid24",
-        "title": "탈퇴",
-        "moderationStatus": "PENDING",
-        "author": {
-          "userId": "$uuid25",
-          "email": "withdrawn+$uuid25@chalkak.invalid",
-          "status": "ACTIVE",
-          "deletedAt": "<t-604800s iso Z>"
-        },
-        "topic": {
-          "topicId": "$uuid20",
-          "title": "어제의 주제",
-          "topicDate": "2026-10-11",
-          "startsAt": "<t-118800s iso Z>",
-          "endsAt": "<t-32400s iso Z>",
-          "deletedAt": null
-        },
-        "photo": {
-          "photoId": "$uuid26",
-          "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
-          "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp",
-          "metadata": {
-            "width": 320,
-            "height": 240,
-            "byteSize": 77
-          },
-          "createdAt": "<t-104400s iso Z>",
-          "updatedAt": "<t-104400s iso Z>",
-          "deletedAt": null
-        },
-        "imageUpload": null,
-        "likeCount": 0,
-        "createdAt": "<t-104400s iso Z>",
-        "updatedAt": "<t-104400s iso Z>",
-        "moderatedAt": null,
-        "moderatedBy": null,
-        "rejectionReason": null,
-        "deletedAt": null
-      }
+      "status": 200,
+      "step": "post detail withdrawn"
     },
     {
-      "step": "post detail noupload",
-      "status": 200,
+      "body": {
+        "author": {
+          "deletedAt": null,
+          "email": null,
+          "status": "ACTIVE",
+          "userId": "$uuid28"
+        },
+        "createdAt": "<t-108000s iso Z>",
+        "deletedAt": null,
+        "imageUpload": null,
+        "likeCount": 0,
+        "moderatedAt": null,
+        "moderatedBy": null,
+        "moderationStatus": "PENDING",
+        "photo": {
+          "createdAt": "<t-108000s iso Z>",
+          "deletedAt": null,
+          "metadata": {
+            "byteSize": 99,
+            "height": 480,
+            "width": 640
+          },
+          "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
+          "photoId": "$uuid29",
+          "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp",
+          "updatedAt": "<t-108000s iso Z>"
+        },
+        "postId": "$uuid27",
+        "rejectionReason": null,
+        "title": "대기",
+        "topic": {
+          "deletedAt": null,
+          "endsAt": "<t-32400s iso Z>",
+          "startsAt": "<t-118800s iso Z>",
+          "title": "어제의 주제",
+          "topicDate": "2026-10-11",
+          "topicId": "$uuid20"
+        },
+        "updatedAt": "<t-108000s iso Z>"
+      },
       "headers": [
         [
           "cache-control",
@@ -2802,50 +2899,167 @@
           "0"
         ]
       ],
-      "body": {
-        "postId": "$uuid27",
-        "title": "대기",
-        "moderationStatus": "PENDING",
-        "author": {
-          "userId": "$uuid28",
-          "email": null,
-          "status": "ACTIVE",
-          "deletedAt": null
-        },
-        "topic": {
-          "topicId": "$uuid20",
-          "title": "어제의 주제",
-          "topicDate": "2026-10-11",
-          "startsAt": "<t-118800s iso Z>",
-          "endsAt": "<t-32400s iso Z>",
-          "deletedAt": null
-        },
-        "photo": {
-          "photoId": "$uuid29",
-          "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
-          "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp",
-          "metadata": {
-            "width": 640,
-            "height": 480,
-            "byteSize": 99
-          },
-          "createdAt": "<t-108000s iso Z>",
-          "updatedAt": "<t-108000s iso Z>",
-          "deletedAt": null
-        },
-        "imageUpload": null,
-        "likeCount": 0,
-        "createdAt": "<t-108000s iso Z>",
-        "updatedAt": "<t-108000s iso Z>",
-        "moderatedAt": null,
-        "moderatedBy": null,
-        "rejectionReason": null,
-        "deletedAt": null
-      }
+      "status": 200,
+      "step": "post detail noupload"
     },
     {
-      "step": "posts userId space",
-      "status": 200,
+      "body": {
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20,
+        "posts": [
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "userId": "$uuid8"
+            },
+            "createdAt": "<t-7200s iso Z>",
+            "deletedAt": "<t-3600s iso Z>",
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "photoId": "$uuid10",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "postId": "$uuid7",
+            "title": null,
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-14400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "photoId": "$uuid13",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "postId": "$uuid11",
+            "title": "하늘",
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": "<t-604800s iso Z>",
+              "email": "withdrawn+$uuid25@chalkak.invalid",
+              "status": "ACTIVE",
+              "userId": "$uuid25"
+            },
+            "createdAt": "<t-104400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
+              "photoId": "$uuid26",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
+            },
+            "postId": "$uuid24",
+            "title": "탈퇴",
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": null,
+              "status": "ACTIVE",
+              "userId": "$uuid28"
+            },
+            "createdAt": "<t-108000s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
+              "photoId": "$uuid29",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp"
+            },
+            "postId": "$uuid27",
+            "title": "대기",
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "userId": "$uuid8"
+            },
+            "createdAt": "<t-111600s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": "<t-46800s iso Z>",
+            "moderationStatus": "REJECTED",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p3/original.webp",
+              "photoId": "$uuid31",
+              "thumbnailImageUrl": null
+            },
+            "postId": "$uuid30",
+            "title": "거절",
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-115200s iso Z>",
+            "deletedAt": null,
+            "likeCount": 2,
+            "moderatedAt": "<t-50400s iso Z>",
+            "moderationStatus": "APPROVED",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
+              "photoId": "$uuid21",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
+            },
+            "postId": "$uuid19",
+            "title": null,
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          }
+        ]
+      },
       "headers": [
         [
           "cache-control",
@@ -2892,167 +3106,167 @@
           "0"
         ]
       ],
-      "body": {
-        "currentPage": 1,
-        "pageSize": 20,
-        "hasNext": false,
-        "posts": [
-          {
-            "postId": "$uuid7",
-            "title": null,
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid8",
-              "email": "bob@test.chalkak",
-              "status": "BANNED",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid10",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-7200s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": "<t-3600s iso Z>"
-          },
-          {
-            "postId": "$uuid11",
-            "title": "하늘",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid13",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-14400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid24",
-            "title": "탈퇴",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid25",
-              "email": "withdrawn+$uuid25@chalkak.invalid",
-              "status": "ACTIVE",
-              "deletedAt": "<t-604800s iso Z>"
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid26",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-104400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid27",
-            "title": "대기",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid28",
-              "email": null,
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid29",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-108000s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid30",
-            "title": "거절",
-            "moderationStatus": "REJECTED",
-            "author": {
-              "userId": "$uuid8",
-              "email": "bob@test.chalkak",
-              "status": "BANNED",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid31",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p3/original.webp",
-              "thumbnailImageUrl": null
-            },
-            "likeCount": 0,
-            "createdAt": "<t-111600s iso Z>",
-            "moderatedAt": "<t-46800s iso Z>",
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid19",
-            "title": null,
-            "moderationStatus": "APPROVED",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid21",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
-            },
-            "likeCount": 2,
-            "createdAt": "<t-115200s iso Z>",
-            "moderatedAt": "<t-50400s iso Z>",
-            "deletedAt": null
-          }
-        ]
-      }
+      "status": 200,
+      "step": "posts userId space"
     },
     {
-      "step": "posts topicDate space",
-      "status": 200,
+      "body": {
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20,
+        "posts": [
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "userId": "$uuid8"
+            },
+            "createdAt": "<t-7200s iso Z>",
+            "deletedAt": "<t-3600s iso Z>",
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "photoId": "$uuid10",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "postId": "$uuid7",
+            "title": null,
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-14400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "photoId": "$uuid13",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "postId": "$uuid11",
+            "title": "하늘",
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": "<t-604800s iso Z>",
+              "email": "withdrawn+$uuid25@chalkak.invalid",
+              "status": "ACTIVE",
+              "userId": "$uuid25"
+            },
+            "createdAt": "<t-104400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
+              "photoId": "$uuid26",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
+            },
+            "postId": "$uuid24",
+            "title": "탈퇴",
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": null,
+              "status": "ACTIVE",
+              "userId": "$uuid28"
+            },
+            "createdAt": "<t-108000s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
+              "photoId": "$uuid29",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp"
+            },
+            "postId": "$uuid27",
+            "title": "대기",
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "userId": "$uuid8"
+            },
+            "createdAt": "<t-111600s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": "<t-46800s iso Z>",
+            "moderationStatus": "REJECTED",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p3/original.webp",
+              "photoId": "$uuid31",
+              "thumbnailImageUrl": null
+            },
+            "postId": "$uuid30",
+            "title": "거절",
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-115200s iso Z>",
+            "deletedAt": null,
+            "likeCount": 2,
+            "moderatedAt": "<t-50400s iso Z>",
+            "moderationStatus": "APPROVED",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
+              "photoId": "$uuid21",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
+            },
+            "postId": "$uuid19",
+            "title": null,
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          }
+        ]
+      },
       "headers": [
         [
           "cache-control",
@@ -3099,167 +3313,167 @@
           "0"
         ]
       ],
-      "body": {
-        "currentPage": 1,
-        "pageSize": 20,
-        "hasNext": false,
-        "posts": [
-          {
-            "postId": "$uuid7",
-            "title": null,
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid8",
-              "email": "bob@test.chalkak",
-              "status": "BANNED",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid10",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-7200s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": "<t-3600s iso Z>"
-          },
-          {
-            "postId": "$uuid11",
-            "title": "하늘",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid13",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-14400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid24",
-            "title": "탈퇴",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid25",
-              "email": "withdrawn+$uuid25@chalkak.invalid",
-              "status": "ACTIVE",
-              "deletedAt": "<t-604800s iso Z>"
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid26",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-104400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid27",
-            "title": "대기",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid28",
-              "email": null,
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid29",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-108000s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid30",
-            "title": "거절",
-            "moderationStatus": "REJECTED",
-            "author": {
-              "userId": "$uuid8",
-              "email": "bob@test.chalkak",
-              "status": "BANNED",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid31",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p3/original.webp",
-              "thumbnailImageUrl": null
-            },
-            "likeCount": 0,
-            "createdAt": "<t-111600s iso Z>",
-            "moderatedAt": "<t-46800s iso Z>",
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid19",
-            "title": null,
-            "moderationStatus": "APPROVED",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid21",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
-            },
-            "likeCount": 2,
-            "createdAt": "<t-115200s iso Z>",
-            "moderatedAt": "<t-50400s iso Z>",
-            "deletedAt": null
-          }
-        ]
-      }
+      "status": 200,
+      "step": "posts topicDate space"
     },
     {
-      "step": "posts createdAtFrom space",
-      "status": 200,
+      "body": {
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20,
+        "posts": [
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "userId": "$uuid8"
+            },
+            "createdAt": "<t-7200s iso Z>",
+            "deletedAt": "<t-3600s iso Z>",
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "photoId": "$uuid10",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "postId": "$uuid7",
+            "title": null,
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-14400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "photoId": "$uuid13",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "postId": "$uuid11",
+            "title": "하늘",
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": "<t-604800s iso Z>",
+              "email": "withdrawn+$uuid25@chalkak.invalid",
+              "status": "ACTIVE",
+              "userId": "$uuid25"
+            },
+            "createdAt": "<t-104400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
+              "photoId": "$uuid26",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
+            },
+            "postId": "$uuid24",
+            "title": "탈퇴",
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": null,
+              "status": "ACTIVE",
+              "userId": "$uuid28"
+            },
+            "createdAt": "<t-108000s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
+              "photoId": "$uuid29",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp"
+            },
+            "postId": "$uuid27",
+            "title": "대기",
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "userId": "$uuid8"
+            },
+            "createdAt": "<t-111600s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": "<t-46800s iso Z>",
+            "moderationStatus": "REJECTED",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p3/original.webp",
+              "photoId": "$uuid31",
+              "thumbnailImageUrl": null
+            },
+            "postId": "$uuid30",
+            "title": "거절",
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-115200s iso Z>",
+            "deletedAt": null,
+            "likeCount": 2,
+            "moderatedAt": "<t-50400s iso Z>",
+            "moderationStatus": "APPROVED",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
+              "photoId": "$uuid21",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
+            },
+            "postId": "$uuid19",
+            "title": null,
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          }
+        ]
+      },
       "headers": [
         [
           "cache-control",
@@ -3306,167 +3520,14 @@
           "0"
         ]
       ],
-      "body": {
-        "currentPage": 1,
-        "pageSize": 20,
-        "hasNext": false,
-        "posts": [
-          {
-            "postId": "$uuid7",
-            "title": null,
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid8",
-              "email": "bob@test.chalkak",
-              "status": "BANNED",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid10",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-7200s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": "<t-3600s iso Z>"
-          },
-          {
-            "postId": "$uuid11",
-            "title": "하늘",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid13",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-14400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid24",
-            "title": "탈퇴",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid25",
-              "email": "withdrawn+$uuid25@chalkak.invalid",
-              "status": "ACTIVE",
-              "deletedAt": "<t-604800s iso Z>"
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid26",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-104400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid27",
-            "title": "대기",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid28",
-              "email": null,
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid29",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-108000s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid30",
-            "title": "거절",
-            "moderationStatus": "REJECTED",
-            "author": {
-              "userId": "$uuid8",
-              "email": "bob@test.chalkak",
-              "status": "BANNED",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid31",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p3/original.webp",
-              "thumbnailImageUrl": null
-            },
-            "likeCount": 0,
-            "createdAt": "<t-111600s iso Z>",
-            "moderatedAt": "<t-46800s iso Z>",
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid19",
-            "title": null,
-            "moderationStatus": "APPROVED",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid21",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
-            },
-            "likeCount": 2,
-            "createdAt": "<t-115200s iso Z>",
-            "moderatedAt": "<t-50400s iso Z>",
-            "deletedAt": null
-          }
-        ]
-      }
+      "status": 200,
+      "step": "posts createdAtFrom space"
     },
     {
-      "step": "posts createdAtFrom nozone",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "createdAtFrom: 요청 값의 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -3513,14 +3574,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "posts createdAtFrom nozone"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "createdAtFrom: 요청 값의 형식이 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "posts createdAtFrom 12 digits",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -3567,14 +3628,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "posts createdAtFrom 12 digits"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "createdAtFrom: 요청 값의 형식이 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "posts createdAtFrom sec 60",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -3621,14 +3682,16 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "createdAtFrom: 요청 값의 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "posts createdAtFrom sec 60"
     },
     {
-      "step": "posts createdAtFrom hour 24",
-      "status": 200,
+      "body": {
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20,
+        "posts": []
+      },
       "headers": [
         [
           "cache-control",
@@ -3675,16 +3738,167 @@
           "0"
         ]
       ],
-      "body": {
-        "currentPage": 1,
-        "pageSize": 20,
-        "hasNext": false,
-        "posts": []
-      }
+      "status": 200,
+      "step": "posts createdAtFrom hour 24"
     },
     {
-      "step": "posts createdAtFrom leap",
-      "status": 200,
+      "body": {
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20,
+        "posts": [
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "userId": "$uuid8"
+            },
+            "createdAt": "<t-7200s iso Z>",
+            "deletedAt": "<t-3600s iso Z>",
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "photoId": "$uuid10",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "postId": "$uuid7",
+            "title": null,
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-14400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "photoId": "$uuid13",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "postId": "$uuid11",
+            "title": "하늘",
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": "<t-604800s iso Z>",
+              "email": "withdrawn+$uuid25@chalkak.invalid",
+              "status": "ACTIVE",
+              "userId": "$uuid25"
+            },
+            "createdAt": "<t-104400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
+              "photoId": "$uuid26",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
+            },
+            "postId": "$uuid24",
+            "title": "탈퇴",
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": null,
+              "status": "ACTIVE",
+              "userId": "$uuid28"
+            },
+            "createdAt": "<t-108000s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
+              "photoId": "$uuid29",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp"
+            },
+            "postId": "$uuid27",
+            "title": "대기",
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "userId": "$uuid8"
+            },
+            "createdAt": "<t-111600s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": "<t-46800s iso Z>",
+            "moderationStatus": "REJECTED",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p3/original.webp",
+              "photoId": "$uuid31",
+              "thumbnailImageUrl": null
+            },
+            "postId": "$uuid30",
+            "title": "거절",
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-115200s iso Z>",
+            "deletedAt": null,
+            "likeCount": 2,
+            "moderatedAt": "<t-50400s iso Z>",
+            "moderationStatus": "APPROVED",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
+              "photoId": "$uuid21",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
+            },
+            "postId": "$uuid19",
+            "title": null,
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          }
+        ]
+      },
       "headers": [
         [
           "cache-control",
@@ -3731,167 +3945,14 @@
           "0"
         ]
       ],
-      "body": {
-        "currentPage": 1,
-        "pageSize": 20,
-        "hasNext": false,
-        "posts": [
-          {
-            "postId": "$uuid7",
-            "title": null,
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid8",
-              "email": "bob@test.chalkak",
-              "status": "BANNED",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid10",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-7200s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": "<t-3600s iso Z>"
-          },
-          {
-            "postId": "$uuid11",
-            "title": "하늘",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid13",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-14400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid24",
-            "title": "탈퇴",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid25",
-              "email": "withdrawn+$uuid25@chalkak.invalid",
-              "status": "ACTIVE",
-              "deletedAt": "<t-604800s iso Z>"
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid26",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-104400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid27",
-            "title": "대기",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid28",
-              "email": null,
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid29",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-108000s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid30",
-            "title": "거절",
-            "moderationStatus": "REJECTED",
-            "author": {
-              "userId": "$uuid8",
-              "email": "bob@test.chalkak",
-              "status": "BANNED",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid31",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p3/original.webp",
-              "thumbnailImageUrl": null
-            },
-            "likeCount": 0,
-            "createdAt": "<t-111600s iso Z>",
-            "moderatedAt": "<t-46800s iso Z>",
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid19",
-            "title": null,
-            "moderationStatus": "APPROVED",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid21",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
-            },
-            "likeCount": 2,
-            "createdAt": "<t-115200s iso Z>",
-            "moderatedAt": "<t-50400s iso Z>",
-            "deletedAt": null
-          }
-        ]
-      }
+      "status": 200,
+      "step": "posts createdAtFrom leap"
     },
     {
-      "step": "posts createdAtFrom lead space",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "createdAtFrom: 요청 값의 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -3938,14 +3999,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "createdAtFrom: 요청 값의 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "posts createdAtFrom lead space"
     },
     {
-      "step": "posts topicDate datetime",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "topicDate: 요청 값의 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -3992,14 +4053,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "posts topicDate datetime"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "topicDate: 요청 값의 형식이 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "posts topicDate compact",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -4046,14 +4107,67 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "topicDate: 요청 값의 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "posts topicDate compact"
     },
     {
-      "step": "posts topicId upper",
-      "status": 200,
+      "body": {
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20,
+        "posts": [
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "userId": "$uuid8"
+            },
+            "createdAt": "<t-7200s iso Z>",
+            "deletedAt": "<t-3600s iso Z>",
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "photoId": "$uuid10",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "postId": "$uuid7",
+            "title": null,
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-14400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "photoId": "$uuid13",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "postId": "$uuid11",
+            "title": "하늘",
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          }
+        ]
+      },
       "headers": [
         [
           "cache-control",
@@ -4100,67 +4214,14 @@
           "0"
         ]
       ],
-      "body": {
-        "currentPage": 1,
-        "pageSize": 20,
-        "hasNext": false,
-        "posts": [
-          {
-            "postId": "$uuid7",
-            "title": null,
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid8",
-              "email": "bob@test.chalkak",
-              "status": "BANNED",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid10",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-7200s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": "<t-3600s iso Z>"
-          },
-          {
-            "postId": "$uuid11",
-            "title": "하늘",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid13",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-14400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          }
-        ]
-      }
+      "status": 200,
+      "step": "posts topicId upper"
     },
     {
-      "step": "posts userId nonhex",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "userId: 요청 값의 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -4207,14 +4268,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "posts userId nonhex"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "userId: 요청 값의 형식이 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "posts userId 36plus",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -4261,14 +4322,67 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "userId: 요청 값의 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "posts userId 36plus"
     },
     {
-      "step": "posts userId plus",
-      "status": 200,
+      "body": {
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20,
+        "posts": [
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-14400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "photoId": "$uuid13",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "postId": "$uuid11",
+            "title": "하늘",
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-115200s iso Z>",
+            "deletedAt": null,
+            "likeCount": 2,
+            "moderatedAt": "<t-50400s iso Z>",
+            "moderationStatus": "APPROVED",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
+              "photoId": "$uuid21",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
+            },
+            "postId": "$uuid19",
+            "title": null,
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          }
+        ]
+      },
       "headers": [
         [
           "cache-control",
@@ -4315,67 +4429,14 @@
           "0"
         ]
       ],
-      "body": {
-        "currentPage": 1,
-        "pageSize": 20,
-        "hasNext": false,
-        "posts": [
-          {
-            "postId": "$uuid11",
-            "title": "하늘",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid13",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-14400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid19",
-            "title": null,
-            "moderationStatus": "APPROVED",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid21",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p2/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp"
-            },
-            "likeCount": 2,
-            "createdAt": "<t-115200s iso Z>",
-            "moderatedAt": "<t-50400s iso Z>",
-            "deletedAt": null
-          }
-        ]
-      }
+      "status": 200,
+      "step": "posts userId plus"
     },
     {
-      "step": "posts status lowercase",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "status: 요청 값의 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -4422,14 +4483,117 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "status: 요청 값의 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "posts status lowercase"
     },
     {
-      "step": "posts status space",
-      "status": 200,
+      "body": {
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20,
+        "posts": [
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "bob@test.chalkak",
+              "status": "BANNED",
+              "userId": "$uuid8"
+            },
+            "createdAt": "<t-7200s iso Z>",
+            "deletedAt": "<t-3600s iso Z>",
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
+              "photoId": "$uuid10",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
+            },
+            "postId": "$uuid7",
+            "title": null,
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": "Alice@Test.Chalkak",
+              "status": "ACTIVE",
+              "userId": "$uuid12"
+            },
+            "createdAt": "<t-14400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
+              "photoId": "$uuid13",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
+            },
+            "postId": "$uuid11",
+            "title": "하늘",
+            "topic": {
+              "title": "가을 하늘",
+              "topicDate": "2026-10-12",
+              "topicId": "$uuid9"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": "<t-604800s iso Z>",
+              "email": "withdrawn+$uuid25@chalkak.invalid",
+              "status": "ACTIVE",
+              "userId": "$uuid25"
+            },
+            "createdAt": "<t-104400s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
+              "photoId": "$uuid26",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
+            },
+            "postId": "$uuid24",
+            "title": "탈퇴",
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          },
+          {
+            "author": {
+              "deletedAt": null,
+              "email": null,
+              "status": "ACTIVE",
+              "userId": "$uuid28"
+            },
+            "createdAt": "<t-108000s iso Z>",
+            "deletedAt": null,
+            "likeCount": 0,
+            "moderatedAt": null,
+            "moderationStatus": "PENDING",
+            "photo": {
+              "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
+              "photoId": "$uuid29",
+              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp"
+            },
+            "postId": "$uuid27",
+            "title": "대기",
+            "topic": {
+              "title": "어제의 주제",
+              "topicDate": "2026-10-11",
+              "topicId": "$uuid20"
+            }
+          }
+        ]
+      },
       "headers": [
         [
           "cache-control",
@@ -4476,117 +4640,14 @@
           "0"
         ]
       ],
-      "body": {
-        "currentPage": 1,
-        "pageSize": 20,
-        "hasNext": false,
-        "posts": [
-          {
-            "postId": "$uuid7",
-            "title": null,
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid8",
-              "email": "bob@test.chalkak",
-              "status": "BANNED",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid10",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p5/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p5/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-7200s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": "<t-3600s iso Z>"
-          },
-          {
-            "postId": "$uuid11",
-            "title": "하늘",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid12",
-              "email": "Alice@Test.Chalkak",
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid9",
-              "title": "가을 하늘",
-              "topicDate": "2026-10-12"
-            },
-            "photo": {
-              "photoId": "$uuid13",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p1/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-14400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid24",
-            "title": "탈퇴",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid25",
-              "email": "withdrawn+$uuid25@chalkak.invalid",
-              "status": "ACTIVE",
-              "deletedAt": "<t-604800s iso Z>"
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid26",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p7/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p7/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-104400s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          },
-          {
-            "postId": "$uuid27",
-            "title": "대기",
-            "moderationStatus": "PENDING",
-            "author": {
-              "userId": "$uuid28",
-              "email": null,
-              "status": "ACTIVE",
-              "deletedAt": null
-            },
-            "topic": {
-              "topicId": "$uuid20",
-              "title": "어제의 주제",
-              "topicDate": "2026-10-11"
-            },
-            "photo": {
-              "photoId": "$uuid29",
-              "originalImageUrl": "https://cdn.test.chalkak/posts/p6/original.webp",
-              "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p6/thumbnail.webp"
-            },
-            "likeCount": 0,
-            "createdAt": "<t-108000s iso Z>",
-            "moderatedAt": null,
-            "deletedAt": null
-          }
-        ]
-      }
+      "status": 200,
+      "step": "posts status space"
     },
     {
-      "step": "posts two binding errors",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "status: 요청 값의 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -4633,14 +4694,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "status: 요청 값의 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "posts two binding errors"
     },
     {
-      "step": "posts binding then range",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "createdAtTo: 요청 값의 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -4687,14 +4748,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "createdAtTo: 요청 값의 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "posts binding then range"
     },
     {
-      "step": "moderation ordinal",
-      "status": 404,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "게시물을 찾을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -4741,14 +4802,14 @@
           "0"
         ]
       ],
+      "status": 404,
+      "step": "moderation ordinal"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "게시물을 찾을 수 없습니다."
-      }
-    },
-    {
-      "step": "moderation string ordinal",
-      "status": 404,
+      },
       "headers": [
         [
           "cache-control",
@@ -4795,14 +4856,14 @@
           "0"
         ]
       ],
+      "status": 404,
+      "step": "moderation string ordinal"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "게시물을 찾을 수 없습니다."
-      }
-    },
-    {
-      "step": "moderation lead space",
-      "status": 404,
+      },
       "headers": [
         [
           "cache-control",
@@ -4849,14 +4910,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "게시물을 찾을 수 없습니다."
-      }
+      "status": 404,
+      "step": "moderation lead space"
     },
     {
-      "step": "moderation lowercase",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -4903,14 +4964,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "moderation lowercase"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
-    },
-    {
-      "step": "moderation empty string",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -4957,14 +5018,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "moderation empty string"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
-    },
-    {
-      "step": "moderation float",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -5011,14 +5072,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "moderation float"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
-    },
-    {
-      "step": "moderation bool",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -5065,14 +5126,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
+      "status": 400,
+      "step": "moderation bool"
     },
     {
-      "step": "moderation reason num",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "승인 요청에는 거절 사유를 입력할 수 없고, 거절 요청에는 500자 이하의 사유가 필요합니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -5119,14 +5180,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "moderation reason num"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "승인 요청에는 거절 사유를 입력할 수 없고, 거절 요청에는 500자 이하의 사유가 필요합니다."
-      }
-    },
-    {
-      "step": "moderation reason empty",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -5173,14 +5234,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "승인 요청에는 거절 사유를 입력할 수 없고, 거절 요청에는 500자 이하의 사유가 필요합니다."
-      }
+      "status": 400,
+      "step": "moderation reason empty"
     },
     {
-      "step": "moderation null reason",
-      "status": 404,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "게시물을 찾을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -5227,14 +5288,14 @@
           "0"
         ]
       ],
+      "status": 404,
+      "step": "moderation null reason"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "게시물을 찾을 수 없습니다."
-      }
-    },
-    {
-      "step": "moderation reject trimmed 500",
-      "status": 404,
+      },
       "headers": [
         [
           "cache-control",
@@ -5281,14 +5342,14 @@
           "0"
         ]
       ],
+      "status": 404,
+      "step": "moderation reject trimmed 500"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "게시물을 찾을 수 없습니다."
-      }
-    },
-    {
-      "step": "moderation reject nbsp",
-      "status": 404,
+      },
       "headers": [
         [
           "cache-control",
@@ -5335,14 +5396,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "게시물을 찾을 수 없습니다."
-      }
+      "status": 404,
+      "step": "moderation reject nbsp"
     },
     {
-      "step": "moderation reject 0x1f",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "승인 요청에는 거절 사유를 입력할 수 없고, 거절 요청에는 500자 이하의 사유가 필요합니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -5389,69 +5450,8 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "승인 요청에는 거절 사유를 입력할 수 없고, 거절 요청에는 500자 이하의 사유가 필요합니다."
-      }
+      "status": 400,
+      "step": "moderation reject 0x1f"
     }
-  ],
-  "db": {
-    "admin_audit_logs": [
-      "{\"id\":\"$uuid?\",\"action\":\"POST_APPROVED\",\"reason\":null,\"target_id\":\"$uuid19\",\"request_id\":\"$uuid?\",\"after_state\":{\"moderatedAt\":\"<t-50400s db Z>\",\"moderatedBy\":\"$uuid56\",\"moderationStatus\":\"APPROVED\"},\"occurred_at\":\"<t-50400s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"moderatedAt\":null,\"moderationStatus\":\"PENDING\"},\"actor_admin_id\":\"$uuid56\"}",
-      "{\"id\":\"$uuid?\",\"action\":\"POST_REJECTED\",\"reason\":\"정책 위반\",\"target_id\":\"$uuid30\",\"request_id\":\"$uuid?\",\"after_state\":{\"moderatedAt\":\"<t-46800s db Z>\",\"moderatedBy\":\"$uuid?\",\"moderationStatus\":\"REJECTED\"},\"occurred_at\":\"<t-46800s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"moderatedAt\":null,\"moderationStatus\":\"PENDING\"},\"actor_admin_id\":\"$uuid?\"}",
-      "{\"id\":\"$uuid?\",\"action\":\"USER_BANNED\",\"reason\":\"반복 위반\",\"target_id\":\"$uuid8\",\"request_id\":\"$uuid?\",\"after_state\":{\"status\":\"BANNED\"},\"occurred_at\":\"<t-43200s db +09:00>\",\"target_type\":\"USER\",\"before_state\":{\"status\":\"ACTIVE\"},\"actor_admin_id\":\"$uuid56\"}"
-    ],
-    "admins": [
-      "{\"id\":\"$uuid56\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"username\":\"operator\",\"created_at\":\"<t-3542400s db +09:00>\",\"updated_at\":\"<t-3542400s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"username\":\"reviewer\",\"created_at\":\"<t-3456000s db +09:00>\",\"updated_at\":\"<t-3456000s db +09:00>\"}"
-    ],
-    "feedbacks": [
-      "{\"id\":\"$uuid?\",\"content\":\"버그 신고\",\"user_id\":\"$uuid28\",\"created_at\":\"<t-43200s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"content\":\"앱이 좋아요\",\"user_id\":\"$uuid12\",\"created_at\":\"<t-172800s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"content\":\"탈퇴 전에 남긴 의견\",\"user_id\":\"$uuid25\",\"created_at\":\"<t-86400s db +09:00>\"}"
-    ],
-    "photos": [
-      "{\"id\":\"$uuid10\",\"metadata\":{\"width\":10,\"height\":20,\"byteSize\":30},\"created_at\":\"<t-7200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-7200s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p5/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p5/thumbnail.webp\"}",
-      "{\"id\":\"$uuid13\",\"metadata\":{\"width\":4000,\"camera\":\"private\",\"height\":3000,\"byteSize\":2048},\"created_at\":\"<t-14400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-14400s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p1/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p1/thumbnail.webp\"}",
-      "{\"id\":\"$uuid21\",\"metadata\":{\"width\":1000.9,\"height\":\"tall\"},\"created_at\":\"<t-115200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-115200s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p2/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p2/thumbnail.webp\"}",
-      "{\"id\":\"$uuid26\",\"metadata\":{\"width\":320,\"height\":240,\"byteSize\":77},\"created_at\":\"<t-104400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-104400s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p7/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p7/thumbnail.webp\"}",
-      "{\"id\":\"$uuid29\",\"metadata\":{\"width\":640,\"height\":480,\"byteSize\":99},\"created_at\":\"<t-108000s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-108000s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p6/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p6/thumbnail.webp\"}",
-      "{\"id\":\"$uuid31\",\"metadata\":{},\"created_at\":\"<t-111600s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-111600s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p3/original.webp\",\"thumbnail_storage_key\":null}",
-      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t-10800s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-10800s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p4/original.webp\",\"thumbnail_storage_key\":null}"
-    ],
-    "post_image_uploads": [
-      "{\"id\":\"$uuid53\",\"status\":\"READY\",\"user_id\":\"$uuid12\",\"claimed_at\":\"<t-14400s db +09:00>\",\"created_at\":\"<t-15000s db +09:00>\",\"expires_at\":\"<t+0s db +09:00>\",\"updated_at\":\"<t-14400s db +09:00>\",\"image_metadata\":{\"width\":4000},\"rejection_reason\":null}",
-      "{\"id\":\"$uuid55\",\"status\":\"READY\",\"user_id\":\"$uuid12\",\"claimed_at\":\"<t-115200s db +09:00>\",\"created_at\":\"<t-115800s db +09:00>\",\"expires_at\":\"<t-86400s db +09:00>\",\"updated_at\":\"<t-115200s db +09:00>\",\"image_metadata\":{\"width\":1000},\"rejection_reason\":null}"
-    ],
-    "post_likes": [
-      "{\"id\":\"$uuid?\",\"post_id\":\"$uuid19\",\"user_id\":\"$uuid12\",\"created_at\":\"<t-43200s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"post_id\":\"$uuid19\",\"user_id\":\"$uuid8\",\"created_at\":\"<t-41400s db +09:00>\"}"
-    ],
-    "posts": [
-      "{\"id\":\"$uuid11\",\"title\":\"하늘\",\"user_id\":\"$uuid12\",\"photo_id\":\"$uuid13\",\"topic_id\":\"$uuid9\",\"created_at\":\"<t-14400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-14400s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":\"$uuid53\"}",
-      "{\"id\":\"$uuid19\",\"title\":null,\"user_id\":\"$uuid12\",\"photo_id\":\"$uuid21\",\"topic_id\":\"$uuid20\",\"created_at\":\"<t-115200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-50400s db +09:00>\",\"moderated_at\":\"<t-50400s db +09:00>\",\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":\"$uuid55\"}",
-      "{\"id\":\"$uuid24\",\"title\":\"탈퇴\",\"user_id\":\"$uuid25\",\"photo_id\":\"$uuid26\",\"topic_id\":\"$uuid20\",\"created_at\":\"<t-104400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-104400s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid27\",\"title\":\"대기\",\"user_id\":\"$uuid28\",\"photo_id\":\"$uuid29\",\"topic_id\":\"$uuid20\",\"created_at\":\"<t-108000s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-108000s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid30\",\"title\":\"거절\",\"user_id\":\"$uuid8\",\"photo_id\":\"$uuid31\",\"topic_id\":\"$uuid20\",\"created_at\":\"<t-111600s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-46800s db +09:00>\",\"moderated_at\":\"<t-46800s db +09:00>\",\"moderation_status\":\"REJECTED\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid7\",\"title\":null,\"user_id\":\"$uuid8\",\"photo_id\":\"$uuid10\",\"topic_id\":\"$uuid9\",\"created_at\":\"<t-7200s db +09:00>\",\"deleted_at\":\"<t-3600s db +09:00>\",\"updated_at\":\"<t-7200s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid?\",\"title\":\"처리중\",\"user_id\":\"$uuid28\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid9\",\"created_at\":\"<t-10800s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-10800s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"VALIDATING\",\"post_image_upload_id\":null}"
-    ],
-    "social_accounts": [
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid12\",\"provider\":\"GOOGLE\",\"created_at\":\"<t-950400s db +09:00>\",\"subject_hmac\":\"1111111111111111111111111111111111111111111111111111111111111111\"}",
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid25\",\"provider\":\"KAKAO\",\"created_at\":\"<t-777600s db +09:00>\",\"subject_hmac\":\"3333333333333333333333333333333333333333333333333333333333333333\"}",
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid8\",\"provider\":\"APPLE\",\"created_at\":\"<t-864000s db +09:00>\",\"subject_hmac\":\"2222222222222222222222222222222222222222222222222222222222222222\"}"
-    ],
-    "topics": [
-      "{\"id\":\"$uuid20\",\"title\":\"어제의 주제\",\"ends_at\":\"<t-32400s db +09:00>\",\"starts_at\":\"<t-118800s db +09:00>\",\"created_at\":\"<t-864000s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-11\",\"updated_at\":\"<t-864000s db +09:00>\"}",
-      "{\"id\":\"$uuid9\",\"title\":\"가을 하늘\",\"ends_at\":\"<t+54000s db +09:00>\",\"starts_at\":\"<t-32400s db +09:00>\",\"created_at\":\"<t-950400s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t-950400s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"title\":\"내일의 주제\",\"ends_at\":\"<t+140400s db +09:00>\",\"starts_at\":\"<t+54000s db +09:00>\",\"created_at\":\"<t-777600s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-13\",\"updated_at\":\"<t-777600s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"title\":\"지워진 주제\",\"ends_at\":\"<t-205200s db +09:00>\",\"starts_at\":\"<t-291600s db +09:00>\",\"created_at\":\"<t-691200s db +09:00>\",\"deleted_at\":\"<t-604800s db +09:00>\",\"topic_date\":\"2026-10-09\",\"updated_at\":\"<t-691200s db +09:00>\"}"
-    ],
-    "users": [
-      "{\"id\":\"$uuid12\",\"email\":\"Alice@Test.Chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t-950400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-950400s db +09:00>\",\"app_version\":\"1.2.0\",\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u1/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u1/thumbnail.png\"}",
-      "{\"id\":\"$uuid25\",\"email\":\"withdrawn+$uuid25@chalkak.invalid\",\"status\":\"ACTIVE\",\"created_at\":\"<t-777600s db +09:00>\",\"deleted_at\":\"<t-604800s db +09:00>\",\"updated_at\":\"<t-604800s db +09:00>\",\"app_version\":\"1.0.0\",\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"withdrawn/$uuid25\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}",
-      "{\"id\":\"$uuid28\",\"email\":null,\"status\":\"ACTIVE\",\"created_at\":\"<t-691200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-691200s db +09:00>\",\"app_version\":\"2.0.0\",\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u4/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u4/thumbnail.png\"}",
-      "{\"id\":\"$uuid8\",\"email\":\"bob@test.chalkak\",\"status\":\"BANNED\",\"created_at\":\"<t-864000s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-864000s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u2/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}"
-    ]
-  }
+  ]
 }

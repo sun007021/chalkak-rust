@@ -1,8 +1,72 @@
 {
+  "db": {
+    "admin_audit_logs": [
+      "{\"action\":\"POST_APPROVED\",\"actor_admin_id\":\"$uuid?\",\"after_state\":{\"moderatedAt\":\"<t-50400s db Z>\",\"moderatedBy\":\"$uuid?\",\"moderationStatus\":\"APPROVED\"},\"before_state\":{\"moderatedAt\":null,\"moderationStatus\":\"PENDING\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-50400s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid?\",\"target_id\":\"$uuid?\",\"target_type\":\"POST\"}",
+      "{\"action\":\"POST_REJECTED\",\"actor_admin_id\":\"$uuid?\",\"after_state\":{\"moderatedAt\":\"<t-46800s db Z>\",\"moderatedBy\":\"$uuid?\",\"moderationStatus\":\"REJECTED\"},\"before_state\":{\"moderatedAt\":null,\"moderationStatus\":\"PENDING\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-46800s db +09:00>\",\"reason\":\"정책 위반\",\"request_id\":\"$uuid?\",\"target_id\":\"$uuid?\",\"target_type\":\"POST\"}",
+      "{\"action\":\"TOPIC_CREATED\",\"actor_admin_id\":\"$uuid?\",\"after_state\":{\"endsAt\":\"<t+226800s db Z>\",\"startsAt\":\"<t+140400s db Z>\",\"title\":\"t2\",\"topicDate\":\"2026-10-14\"},\"before_state\":{},\"id\":\"$uuid?\",\"occurred_at\":\"<t+0s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid15\",\"target_id\":\"$uuid16\",\"target_type\":\"TOPIC\"}",
+      "{\"action\":\"TOPIC_DELETED\",\"actor_admin_id\":\"$uuid?\",\"after_state\":{\"deletedAt\":\"<t+0s db Z>\",\"endsAt\":\"<t+140400s db Z>\",\"startsAt\":\"<t+54000s db Z>\",\"title\":\"내일의 주제\",\"topicDate\":\"2026-10-13\"},\"before_state\":{\"deletedAt\":null,\"endsAt\":\"<t+140400s db Z>\",\"startsAt\":\"<t+54000s db Z>\",\"title\":\"내일의 주제\",\"topicDate\":\"2026-10-13\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t+0s db +09:00>\",\"reason\":\"사유\",\"request_id\":\"$uuid31\",\"target_id\":\"$uuid?\",\"target_type\":\"TOPIC\"}",
+      "{\"action\":\"USER_BANNED\",\"actor_admin_id\":\"$uuid?\",\"after_state\":{\"status\":\"BANNED\"},\"before_state\":{\"status\":\"ACTIVE\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-43200s db +09:00>\",\"reason\":\"반복 위반\",\"request_id\":\"$uuid?\",\"target_id\":\"$uuid?\",\"target_type\":\"USER\"}"
+    ],
+    "admins": [
+      "{\"created_at\":\"<t-3456000s db +09:00>\",\"id\":\"$uuid?\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"updated_at\":\"<t-3456000s db +09:00>\",\"username\":\"reviewer\"}",
+      "{\"created_at\":\"<t-3542400s db +09:00>\",\"id\":\"$uuid?\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"updated_at\":\"<t-3542400s db +09:00>\",\"username\":\"operator\"}"
+    ],
+    "feedbacks": [
+      "{\"content\":\"버그 신고\",\"created_at\":\"<t-43200s db +09:00>\",\"id\":\"$uuid?\",\"user_id\":\"$uuid?\"}",
+      "{\"content\":\"앱이 좋아요\",\"created_at\":\"<t-172800s db +09:00>\",\"id\":\"$uuid?\",\"user_id\":\"$uuid?\"}",
+      "{\"content\":\"탈퇴 전에 남긴 의견\",\"created_at\":\"<t-86400s db +09:00>\",\"id\":\"$uuid?\",\"user_id\":\"$uuid?\"}"
+    ],
+    "photos": [
+      "{\"created_at\":\"<t-104400s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"byteSize\":77,\"height\":240,\"width\":320},\"original_storage_key\":\"chalkak/posts/p7/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p7/thumbnail.webp\",\"updated_at\":\"<t-104400s db +09:00>\"}",
+      "{\"created_at\":\"<t-108000s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"byteSize\":99,\"height\":480,\"width\":640},\"original_storage_key\":\"chalkak/posts/p6/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p6/thumbnail.webp\",\"updated_at\":\"<t-108000s db +09:00>\"}",
+      "{\"created_at\":\"<t-10800s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/p4/original.webp\",\"thumbnail_storage_key\":null,\"updated_at\":\"<t-10800s db +09:00>\"}",
+      "{\"created_at\":\"<t-111600s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/p3/original.webp\",\"thumbnail_storage_key\":null,\"updated_at\":\"<t-111600s db +09:00>\"}",
+      "{\"created_at\":\"<t-115200s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"height\":\"tall\",\"width\":1000.9},\"original_storage_key\":\"chalkak/posts/p2/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p2/thumbnail.webp\",\"updated_at\":\"<t-115200s db +09:00>\"}",
+      "{\"created_at\":\"<t-14400s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"byteSize\":2048,\"camera\":\"private\",\"height\":3000,\"width\":4000},\"original_storage_key\":\"chalkak/posts/p1/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p1/thumbnail.webp\",\"updated_at\":\"<t-14400s db +09:00>\"}",
+      "{\"created_at\":\"<t-7200s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"byteSize\":30,\"height\":20,\"width\":10},\"original_storage_key\":\"chalkak/posts/p5/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p5/thumbnail.webp\",\"updated_at\":\"<t-7200s db +09:00>\"}"
+    ],
+    "post_image_uploads": [
+      "{\"claimed_at\":\"<t-115200s db +09:00>\",\"created_at\":\"<t-115800s db +09:00>\",\"expires_at\":\"<t-86400s db +09:00>\",\"id\":\"$uuid?\",\"image_metadata\":{\"width\":1000},\"rejection_reason\":null,\"status\":\"READY\",\"updated_at\":\"<t-115200s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"claimed_at\":\"<t-14400s db +09:00>\",\"created_at\":\"<t-15000s db +09:00>\",\"expires_at\":\"<t+0s db +09:00>\",\"id\":\"$uuid?\",\"image_metadata\":{\"width\":4000},\"rejection_reason\":null,\"status\":\"READY\",\"updated_at\":\"<t-14400s db +09:00>\",\"user_id\":\"$uuid?\"}"
+    ],
+    "post_likes": [
+      "{\"created_at\":\"<t-41400s db +09:00>\",\"id\":\"$uuid?\",\"post_id\":\"$uuid?\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-43200s db +09:00>\",\"id\":\"$uuid?\",\"post_id\":\"$uuid?\",\"user_id\":\"$uuid?\"}"
+    ],
+    "posts": [
+      "{\"created_at\":\"<t-104400s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"탈퇴\",\"topic_id\":\"$uuid34\",\"updated_at\":\"<t-104400s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-108000s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"대기\",\"topic_id\":\"$uuid34\",\"updated_at\":\"<t-108000s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-10800s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"VALIDATING\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"처리중\",\"topic_id\":\"$uuid33\",\"updated_at\":\"<t-10800s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-111600s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":\"<t-46800s db +09:00>\",\"moderation_status\":\"REJECTED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"거절\",\"topic_id\":\"$uuid34\",\"updated_at\":\"<t-46800s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-115200s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":\"<t-50400s db +09:00>\",\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":\"$uuid?\",\"title\":null,\"topic_id\":\"$uuid34\",\"updated_at\":\"<t-50400s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-14400s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":\"$uuid?\",\"title\":\"하늘\",\"topic_id\":\"$uuid33\",\"updated_at\":\"<t-14400s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-7200s db +09:00>\",\"deleted_at\":\"<t-3600s db +09:00>\",\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":null,\"topic_id\":\"$uuid33\",\"updated_at\":\"<t-7200s db +09:00>\",\"user_id\":\"$uuid?\"}"
+    ],
+    "social_accounts": [
+      "{\"created_at\":\"<t-777600s db +09:00>\",\"id\":\"$uuid?\",\"provider\":\"KAKAO\",\"subject_hmac\":\"3333333333333333333333333333333333333333333333333333333333333333\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-864000s db +09:00>\",\"id\":\"$uuid?\",\"provider\":\"APPLE\",\"subject_hmac\":\"2222222222222222222222222222222222222222222222222222222222222222\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-950400s db +09:00>\",\"id\":\"$uuid?\",\"provider\":\"GOOGLE\",\"subject_hmac\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"user_id\":\"$uuid?\"}"
+    ],
+    "topics": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t+226800s db +09:00>\",\"id\":\"$uuid16\",\"starts_at\":\"<t+140400s db +09:00>\",\"title\":\"t2\",\"topic_date\":\"2026-10-14\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t-691200s db +09:00>\",\"deleted_at\":\"<t-604800s db +09:00>\",\"ends_at\":\"<t-205200s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-291600s db +09:00>\",\"title\":\"지워진 주제\",\"topic_date\":\"2026-10-09\",\"updated_at\":\"<t-691200s db +09:00>\"}",
+      "{\"created_at\":\"<t-777600s db +09:00>\",\"deleted_at\":\"<t+0s db +09:00>\",\"ends_at\":\"<t+140400s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t+54000s db +09:00>\",\"title\":\"내일의 주제\",\"topic_date\":\"2026-10-13\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t-864000s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t-32400s db +09:00>\",\"id\":\"$uuid34\",\"starts_at\":\"<t-118800s db +09:00>\",\"title\":\"어제의 주제\",\"topic_date\":\"2026-10-11\",\"updated_at\":\"<t-864000s db +09:00>\"}",
+      "{\"created_at\":\"<t-950400s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t+54000s db +09:00>\",\"id\":\"$uuid33\",\"starts_at\":\"<t-32400s db +09:00>\",\"title\":\"가을 하늘\",\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t-950400s db +09:00>\"}"
+    ],
+    "users": [
+      "{\"app_version\":\"1.0.0\",\"created_at\":\"<t-777600s db +09:00>\",\"deleted_at\":\"<t-604800s db +09:00>\",\"email\":\"withdrawn+$uuid?@chalkak.invalid\",\"id\":\"$uuid?\",\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"withdrawn/$uuid?\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"updated_at\":\"<t-604800s db +09:00>\"}",
+      "{\"app_version\":\"1.2.0\",\"created_at\":\"<t-950400s db +09:00>\",\"deleted_at\":null,\"email\":\"Alice@Test.Chalkak\",\"id\":\"$uuid?\",\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u1/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u1/thumbnail.png\",\"status\":\"ACTIVE\",\"updated_at\":\"<t-950400s db +09:00>\"}",
+      "{\"app_version\":\"2.0.0\",\"created_at\":\"<t-691200s db +09:00>\",\"deleted_at\":null,\"email\":null,\"id\":\"$uuid?\",\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u4/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u4/thumbnail.png\",\"status\":\"ACTIVE\",\"updated_at\":\"<t-691200s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t-864000s db +09:00>\",\"deleted_at\":null,\"email\":\"bob@test.chalkak\",\"id\":\"$uuid?\",\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u2/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"BANNED\",\"updated_at\":\"<t-864000s db +09:00>\"}"
+    ]
+  },
   "steps": [
     {
-      "step": "topic create null title",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be blank"
+      },
       "headers": [
         [
           "cache-control",
@@ -49,14 +113,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic create null title"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "must not be blank"
-      }
-    },
-    {
-      "step": "topic create no title",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -103,14 +167,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "must not be blank"
-      }
+      "status": 400,
+      "step": "topic create no title"
     },
     {
-      "step": "topic create no topicDate",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be null"
+      },
       "headers": [
         [
           "cache-control",
@@ -157,14 +221,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic create no topicDate"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "must not be null"
-      }
-    },
-    {
-      "step": "topic create no startsAt",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -211,14 +275,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic create no startsAt"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "must not be null"
-      }
-    },
-    {
-      "step": "topic create no endsAt",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -265,14 +329,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "must not be null"
-      }
+      "status": 400,
+      "step": "topic create no endsAt"
     },
     {
-      "step": "topics phase bogus",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "phase: 요청 값의 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -319,14 +383,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "phase: 요청 값의 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "topics phase bogus"
     },
     {
-      "step": "topics dateFrom bad",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "dateFrom: 요청 값의 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -373,14 +437,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "dateFrom: 요청 값의 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "topics dateFrom bad"
     },
     {
-      "step": "topics date inverted",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "관리자 주제 요청이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -427,14 +491,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "관리자 주제 요청이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "topics date inverted"
     },
     {
-      "step": "topics sort bad",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "sort: 요청 값의 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -481,14 +545,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "sort: 요청 값의 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "topics sort bad"
     },
     {
-      "step": "topics page overflow",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -535,14 +599,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "page: 요청 값의 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "topics page overflow"
     },
     {
-      "step": "topic create title long",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "size must be between 0 and 255"
+      },
       "headers": [
         [
           "cache-control",
@@ -589,14 +653,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "size must be between 0 and 255"
-      }
+      "status": 400,
+      "step": "topic create title long"
     },
     {
-      "step": "topic create bad date",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -643,14 +707,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
+      "status": 400,
+      "step": "topic create bad date"
     },
     {
-      "step": "topic create date mismatch",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제 정보가 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -697,14 +761,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic create date mismatch"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "주제 정보가 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "topic create epoch",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -751,14 +815,25 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "주제 정보가 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "topic create epoch"
     },
     {
-      "step": "topic create offset",
-      "status": 201,
+      "body": {
+        "createdAt": "<t+0s iso Z>",
+        "endsAt": "<t+226800s iso Z>",
+        "phase": "BEFORE_OPEN",
+        "postCounts": {
+          "approved": 0,
+          "pending": 0,
+          "rejected": 0
+        },
+        "startsAt": "<t+140400s iso Z>",
+        "title": "t2",
+        "topicDate": "2026-10-14",
+        "topicId": "$uuid16",
+        "updatedAt": "<t+0s iso Z>"
+      },
       "headers": [
         [
           "cache-control",
@@ -805,25 +880,14 @@
           "0"
         ]
       ],
-      "body": {
-        "topicId": "$uuid16",
-        "title": "t2",
-        "topicDate": "2026-10-14",
-        "startsAt": "<t+140400s iso Z>",
-        "endsAt": "<t+226800s iso Z>",
-        "phase": "BEFORE_OPEN",
-        "postCounts": {
-          "pending": 0,
-          "approved": 0,
-          "rejected": 0
-        },
-        "createdAt": "<t+0s iso Z>",
-        "updatedAt": "<t+0s iso Z>"
-      }
+      "status": 201,
+      "step": "topic create offset"
     },
     {
-      "step": "topic create blank title",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be blank"
+      },
       "headers": [
         [
           "cache-control",
@@ -870,14 +934,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "must not be blank"
-      }
+      "status": 400,
+      "step": "topic create blank title"
     },
     {
-      "step": "topic create no body",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -924,14 +988,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
+      "status": 400,
+      "step": "topic create no body"
     },
     {
-      "step": "topic create ok",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "해당 날짜의 주제가 이미 존재합니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -978,14 +1042,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic create ok"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "해당 날짜의 주제가 이미 존재합니다."
-      }
-    },
-    {
-      "step": "topic create dup",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -1032,14 +1096,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "해당 날짜의 주제가 이미 존재합니다."
-      }
+      "status": 400,
+      "step": "topic create dup"
     },
     {
-      "step": "topic create overlap",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제 정보가 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1086,14 +1150,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "주제 정보가 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "topic create overlap"
     },
     {
-      "step": "topic delete no body",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1140,14 +1204,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
+      "status": 400,
+      "step": "topic delete no body"
     },
     {
-      "step": "topic delete empty",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be blank"
+      },
       "headers": [
         [
           "cache-control",
@@ -1194,14 +1258,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic delete empty"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "must not be blank"
-      }
-    },
-    {
-      "step": "topic delete blank",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -1248,14 +1312,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "must not be blank"
-      }
+      "status": 400,
+      "step": "topic delete blank"
     },
     {
-      "step": "topic delete long",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "size must be between 0 and 500"
+      },
       "headers": [
         [
           "cache-control",
@@ -1302,14 +1366,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "size must be between 0 and 500"
-      }
+      "status": 400,
+      "step": "topic delete long"
     },
     {
-      "step": "topic delete closed",
-      "status": 400,
+      "body": {
+        "errorCode": "RESOURCE_STATE_CHANGED",
+        "message": "공개 전 주제만 변경할 수 있습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1356,14 +1420,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic delete closed"
+    },
+    {
       "body": {
         "errorCode": "RESOURCE_STATE_CHANGED",
         "message": "공개 전 주제만 변경할 수 있습니다."
-      }
-    },
-    {
-      "step": "topic put open",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -1410,14 +1474,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "RESOURCE_STATE_CHANGED",
-        "message": "공개 전 주제만 변경할 수 있습니다."
-      }
+      "status": 400,
+      "step": "topic put open"
     },
     {
-      "step": "topic put deleted",
-      "status": 404,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제를 찾을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1464,14 +1528,14 @@
           "0"
         ]
       ],
+      "status": 404,
+      "step": "topic put deleted"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "주제를 찾을 수 없습니다."
-      }
-    },
-    {
-      "step": "topic get deleted",
-      "status": 404,
+      },
       "headers": [
         [
           "cache-control",
@@ -1518,14 +1582,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "주제를 찾을 수 없습니다."
-      }
+      "status": 404,
+      "step": "topic get deleted"
     },
     {
-      "step": "topic put future",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "해당 날짜의 주제가 이미 존재합니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1572,14 +1636,11 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "해당 날짜의 주제가 이미 존재합니다."
-      }
+      "status": 400,
+      "step": "topic put future"
     },
     {
-      "step": "topic delete future",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -1622,11 +1683,62 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "topic delete future"
     },
     {
-      "step": "topics list",
-      "status": 200,
+      "body": {
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20,
+        "topics": [
+          {
+            "createdAt": "<t+0s iso Z>",
+            "endsAt": "<t+226800s iso Z>",
+            "phase": "BEFORE_OPEN",
+            "postCounts": {
+              "approved": 0,
+              "pending": 0,
+              "rejected": 0
+            },
+            "startsAt": "<t+140400s iso Z>",
+            "title": "t2",
+            "topicDate": "2026-10-14",
+            "topicId": "$uuid16",
+            "updatedAt": "<t+0s iso Z>"
+          },
+          {
+            "createdAt": "<t-950400s iso Z>",
+            "endsAt": "<t+54000s iso Z>",
+            "phase": "OPEN",
+            "postCounts": {
+              "approved": 0,
+              "pending": 1,
+              "rejected": 0
+            },
+            "startsAt": "<t-32400s iso Z>",
+            "title": "가을 하늘",
+            "topicDate": "2026-10-12",
+            "topicId": "$uuid33",
+            "updatedAt": "<t-950400s iso Z>"
+          },
+          {
+            "createdAt": "<t-864000s iso Z>",
+            "endsAt": "<t-32400s iso Z>",
+            "phase": "CLOSED",
+            "postCounts": {
+              "approved": 1,
+              "pending": 2,
+              "rejected": 1
+            },
+            "startsAt": "<t-118800s iso Z>",
+            "title": "어제의 주제",
+            "topicDate": "2026-10-11",
+            "topicId": "$uuid34",
+            "updatedAt": "<t-864000s iso Z>"
+          }
+        ]
+      },
       "headers": [
         [
           "cache-control",
@@ -1673,62 +1785,32 @@
           "0"
         ]
       ],
+      "status": 200,
+      "step": "topics list"
+    },
+    {
       "body": {
         "currentPage": 1,
-        "pageSize": 20,
         "hasNext": false,
+        "pageSize": 20,
         "topics": [
           {
-            "topicId": "$uuid16",
-            "title": "t2",
-            "topicDate": "2026-10-14",
-            "startsAt": "<t+140400s iso Z>",
-            "endsAt": "<t+226800s iso Z>",
-            "phase": "BEFORE_OPEN",
-            "postCounts": {
-              "pending": 0,
-              "approved": 0,
-              "rejected": 0
-            },
-            "createdAt": "<t+0s iso Z>",
-            "updatedAt": "<t+0s iso Z>"
-          },
-          {
-            "topicId": "$uuid33",
-            "title": "가을 하늘",
-            "topicDate": "2026-10-12",
-            "startsAt": "<t-32400s iso Z>",
+            "createdAt": "<t-950400s iso Z>",
             "endsAt": "<t+54000s iso Z>",
             "phase": "OPEN",
             "postCounts": {
-              "pending": 1,
               "approved": 0,
+              "pending": 1,
               "rejected": 0
             },
-            "createdAt": "<t-950400s iso Z>",
+            "startsAt": "<t-32400s iso Z>",
+            "title": "가을 하늘",
+            "topicDate": "2026-10-12",
+            "topicId": "$uuid33",
             "updatedAt": "<t-950400s iso Z>"
-          },
-          {
-            "topicId": "$uuid34",
-            "title": "어제의 주제",
-            "topicDate": "2026-10-11",
-            "startsAt": "<t-118800s iso Z>",
-            "endsAt": "<t-32400s iso Z>",
-            "phase": "CLOSED",
-            "postCounts": {
-              "pending": 2,
-              "approved": 1,
-              "rejected": 1
-            },
-            "createdAt": "<t-864000s iso Z>",
-            "updatedAt": "<t-864000s iso Z>"
           }
         ]
-      }
-    },
-    {
-      "step": "topics list phase open",
-      "status": 200,
+      },
       "headers": [
         [
           "cache-control",
@@ -1775,32 +1857,47 @@
           "0"
         ]
       ],
+      "status": 200,
+      "step": "topics list phase open"
+    },
+    {
       "body": {
         "currentPage": 1,
-        "pageSize": 20,
         "hasNext": false,
+        "pageSize": 20,
         "topics": [
           {
-            "topicId": "$uuid33",
-            "title": "가을 하늘",
-            "topicDate": "2026-10-12",
-            "startsAt": "<t-32400s iso Z>",
+            "createdAt": "<t-864000s iso Z>",
+            "endsAt": "<t-32400s iso Z>",
+            "phase": "CLOSED",
+            "postCounts": {
+              "approved": 1,
+              "pending": 2,
+              "rejected": 1
+            },
+            "startsAt": "<t-118800s iso Z>",
+            "title": "어제의 주제",
+            "topicDate": "2026-10-11",
+            "topicId": "$uuid34",
+            "updatedAt": "<t-864000s iso Z>"
+          },
+          {
+            "createdAt": "<t-950400s iso Z>",
             "endsAt": "<t+54000s iso Z>",
             "phase": "OPEN",
             "postCounts": {
-              "pending": 1,
               "approved": 0,
+              "pending": 1,
               "rejected": 0
             },
-            "createdAt": "<t-950400s iso Z>",
+            "startsAt": "<t-32400s iso Z>",
+            "title": "가을 하늘",
+            "topicDate": "2026-10-12",
+            "topicId": "$uuid33",
             "updatedAt": "<t-950400s iso Z>"
           }
         ]
-      }
-    },
-    {
-      "step": "topics list dates",
-      "status": 200,
+      },
       "headers": [
         [
           "cache-control",
@@ -1847,47 +1944,14 @@
           "0"
         ]
       ],
-      "body": {
-        "currentPage": 1,
-        "pageSize": 20,
-        "hasNext": false,
-        "topics": [
-          {
-            "topicId": "$uuid34",
-            "title": "어제의 주제",
-            "topicDate": "2026-10-11",
-            "startsAt": "<t-118800s iso Z>",
-            "endsAt": "<t-32400s iso Z>",
-            "phase": "CLOSED",
-            "postCounts": {
-              "pending": 2,
-              "approved": 1,
-              "rejected": 1
-            },
-            "createdAt": "<t-864000s iso Z>",
-            "updatedAt": "<t-864000s iso Z>"
-          },
-          {
-            "topicId": "$uuid33",
-            "title": "가을 하늘",
-            "topicDate": "2026-10-12",
-            "startsAt": "<t-32400s iso Z>",
-            "endsAt": "<t+54000s iso Z>",
-            "phase": "OPEN",
-            "postCounts": {
-              "pending": 1,
-              "approved": 0,
-              "rejected": 0
-            },
-            "createdAt": "<t-950400s iso Z>",
-            "updatedAt": "<t-950400s iso Z>"
-          }
-        ]
-      }
+      "status": 200,
+      "step": "topics list dates"
     },
     {
-      "step": "topic starts int",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제 정보가 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1934,14 +1998,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic starts int"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "주제 정보가 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "topic starts decimal",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -1988,14 +2052,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic starts decimal"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "주제 정보가 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "topic starts string int",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -2042,14 +2106,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic starts string int"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "주제 정보가 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "topic starts string decimal",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -2096,14 +2160,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic starts string decimal"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "주제 정보가 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "topic starts epoch string neg",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -2150,14 +2214,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic starts epoch string neg"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "주제 정보가 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "topic starts iso zone",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -2204,14 +2268,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "주제 정보가 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "topic starts iso zone"
     },
     {
-      "step": "topic starts iso nozone",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -2258,14 +2322,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic starts iso nozone"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
-    },
-    {
-      "step": "topic starts iso nosec",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -2312,14 +2376,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic starts iso nosec"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
-    },
-    {
-      "step": "topic starts date only",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -2366,14 +2430,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
+      "status": 400,
+      "step": "topic starts date only"
     },
     {
-      "step": "topic starts lowercase",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제 정보가 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -2420,14 +2484,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic starts lowercase"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "주제 정보가 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "topic starts space",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -2474,14 +2538,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "주제 정보가 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "topic starts space"
     },
     {
-      "step": "topic starts bool",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -2528,14 +2592,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic starts bool"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
-    },
-    {
-      "step": "topic starts array",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -2582,14 +2646,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic starts array"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
-    },
-    {
-      "step": "topic starts object",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -2636,14 +2700,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
+      "status": 400,
+      "step": "topic starts object"
     },
     {
-      "step": "topic starts empty string",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be null"
+      },
       "headers": [
         [
           "cache-control",
@@ -2690,14 +2754,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic starts empty string"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "must not be null"
-      }
-    },
-    {
-      "step": "topic starts null",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -2744,14 +2808,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "must not be null"
-      }
+      "status": 400,
+      "step": "topic starts null"
     },
     {
-      "step": "topic starts huge",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -2798,14 +2862,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
+      "status": 400,
+      "step": "topic starts huge"
     },
     {
-      "step": "topic starts exp",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제 정보가 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -2852,14 +2916,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "주제 정보가 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "topic starts exp"
     },
     {
-      "step": "topic starts long digits",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -2906,14 +2970,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
+      "status": 400,
+      "step": "topic starts long digits"
     },
     {
-      "step": "topic date datetime",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제 정보가 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -2960,14 +3024,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic date datetime"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "주제 정보가 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "topic date datetime z",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -3014,14 +3078,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic date datetime z"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "주제 정보가 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "topic date lead space",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -3068,14 +3132,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "주제 정보가 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "topic date lead space"
     },
     {
-      "step": "topic date compact",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -3122,14 +3186,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
+      "status": 400,
+      "step": "topic date compact"
     },
     {
-      "step": "topic date int",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제 정보가 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -3176,14 +3240,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic date int"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "주제 정보가 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "topic date array",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -3230,14 +3294,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "주제 정보가 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "topic date array"
     },
     {
-      "step": "topic date offset",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -3284,14 +3348,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
+      "status": 400,
+      "step": "topic date offset"
     },
     {
-      "step": "topic date empty",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be null"
+      },
       "headers": [
         [
           "cache-control",
@@ -3338,14 +3402,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "must not be null"
-      }
+      "status": 400,
+      "step": "topic date empty"
     },
     {
-      "step": "topic date short month",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -3392,14 +3456,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic date short month"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
-    },
-    {
-      "step": "topic date feb30",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -3446,14 +3510,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
+      "status": 400,
+      "step": "topic date feb30"
     },
     {
-      "step": "topic date year5",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제 정보가 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -3500,14 +3564,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic date year5"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "주제 정보가 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "topic title number",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -3554,14 +3618,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic title number"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "주제 정보가 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "topic title bool",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -3608,14 +3672,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "주제 정보가 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "topic title bool"
     },
     {
-      "step": "topic title array",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -3662,14 +3726,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
+      "status": 400,
+      "step": "topic title array"
     },
     {
-      "step": "topic title empty",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be blank"
+      },
       "headers": [
         [
           "cache-control",
@@ -3716,14 +3780,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "must not be blank"
-      }
+      "status": 400,
+      "step": "topic title empty"
     },
     {
-      "step": "topic title 255",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제 정보가 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -3770,14 +3834,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "주제 정보가 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "topic title 255"
     },
     {
-      "step": "topic title 256 padded",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "size must be between 0 and 255"
+      },
       "headers": [
         [
           "cache-control",
@@ -3824,14 +3888,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic title 256 padded"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "size must be between 0 and 255"
-      }
-    },
-    {
-      "step": "topic title surrogate 255",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -3878,14 +3942,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic title surrogate 255"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "size must be between 0 and 255"
-      }
-    },
-    {
-      "step": "topic title surrogate 128",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -3932,14 +3996,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "size must be between 0 and 255"
-      }
+      "status": 400,
+      "step": "topic title surrogate 128"
     },
     {
-      "step": "topic put bad id",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "ID 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -3986,14 +4050,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "ID 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "topic put bad id"
     },
     {
-      "step": "topic put missing",
-      "status": 404,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제를 찾을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -4040,14 +4104,14 @@
           "0"
         ]
       ],
+      "status": 404,
+      "step": "topic put missing"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "주제를 찾을 수 없습니다."
-      }
-    },
-    {
-      "step": "topic put unchanged",
-      "status": 404,
+      },
       "headers": [
         [
           "cache-control",
@@ -4094,14 +4158,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "주제를 찾을 수 없습니다."
-      }
+      "status": 404,
+      "step": "topic put unchanged"
     },
     {
-      "step": "topic get bad id",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "ID 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -4148,14 +4212,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "ID 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "topic get bad id"
     },
     {
-      "step": "topic get missing",
-      "status": 404,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제를 찾을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -4202,14 +4266,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "주제를 찾을 수 없습니다."
-      }
+      "status": 404,
+      "step": "topic get missing"
     },
     {
-      "step": "topic delete bad id",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "ID 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -4256,14 +4320,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "ID 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "topic delete bad id"
     },
     {
-      "step": "topic delete missing",
-      "status": 404,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제를 찾을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -4310,14 +4374,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "주제를 찾을 수 없습니다."
-      }
+      "status": 404,
+      "step": "topic delete missing"
     },
     {
-      "step": "topic delete reason num",
-      "status": 400,
+      "body": {
+        "errorCode": "RESOURCE_STATE_CHANGED",
+        "message": "공개 전 주제만 변경할 수 있습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -4364,14 +4428,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "RESOURCE_STATE_CHANGED",
-        "message": "공개 전 주제만 변경할 수 있습니다."
-      }
+      "status": 400,
+      "step": "topic delete reason num"
     },
     {
-      "step": "topic delete reason 500 spaces",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "size must be between 0 and 500"
+      },
       "headers": [
         [
           "cache-control",
@@ -4418,14 +4482,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "topic delete reason 500 spaces"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "size must be between 0 and 500"
-      }
-    },
-    {
-      "step": "topic delete reason 501",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -4472,72 +4536,8 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "size must be between 0 and 500"
-      }
+      "status": 400,
+      "step": "topic delete reason 501"
     }
-  ],
-  "db": {
-    "admin_audit_logs": [
-      "{\"id\":\"$uuid?\",\"action\":\"POST_APPROVED\",\"reason\":null,\"target_id\":\"$uuid?\",\"request_id\":\"$uuid?\",\"after_state\":{\"moderatedAt\":\"<t-50400s db Z>\",\"moderatedBy\":\"$uuid?\",\"moderationStatus\":\"APPROVED\"},\"occurred_at\":\"<t-50400s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"moderatedAt\":null,\"moderationStatus\":\"PENDING\"},\"actor_admin_id\":\"$uuid?\"}",
-      "{\"id\":\"$uuid?\",\"action\":\"POST_REJECTED\",\"reason\":\"정책 위반\",\"target_id\":\"$uuid?\",\"request_id\":\"$uuid?\",\"after_state\":{\"moderatedAt\":\"<t-46800s db Z>\",\"moderatedBy\":\"$uuid?\",\"moderationStatus\":\"REJECTED\"},\"occurred_at\":\"<t-46800s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"moderatedAt\":null,\"moderationStatus\":\"PENDING\"},\"actor_admin_id\":\"$uuid?\"}",
-      "{\"id\":\"$uuid?\",\"action\":\"TOPIC_CREATED\",\"reason\":null,\"target_id\":\"$uuid16\",\"request_id\":\"$uuid15\",\"after_state\":{\"title\":\"t2\",\"endsAt\":\"<t+226800s db Z>\",\"startsAt\":\"<t+140400s db Z>\",\"topicDate\":\"2026-10-14\"},\"occurred_at\":\"<t+0s db +09:00>\",\"target_type\":\"TOPIC\",\"before_state\":{},\"actor_admin_id\":\"$uuid?\"}",
-      "{\"id\":\"$uuid?\",\"action\":\"TOPIC_DELETED\",\"reason\":\"사유\",\"target_id\":\"$uuid?\",\"request_id\":\"$uuid31\",\"after_state\":{\"title\":\"내일의 주제\",\"endsAt\":\"<t+140400s db Z>\",\"startsAt\":\"<t+54000s db Z>\",\"deletedAt\":\"<t+0s db Z>\",\"topicDate\":\"2026-10-13\"},\"occurred_at\":\"<t+0s db +09:00>\",\"target_type\":\"TOPIC\",\"before_state\":{\"title\":\"내일의 주제\",\"endsAt\":\"<t+140400s db Z>\",\"startsAt\":\"<t+54000s db Z>\",\"deletedAt\":null,\"topicDate\":\"2026-10-13\"},\"actor_admin_id\":\"$uuid?\"}",
-      "{\"id\":\"$uuid?\",\"action\":\"USER_BANNED\",\"reason\":\"반복 위반\",\"target_id\":\"$uuid?\",\"request_id\":\"$uuid?\",\"after_state\":{\"status\":\"BANNED\"},\"occurred_at\":\"<t-43200s db +09:00>\",\"target_type\":\"USER\",\"before_state\":{\"status\":\"ACTIVE\"},\"actor_admin_id\":\"$uuid?\"}"
-    ],
-    "admins": [
-      "{\"id\":\"$uuid?\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"username\":\"operator\",\"created_at\":\"<t-3542400s db +09:00>\",\"updated_at\":\"<t-3542400s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"username\":\"reviewer\",\"created_at\":\"<t-3456000s db +09:00>\",\"updated_at\":\"<t-3456000s db +09:00>\"}"
-    ],
-    "feedbacks": [
-      "{\"id\":\"$uuid?\",\"content\":\"버그 신고\",\"user_id\":\"$uuid?\",\"created_at\":\"<t-43200s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"content\":\"앱이 좋아요\",\"user_id\":\"$uuid?\",\"created_at\":\"<t-172800s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"content\":\"탈퇴 전에 남긴 의견\",\"user_id\":\"$uuid?\",\"created_at\":\"<t-86400s db +09:00>\"}"
-    ],
-    "photos": [
-      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":10,\"height\":20,\"byteSize\":30},\"created_at\":\"<t-7200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-7200s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p5/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p5/thumbnail.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":1000.9,\"height\":\"tall\"},\"created_at\":\"<t-115200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-115200s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p2/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p2/thumbnail.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":320,\"height\":240,\"byteSize\":77},\"created_at\":\"<t-104400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-104400s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p7/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p7/thumbnail.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4000,\"camera\":\"private\",\"height\":3000,\"byteSize\":2048},\"created_at\":\"<t-14400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-14400s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p1/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p1/thumbnail.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":640,\"height\":480,\"byteSize\":99},\"created_at\":\"<t-108000s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-108000s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p6/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p6/thumbnail.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t-10800s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-10800s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p4/original.webp\",\"thumbnail_storage_key\":null}",
-      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t-111600s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-111600s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p3/original.webp\",\"thumbnail_storage_key\":null}"
-    ],
-    "post_image_uploads": [
-      "{\"id\":\"$uuid?\",\"status\":\"READY\",\"user_id\":\"$uuid?\",\"claimed_at\":\"<t-115200s db +09:00>\",\"created_at\":\"<t-115800s db +09:00>\",\"expires_at\":\"<t-86400s db +09:00>\",\"updated_at\":\"<t-115200s db +09:00>\",\"image_metadata\":{\"width\":1000},\"rejection_reason\":null}",
-      "{\"id\":\"$uuid?\",\"status\":\"READY\",\"user_id\":\"$uuid?\",\"claimed_at\":\"<t-14400s db +09:00>\",\"created_at\":\"<t-15000s db +09:00>\",\"expires_at\":\"<t+0s db +09:00>\",\"updated_at\":\"<t-14400s db +09:00>\",\"image_metadata\":{\"width\":4000},\"rejection_reason\":null}"
-    ],
-    "post_likes": [
-      "{\"id\":\"$uuid?\",\"post_id\":\"$uuid?\",\"user_id\":\"$uuid?\",\"created_at\":\"<t-41400s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"post_id\":\"$uuid?\",\"user_id\":\"$uuid?\",\"created_at\":\"<t-43200s db +09:00>\"}"
-    ],
-    "posts": [
-      "{\"id\":\"$uuid?\",\"title\":\"거절\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid34\",\"created_at\":\"<t-111600s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-46800s db +09:00>\",\"moderated_at\":\"<t-46800s db +09:00>\",\"moderation_status\":\"REJECTED\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid?\",\"title\":\"대기\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid34\",\"created_at\":\"<t-108000s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-108000s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid?\",\"title\":\"처리중\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid33\",\"created_at\":\"<t-10800s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-10800s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"VALIDATING\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid?\",\"title\":\"탈퇴\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid34\",\"created_at\":\"<t-104400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-104400s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid?\",\"title\":\"하늘\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid33\",\"created_at\":\"<t-14400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-14400s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":\"$uuid?\"}",
-      "{\"id\":\"$uuid?\",\"title\":null,\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid33\",\"created_at\":\"<t-7200s db +09:00>\",\"deleted_at\":\"<t-3600s db +09:00>\",\"updated_at\":\"<t-7200s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid?\",\"title\":null,\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid34\",\"created_at\":\"<t-115200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-50400s db +09:00>\",\"moderated_at\":\"<t-50400s db +09:00>\",\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":\"$uuid?\"}"
-    ],
-    "social_accounts": [
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid?\",\"provider\":\"APPLE\",\"created_at\":\"<t-864000s db +09:00>\",\"subject_hmac\":\"2222222222222222222222222222222222222222222222222222222222222222\"}",
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid?\",\"provider\":\"GOOGLE\",\"created_at\":\"<t-950400s db +09:00>\",\"subject_hmac\":\"1111111111111111111111111111111111111111111111111111111111111111\"}",
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid?\",\"provider\":\"KAKAO\",\"created_at\":\"<t-777600s db +09:00>\",\"subject_hmac\":\"3333333333333333333333333333333333333333333333333333333333333333\"}"
-    ],
-    "topics": [
-      "{\"id\":\"$uuid16\",\"title\":\"t2\",\"ends_at\":\"<t+226800s db +09:00>\",\"starts_at\":\"<t+140400s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-14\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"id\":\"$uuid33\",\"title\":\"가을 하늘\",\"ends_at\":\"<t+54000s db +09:00>\",\"starts_at\":\"<t-32400s db +09:00>\",\"created_at\":\"<t-950400s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t-950400s db +09:00>\"}",
-      "{\"id\":\"$uuid34\",\"title\":\"어제의 주제\",\"ends_at\":\"<t-32400s db +09:00>\",\"starts_at\":\"<t-118800s db +09:00>\",\"created_at\":\"<t-864000s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-11\",\"updated_at\":\"<t-864000s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"title\":\"내일의 주제\",\"ends_at\":\"<t+140400s db +09:00>\",\"starts_at\":\"<t+54000s db +09:00>\",\"created_at\":\"<t-777600s db +09:00>\",\"deleted_at\":\"<t+0s db +09:00>\",\"topic_date\":\"2026-10-13\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"title\":\"지워진 주제\",\"ends_at\":\"<t-205200s db +09:00>\",\"starts_at\":\"<t-291600s db +09:00>\",\"created_at\":\"<t-691200s db +09:00>\",\"deleted_at\":\"<t-604800s db +09:00>\",\"topic_date\":\"2026-10-09\",\"updated_at\":\"<t-691200s db +09:00>\"}"
-    ],
-    "users": [
-      "{\"id\":\"$uuid?\",\"email\":\"Alice@Test.Chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t-950400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-950400s db +09:00>\",\"app_version\":\"1.2.0\",\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u1/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u1/thumbnail.png\"}",
-      "{\"id\":\"$uuid?\",\"email\":\"bob@test.chalkak\",\"status\":\"BANNED\",\"created_at\":\"<t-864000s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-864000s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u2/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}",
-      "{\"id\":\"$uuid?\",\"email\":\"withdrawn+$uuid?@chalkak.invalid\",\"status\":\"ACTIVE\",\"created_at\":\"<t-777600s db +09:00>\",\"deleted_at\":\"<t-604800s db +09:00>\",\"updated_at\":\"<t-604800s db +09:00>\",\"app_version\":\"1.0.0\",\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"withdrawn/$uuid?\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}",
-      "{\"id\":\"$uuid?\",\"email\":null,\"status\":\"ACTIVE\",\"created_at\":\"<t-691200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-691200s db +09:00>\",\"app_version\":\"2.0.0\",\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u4/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u4/thumbnail.png\"}"
-    ]
-  }
+  ]
 }
