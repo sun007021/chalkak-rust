@@ -15,7 +15,9 @@
 //! - 문자열 필드에 숫자·불리언을 보내면 거절하지 않고 문자열로 바꾼다(Jackson 스칼라 강제 변환). 배열·객체는 400.
 
 use chalkak_http::Request;
+use serde_json::value::RawValue;
 use serde_json::{Map, Value};
+use std::collections::HashMap;
 
 use super::ApiError;
 
@@ -170,23 +172,38 @@ pub fn required_date_query(req: &Request, name: &str) -> Result<LocalDate, ApiEr
 // JSON 본문
 // ---------------------------------------------------------------------------------------------
 
-/// 해석된 JSON 객체 본문. 필드는 Jackson처럼 느슨하게 꺼낸다.
-pub struct JsonObject(Map<String, Value>);
+/// 해석된 JSON 객체 본문. 필드는 Jackson처럼 느슨하게 꺼낸다. 값은 원문 그대로 들고 있다.
+pub struct JsonObject {
+    raw: HashMap<String, Box<RawValue>>,
+    values: Map<String, Value>,
+}
 
 impl JsonObject {
-    /// 필드의 원본 JSON 값. 문자열 말고 UUID·숫자 필드를 직접 해석해야 하는 DTO가 쓴다.
-    pub fn value(&self, name: &str) -> Option<&Value> {
-        self.0.get(name)
+    fn parse(body: &[u8]) -> Option<JsonObject> {
+        let raw = serde_json::from_slice::<HashMap<String, Box<RawValue>>>(body).ok()?;
+        let values = serde_json::from_slice::<Map<String, Value>>(body).ok()?;
+        Some(JsonObject { raw, values })
     }
 
-    /// 문자열 필드. 없거나 `null`이면 `None`, 숫자·불리언은 문자열로 바꾸고, 배열·객체는 본문 오류(400).
+    /// 필드의 원본 JSON 값. 문자열 말고 UUID·숫자 필드를 직접 해석해야 하는 DTO가 쓴다.
+    pub fn value(&self, name: &str) -> Option<&Value> {
+        self.values.get(name)
+    }
+
+    /// 문자열 필드. 없거나 `null`이면 `None`, 숫자·불리언은 원문 그대로 문자열로 바꾸고(`1.50` -> `"1.50"`),
+    /// 배열·객체는 본문 오류(400).
     pub fn string(&self, name: &str) -> Result<Option<String>, ApiError> {
-        match self.0.get(name) {
-            None | Some(Value::Null) => Ok(None),
-            Some(Value::String(s)) => Ok(Some(s.clone())),
-            Some(Value::Number(n)) => Ok(Some(n.to_string())),
-            Some(Value::Bool(b)) => Ok(Some(b.to_string())),
-            Some(Value::Array(_) | Value::Object(_)) => Err(ApiError::UnreadableBody),
+        let Some(raw) = self.raw.get(name) else {
+            return Ok(None);
+        };
+        let text = raw.get();
+        match text.as_bytes().first() {
+            Some(b'"') => serde_json::from_str::<String>(text)
+                .map(Some)
+                .map_err(|_| ApiError::UnreadableBody),
+            Some(b'[' | b'{') => Err(ApiError::UnreadableBody),
+            _ if text == "null" => Ok(None),
+            _ => Ok(Some(text.to_owned())),
         }
     }
 }
@@ -204,9 +221,64 @@ pub fn read_json_object(req: &Request) -> Result<JsonObject, ApiError> {
     {
         return Err(ApiError::UnreadableBody);
     }
-    match serde_json::from_slice::<Value>(body) {
-        Ok(Value::Object(map)) => Ok(JsonObject(map)),
-        _ => Err(ApiError::UnreadableBody),
+    let body = replace_lone_surrogates(body);
+    JsonObject::parse(&body).ok_or(ApiError::UnreadableBody)
+}
+
+/// 문자열 안의 짝 없는 서로게이트 이스케이프(`\ud800` 등)를 `?`로 바꾼다.
+/// Jackson은 이를 그대로 문자열에 담고 PostgreSQL 드라이버가 저장할 때 `?`로 바꾸므로 결과가 같다.
+/// 쌍을 이룬 서로게이트와 다른 이스케이프는 건드리지 않는다.
+fn replace_lone_surrogates(body: &[u8]) -> std::borrow::Cow<'_, [u8]> {
+    let hex4 = |at: usize| -> Option<u32> {
+        let h = body.get(at..at + 4)?;
+        u32::from_str_radix(std::str::from_utf8(h).ok()?, 16).ok()
+    };
+    let mut out: Option<Vec<u8>> = None;
+    let (mut i, mut in_string) = (0, false);
+    while i < body.len() {
+        let b = body[i];
+        if !in_string {
+            in_string = b == b'"';
+            if let Some(o) = out.as_mut() {
+                o.push(b);
+            }
+            i += 1;
+            continue;
+        }
+        if b == b'\\' && body.get(i + 1) == Some(&b'u') {
+            let unit = hex4(i + 2);
+            let paired_high = matches!(unit, Some(0xD800..=0xDBFF))
+                && body.get(i + 6) == Some(&b'\\')
+                && body.get(i + 7) == Some(&b'u')
+                && matches!(hex4(i + 8), Some(0xDC00..=0xDFFF));
+            let lone = matches!(unit, Some(0xD800..=0xDFFF)) && !paired_high;
+            let end = (i + if paired_high { 12 } else { 6 }).min(body.len());
+            if lone {
+                let o = out.get_or_insert_with(|| body[..i].to_vec());
+                o.extend_from_slice(b"\\u003f");
+            } else if let Some(o) = out.as_mut() {
+                o.extend_from_slice(&body[i..end]);
+            }
+            i = end;
+            continue;
+        }
+        // 그 밖의 이스케이프는 두 바이트를 함께 넘겨 `\"`가 문자열을 닫지 않게 한다.
+        let end = if b == b'\\' {
+            (i + 2).min(body.len())
+        } else {
+            i + 1
+        };
+        if b == b'"' {
+            in_string = false;
+        }
+        if let Some(o) = out.as_mut() {
+            o.extend_from_slice(&body[i..end]);
+        }
+        i = end;
+    }
+    match out {
+        Some(v) => std::borrow::Cow::Owned(v),
+        None => std::borrow::Cow::Borrowed(body),
     }
 }
 
@@ -254,6 +326,36 @@ fn parse_media_type(raw: &str) -> Option<(String, String)> {
 mod tests {
     use super::*;
     use chalkak_http::Method;
+
+    const BS: char = '\\';
+
+    #[test]
+    fn 짝_없는_서로게이트는_물음표로_바뀌고_쌍은_유지된다() {
+        let f = |s: String| String::from_utf8(replace_lone_surrogates(s.as_bytes()).into_owned());
+        let lone = format!(r#"{{"a":"x{BS}ud800y"}}"#);
+        let want = format!(r#"{{"a":"x{BS}u003fy"}}"#);
+        assert_eq!(f(lone).unwrap(), want);
+        let low = format!(r#"{{"a":"{BS}udc00"}}"#);
+        assert_eq!(f(low).unwrap(), format!(r#"{{"a":"{BS}u003f"}}"#));
+        let pair = format!(r#"{{"a":"{BS}ud83d{BS}ude00"}}"#);
+        assert_eq!(f(pair.clone()).unwrap(), pair);
+        let escaped = format!(r#"{{"a":"{BS}{BS}ud800"}}"#);
+        assert_eq!(f(escaped.clone()).unwrap(), escaped);
+        let mixed = format!(r#"{{"a":"{BS}ud800{BS}ud83d{BS}ude00"}}"#);
+        let want = format!(r#"{{"a":"{BS}u003f{BS}ud83d{BS}ude00"}}"#);
+        assert_eq!(f(mixed).unwrap(), want);
+    }
+
+    #[test]
+    fn 숫자_내용은_원문_그대로_문자열이_된다() {
+        let o = JsonObject::parse(br#"{"a":1.50,"b":1e3,"c":true,"d":null,"e":"x"}"#).unwrap();
+        assert_eq!(o.string("a").unwrap().as_deref(), Some("1.50"));
+        assert_eq!(o.string("b").unwrap().as_deref(), Some("1e3"));
+        assert_eq!(o.string("c").unwrap().as_deref(), Some("true"));
+        assert_eq!(o.string("d").unwrap(), None);
+        assert_eq!(o.string("e").unwrap().as_deref(), Some("x"));
+        assert_eq!(o.string("zz").unwrap(), None);
+    }
 
     fn date(s: &str) -> Option<LocalDate> {
         parse_iso_date(s)

@@ -12,6 +12,18 @@ impl std::fmt::Display for InvalidStorageKey {
 
 impl std::error::Error for InvalidStorageKey {}
 
+/// 원본 `ImageUrlProvider`. 알림함처럼 구현을 바꿔 끼워 시험해야 하는 쪽이 이 인터페이스로 받는다.
+pub trait ImageUrlProvider: Send + Sync {
+    /// `getUrl`: 키가 없으면 `None`.
+    fn get_url(&self, storage_key: Option<&str>) -> Result<Option<String>, InvalidStorageKey>;
+}
+
+impl ImageUrlProvider for CloudFrontUrlProvider {
+    fn get_url(&self, storage_key: Option<&str>) -> Result<Option<String>, InvalidStorageKey> {
+        CloudFrontUrlProvider::get_url(self, storage_key)
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct CloudFrontUrlProvider {
     /// 스킴·권한 부분(`https://cdn.example.com`). 기준 주소 자체의 경로는 `base_path`에 따로 둔다.

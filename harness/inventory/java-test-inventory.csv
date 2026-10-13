@@ -289,7 +289,7 @@ auth,auth/api/support/SuspendedUserAccessTest.java,getPost_suspendedUser_isNotFo
 auth,auth/api/support/SuspendedUserAccessTest.java,getPosts_suspendedUser_isNotForbidden,정지 회원도 게시물 목록을 조회할 수 있다,통합(Spring+DB),@Test,,미이식
 auth,auth/api/support/SuspendedUserAccessTest.java,getSignature_suspendedUser_isNotForbidden,정지 회원도 내 사인을 조회할 수 있다,통합(Spring+DB),@Test,crates/server/tests/user_access_db.rs::get_signature_suspended_user_is_not_forbidden,이식
 auth,auth/api/support/SuspendedUserAccessTest.java,likePost_suspendedUser_returnsForbidden,정지 회원은 좋아요를 등록할 수 없다,통합(Spring+DB),@Test,,미이식
-auth,auth/api/support/SuspendedUserAccessTest.java,submitFeedback_suspendedUser_isNotForbidden,정지 회원도 피드백을 제출할 수 있다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/SuspendedUserAccessTest.java,submitFeedback_suspendedUser_isNotForbidden,정지 회원도 피드백을 제출할 수 있다,통합(Spring+DB),@Test,harness/scenarios/feedback/submit.toml::정지 회원도 제출할 수 있다,이식
 auth,auth/api/support/SuspendedUserAccessTest.java,unlikePost_suspendedUser_isNotForbidden,정지 회원도 좋아요를 취소할 수 있다,통합(Spring+DB),@Test,,미이식
 auth,auth/api/support/SuspendedUserAccessTest.java,updatePost_suspendedUser_returnsForbidden,정지 회원은 게시물 제목을 수정할 수 없다,통합(Spring+DB),@Test,,미이식
 auth,auth/api/support/SuspendedUserAccessTest.java,updateSignature_suspendedUser_returnsForbidden,정지 회원은 사인을 교체할 수 없다,통합(Spring+DB),@Test,crates/server/tests/user_access_db.rs::update_signature_suspended_user_returns_forbidden,이식
@@ -314,7 +314,7 @@ auth,auth/api/support/WithdrawnUserAccessTest.java,getPost_withdrawnUser_returns
 auth,auth/api/support/WithdrawnUserAccessTest.java,getPosts_withdrawnUser_returnsUnauthorized,탈퇴 회원은 게시물 목록도 조회할 수 없다,통합(Spring+DB),@Test,,미이식
 auth,auth/api/support/WithdrawnUserAccessTest.java,getSignature_withdrawnUser_returnsUnauthorized,탈퇴 회원은 내 사인을 조회할 수 없다,통합(Spring+DB),@Test,crates/server/tests/user_access_db.rs::get_signature_withdrawn_user_returns_unauthorized,이식
 auth,auth/api/support/WithdrawnUserAccessTest.java,likePost_withdrawnUser_returnsUnauthorized,탈퇴 회원은 좋아요를 등록할 수 없다,통합(Spring+DB),@Test,,미이식
-auth,auth/api/support/WithdrawnUserAccessTest.java,submitFeedback_withdrawnUser_returnsUnauthorized,탈퇴 회원은 피드백을 제출할 수 없다,통합(Spring+DB),@Test,,미이식
+auth,auth/api/support/WithdrawnUserAccessTest.java,submitFeedback_withdrawnUser_returnsUnauthorized,탈퇴 회원은 피드백을 제출할 수 없다,통합(Spring+DB),@Test,harness/scenarios/feedback/submit.toml::탈퇴 회원은 401,이식
 auth,auth/api/support/WithdrawnUserAccessTest.java,unlikePost_withdrawnUser_returnsUnauthorized,탈퇴 회원은 좋아요를 취소할 수 없다,통합(Spring+DB),@Test,,미이식
 auth,auth/api/support/WithdrawnUserAccessTest.java,updateSignature_withdrawnUser_returnsUnauthorized,탈퇴 회원은 사인을 교체할 수 없다,통합(Spring+DB),@Test,crates/server/tests/user_access_db.rs::update_signature_withdrawn_user_returns_unauthorized,이식
 auth,auth/api/support/WithdrawnUserAccessTest.java,withdraw_withdrawnUser_returnsUnauthorized,탈퇴 회원은 다시 탈퇴할 수 없다,통합(Spring+DB),@Test,crates/server/tests/user_access_db.rs::withdraw_withdrawn_user_returns_unauthorized,이식
@@ -687,23 +687,23 @@ exception,exception/GlobalExceptionHandlerTest.java,typeMismatchFailureKeepsFiel
 exception,exception/GlobalExceptionHandlerTest.java,unexpectedException,,웹 슬라이스,@Test,,미이식
 exception,exception/GlobalExceptionHandlerTest.java,unsupportedHttpMethod,,웹 슬라이스,@Test,,미이식
 exception,exception/GlobalExceptionHandlerTest.java,unsupportedMediaType,,웹 슬라이스,@Test,,미이식
-feedback,feedback/api/v1/controller/FeedbackControllerTest.java,submitFeedback_blankContent_returnsBadRequest,내용이 공백뿐이면 400을 반환한다,웹 슬라이스,@Test,,미이식
-feedback,feedback/api/v1/controller/FeedbackControllerTest.java,submitFeedback_contentOverMaxLength_returnsBadRequest,내용이 1000자를 넘으면 400을 반환한다,웹 슬라이스,@Test,,미이식
-feedback,feedback/api/v1/controller/FeedbackControllerTest.java,submitFeedback_maxLengthAfterStrip_returnsCreated,앞뒤 공백을 제거해 1000자면 공백을 포함한 원문이 더 길어도 접수한다,웹 슬라이스,@Test,,미이식
-feedback,feedback/api/v1/controller/FeedbackControllerTest.java,submitFeedback_unauthenticated_returnsUnauthorized,인증 정보가 없으면 401을 반환한다,웹 슬라이스,@Test,,미이식
-feedback,feedback/api/v1/controller/FeedbackControllerTest.java,submitFeedback_validRequest_returnsCreated,피드백을 접수하고 201과 식별자를 반환한다,웹 슬라이스,@Test,,미이식
-feedback,feedback/api/v1/controller/FeedbackSubmissionIntegrationTest.java,submitFeedback_maxLengthSupplementaryCharacters_areStoredIntact,TEXT 컬럼은 허용 상한인 보조 평면 문자 1000자를 그대로 보관한다,통합(Spring+DB),@Test,,미이식
-feedback,feedback/api/v1/controller/FeedbackSubmissionIntegrationTest.java,submitFeedback_validRequest_returnsPersistedIdentifierAndCreatedAt,제출 응답은 실제로 채워진 식별자와 접수 시각을 담는다,통합(Spring+DB),@Test,,미이식
+feedback,feedback/api/v1/controller/FeedbackControllerTest.java,submitFeedback_blankContent_returnsBadRequest,내용이 공백뿐이면 400을 반환한다,웹 슬라이스,@Test,crates/app/src/feedback/api.rs::내용_검증은_원본_메시지를_쓴다,이식
+feedback,feedback/api/v1/controller/FeedbackControllerTest.java,submitFeedback_contentOverMaxLength_returnsBadRequest,내용이 1000자를 넘으면 400을 반환한다,웹 슬라이스,@Test,crates/app/src/feedback/api.rs::내용_검증은_원본_메시지를_쓴다,이식
+feedback,feedback/api/v1/controller/FeedbackControllerTest.java,submitFeedback_maxLengthAfterStrip_returnsCreated,앞뒤 공백을 제거해 1000자면 공백을 포함한 원문이 더 길어도 접수한다,웹 슬라이스,@Test,harness/scenarios/feedback/submit.toml::공백 포함 1000자 + 앞뒤 공백은 201,이식
+feedback,feedback/api/v1/controller/FeedbackControllerTest.java,submitFeedback_unauthenticated_returnsUnauthorized,인증 정보가 없으면 401을 반환한다,웹 슬라이스,@Test,harness/scenarios/feedback/submit.toml::토큰 없이 401,이식
+feedback,feedback/api/v1/controller/FeedbackControllerTest.java,submitFeedback_validRequest_returnsCreated,피드백을 접수하고 201과 식별자를 반환한다,웹 슬라이스,@Test,harness/scenarios/feedback/submit.toml::앞뒤 공백을 떼어 저장,이식
+feedback,feedback/api/v1/controller/FeedbackSubmissionIntegrationTest.java,submitFeedback_maxLengthSupplementaryCharacters_areStoredIntact,TEXT 컬럼은 허용 상한인 보조 평면 문자 1000자를 그대로 보관한다,통합(Spring+DB),@Test,crates/app/tests/feedback_db.rs::max_length_supplementary_characters_are_stored_intact,이식
+feedback,feedback/api/v1/controller/FeedbackSubmissionIntegrationTest.java,submitFeedback_validRequest_returnsPersistedIdentifierAndCreatedAt,제출 응답은 실제로 채워진 식별자와 접수 시각을 담는다,통합(Spring+DB),@Test,crates/app/tests/feedback_db.rs::submit_stores_stripped_content_with_app_clock_timestamp,이식
 feedback,feedback/api/v1/docs/FeedbackOpenApiTest.java,userApiDocs_feedback_exposesSubmissionOnly,피드백 제출은 조회·수정·삭제를 제공하지 않는다,통합(Spring+DB),@Test,,미이식
 feedback,feedback/api/v1/docs/FeedbackOpenApiTest.java,userApiDocs_submitFeedback_exposesContract,user-api 문서는 피드백 제출 계약을 제공한다,통합(Spring+DB),@Test,,미이식
-feedback,feedback/domain/FeedbackTest.java,create_blankContent_throwsBusinessException,내용이 비었거나 공백뿐이면 거절한다,단위,@ParameterizedTest,,미이식
-feedback,feedback/domain/FeedbackTest.java,create_contentAtMaxLength_storesContent,앞뒤 공백을 제거한 1000자는 허용한다,단위,@Test,,미이식
-feedback,feedback/domain/FeedbackTest.java,create_contentOverMaxLength_throwsBusinessException,앞뒤 공백을 제거한 1001자는 거절한다,단위,@Test,,미이식
-feedback,feedback/domain/FeedbackTest.java,create_contentWithSurroundingWhitespace_storesStrippedContent,피드백 내용의 앞뒤 공백을 제거해 보관한다,단위,@Test,,미이식
-feedback,feedback/domain/FeedbackTest.java,create_nullContent_throwsBusinessException,내용이 null이면 거절한다,단위,@Test,,미이식
-feedback,feedback/domain/FeedbackTest.java,create_supplementaryCharactersAtMaxLength_storesContent,보조 평면 문자는 code point 하나로 세어 1000자까지 허용한다,단위,@Test,,미이식
-feedback,feedback/infrastructure/persistence/FeedbackRepositoryTest.java,save_newFeedback_assignsIdentifierAndCreatedAt,저장한 피드백에 식별자와 접수 시각이 채워진다,JPA 슬라이스,@Test,,미이식
-feedback,feedback/infrastructure/persistence/FeedbackRepositoryTest.java,save_repeatedFeedback_storesEverySubmission,한 회원이 피드백을 여러 번 남길 수 있다,JPA 슬라이스,@Test,,미이식
+feedback,feedback/domain/FeedbackTest.java,create_blankContent_throwsBusinessException,내용이 비었거나 공백뿐이면 거절한다,단위,@ParameterizedTest,crates/app/src/feedback/domain.rs::비었거나_공백뿐이면_거절한다,이식
+feedback,feedback/domain/FeedbackTest.java,create_contentAtMaxLength_storesContent,앞뒤 공백을 제거한 1000자는 허용한다,단위,@Test,crates/app/src/feedback/domain.rs::길이는_공백을_뗀_코드포인트_수로_잰다,이식
+feedback,feedback/domain/FeedbackTest.java,create_contentOverMaxLength_throwsBusinessException,앞뒤 공백을 제거한 1001자는 거절한다,단위,@Test,crates/app/src/feedback/domain.rs::길이는_공백을_뗀_코드포인트_수로_잰다,이식
+feedback,feedback/domain/FeedbackTest.java,create_contentWithSurroundingWhitespace_storesStrippedContent,피드백 내용의 앞뒤 공백을 제거해 보관한다,단위,@Test,crates/app/src/feedback/domain.rs::앞뒤_공백을_떼어_보관한다,이식
+feedback,feedback/domain/FeedbackTest.java,create_nullContent_throwsBusinessException,내용이 null이면 거절한다,단위,@Test,crates/app/src/feedback/domain.rs::비었거나_공백뿐이면_거절한다,이식
+feedback,feedback/domain/FeedbackTest.java,create_supplementaryCharactersAtMaxLength_storesContent,보조 평면 문자는 code point 하나로 세어 1000자까지 허용한다,단위,@Test,crates/app/src/feedback/domain.rs::길이는_공백을_뗀_코드포인트_수로_잰다,이식
+feedback,feedback/infrastructure/persistence/FeedbackRepositoryTest.java,save_newFeedback_assignsIdentifierAndCreatedAt,저장한 피드백에 식별자와 접수 시각이 채워진다,JPA 슬라이스,@Test,crates/app/tests/feedback_db.rs::save_assigns_identifier_and_created_at,이식
+feedback,feedback/infrastructure/persistence/FeedbackRepositoryTest.java,save_repeatedFeedback_storesEverySubmission,한 회원이 피드백을 여러 번 남길 수 있다,JPA 슬라이스,@Test,crates/app/tests/feedback_db.rs::a_user_can_submit_feedback_repeatedly,이식
 like,like/api/v1/controller/PostLikeControllerTest.java,likePost_invalidPostId_returnsBadRequest,게시물 ID 형식이 올바르지 않으면 400을 반환한다,웹 슬라이스,@Test,crates/app/tests/post_http_db.rs::like_post_invalid_post_id_returns_bad_request,이식
 like,like/api/v1/controller/PostLikeControllerTest.java,likePost_invisiblePost_returnsNotFound,공개 가능한 게시물이 아니면 404를 반환한다,웹 슬라이스,@Test,crates/app/tests/post_http_db.rs::like_post_invisible_post_returns_not_found,이식
 like,like/api/v1/controller/PostLikeControllerTest.java,likePost_unauthenticated_returnsUnauthorized,인증 정보가 없으면 401을 반환한다,웹 슬라이스,@Test,crates/app/tests/post_http_db.rs::like_post_unauthenticated_returns_unauthorized,이식
@@ -726,47 +726,47 @@ like,like/service/PostLikeServiceTest.java,likePost_unknownUser_throwsUnauthoriz
 like,like/service/PostLikeServiceTest.java,likePost_visiblePost_returnsLikedResult,공개 게시물에 좋아요를 등록하고 현재 상태를 반환한다,통합(Spring+DB),@Test,crates/app/tests/like_db.rs::like_post_visible_post_returns_liked_result,이식
 like,like/service/PostLikeServiceTest.java,unlikePost_existingPostLike_returnsUnlikedResult,등록된 좋아요를 취소하고 현재 상태를 반환한다,통합(Spring+DB),@Test,crates/app/tests/like_db.rs::unlike_post_existing_post_like_returns_unliked_result,이식
 like,like/service/PostLikeServiceTest.java,unlikePost_missingPostLike_returnsSameResult,좋아요가 없는 게시물을 다시 취소해도 같은 상태를 반환한다,통합(Spring+DB),@Test,crates/app/tests/like_db.rs::unlike_post_missing_post_like_returns_same_result,이식
-notification,notification/api/v1/controller/NotificationControllerTest.java,getNotification_otherUser_returnsNotFound,다른 회원의 알림 상세는 404를 반환한다,웹 슬라이스,@Test,,미이식
-notification,notification/api/v1/controller/NotificationControllerTest.java,getNotification_returnsOriginalAndRejectionReasonWithoutMarkingRead,알림 상세는 원본 사진과 반려 사유를 반환하고 조회만으로 읽음 처리하지 않는다,웹 슬라이스,@Test,,미이식
-notification,notification/api/v1/controller/NotificationControllerTest.java,getNotifications_invalidPageSize_returnsBadRequest,목록 페이지 크기가 범위를 벗어나면 400을 반환한다,웹 슬라이스,@Test,,미이식
-notification,notification/api/v1/controller/NotificationControllerTest.java,getNotifications_returnsPaginatedNotifications,알림 목록은 페이지 정보와 썸네일을 반환한다,웹 슬라이스,@Test,,미이식
-notification,notification/api/v1/controller/NotificationControllerTest.java,getNotifications_unauthenticated_returnsUnauthorized,인증 정보가 없으면 알림함 조회를 거부한다,웹 슬라이스,@Test,,미이식
-notification,notification/api/v1/controller/NotificationControllerTest.java,getUnreadStatus_returnsHasUnread,미읽음 상태는 hasUnread 필드로 반환한다,웹 슬라이스,@Test,,미이식
-notification,notification/api/v1/controller/NotificationControllerTest.java,markAllRead_returnsNoContent,모두 읽기 요청은 현재 회원에게 적용하고 204를 반환한다,웹 슬라이스,@Test,,미이식
-notification,notification/api/v1/controller/NotificationControllerTest.java,markRead_returnsNoContent,알림 읽음 요청은 본인 알림 ID로 처리하고 204를 반환한다,웹 슬라이스,@Test,,미이식
+notification,notification/api/v1/controller/NotificationControllerTest.java,getNotification_otherUser_returnsNotFound,다른 회원의 알림 상세는 404를 반환한다,웹 슬라이스,@Test,harness/scenarios/notification/detail-and-read.toml::남의 알림 상세는 404,이식
+notification,notification/api/v1/controller/NotificationControllerTest.java,getNotification_returnsOriginalAndRejectionReasonWithoutMarkingRead,알림 상세는 원본 사진과 반려 사유를 반환하고 조회만으로 읽음 처리하지 않는다,웹 슬라이스,@Test,crates/server/tests/e2e_db.rs::notification_inbox_flow,이식
+notification,notification/api/v1/controller/NotificationControllerTest.java,getNotifications_invalidPageSize_returnsBadRequest,목록 페이지 크기가 범위를 벗어나면 400을 반환한다,웹 슬라이스,@Test,crates/app/src/notification/api.rs::페이지_크기가_범위를_벗어나면_400이다,이식
+notification,notification/api/v1/controller/NotificationControllerTest.java,getNotifications_returnsPaginatedNotifications,알림 목록은 페이지 정보와 썸네일을 반환한다,웹 슬라이스,@Test,"harness/scenarios/notification/inbox-list.toml::페이지 크기 1, 2쪽",이식
+notification,notification/api/v1/controller/NotificationControllerTest.java,getNotifications_unauthenticated_returnsUnauthorized,인증 정보가 없으면 알림함 조회를 거부한다,웹 슬라이스,@Test,harness/scenarios/notification/inbox-list.toml::토큰 없이 401,이식
+notification,notification/api/v1/controller/NotificationControllerTest.java,getUnreadStatus_returnsHasUnread,미읽음 상태는 hasUnread 필드로 반환한다,웹 슬라이스,@Test,crates/server/tests/e2e_db.rs::notification_inbox_flow,이식
+notification,notification/api/v1/controller/NotificationControllerTest.java,markAllRead_returnsNoContent,모두 읽기 요청은 현재 회원에게 적용하고 204를 반환한다,웹 슬라이스,@Test,harness/scenarios/notification/read-all.toml::모두 읽기(남의 알림·삭제된 게시물의 알림은 그대로),이식
+notification,notification/api/v1/controller/NotificationControllerTest.java,markRead_returnsNoContent,알림 읽음 요청은 본인 알림 ID로 처리하고 204를 반환한다,웹 슬라이스,@Test,harness/scenarios/notification/detail-and-read.toml::읽음: 안 읽은 알림,이식
 notification,notification/api/v1/docs/NotificationOpenApiTest.java,userApiDocs_exposesNotificationInboxContract,사용자 API 문서에 알림함 조회와 읽음 계약을 제공한다,통합(Spring+DB),@Test,,미이식
-notification,notification/infrastructure/infra/NotificationCleanupSchedulerTest.java,deleteExpiredNotifications_activeUser_deletesOnlyOlderThanSixtyDays,일반 회원의 알림은 생성 후 60일이 지나면 삭제한다,통합(Spring+DB),@Test,,미이식
-notification,notification/infrastructure/infra/NotificationCleanupSchedulerTest.java,deleteExpiredNotifications_oldWithdrawal_deletesRecentNotification,탈퇴한 지 30일이 지나면 최근에 생성된 알림도 삭제한다,통합(Spring+DB),@Test,,미이식
-notification,notification/infrastructure/infra/NotificationCleanupSchedulerTest.java,deleteExpiredNotifications_recentWithdrawal_keepsOlderNotification,탈퇴 30일 경계에 있는 회원의 알림은 생성 후 60일이 지나도 보관한다,통합(Spring+DB),@Test,,미이식
-notification,notification/infrastructure/infra/NotificationConfigurationTest.java,create_deliveryDisabled_doesNotRegisterCommonNotificationBeans,알림 발송을 끄면 공통 알림 Bean을 등록하지 않는다,단위,@Test,,미이식
-notification,notification/infrastructure/infra/NotificationConfigurationTest.java,create_deliveryEnabled_registersCommonNotificationBeans,공통 알림 설정은 메시지 생성기와 이벤트 리스너를 등록한다,단위,@Test,,미이식
-notification,notification/infrastructure/infra/NotificationPropertiesTest.java,create_adminWebPath_throwsException,경로가 붙은 관리자 웹 주소를 거부한다,단위,@Test,,미이식
-notification,notification/infrastructure/infra/NotificationPropertiesTest.java,create_exactHttpsOrigin_succeeds,경로 없는 HTTPS 관리자 웹 Origin을 사용한다,단위,@Test,,미이식
-notification,notification/infrastructure/infra/slack/SlackIncomingWebhookNotificationSenderTest.java,send_networkError_returnsFalse,그 밖의 통신 실패도 발송 실패로 반환한다,단위,@Test,,미이식
-notification,notification/infrastructure/infra/slack/SlackIncomingWebhookNotificationSenderTest.java,send_successfulResponse_postsBlockKitAndReturnsSent,Block Kit JSON에 검수 내용과 정확한 링크를 담아 POST하고 2xx를 성공으로 반환한다,단위,@Test,,미이식
-notification,notification/infrastructure/infra/slack/SlackIncomingWebhookNotificationSenderTest.java,send_timeout_returnsFalse,응답 시간 초과는 발송 실패로 반환한다,단위,@Test,,미이식
-notification,notification/infrastructure/infra/slack/SlackIncomingWebhookNotificationSenderTest.java,send_unsuccessfulResponse_returnsFalse,2xx가 아닌 Slack 응답은 발송 실패로 반환한다,단위,@ParameterizedTest,,미이식
-notification,notification/infrastructure/infra/slack/SlackNotificationConfigurationTest.java,create_deliveryDisabled_doesNotRegisterSlackBeans,알림 발송을 끄면 Slack 관련 Bean을 등록하지 않는다,단위,@Test,,미이식
-notification,notification/infrastructure/infra/slack/SlackNotificationConfigurationTest.java,create_deliveryEnabled_registersSafeSlackClientAndSender,Slack 설정은 redirect를 따르지 않는 HTTP 클라이언트와 발송기를 등록한다,단위,@Test,,미이식
-notification,notification/infrastructure/infra/slack/SlackNotificationPropertiesTest.java,create_nonPositiveConnectTimeout_throwsException,0 이하인 Slack 연결 제한 시간을 거부한다,단위,@Test,,미이식
-notification,notification/infrastructure/infra/slack/SlackNotificationPropertiesTest.java,create_nonPositiveReadTimeout_throwsException,0 이하인 Slack 응답 제한 시간을 거부한다,단위,@Test,,미이식
-notification,notification/infrastructure/infra/slack/SlackNotificationPropertiesTest.java,create_nonSlackWebhook_throwsException,Slack 이외 호스트의 Webhook을 거부한다,단위,@Test,,미이식
-notification,notification/infrastructure/infra/slack/SlackNotificationPropertiesTest.java,create_safeWebhookAndTimeouts_succeeds,공식 Slack Webhook과 양수 제한 시간을 사용한다,단위,@Test,,미이식
-notification,notification/infrastructure/infra/slack/SlackNotificationPropertiesTest.java,create_slackWebhookWithTrailingSlash_throwsException,마지막 슬래시가 붙은 Slack Webhook을 거부한다,단위,@Test,,미이식
-notification,notification/service/NotificationInboxServiceTest.java,getNotification_rejectedNotification_returnsOriginalAndReasonForOwnerOnly,반려 알림 상세에는 원본 사진과 사유를 포함하고 다른 회원은 조회할 수 없다,통합(Spring+DB),@Test,,미이식
-notification,notification/service/NotificationInboxServiceTest.java,getNotifications_adminDeletedRejectedPost_hidesNotification,관리자가 반려 게시물을 삭제해도 알림함에서 제외한다,통합(Spring+DB),@Test,,미이식
-notification,notification/service/NotificationInboxServiceTest.java,getNotifications_authorDeletedApprovedPost_hidesNotificationButKeepsRecord,작성자가 승인 게시물을 삭제하면 알림함에서 제외하되 알림 기록은 보관한다,통합(Spring+DB),@Test,,미이식
-notification,notification/service/NotificationInboxServiceTest.java,getNotifications_ordersNewestFirstAndReturnsHasNext,알림 목록은 최신순으로 페이지를 나누고 다음 페이지 여부를 표시한다,통합(Spring+DB),@Test,,미이식
-notification,notification/service/NotificationInboxServiceTest.java,getNotifications_returnsOwnNotificationsWithThumbnail,내 알림 목록에는 썸네일 URL을 포함하고 다른 회원의 알림은 제외한다,통합(Spring+DB),@Test,,미이식
-notification,notification/service/NotificationInboxServiceTest.java,hasUnreadNotification_returnsOwnUnreadStatus,미읽음 여부는 로그인한 회원의 알림만 기준으로 판단한다,통합(Spring+DB),@Test,,미이식
-notification,notification/service/NotificationInboxServiceTest.java,markAllRead_marksEveryOwnUnreadNotification,모두 읽기는 내 미읽음 알림을 한 번에 처리한다,통합(Spring+DB),@Test,,미이식
-notification,notification/service/NotificationInboxServiceTest.java,markRead_isOwnerOnlyAndIdempotent,알림 읽음은 본인만 처리하며 반복 호출해도 처음 읽은 시각을 유지한다,통합(Spring+DB),@Test,,미이식
-notification,notification/service/NotificationMessageFactoryTest.java,create_baseUrlWithTrailingSlash_doesNotDuplicateSlash,관리자 웹 주소의 마지막 슬래시는 제거한 뒤 상세 경로를 붙인다,단위,@Test,,미이식
-notification,notification/service/NotificationMessageFactoryTest.java,create_postModerationPending_createsAdminPostDetailLink,게시물 검수 알림은 관리자 웹의 해당 게시물 상세 주소를 만든다,단위,@Test,,미이식
-notification,notification/service/PostModerationPendingNotificationListenerTest.java,sendPostModerationPending_afterCommit_sendsMessage,트랜잭션 커밋이 끝난 뒤 Slack 알림을 전송한다,단위,@Test,,미이식
+notification,notification/infrastructure/infra/NotificationCleanupSchedulerTest.java,deleteExpiredNotifications_activeUser_deletesOnlyOlderThanSixtyDays,일반 회원의 알림은 생성 후 60일이 지나면 삭제한다,통합(Spring+DB),@Test,crates/app/tests/notification_db.rs::cleanup_active_user_deletes_only_older_than_sixty_days,이식
+notification,notification/infrastructure/infra/NotificationCleanupSchedulerTest.java,deleteExpiredNotifications_oldWithdrawal_deletesRecentNotification,탈퇴한 지 30일이 지나면 최근에 생성된 알림도 삭제한다,통합(Spring+DB),@Test,crates/app/tests/notification_db.rs::cleanup_old_withdrawal_deletes_recent_notification,이식
+notification,notification/infrastructure/infra/NotificationCleanupSchedulerTest.java,deleteExpiredNotifications_recentWithdrawal_keepsOlderNotification,탈퇴 30일 경계에 있는 회원의 알림은 생성 후 60일이 지나도 보관한다,통합(Spring+DB),@Test,crates/app/tests/notification_db.rs::cleanup_recent_withdrawal_keeps_older_notification,이식
+notification,notification/infrastructure/infra/NotificationConfigurationTest.java,create_deliveryDisabled_doesNotRegisterCommonNotificationBeans,알림 발송을 끄면 공통 알림 Bean을 등록하지 않는다,단위,@Test,crates/app/src/notification/slack/settings.rs::전달이_꺼져_있으면_다른_값은_읽지_않는다,이식
+notification,notification/infrastructure/infra/NotificationConfigurationTest.java,create_deliveryEnabled_registersCommonNotificationBeans,공통 알림 설정은 메시지 생성기와 이벤트 리스너를 등록한다,단위,@Test,crates/app/src/notification/slack/settings.rs::켜면_관리자_웹_주소와_webhook을_검증한다,이식
+notification,notification/infrastructure/infra/NotificationPropertiesTest.java,create_adminWebPath_throwsException,경로가 붙은 관리자 웹 주소를 거부한다,단위,@Test,crates/app/src/notification/slack/settings.rs::경로가_붙은_관리자_웹_주소를_거부한다,이식
+notification,notification/infrastructure/infra/NotificationPropertiesTest.java,create_exactHttpsOrigin_succeeds,경로 없는 HTTPS 관리자 웹 Origin을 사용한다,단위,@Test,crates/app/src/notification/slack/settings.rs::경로_없는_https_origin을_받는다,이식
+notification,notification/infrastructure/infra/slack/SlackIncomingWebhookNotificationSenderTest.java,send_networkError_returnsFalse,그 밖의 통신 실패도 발송 실패로 반환한다,단위,@Test,crates/app/src/notification/slack/mod.rs::연결_실패도_발송_실패다,이식
+notification,notification/infrastructure/infra/slack/SlackIncomingWebhookNotificationSenderTest.java,send_successfulResponse_postsBlockKitAndReturnsSent,Block Kit JSON에 검수 내용과 정확한 링크를 담아 POST하고 2xx를 성공으로 반환한다,단위,@Test,crates/app/src/notification/slack/mod.rs::block_kit_본문은_검수_내용과_정확한_링크를_담는다,이식
+notification,notification/infrastructure/infra/slack/SlackIncomingWebhookNotificationSenderTest.java,send_timeout_returnsFalse,응답 시간 초과는 발송 실패로 반환한다,단위,@Test,crates/app/src/notification/slack/mod.rs::응답_시간_초과는_발송_실패다,이식
+notification,notification/infrastructure/infra/slack/SlackIncomingWebhookNotificationSenderTest.java,send_unsuccessfulResponse_returnsFalse,2xx가 아닌 Slack 응답은 발송 실패로 반환한다,단위,@ParameterizedTest,crates/app/src/notification/slack/mod.rs::이백번대가_아닌_응답은_발송_실패다,이식
+notification,notification/infrastructure/infra/slack/SlackNotificationConfigurationTest.java,create_deliveryDisabled_doesNotRegisterSlackBeans,알림 발송을 끄면 Slack 관련 Bean을 등록하지 않는다,단위,@Test,crates/app/src/notification/slack/settings.rs::전달이_꺼져_있으면_다른_값은_읽지_않는다,이식
+notification,notification/infrastructure/infra/slack/SlackNotificationConfigurationTest.java,create_deliveryEnabled_registersSafeSlackClientAndSender,Slack 설정은 redirect를 따르지 않는 HTTP 클라이언트와 발송기를 등록한다,단위,@Test,crates/app/src/notification/slack/mod.rs::이백번대가_아닌_응답은_발송_실패다,이식
+notification,notification/infrastructure/infra/slack/SlackNotificationPropertiesTest.java,create_nonPositiveConnectTimeout_throwsException,0 이하인 Slack 연결 제한 시간을 거부한다,단위,@Test,crates/app/src/notification/slack/settings.rs::양수가_아닌_제한_시간을_거부한다,이식
+notification,notification/infrastructure/infra/slack/SlackNotificationPropertiesTest.java,create_nonPositiveReadTimeout_throwsException,0 이하인 Slack 응답 제한 시간을 거부한다,단위,@Test,crates/app/src/notification/slack/settings.rs::양수가_아닌_제한_시간을_거부한다,이식
+notification,notification/infrastructure/infra/slack/SlackNotificationPropertiesTest.java,create_nonSlackWebhook_throwsException,Slack 이외 호스트의 Webhook을 거부한다,단위,@Test,crates/app/src/notification/slack/settings.rs::slack이_아닌_webhook을_거부한다,이식
+notification,notification/infrastructure/infra/slack/SlackNotificationPropertiesTest.java,create_safeWebhookAndTimeouts_succeeds,공식 Slack Webhook과 양수 제한 시간을 사용한다,단위,@Test,crates/app/src/notification/slack/settings.rs::공식_webhook과_양수_제한_시간을_받는다,이식
+notification,notification/infrastructure/infra/slack/SlackNotificationPropertiesTest.java,create_slackWebhookWithTrailingSlash_throwsException,마지막 슬래시가 붙은 Slack Webhook을 거부한다,단위,@Test,crates/app/src/notification/slack/settings.rs::마지막_슬래시가_붙은_webhook을_거부한다,이식
+notification,notification/service/NotificationInboxServiceTest.java,getNotification_rejectedNotification_returnsOriginalAndReasonForOwnerOnly,반려 알림 상세에는 원본 사진과 사유를 포함하고 다른 회원은 조회할 수 없다,통합(Spring+DB),@Test,crates/app/tests/notification_db.rs::get_notification_returns_original_and_reason_for_owner_only,이식
+notification,notification/service/NotificationInboxServiceTest.java,getNotifications_adminDeletedRejectedPost_hidesNotification,관리자가 반려 게시물을 삭제해도 알림함에서 제외한다,통합(Spring+DB),@Test,crates/app/tests/notification_db.rs::admin_deleted_rejected_post_hides_notification_and_mark_all_read_skips_it,이식
+notification,notification/service/NotificationInboxServiceTest.java,getNotifications_authorDeletedApprovedPost_hidesNotificationButKeepsRecord,작성자가 승인 게시물을 삭제하면 알림함에서 제외하되 알림 기록은 보관한다,통합(Spring+DB),@Test,crates/app/tests/notification_db.rs::author_deleted_approved_post_hides_notification_but_keeps_record,이식
+notification,notification/service/NotificationInboxServiceTest.java,getNotifications_ordersNewestFirstAndReturnsHasNext,알림 목록은 최신순으로 페이지를 나누고 다음 페이지 여부를 표시한다,통합(Spring+DB),@Test,crates/app/tests/notification_db.rs::get_notifications_orders_newest_first_and_reports_has_next,이식
+notification,notification/service/NotificationInboxServiceTest.java,getNotifications_returnsOwnNotificationsWithThumbnail,내 알림 목록에는 썸네일 URL을 포함하고 다른 회원의 알림은 제외한다,통합(Spring+DB),@Test,crates/app/tests/notification_db.rs::get_notifications_returns_own_notifications_with_thumbnail,이식
+notification,notification/service/NotificationInboxServiceTest.java,hasUnreadNotification_returnsOwnUnreadStatus,미읽음 여부는 로그인한 회원의 알림만 기준으로 판단한다,통합(Spring+DB),@Test,crates/app/tests/notification_db.rs::has_unread_notification_is_per_user,이식
+notification,notification/service/NotificationInboxServiceTest.java,markAllRead_marksEveryOwnUnreadNotification,모두 읽기는 내 미읽음 알림을 한 번에 처리한다,통합(Spring+DB),@Test,crates/app/tests/notification_db.rs::mark_all_read_marks_every_own_unread_notification,이식
+notification,notification/service/NotificationInboxServiceTest.java,markRead_isOwnerOnlyAndIdempotent,알림 읽음은 본인만 처리하며 반복 호출해도 처음 읽은 시각을 유지한다,통합(Spring+DB),@Test,crates/app/tests/notification_db.rs::mark_read_is_owner_only_and_keeps_the_first_read_time,이식
+notification,notification/service/NotificationMessageFactoryTest.java,create_baseUrlWithTrailingSlash_doesNotDuplicateSlash,관리자 웹 주소의 마지막 슬래시는 제거한 뒤 상세 경로를 붙인다,단위,@Test,crates/app/src/notification/slack/mod.rs::기준_주소의_마지막_슬래시는_떼고_붙인다,이식
+notification,notification/service/NotificationMessageFactoryTest.java,create_postModerationPending_createsAdminPostDetailLink,게시물 검수 알림은 관리자 웹의 해당 게시물 상세 주소를 만든다,단위,@Test,crates/app/src/notification/slack/mod.rs::검수_알림은_관리자_웹의_게시물_상세_주소를_만든다,이식
+notification,notification/service/PostModerationPendingNotificationListenerTest.java,sendPostModerationPending_afterCommit_sendsMessage,트랜잭션 커밋이 끝난 뒤 Slack 알림을 전송한다,단위,@Test,crates/app/src/notification/slack/mod.rs::이벤트를_받으면_만든_메시지를_전송한다,이식
 notification,notification/service/PostModerationPendingNotificationListenerTest.java,sendPostModerationPending_annotation_usesAfterCommitPhase,알림 리스너는 트랜잭션 커밋 이후 단계에서 실행된다,단위,@Test,,미이식
-notification,notification/service/PostModerationPendingNotificationListenerTest.java,sendPostModerationPending_senderReturnsFalse_doesNotThrow,Slack이 실패를 반환해도 게시물 처리 흐름으로 예외를 전파하지 않는다,단위,@Test,,미이식
-notification,notification/service/PostModerationPendingNotificationListenerTest.java,sendPostModerationPending_senderThrows_doesNotExposeSecret,Slack 발송 경계에서 런타임 예외가 나도 외부로 전파하지 않는다,단위,@Test,,미이식
+notification,notification/service/PostModerationPendingNotificationListenerTest.java,sendPostModerationPending_senderReturnsFalse_doesNotThrow,Slack이 실패를 반환해도 게시물 처리 흐름으로 예외를 전파하지 않는다,단위,@Test,crates/app/src/notification/slack/mod.rs::전송이_실패를_돌려주면_경고만_남기고_전파하지_않는다,이식
+notification,notification/service/PostModerationPendingNotificationListenerTest.java,sendPostModerationPending_senderThrows_doesNotExposeSecret,Slack 발송 경계에서 런타임 예외가 나도 외부로 전파하지 않는다,단위,@Test,crates/app/src/notification/slack/mod.rs::전송이_패닉해도_전파하지_않고_원문을_남기지_않는다,이식
 photo,photo/domain/PhotoTest.java,completeProcessing_nullMetadata_keepsEmptyMetadata,메타데이터가 없어도 이미지 처리를 완료할 수 있다,단위,@Test,crates/app/src/photo/domain.rs::complete_processing_null_metadata_keeps_empty_metadata,이식
 photo,photo/domain/PhotoTest.java,completeProcessing_processedImage_fillsThumbnailKeyAndMetadata,이미지 처리를 완료하면 썸네일 키와 메타데이터를 채운다,단위,@Test,crates/app/src/photo/domain.rs::complete_processing_processed_image_fills_thumbnail_key_and_metadata,이식
 photo,photo/domain/PhotoTest.java,createPhoto_blankOriginalStorageKey_throwsBusinessException,원본 스토리지 키가 공백이면 사진을 생성할 수 없다,단위,@Test,crates/app/src/photo/domain.rs::create_photo_blank_original_storage_key_throws_business_exception,이식

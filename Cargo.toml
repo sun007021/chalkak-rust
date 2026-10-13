@@ -21,7 +21,7 @@ publish = false
 # 의존성 허용 목록(docs/plan/migration-plan.md 2장, B안). 여기에 없는 crate는 deny.toml이 막는다.
 [workspace.dependencies]
 serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+serde_json = { version = "1", features = ["raw_value"] }
 toml = "0.9"
 postgres = "0.19"
 hmac = "0.12"
