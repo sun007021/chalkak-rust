@@ -15,6 +15,8 @@ pub struct Request {
     pub raw_path: String,
     /// 디코딩된 쿼리. 같은 이름이 여러 번 나오면 순서대로 모두 남는다.
     pub query: Vec<(String, String)>,
+    /// 쿼리에 잘못된 퍼센트 인코딩이 있다. 파라미터를 읽는 핸들러는 원본처럼 500으로 답해야 한다.
+    pub query_malformed: bool,
     pub headers: Headers,
     pub body: Vec<u8>,
     pub remote_addr: SocketAddr,
@@ -33,6 +35,7 @@ impl Request {
             raw_path: path.clone(),
             path,
             query: Vec::new(),
+            query_malformed: false,
             headers: Headers::new(),
             body: Vec::new(),
             remote_addr: SocketAddr::from((Ipv4Addr::UNSPECIFIED, 0)),

@@ -326,7 +326,7 @@ fn malformed_requests_get_400_and_the_connection_is_closed() {
 }
 
 #[test]
-fn size_limits_map_to_431_413_414_505_501() {
+fn size_limits_map_to_400_413_505_501() {
     let srv = TestServer::start(
         echo,
         1,
@@ -340,13 +340,13 @@ fn size_limits_map_to_431_413_414_505_501() {
     let cases: Vec<(String, u16)> = vec![
         (
             format!("GET / HTTP/1.1\r\nHost: t\r\nX: {}\r\n\r\n", "a".repeat(400)),
-            431,
+            400,
         ),
         (
             "GET / HTTP/1.1\r\nHost: t\r\nA: 1\r\nB: 2\r\nC: 3\r\nD: 4\r\nE: 5\r\n\r\n".into(),
-            431,
+            400,
         ),
-        (format!("GET /{} HTTP/1.1\r\nHost: t\r\n\r\n", "a".repeat(400)), 414),
+        (format!("GET /{} HTTP/1.1\r\nHost: t\r\n\r\n", "a".repeat(400)), 400),
         (
             "POST / HTTP/1.1\r\nHost: t\r\nContent-Length: 9\r\n\r\n123456789".into(),
             413,

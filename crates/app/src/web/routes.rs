@@ -8,7 +8,23 @@ use std::sync::Arc;
 use chalkak_core::log::Logger;
 use chalkak_http::{Method, Request, Response, Router};
 
-use super::{ApiError, ApiResult, context, marker};
+use super::{ApiError, ApiResult, context, marker, unreadable_query_response};
+
+/// 요청 파라미터를 읽는(`@RequestParam`·`@ModelAttribute`) GET 핸들러의 경로.
+/// 쿼리에 잘못된 퍼센트 인코딩이 있으면 Tomcat이 파라미터를 읽는 순간 `IllegalStateException`을 던지고,
+/// 처리되지 않은 예외로 500이 된다. 파라미터를 읽지 않는 핸들러(본문만 받는 POST 등)는 영향이 없다.
+/// 원본 컨트롤러에서 해당 인자를 가진 메서드만 모았다(`harness/inventory/endpoints.csv`의 핸들러 기준).
+const PARAM_READERS: [&str; 9] = [
+    "/api/v1/topics",
+    "/api/v1/notifications",
+    "/api/v1/posts",
+    "/api/v1/posts/calendar",
+    "/api/v1/admin/audit-logs",
+    "/api/v1/admin/feedbacks",
+    "/api/v1/admin/posts",
+    "/api/v1/admin/topics",
+    "/api/v1/admin/users",
+];
 
 pub struct Routes {
     router: Router,
@@ -28,8 +44,12 @@ impl Routes {
         F: Fn(&Request) -> ApiResult + Send + Sync + 'static,
     {
         let logger = Arc::clone(&self.logger);
+        let reads_params = method == Method::Get && PARAM_READERS.contains(&pattern);
         self.router = self.router.route(method, pattern, move |req: Request| {
             context::set_route(pattern);
+            if reads_params && req.query_malformed {
+                return unreadable_query_response(&logger, marker::PARAM);
+            }
             let outcome = panic::catch_unwind(AssertUnwindSafe(|| handler(&req)));
             match outcome {
                 Ok(Ok(response)) => response,
@@ -201,5 +221,24 @@ mod tests {
             String::from_utf8(r.body).unwrap(),
             r#"{"errorCode":"INTERNAL_ERROR","message":"서버에서 요청을 처리하지 못했습니다."}"#
         );
+    }
+
+    // TopicController#getTopic(@RequestParam)는 파라미터를 읽다 Tomcat의 예외로 500이 된다.
+    // (java-3 실측: GET /api/v1/topics?date=2026-10-12&x=%zz -> 500 INTERNAL_ERROR)
+    #[test]
+    fn 잘못된_퍼센트_쿼리는_파라미터를_읽는_get만_500으로_만든다() {
+        let router = Routes::new(logger())
+            .get("/api/v1/topics", |_| Ok(Response::new(200)))
+            .get("/other", |_| Ok(Response::new(200)))
+            .post("/api/v1/topics", |_| Ok(Response::new(201)))
+            .into_router();
+        let bad = |method, path: &str| {
+            let mut r = Request::new(method, path);
+            r.query_malformed = true;
+            router.handle(r).status
+        };
+        assert_eq!(bad(Method::Get, "/api/v1/topics"), 500);
+        assert_eq!(bad(Method::Get, "/other"), 200);
+        assert_eq!(bad(Method::Post, "/api/v1/topics"), 201);
     }
 }

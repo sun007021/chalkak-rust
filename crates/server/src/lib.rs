@@ -79,6 +79,8 @@ pub fn build_chain(
             settings.admin_development_bypass,
             Arc::clone(&logger),
         ))
+        // 핸들러에 닿기 전 파서가 거절한 요청은 Tomcat 오류 페이지로 답한다.
+        .on_reject(web::whitelabel::tomcat_page)
 }
 
 /// 관리자 도메인이 쓰는 설정을 `Settings`에서 뽑는다.

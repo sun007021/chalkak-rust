@@ -267,7 +267,7 @@ fn serve_connection(
             Ok(Some(head)) => head,
             Ok(None) => break,
             Err(e) => {
-                reject(&mut conn, &mut writer, &e);
+                reject(handler, &mut conn, &mut writer, &e);
                 break;
             }
         };
@@ -278,7 +278,7 @@ fn serve_connection(
         let body = match conn.read_body(&head, limits) {
             Ok(b) => b,
             Err(e) => {
-                reject(&mut conn, &mut writer, &e);
+                reject(handler, &mut conn, &mut writer, &e);
                 break;
             }
         };
@@ -316,6 +316,7 @@ fn into_request(head: Head, body: Vec<u8>, remote_addr: SocketAddr) -> Request {
         path: head.path,
         raw_path: head.raw_path,
         query: head.query,
+        query_malformed: head.query_malformed,
         headers: head.headers,
         body,
         remote_addr,
@@ -324,10 +325,15 @@ fn into_request(head: Head, body: Vec<u8>, remote_addr: SocketAddr) -> Request {
 }
 
 /// 잘못된 요청에 오류 응답을 쓰고 연결을 정리한다. 응답할 수 없는 오류(연결 끊김)는 조용히 닫는다.
-fn reject(conn: &mut Conn<PollReader>, writer: &mut TcpStream, err: &ParseError) {
+fn reject(
+    handler: &dyn Handler,
+    conn: &mut Conn<PollReader>,
+    writer: &mut TcpStream,
+    err: &ParseError,
+) {
     let Some(status) = err.status() else { return };
     let bytes = serialize(
-        &Response::new(status),
+        &handler.reject(status),
         WriteOptions {
             close: true,
             ..Default::default()

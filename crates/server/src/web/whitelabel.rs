@@ -185,7 +185,10 @@ mod tests {
         let clock = FixedClock::new("2026-10-13T10:02:35Z".parse().unwrap());
         let r = whitelabel(&clock, "en-US", 404, "Not Found");
         assert_eq!(r.status, 404);
-        assert_eq!(r.headers.get("content-type"), Some("text/html;charset=UTF-8"));
+        assert_eq!(
+            r.headers.get("content-type"),
+            Some("text/html;charset=UTF-8")
+        );
         assert_eq!(r.headers.get("content-language"), Some("en-US"));
         let body = String::from_utf8(r.body).unwrap();
         assert_eq!(

@@ -7,6 +7,7 @@
 //! | 컨트롤러 성공 응답(본문이 있는 JSON) | `Content-Type`을 선택한 타입으로 | 406 |
 //! | Spring 예외 응답(400·404·405·415) | 같음 | 같은 상태 코드의 오류 페이지 |
 //! | 도메인·처리되지 않은 예외 응답 | 같음 | 500 오류 페이지(해석 실패면 원래 상태 그대로, 본문 없음) |
+//! | 파라미터 읽기 실패(잘못된 퍼센트 쿼리) | 같음(500) | 400 오류 페이지(해석 실패면 500, 본문 없음) |
 //! | Boot 오류 본문(방화벽, TRACE, `/error`) | 같음 | 같은 상태 코드의 오류 페이지 |
 //! | 액추에이터 응답 | 액추에이터 타입 중 선택 | 406 |
 //!
@@ -113,6 +114,8 @@ enum Kind {
     Handler,
     Boot,
     Actuator,
+    /// 파라미터를 읽다 컨테이너 예외로 실패한 응답([`marker::PARAM`]).
+    Param,
 }
 
 /// 응답을 요청의 `Accept`에 맞춰 바로잡는다. 표지 헤더는 항상 지운다.
@@ -126,6 +129,15 @@ pub fn finish(mut response: Response, wanted: &Wanted, clock: &dyn Clock) -> Res
         Some(marker::HANDLER) => Kind::Handler,
         Some(marker::BOOT) => Kind::Boot,
         Some(marker::ACTUATOR) => Kind::Actuator,
+        Some(marker::PARAM) => Kind::Param,
+        // 액추에이터는 핸들러 매핑의 `produces` 검사가 먼저라 액추에이터 타입을 받지 못하면 406이다.
+        Some(marker::ACTUATOR_PARAM) => {
+            if matches!(wanted.select(&actuator_producible()), Ok(Some(_))) {
+                Kind::Param
+            } else {
+                return finish_actuator(response, wanted, clock);
+            }
+        }
         _ if is_controller_json(&response) => Kind::Success,
         _ => return response,
     };
@@ -243,6 +255,10 @@ fn fail(
         // 해석에 실패한 `Accept`는 오류 디스패치 자체가 실패해 처리기가 정한 상태가 그대로 남는다.
         Kind::Handler if parse_failed => (original.status, Vec::new()),
         Kind::Handler => (500, Vec::new()),
+        // 처리기가 쓰지 못하면 컨테이너가 파라미터 해석 실패로 정해 둔 400이 남는다.
+        // 해석에 실패한 `Accept`로는 `/error` 디스패치가 실패해 처리기의 500이 그대로 남는다.
+        Kind::Param if parse_failed => (original.status, Vec::new()),
+        Kind::Param => (400, Vec::new()),
         Kind::Actuator => (406, Vec::new()),
     };
 
@@ -271,7 +287,9 @@ fn boot_status(kind: Kind, original: &Response) -> Option<u16> {
         return None;
     }
     let v: serde_json::Value = serde_json::from_slice(&original.body).ok()?;
-    v.get("status")?.as_u64().and_then(|s| u16::try_from(s).ok())
+    v.get("status")?
+        .as_u64()
+        .and_then(|s| u16::try_from(s).ok())
 }
 
 fn boot_reason(kind: Kind, original: &Response) -> Option<&'static str> {
@@ -356,13 +374,23 @@ mod tests {
     #[test]
     fn 성공_응답은_타입만_바꾸고_받을_수_없으면_406이다() {
         let c = clock();
-        let r = finish(json(200, None), &wanted("application/json;charset=UTF-8"), &c);
-        assert_eq!(r.headers.get("content-type"), Some("application/json;charset=UTF-8"));
+        let r = finish(
+            json(200, None),
+            &wanted("application/json;charset=UTF-8"),
+            &c,
+        );
+        assert_eq!(
+            r.headers.get("content-type"),
+            Some("application/json;charset=UTF-8")
+        );
         assert_eq!(r.status, 200);
 
         let r = finish(json(200, None), &wanted("text/html"), &c);
         assert_eq!(r.status, 406);
-        assert_eq!(r.headers.get("content-type"), Some("text/html;charset=UTF-8"));
+        assert_eq!(
+            r.headers.get("content-type"),
+            Some("text/html;charset=UTF-8")
+        );
         assert_eq!(r.headers.get("accept"), Some(JSON_ACCEPT));
         assert_eq!(r.headers.get("x-request-id"), Some("r1"));
 
@@ -413,14 +441,62 @@ mod tests {
         let c = clock();
         let r = finish(json(404, Some(marker::HANDLER)), &wanted("text/html"), &c);
         assert_eq!(r.status, 500);
-        assert!(String::from_utf8_lossy(&r.body).contains("type=Internal Server Error, status=500"));
+        assert!(
+            String::from_utf8_lossy(&r.body).contains("type=Internal Server Error, status=500")
+        );
         assert!(r.headers.has_token("connection", "close"));
 
-        let r = finish(json(404, Some(marker::HANDLER)), &wanted("application/xml"), &c);
+        let r = finish(
+            json(404, Some(marker::HANDLER)),
+            &wanted("application/xml"),
+            &c,
+        );
         assert_eq!(summary(&r), (500, None, String::new()));
 
         let r = finish(json(404, Some(marker::HANDLER)), &wanted("bad"), &c);
         assert_eq!(summary(&r), (404, None, String::new()));
+    }
+
+    // java-3: GET /api/v1/topics?date=2026-10-12&x=%zz 에 Accept를 바꿔 보낸 결과
+    #[test]
+    fn 파라미터_읽기_실패는_json이면_500이고_아니면_400_페이지다() {
+        let c = clock();
+        let failed = || json(500, Some(marker::PARAM));
+        let r = finish(failed(), &wanted(""), &c);
+        assert_eq!(summary(&r).0, 500);
+        assert_eq!(r.headers.get("content-type"), Some("application/json"));
+        let r = finish(failed(), &wanted("text/html"), &c);
+        assert_eq!(r.status, 400);
+        assert!(String::from_utf8_lossy(&r.body).contains("type=Bad Request, status=400"));
+        assert!(r.headers.has_token("connection", "close"));
+        let r = finish(failed(), &wanted("application/xml"), &c);
+        assert_eq!(summary(&r), (400, None, String::new()));
+        let r = finish(failed(), &wanted("bad"), &c);
+        assert_eq!(summary(&r), (500, None, String::new()));
+    }
+
+    // java-3: GET /actuator/health?x=%zz 에 Accept를 바꿔 보낸 결과(핸들러 매핑의 produces 검사가 먼저다)
+    #[test]
+    fn 액추에이터_파라미터_읽기_실패는_액추에이터_타입을_받을_때만_500이다() {
+        let c = clock();
+        let failed = || json(500, Some(marker::ACTUATOR_PARAM));
+        for accept in [
+            "",
+            "*/*",
+            "application/json",
+            "text/html, application/json;q=0.5",
+        ] {
+            let r = finish(failed(), &wanted(accept), &c);
+            assert_eq!(r.status, 500, "{accept}");
+        }
+        let r = finish(failed(), &wanted("text/html"), &c);
+        assert_eq!(r.status, 406);
+        assert_eq!(r.headers.get("accept"), Some(ACTUATOR_ACCEPT));
+        let r = finish(failed(), &wanted("application/xml"), &c);
+        assert_eq!(summary(&r), (406, None, String::new()));
+        let r = finish(failed(), &wanted("application/problem+json, text/html"), &c);
+        assert_eq!(r.status, 406);
+        assert!(String::from_utf8_lossy(&r.body).contains("BUSINESS_ERROR"));
     }
 
     #[test]
@@ -453,7 +529,10 @@ mod tests {
         let c = clock();
         let health = || {
             let mut r = Response::new(200)
-                .with_header("Content-Type", "application/vnd.spring-boot.actuator.v3+json")
+                .with_header(
+                    "Content-Type",
+                    "application/vnd.spring-boot.actuator.v3+json",
+                )
                 .with_body(r#"{"status":"UP"}"#);
             r.headers.append(marker::ORIGIN, marker::ACTUATOR);
             r
@@ -464,20 +543,35 @@ mod tests {
                 .get("content-type")
                 .map(str::to_owned)
         };
-        assert_eq!(ct("").as_deref(), Some("application/vnd.spring-boot.actuator.v3+json"));
-        assert_eq!(ct("application/*").as_deref(), Some("application/vnd.spring-boot.actuator.v3+json"));
-        assert_eq!(ct("application/*+json").as_deref(), Some("application/vnd.spring-boot.actuator.v3+json"));
+        assert_eq!(
+            ct("").as_deref(),
+            Some("application/vnd.spring-boot.actuator.v3+json")
+        );
+        assert_eq!(
+            ct("application/*").as_deref(),
+            Some("application/vnd.spring-boot.actuator.v3+json")
+        );
+        assert_eq!(
+            ct("application/*+json").as_deref(),
+            Some("application/vnd.spring-boot.actuator.v3+json")
+        );
         assert_eq!(ct("application/json").as_deref(), Some("application/json"));
         assert_eq!(
             ct("application/json;charset=UTF-8").as_deref(),
             Some("application/json;charset=UTF-8")
         );
-        assert_eq!(ct("text/html,application/json;q=0.5").as_deref(), Some("application/json"));
+        assert_eq!(
+            ct("text/html,application/json;q=0.5").as_deref(),
+            Some("application/json")
+        );
 
         // 받을 수 없으면 406. 처리기가 JSON을 쓸 수 있으면(`+json`) JSON 오류, 아니면 오류 페이지
         let r = finish(health(), &wanted("application/vnd.x+json"), &c);
         assert_eq!(r.status, 406);
-        assert_eq!(r.headers.get("content-type"), Some("application/vnd.x+json"));
+        assert_eq!(
+            r.headers.get("content-type"),
+            Some("application/vnd.x+json")
+        );
         let r = finish(health(), &wanted("text/html"), &c);
         assert_eq!(r.status, 406);
         assert_eq!(r.headers.get("accept"), Some(ACTUATOR_ACCEPT));

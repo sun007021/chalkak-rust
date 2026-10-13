@@ -47,6 +47,15 @@ pub enum ApiError {
     Internal(String),
 }
 
+/// 쿼리에 잘못된 퍼센트 인코딩이 있어 파라미터를 읽다 실패한 요청의 응답. `origin`은 [`marker::PARAM`] 또는
+/// [`marker::ACTUATOR_PARAM`]이다. Tomcat이 던진 `IllegalStateException`이 처리되지 않은 예외로 500이 되는 경로다.
+pub fn unreadable_query_response(logger: &Logger, origin: &str) -> Response {
+    let cause = "잘못된 퍼센트 인코딩이 든 쿼리 파라미터를 읽을 수 없습니다.";
+    let mut response = ApiError::Internal(cause.to_owned()).into_response(logger);
+    response.headers.set(marker::ORIGIN, origin);
+    response
+}
+
 impl ApiError {
     /// 필드 이름이 붙은 메시지(`이름: 문구`)를 만든다.
     fn field_message(field: &str, message: &str) -> String {

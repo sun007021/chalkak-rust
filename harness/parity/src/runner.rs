@@ -380,10 +380,18 @@ fn lookup<'a>(v: &'a Value, path: &str) -> Option<&'a Value> {
         })
 }
 
+/// 보여 줄 차이의 최대 개수. 기본 20, `PARITY_DIFF_MAX`로 늘린다.
+fn diff_limit() -> usize {
+    std::env::var("PARITY_DIFF_MAX")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(20)
+}
+
 /// 두 결과의 첫 차이를 사람이 읽을 수 있게 설명한다. 같으면 None.
 pub fn diff(left: &Value, right: &Value) -> Option<String> {
     fn walk(path: &str, l: &Value, r: &Value, out: &mut Vec<String>) {
-        if out.len() >= 20 {
+        if out.len() >= diff_limit() {
             return;
         }
         match (l, r) {

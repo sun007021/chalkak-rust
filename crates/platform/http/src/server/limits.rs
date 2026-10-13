@@ -5,9 +5,9 @@ use std::time::Duration;
 /// 요청 크기·시간·연결 수 한도. 기본값은 Tomcat(Spring Boot) 기본값에 가깝게 잡았다.
 #[derive(Clone, Debug)]
 pub struct Limits {
-    /// 요청 줄 + 헤더 전체(끝의 빈 줄 포함) 바이트 상한. 넘으면 431(요청 줄만 길면 414).
+    /// 요청 줄 + 헤더 전체(끝의 빈 줄 포함) 바이트 상한. 넘으면 400(Tomcat과 같다).
     pub max_header_bytes: usize,
-    /// 헤더 줄 개수 상한(트레일러 포함). 넘으면 431.
+    /// 헤더 줄 개수 상한(트레일러 포함). 넘으면 400.
     pub max_headers: usize,
     /// 디코딩된 본문 바이트 상한. 넘으면 413.
     pub max_body_bytes: usize,

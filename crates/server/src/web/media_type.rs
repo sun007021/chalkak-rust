@@ -246,9 +246,9 @@ fn check_token(s: &str) -> Result<(), InvalidAccept> {
     if s.is_empty() {
         return Err(InvalidAccept);
     }
-    let ok = s.bytes().all(|b| {
-        (0x21..0x7f).contains(&b) && !b"()<>@,;:\\\"/[]?={}".contains(&b)
-    });
+    let ok = s
+        .bytes()
+        .all(|b| (0x21..0x7f).contains(&b) && !b"()<>@,;:\\\"/[]?={}".contains(&b));
     if ok { Ok(()) } else { Err(InvalidAccept) }
 }
 

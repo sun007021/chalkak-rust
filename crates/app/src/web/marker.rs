@@ -16,6 +16,11 @@ pub const HANDLER: &str = "handler";
 pub const BOOT: &str = "boot";
 /// 액추에이터 응답(자체 미디어 타입 협상을 한다).
 pub const ACTUATOR: &str = "actuator";
+/// 요청 파라미터를 읽다 컨테이너가 예외를 던진 응답(`Request.getParameter`의 `IllegalStateException`).
+/// 처리기가 JSON을 쓰면 500이지만, 쓰지 못하면 컨테이너가 파라미터 해석 실패로 둔 400이 남는다.
+pub const PARAM: &str = "param";
+/// [`PARAM`]과 같되 액추에이터 엔드포인트에서 난 것. 핸들러 매핑의 `produces` 검사가 먼저 돈다.
+pub const ACTUATOR_PARAM: &str = "actuator-param";
 
 /// 협상에 실패했을 때만 실제 헤더가 되는 값. 이름은 `<접두사><원래 헤더 이름>`이다.
 pub const CARRY_PREFIX: &str = "x-chalkak-error-";

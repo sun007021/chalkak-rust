@@ -1,7 +1,8 @@
 //! 퍼센트 디코딩과 쿼리 문자열 파싱.
 //!
 //! 쿼리는 Spring/Tomcat 규칙을 따른다: `+`는 공백, 바이트열은 UTF-8로 해석하고(잘못된 바이트는 U+FFFD),
-//! 잘못된 `%xx`가 든 파라미터는 버린다(Tomcat `Parameters`가 URL 디코딩 실패 파라미터를 건너뛰는 동작).
+//! 잘못된 `%xx`가 든 파라미터는 버리고 쿼리가 망가졌다고 표시한다. Tomcat은 그런 요청에서 파라미터를 읽는 순간
+//! `IllegalStateException`을 던진다(파라미터를 읽지 않는 경로는 영향이 없다).
 //! 경로는 `+`를 그대로 두고, 인코딩된 `/`·`\`·NUL은 거절한다(Tomcat 기본값).
 
 fn hex_val(b: u8) -> Option<u8> {
@@ -57,20 +58,39 @@ pub fn decode_path(s: &str) -> Option<String> {
 /// `a=1&b=%EA%B0%80&c` → `[("a","1"),("b","가"),("c","")]`.
 /// 빈 조각(`&&`)과 이름이 빈 조각은 건너뛴다. 같은 이름은 등장 순서대로 모두 남는다.
 pub fn parse_query(raw: &str) -> Vec<(String, String)> {
+    parse_query_checked(raw).0
+}
+
+/// [`parse_query`]와 같고, 잘못된 퍼센트 인코딩이 있었는지도 돌려준다.
+pub fn parse_query_checked(raw: &str) -> (Vec<(String, String)>, bool) {
     let mut out = Vec::new();
+    let mut malformed = false;
     for pair in raw.split('&') {
         if pair.is_empty() {
             continue;
         }
         let (n, v) = pair.split_once('=').unwrap_or((pair, ""));
-        if n.is_empty() {
+        // 이름이 빈 조각도 디코딩은 시도한다: Tomcat은 `=%zz`에서도 실패한다.
+        let (name, value) = match (decode(n, true, false), decode(v, true, false)) {
+            (Some(n), Some(v)) => (n, v),
+            _ => {
+                malformed = true;
+                continue;
+            }
+        };
+        // UTF-8로 읽을 수 없는 바이트열도 Tomcat은 해석 실패로 본다. 값은 대체 문자로 남긴다.
+        if std::str::from_utf8(&name).is_err() || std::str::from_utf8(&value).is_err() {
+            malformed = true;
+        }
+        if name.is_empty() {
             continue;
         }
-        if let (Some(n), Some(v)) = (decode_query_component(n), decode_query_component(v)) {
-            out.push((n, v));
-        }
+        out.push((
+            String::from_utf8_lossy(&name).into_owned(),
+            String::from_utf8_lossy(&value).into_owned(),
+        ));
     }
-    out
+    (out, malformed)
 }
 
 #[cfg(test)]
@@ -108,6 +128,21 @@ mod tests {
     #[test]
     fn invalid_escape_drops_only_that_pair() {
         assert_eq!(q("a=%zz&b=2&c=%4&d=%"), [p("b", "2")]);
+    }
+
+    #[test]
+    fn invalid_escape_marks_the_query_malformed() {
+        assert!(!parse_query_checked("a=1&b=%EA%B0%80&&c").1);
+        for raw in ["a=%zz", "%zz=1", "a=%4", "a=%", "ok=1&a=%G0", "%"] {
+            assert!(parse_query_checked(raw).1, "{raw}");
+        }
+        // 이름이 빈 조각도 디코딩에 실패하면 망가진 것으로 본다(java-3: `?=%zz` -> 500).
+        assert!(parse_query_checked("=%zz").1);
+        assert!(!parse_query_checked("=ok").1);
+        // UTF-8이 아닌 바이트열(`%FF`, 잘린 다바이트 문자)도 마찬가지다.
+        assert!(parse_query_checked("t=%FF").1);
+        assert!(parse_query_checked("t=%e4%b8").1);
+        assert!(!parse_query_checked("t=%EA%B0%80").1);
     }
 
     #[test]
