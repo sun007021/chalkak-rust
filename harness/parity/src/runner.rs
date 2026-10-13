@@ -76,7 +76,8 @@ fn run_once(target: &Target, scenario: &Scenario) -> Result<Value, String> {
         .epoch as i64;
 
     let mut db = target.db()?;
-    target.set_clock(clock)?;
+    let mut sync = ClockSync::default();
+    sync.ensure(target, clock)?;
     target::reset_db(&mut db, &scenario.setup.sql)?;
 
     let mut norm = Normalizer::new(clock as f64);
@@ -105,8 +106,8 @@ fn run_once(target: &Target, scenario: &Scenario) -> Result<Value, String> {
     let mut steps = Vec::new();
 
     for step in &scenario.steps {
-        // 단계마다 시계를 다시 맞춘다. 구현마다 앞 단계 처리 시간이 달라도 각 단계는 같은 시각에서 출발한다.
-        target.set_clock(clock + app_offset)?;
+        // 각 단계가 같은 시각 칸에서 출발하도록 필요할 때 시계를 다시 맞춘다(ClockSync 참고).
+        sync.ensure(target, clock + app_offset)?;
         if let Some(over) = &step.fakes {
             fakes_spec.merge(over);
         }
@@ -198,6 +199,7 @@ fn run_once(target: &Target, scenario: &Scenario) -> Result<Value, String> {
         Value::Null
     };
     let mut outcome = json!({ "steps": steps, "db": db_state });
+    canonicalize(&mut outcome);
     // 외부 연동을 쓰지 않고 받은 요청도 없는 시나리오는 결과 형식이 이전과 같다(기존 golden 호환).
     if let Some(calls) =
         external_calls.filter(|c| uses_fakes || c.as_array().is_some_and(|a| !a.is_empty()))
@@ -205,6 +207,40 @@ fn run_once(target: &Target, scenario: &Scenario) -> Result<Value, String> {
         outcome["fakes"] = calls;
     }
     Ok(outcome)
+}
+
+/// 앞 단계들이 쓴 시간이 쌓여도 각 단계의 앱 시각이 `시나리오 시각 + CLOCK_LEAD`에서 크게 벗어나지 않게 한다.
+///
+/// 예전에는 단계마다 시계 파일을 다시 쓰고 1.1초씩 기다려서 단계당 약 2초가 들었다(요청 자체는 수 ms~수백 ms).
+/// 지금은 목표 시각이 바뀌었거나(시나리오 시작, `advance_seconds`) 마지막으로 맞춘 뒤 `RESYNC_AFTER`초가 지났을 때만
+/// 다시 맞춘다. 그래서 요청 시점의 앱 시각은 `목표 + CLOCK_LEAD`에서 `RESYNC_AFTER + 앞 요청 처리 시간`
+/// 이내로 늦고, 정규화의 5초 칸 안에 머문다. `PARITY_CLOCK=strict`이면 예전처럼 단계마다 맞춘다.
+#[derive(Default)]
+struct ClockSync {
+    /// (맞춘 목표 시각, 기다림이 끝난 실제 시각)
+    last: Option<(i64, f64)>,
+}
+
+const RESYNC_AFTER: f64 = 1.0;
+
+impl ClockSync {
+    fn ensure(&mut self, target: &Target, epoch: i64) -> Result<(), String> {
+        let fresh = match self.last {
+            Some((at, synced)) => {
+                at == epoch && time::now_epoch() - synced < RESYNC_AFTER && !strict()
+            }
+            None => false,
+        };
+        if !fresh {
+            let synced = target.set_clock(epoch)?;
+            self.last = Some((epoch, synced));
+        }
+        Ok(())
+    }
+}
+
+fn strict() -> bool {
+    std::env::var("PARITY_CLOCK").is_ok_and(|v| v == "strict")
 }
 
 /// 응답에서 본 UUID 기호를 이어서 쓰고, 처음 보는 UUID는 `$uuid?`로 둔 뒤 정렬한다.
@@ -220,7 +256,7 @@ fn db_snapshot(
     for (table, rows) in target::dump(db)? {
         let mut rows: Vec<String> = rows
             .iter()
-            .map(|r| norm.value(r, opaque, "").to_string())
+            .map(|r| sorted_keys(&norm.value(r, opaque, "")).to_string())
             .collect();
         rows.sort();
         if !rows.is_empty() {
@@ -231,6 +267,66 @@ fn db_snapshot(
         }
     }
     Ok(Value::Object(tables))
+}
+
+/// 객체 키를 사전 순으로 다시 넣은 값. serde_json `preserve_order` 기능이 켜지면(워크스페이스 함께 빌드) 맵이 넣은
+/// 순서를 지키고, 꺼지면(parity 단독 빌드) 정렬한다. 문자열로 바꿔 비교하는 DB 행이 빌드 방식에 따라 달라지지 않게 한다.
+pub fn sorted_keys(v: &Value) -> Value {
+    match v {
+        Value::Object(m) => {
+            let mut keys: Vec<&String> = m.keys().collect();
+            keys.sort();
+            Value::Object(
+                keys.into_iter()
+                    .map(|k| (k.clone(), sorted_keys(&m[k])))
+                    .collect(),
+            )
+        }
+        Value::Array(a) => Value::Array(a.iter().map(sorted_keys).collect()),
+        other => other.clone(),
+    }
+}
+
+/// 구현이 정하지 않는 순서를 한 형식으로 맞춘다. 실행 결과와 읽어 들인 golden 모두에 적용해, 형식이 섞여 녹화된
+/// 기존 golden도 지금 결과와 비교할 수 있게 한다.
+/// - DB 행 문자열: 키 정렬 형식으로 바꾸고 행을 다시 정렬한다.
+/// - `Allow` 헤더: 메서드를 정렬한다. Spring은 메서드 집합을 해시 순서로 내보내 JVM 실행마다 순서가 다르다
+///   (2026-10-13, 같은 기준 커밋에서 `GET,HEAD,PATCH,OPTIONS`와 `PATCH,GET,HEAD,OPTIONS`).
+pub fn canonicalize(outcome: &mut Value) {
+    if let Some(Value::Array(steps)) = outcome.get_mut("steps") {
+        for step in steps {
+            let Some(Value::Array(headers)) = step.get_mut("headers") else {
+                continue;
+            };
+            for h in headers {
+                if h.get(0).and_then(Value::as_str) != Some("allow") {
+                    continue;
+                }
+                if let Some(Value::String(v)) = h.get_mut(1) {
+                    let mut methods: Vec<&str> = v.split(',').map(str::trim).collect();
+                    methods.sort_unstable();
+                    *v = methods.join(",");
+                }
+            }
+        }
+    }
+    let Some(Value::Object(tables)) = outcome.get_mut("db") else {
+        return;
+    };
+    for rows in tables.values_mut() {
+        let Value::Array(rows) = rows else { continue };
+        let mut texts: Vec<String> = rows
+            .iter()
+            .map(|r| match r {
+                Value::String(s) => serde_json::from_str::<Value>(s)
+                    .map(|v| sorted_keys(&v).to_string())
+                    .unwrap_or_else(|_| s.clone()),
+                other => other.to_string(),
+            })
+            .collect();
+        texts.sort();
+        *rows = texts.into_iter().map(Value::String).collect();
+    }
 }
 
 fn authorization(
@@ -327,6 +423,27 @@ mod tests {
         let v = json!({"a": [{"b": 1}]});
         assert_eq!(lookup(&v, "a.0.b"), Some(&json!(1)));
         assert_eq!(lookup(&v, "a.1.b"), None);
+    }
+
+    #[test]
+    fn db_행은_키_순서와_무관하게_같은_문자열이_된다() {
+        let mut a = json!({"db": {"t": ["{\"id\":1,\"b\":2,\"a\":{\"z\":1,\"y\":2}}", "{\"a\":0,\"b\":0,\"id\":0}"]}});
+        let mut b = json!({"db": {"t": ["{\"a\":0,\"id\":0,\"b\":0}", "{\"a\":{\"y\":2,\"z\":1},\"b\":2,\"id\":1}"]}});
+        canonicalize(&mut a);
+        canonicalize(&mut b);
+        assert_eq!(a, b);
+        assert_eq!(a["db"]["t"][0], json!("{\"a\":0,\"b\":0,\"id\":0}"));
+    }
+
+    #[test]
+    fn allow_헤더는_메서드를_정렬한다() {
+        let mut v = json!({"steps": [{"headers": [["allow", "PATCH,GET,HEAD,OPTIONS"], ["vary", "b,a"]]}], "db": null});
+        canonicalize(&mut v);
+        assert_eq!(
+            v["steps"][0]["headers"][0][1],
+            json!("GET,HEAD,OPTIONS,PATCH")
+        );
+        assert_eq!(v["steps"][0]["headers"][1][1], json!("b,a"));
     }
 
     #[test]
