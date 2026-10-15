@@ -7,6 +7,8 @@
 #   harness/scripts/perf.sh bench [라운드]     # 번갈아 가며 혼합 부하(고정 RPS, 최대 처리량)와 엔드포인트별 최대 처리량
 #   harness/scripts/perf.sh race [시험이름]    # 동시성·격리 시험(같은 자원 동시 요청, 풀 고갈, 트랜잭션 원자성·가시성, 리프레시·가입 토큰 경쟁) 두 구현
 #                                              #   PERF_RACE_SKIP_SLOW=1이면 풀 고갈 35초 시험을 건너뛴다
+#   harness/scripts/perf.sh stress [java|rust|both] [케이스] [loadgen stress 옵션...]   # 트래픽 급증·연결 폭주·유휴 연결·느린 클라이언트·DB 장애 시험(docs/perf/stress.md)
+#                                              케이스: all, spike[:N], storm[:N], idle[:N], slow, fairness[:N], dbkill, outage, abort  (결과: $PERF_OUT/stress-<대상>.json)
 #   harness/scripts/perf.sh soak <java|rust> <기간>   # 장시간 시험(예: 30m, 24h). 메모리·FD·DB 연결 추세를 1분마다 찍는다
 #   harness/scripts/perf.sh trend <java|rust>  # soak 로그에서 메모리·FD·스레드·DB 연결 누수 추세 판정
 #   harness/scripts/perf.sh report             # 결과 디렉터리를 비교해 게이트 판정(마크다운)
@@ -16,6 +18,8 @@
 #
 # 설정(환경변수): PERF_OUT(결과 디렉터리, 기본 target/perf/latest), PERF_PORT_BASE(기본 21000), PERF_APP_CPUS(2), PERF_APP_MEM(1536m),
 #   PERF_DB_CPUS(1), PERF_CONNS(64), PERF_RPS(300), PERF_DURATION(30), PERF_WARMUP(60), PERF_EP_DURATION(8), PERF_ROUNDS(3),
+#   PERF_PG_PERSIST(1이면 DB를 tmpfs 대신 볼륨에: stress outage의 stop/start에 필요), PERF_APP_NOFILE·PERF_APP_PIDS(앱 컨테이너 nofile·pids 한도),
+#   PERF_STRESS_RPS(stress의 고정 RPS 기준 부하, 기본 60), PERF_STRESS_QUICK(1이면 시간을 3분의 1로: 스모크),
 #   PERF_JAVA_OPTS(JVM 추가 옵션), ORACLE_JAR(기본 /tmp/chalkak-lanes/oracle/app.jar, harness/scripts/oracle-jar.sh로 만든다)
 #
 # 측정 전후 호스트 부하(uptime)를 결과 JSON(load_before/load_after)에 남긴다. 다른 작업이 같은 머신에서 빌드하면 흔들리므로
@@ -37,7 +41,14 @@ CONNS="${PERF_CONNS:-64}" RPS="${PERF_RPS:-300}" DURATION="${PERF_DURATION:-30}"
 EP_DURATION="${PERF_EP_DURATION:-8}" ROUNDS="${PERF_ROUNDS:-3}"
 
 die() { echo "perf: $*" >&2; exit 1; }
-compose() { docker compose -f "$COMPOSE_FILE" "$@"; }
+# PERF_PG_PERSIST=1이면 PostgreSQL 데이터를 tmpfs 대신 볼륨에 둔다(DB 컨테이너를 stop/start하는 stress outage 시험에 필요).
+compose() {
+  local files=(-f "$COMPOSE_FILE")
+  [[ -n "${PERF_PG_PERSIST:-}" ]] && files+=(-f "$ROOT/harness/perf/compose.persist.yaml")
+  # PERF_APP_NOFILE / PERF_APP_PIDS: 앱 컨테이너 nofile·pids 한도(stress에서 한도 실패의 원인을 가를 때)
+  [[ -n "${PERF_APP_NOFILE:-}${PERF_APP_PIDS:-}" ]] && files+=(-f "$ROOT/harness/perf/compose.limits.yaml")
+  docker compose "${files[@]}" "$@"
+}
 port_of() { case $1 in java) echo "$PERF_PORT_JAVA" ;; rust) echo "$PERF_PORT_RUST" ;; *) die "java 또는 rust" ;; esac; }
 db_url() { case $1 in java) echo "host=127.0.0.1 port=$PERF_PORT_PG_JAVA user=chalkak password=test-password dbname=chalkak" ;;
   rust) echo "host=127.0.0.1 port=$PERF_PORT_PG_RUST user=chalkak password=test-password dbname=chalkak" ;; *) die "java 또는 rust" ;; esac; }
@@ -161,6 +172,41 @@ cmd_soak() {
     --out "$OUT/$side/soak.json" | tee "$OUT/$side/soak.log"
 }
 
+# 컨테이너(Docker 브리지)의 IP. 호스트 포트(docker-proxy)를 거치지 않고 서버의 리슨 소켓에 바로 붙으려는 것이다:
+# 연결 폭주 시험이 docker-proxy의 큰 백로그가 아니라 서버 자신의 백로그를 보게 한다.
+container_addr() { # <side>
+  local id ip; id=$(compose ps -q "$1")
+  ip=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$id" 2>/dev/null | awk '{print $1}')
+  if [[ -n "$ip" ]]; then echo "$ip:8080"; else echo "127.0.0.1:$(port_of "$1")"; fi
+}
+
+cmd_stress() { # [java|rust|both] [케이스] [추가 옵션...]
+  local target=${1:-both} cs=${2:-all} sides side
+  shift $(($# > 2 ? 2 : $#)) || true
+  case $target in both) sides="java rust" ;; java | rust) sides=$target ;; *) die "대상은 java|rust|both" ;; esac
+  mkdir -p "$OUT"
+  # 연결을 수천 개 여는 부하 발생기는 FD가 많이 든다. 하드 한도까지 올린다.
+  ulimit -n "$(ulimit -Hn)" 2>/dev/null || true
+  local extra=() mode_args=()
+  [[ -n "${PERF_STRESS_QUICK:-}" ]] && extra+=(--quick)
+  if [[ -z "${PERF_PG_PERSIST:-}" && -z "${PERF_STRESS_OUTAGE_MODE:-}" ]]; then
+    # tmpfs DB는 stop/start에 데이터가 사라진다. pause만 돌린다(둘 다 보려면 PERF_PG_PERSIST=1로 스택을 다시 띄운다).
+    mode_args=(--outage-mode pause)
+  else
+    mode_args=(--outage-mode "${PERF_STRESS_OUTAGE_MODE:-both}")
+  fi
+  for side in $sides; do
+    wait_health "$side"
+    "$LOADGEN" seed --db "$(db_url "$side")" ${PERF_SEED_ARGS:-} >/dev/null
+    echo "=== stress $side: $cs (서버 $(container_addr "$side"), 부하 발생기 nofile $(ulimit -n)) ==="
+    "$LOADGEN" stress --case "$cs" --base "$(container_addr "$side")" --secret "$SECRET" \
+      --db "$(db_url "$side")" --label "$side" \
+      --container "$(compose ps -q "$side")" --db-container "$(compose ps -q "pg-$side")" \
+      --rps "${PERF_STRESS_RPS:-60}" "${mode_args[@]}" "${extra[@]}" \
+      --out "$OUT/stress-$side.json" "$@" || true
+  done
+}
+
 cmd_report() {
   "$LOADGEN" report --dir "$OUT" --out "$OUT/report.md"
 }
@@ -173,6 +219,7 @@ case "${1:-}" in
   bench) shift; cmd_bench "$@" ;;
   race) shift; cmd_race "$@" ;;
   soak) shift; cmd_soak "$@" ;;
+  stress) shift; cmd_stress "$@" ;;
   report) cmd_report ;;
   trend) shift; "$LOADGEN" trend --log "$OUT/${1:?java|rust}/soak.log" ;;
   run) shift; side=${1:?java|rust}; file=${2:?파일명}; shift 2; run_one "$side" "$file" "$@" ;;
