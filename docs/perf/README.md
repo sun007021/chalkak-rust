@@ -1,13 +1,13 @@
 # 성능·동시성·장시간 시험
 
 [전환 계획 4.5](../plan/migration-plan.md#45-성능-검증)의 성능 검증을 재현하는 방법이다. 결과는 날짜별 보고서
-(`report-*.md`)에 있다. 장시간(24시간) 시험 절차는 [soak-24h.md](soak-24h.md)에 있다.
+(`report-*.md`)에 있다. 장시간(24시간) 시험 절차는 [soak-24h.md](soak-24h.md), 트래픽이 몰릴 때의 서버·풀 안정성 시험은 [stress.md](stress.md)에 있다.
 
 ## 구성
 
 | 경로 | 내용 |
 | --- | --- |
-| `harness/loadgen/` | 부하 발생기(`chalkak-loadgen`). 스레드와 블로킹 소켓만 쓴다(tokio 없음). `seed`, `run`, `sql`, `race`, `report` 명령 |
+| `harness/loadgen/` | 부하 발생기(`chalkak-loadgen`). 스레드와 블로킹 소켓만 쓴다(tokio 없음). `seed`, `run`, `sql`, `race`, `stress`, `report` 명령 |
 | `harness/perf/compose.yaml` | Java·Rust·각자의 PostgreSQL·가짜 서버. **libfaketime 없음**(실제 시계). 하네스 lane과 별개의 스택 |
 | `harness/scripts/perf.sh` | 스택 기동, 시드, 번갈아 가며 측정, SQL 수 측정, 동시성·장시간 시험, 보고서 |
 
@@ -28,6 +28,7 @@ harness/scripts/perf.sh up              # 릴리스 빌드 -> 스택 기동 -> �
 harness/scripts/perf.sh startup 3       # 재시작 3번씩 기동 시간
 harness/scripts/perf.sh sql             # 시드를 다시 넣고 엔드포인트별 요청당 SQL 수·DB 시간
 harness/scripts/perf.sh bench 5         # 5라운드. 라운드마다 Java/Rust 순서를 바꾼다
+harness/scripts/perf.sh stress both     # 트래픽 급증·연결 폭주·유휴 연결·느린 클라이언트·DB 장애 시험(stress.md)
 harness/scripts/perf.sh race            # 동시성 시험(같은 자원 동시 수정·좋아요·검수, 풀 고갈과 회복)
 harness/scripts/perf.sh report          # 게이트 판정과 표 -> $PERF_OUT/report.md
 harness/scripts/perf.sh soak rust 30m   # 장시간 시험

@@ -16,7 +16,7 @@
 | `scripts/check.sh` | **기본 진입점.** 빌드 → lane 준비 → 시나리오를 lane에 나눠 병렬 실행(`verify`·`compare`·`record`) |
 | `scripts/lane.sh`, `lane/compose.yaml` | lane(서로 섞이지 않는 비교 대상 하나) 띄우기·목록·정리 |
 | `scripts/oracle-jar.sh` | Java lane이 쓰는 원본 JAR(`BASELINE` 커밋)을 호스트에서 빌드 |
-| `loadgen/`, `perf/`, `scripts/perf.sh` | 성능·동시성·장시간 시험: 부하 발생기(`chalkak-loadgen`)와, libfaketime 없는 Java 대 Rust 비교 스택. 사용법은 [docs/perf/README.md](../docs/perf/README.md) |
+| `loadgen/`, `perf/`, `scripts/perf.sh` | 성능·동시성·장시간·스트레스(트래픽 급증·연결 폭주·DB 장애) 시험: 부하 발생기(`chalkak-loadgen`)와, libfaketime 없는 Java 대 Rust 비교 스택. 사용법은 [docs/perf/README.md](../docs/perf/README.md) |
 | `scripts/up.sh`, `down.sh` | 예전 고정 환경(java-a·java-b·rust 한 벌) 기동·정리. 서비스 정의는 저장소 루트 `compose.yaml` |
 | `scripts/collect-sql.sh` | Java oracle이 시나리오를 처리하는 동안 보낸 SQL을 `pg_stat_statements`로 모아 저장 |
 | `scripts/collect-openapi.sh` | Java oracle의 `/v3/api-docs`(springdoc) 저장 |
