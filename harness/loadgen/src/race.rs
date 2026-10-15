@@ -18,11 +18,18 @@ use crate::run_cmd::{connect_db, db_err};
 use crate::sql;
 use crate::token::{Scope, Signer, user_uuid};
 
+mod isolation;
+
+#[derive(Clone)]
 struct Env {
     addr: SocketAddr,
     signer: Arc<Signer>,
     db_url: String,
     admin_id: String,
+    /// 가짜 외부 서버(S3 HeadObject 응답 지정용). 없으면 가입 시험을 건너뛴다.
+    fakes: Option<SocketAddr>,
+    /// 회원가입 토큰 서명 키(`SOCIAL_SIGNUP_TOKEN_SECRET`의 바이트). 없으면 가입 시험을 건너뛴다.
+    signup_key: Option<Arc<Vec<u8>>>,
 }
 
 #[derive(Clone)]
@@ -64,12 +71,7 @@ fn fire(env: &Env, calls: Vec<Call>) -> Vec<u16> {
         .into_iter()
         .map(|call| {
             let barrier = Arc::clone(&barrier);
-            let env = Env {
-                addr: env.addr,
-                signer: Arc::clone(&env.signer),
-                db_url: env.db_url.clone(),
-                admin_id: env.admin_id.clone(),
-            };
+            let env = env.clone();
             thread::spawn(move || {
                 let mut client = Client::new(env.addr, true);
                 // 연결을 미리 맺어 두고(요청은 보내지 않는다: 헬스체크도 풀 연결을 쓴다) 동시에 보낸다.
@@ -102,6 +104,12 @@ struct Case {
     failures: Vec<String>,
     statuses: BTreeMap<String, usize>,
     detail: Value,
+    /// 끝난 뒤 DB 상태 중 요청 순서와 무관하게 정해지는 값. Java와 Rust의 보고서 대조(`report`)가 이 값을 비교한다.
+    state: Value,
+    /// 상태 코드 분포가 요청 순서와 무관하게 정해지는 시험이면 참. 보고서가 두 구현의 분포를 비교한다.
+    compare_statuses: bool,
+    /// 두 구현의 결과가 달라도 알려진 차이면 그 설명(보고서가 다름으로 표시하되 게이트에서 뺀다).
+    known_diff: Option<&'static str>,
     millis: u128,
 }
 
@@ -112,7 +120,17 @@ impl Case {
             failures: Vec::new(),
             statuses: BTreeMap::new(),
             detail: Value::Null,
+            state: Value::Null,
+            compare_statuses: false,
+            known_diff: None,
             millis: 0,
+        }
+    }
+
+    /// 상태 코드를 합치기만 한다(5xx를 실패로 세지 않는다). 실패가 정답인 시험(트리거로 일부러 터뜨리는 원자성 시험)이 쓴다.
+    fn record(&mut self, statuses: &[u16]) {
+        for (k, v) in tally(statuses) {
+            *self.statuses.entry(k).or_insert(0) += v;
         }
     }
 
@@ -134,6 +152,9 @@ impl Case {
             "failures": self.failures,
             "statuses": self.statuses,
             "detail": self.detail,
+            "state": self.state,
+            "compare_statuses": self.compare_statuses,
+            "known_diff": self.known_diff,
             "millis": self.millis,
         })
     }
@@ -597,12 +618,7 @@ fn pool_exhaustion(env: &Env, hold: Duration, name: &'static str) -> Case {
 }
 
 fn clone_env(env: &Env) -> Env {
-    Env {
-        addr: env.addr,
-        signer: Arc::clone(&env.signer),
-        db_url: env.db_url.clone(),
-        admin_id: env.admin_id.clone(),
-    }
+    env.clone()
 }
 
 pub fn command(args: &Args) -> Result<u8, String> {
@@ -630,11 +646,27 @@ pub fn command(args: &Args) -> Result<u8, String> {
             )
         })?
         .get(0);
+    let fakes = match args.str("fakes") {
+        Some(f) => Some(
+            f.trim_start_matches("http://")
+                .to_socket_addrs()
+                .map_err(|e| format!("{f}: {e}"))?
+                .next()
+                .ok_or("가짜 서버 주소가 없습니다")?,
+        ),
+        None => None,
+    };
+    let signup_key = match args.str("signup-secret") {
+        Some(hex) => Some(Arc::new(crate::token::hex_decode(hex)?)),
+        None => None,
+    };
     let env = Env {
         addr,
         signer,
         db_url,
         admin_id,
+        fakes,
+        signup_key,
     };
 
     let only = args.str("only");
@@ -651,6 +683,14 @@ pub fn command(args: &Args) -> Result<u8, String> {
         ("moderate-vs-owner-update", moderate_vs_update),
         ("feedback-burst", feedback_burst),
     ];
+    let scenarios: Vec<(&str, Scenario)> = scenarios
+        .into_iter()
+        .chain(isolation::scenarios())
+        .collect();
+    // 앞선 실행이 중간에 죽어 남긴 격리 시험 트리거를 먼저 치운다(다음 시험이 영향받지 않게).
+    if let Err(e) = isolation::purge_leftovers(&mut db) {
+        eprintln!("격리 시험 잔여물 정리 실패: {e}");
+    }
     let mut cases = Vec::new();
     for (name, f) in scenarios {
         if only.is_some_and(|o| o != name) {

@@ -42,6 +42,22 @@ pub fn hex_decode(s: &str) -> Result<Vec<u8>, String> {
         .collect()
 }
 
+/// 헤더 `{"typ":"JWT","alg":"HS256"}`에 `payload`를 HS256으로 서명한 JWT. 회원가입 토큰처럼 액세스 토큰이 아닌 클레임에 쓴다.
+pub fn hs256_jwt(key: &[u8], payload: &serde_json::Value) -> String {
+    let header = r#"{"typ":"JWT","alg":"HS256"}"#;
+    let signing_input = format!(
+        "{}.{}",
+        base64url(header.as_bytes()),
+        base64url(payload.to_string().as_bytes())
+    );
+    let mut mac = Hmac::<Sha256>::new_from_slice(key).expect("HMAC은 모든 키 길이를 받는다");
+    mac.update(signing_input.as_bytes());
+    format!(
+        "{signing_input}.{}",
+        base64url(&mac.finalize().into_bytes())
+    )
+}
+
 pub struct Signer {
     key: Vec<u8>,
 }

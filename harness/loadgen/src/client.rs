@@ -20,7 +20,7 @@ pub struct Response {
     pub body_head: Vec<u8>,
 }
 
-const KEEP: usize = 512;
+const KEEP: usize = 4096;
 
 pub struct Client {
     addr: SocketAddr,
