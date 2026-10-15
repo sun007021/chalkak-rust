@@ -64,6 +64,12 @@ target/release/chalkak-loadgen list     # 엔드포인트 이름과 비율
 - 2026-10-13 결과는 호스트가 포화라 `PERF_RPS=40`으로 잰 값이다.
 - 토큰은 하네스와 같은 HS256 형식으로 직접 만든다(`ACCESS_TOKEN_SECRET`만 알면 된다). 시드는 DB에 직접 넣는다.
 
+## 트랜잭션 모양 비교
+
+동시성·격리 검증의 전제로, Java와 Rust가 같은 요청에서 같은 트랜잭션 경계·잠금·격리 수준으로 DB를 쓰는지 하네스 시나리오
+전체에 대해 비교한다: `harness/scripts/check.sh txshape`. 사용법과 판정 규칙은
+[harness/README.md](../../harness/README.md#트랜잭션-모양-비교txshape), 결과는 [results/2026-10-15/txshape.md](results/2026-10-15/txshape.md).
+
 ## 부하 구성
 
 실제 운영 호출 수는 아직 없다(배포 전). 앱 화면 흐름에서 비율을 가정했다. `harness/loadgen/src/mix.rs`의 `WEIGHTS`에서 바꾼다.

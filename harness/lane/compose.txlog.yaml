@@ -1,0 +1,6 @@
+# TXLOG=1로 띄우는 lane에 겹치는 설정: DB 문장 로그를 호스트 디렉터리(<lane 디렉터리>/pglog)에 파일로 쓴다.
+# 앱이 보낸 문장의 트랜잭션 모양을 읽는 `parity txshape`가 쓴다. 직접 쓰지 않고 harness/scripts/lane.sh가 겹친다.
+services:
+  pg:
+    volumes:
+      - ${LANE_DIR}/pglog:/pglog

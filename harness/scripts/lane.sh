@@ -5,7 +5,9 @@
 #   harness/scripts/lane.sh up rust [개수]    # 이 작업 트리의 target/release 바이너리로 Rust lane을 띄운다(기본 1개)
 #   harness/scripts/lane.sh up java [개수]    # 원본 JAR로 Java oracle lane을 띄운다. 작업 트리와 무관하게 모두가 함께 쓴다
 #   harness/scripts/lane.sh restart rust      # 이 작업 트리의 Rust lane 앱만 다시 띄운다(cargo build 후)
-#   harness/scripts/lane.sh targets rust|java # 쓸 수 있는 lane의 대상 설정 경로를 쉼표로 잇는다(parity --target 값)
+#   harness/scripts/lane.sh targets rust|java [--txlog]
+#                                             # 쓸 수 있는 lane의 대상 설정 경로를 쉼표로 잇는다(parity --target 값).
+#                                             # --txlog이면 TXLOG=1로 띄운 lane만(parity txshape용)
 #   harness/scripts/lane.sh ls
 #   harness/scripts/lane.sh down rust|java|<lane 이름>|all
 #
@@ -13,6 +15,10 @@
 # 사용 중 잠금 lock(parity가 실행 동안 잡는다), Rust lane이면 주인 작업 트리 owner.
 # Rust lane은 그 lane을 띄운 작업 트리의 바이너리를 마운트하므로 그 작업 트리만 쓴다(targets rust가 거른다).
 # Java lane은 기준 커밋이 같으면 누구나 쓴다. parity가 lane 잠금을 잡으므로 여러 작업이 같은 Java lane을 동시에 쓰지 않는다.
+#
+# TXLOG=1 harness/scripts/lane.sh up rust|java [개수]: DB 문장 로그를 켠 lane(`log_statement=all`, 세션·application_name 등을
+#   줄 머리에 붙여 <lane 디렉터리>/pglog/postgres.log에 쓴다). 로그가 늘어나므로 평소 lane은 끄고 `parity txshape`가 쓸
+#   때만 켠다. target.toml에 pg_log_file이 들어가고 lane 디렉터리에 txlog 표시 파일이 생긴다.
 #
 # 포트: lane 번호 N마다 20000+N*10 (앱), +1 (DB), +2 (가짜 서버). 번호는 잠금 아래에서 비어 있는 가장 작은 수로 정한다.
 #
@@ -41,9 +47,21 @@ lane_env() { # <이름> <번호> <종류>
   export LANE_JAVA_JAR="$ORACLE_JAR"
 }
 
+# TXLOG=1로 띄운 lane인가(lane 디렉터리의 표시 파일).
+is_txlog() { [[ -f "$LANES_DIR/$1/txlog" ]]; }
+
+# 문장 로그를 켜는 변수(TXLOG lane). 줄 머리: 세션 id|application_name|사용자|트랜잭션 id|가상 트랜잭션 id|시각|
+# (harness/parity/src/txlog.rs가 읽는다)
+txlog_env() {
+  export LANE_PG_LOG_STATEMENT=all LANE_PG_LOGGING_COLLECTOR=on LANE_PG_LOG_DIR=/pglog
+  export LANE_PG_LOG_PREFIX='@@%c|%a|%u|%x|%v|%m|'
+}
+
 compose() { # <종류> 인자...
   local kind=$1; shift
-  docker compose -f "$COMPOSE_FILE" --profile "$kind" "$@"
+  local files=(-f "$COMPOSE_FILE")
+  [[ -n "${LANE_PG_LOG_STATEMENT:-}" ]] && files+=(-f "$ROOT/harness/lane/compose.txlog.yaml")
+  docker compose "${files[@]}" --profile "$kind" "$@"
 }
 
 used_numbers() {
@@ -51,10 +69,11 @@ used_numbers() {
 }
 
 # lane 이름 목록(종류별). Rust는 이 작업 트리 것만.
-lanes_of() { # <종류>
-  local kind=$1
+lanes_of() { # <종류> [--txlog]
+  local kind=$1 only_txlog=${2:-}
   for d in "$LANES_DIR"/"$kind"-*/; do
     [[ -f "$d/target.toml" ]] || continue
+    [[ $only_txlog == --txlog && ! -f "$d/txlog" ]] && continue
     if [[ $kind == rust && "$(cat "$d/owner" 2>/dev/null)" != "$ROOT" ]]; then continue; fi
     basename "$d"
   done
@@ -74,6 +93,9 @@ fakes_url = "http://127.0.0.1:$((base + 2))"
 lock_file = "$LANES_DIR/$name/lock"
 clock_settle_ms = $settle
 EOF
+  if is_txlog "$name"; then
+    echo "pg_log_file = \"$LANES_DIR/$name/pglog/postgres.log\"" >> "$LANES_DIR/$name/target.toml"
+  fi
 }
 
 check_inputs() { # <종류>
@@ -108,6 +130,12 @@ cmd_up() { # <종류> [개수]
     echo "+0" > "$LANES_DIR/$name/clock"
     chmod a+r "$LANES_DIR/$name/clock"
     [[ $kind == rust ]] && echo "$ROOT" > "$LANES_DIR/$name/owner"
+    if [[ "${TXLOG:-}" == 1 ]]; then
+      # postgres 사용자(uid 999)가 쓸 수 있어야 한다.
+      mkdir -p "$LANES_DIR/$name/pglog"
+      chmod 777 "$LANES_DIR/$name/pglog"
+      touch "$LANES_DIR/$name/txlog"
+    fi
     names+=("$name")
   done
   flock -u 9
@@ -116,6 +144,7 @@ cmd_up() { # <종류> [개수]
   for name in "${names[@]}"; do
     (
       lane_env "$name" "$(cat "$LANES_DIR/$name/number")" "$kind"
+      if is_txlog "$name"; then txlog_env; fi
       compose "$kind" up -d --wait --quiet-pull >"$LANES_DIR/$name/up.log" 2>&1 \
         || { cat "$LANES_DIR/$name/up.log" >&2; exit 1; }
       write_target "$name" "$kind" "$(cat "$LANES_DIR/$name/number")"
@@ -132,6 +161,7 @@ cmd_restart() { # rust
   local kind=${1:-rust} name
   for name in $(lanes_of "$kind"); do
     (lane_env "$name" "$(cat "$LANES_DIR/$name/number")" "$kind"
+     if is_txlog "$name"; then txlog_env; fi
      compose "$kind" up -d --wait --force-recreate --no-deps "$kind" >/dev/null 2>&1) &
   done
   wait
@@ -139,7 +169,7 @@ cmd_restart() { # rust
 
 cmd_targets() { # <종류>
   local out=()
-  for name in $(lanes_of "${1:?종류}"); do out+=("$LANES_DIR/$name/target.toml"); done
+  for name in $(lanes_of "${1:?종류}" "${2:-}"); do out+=("$LANES_DIR/$name/target.toml"); done
   local IFS=,
   echo "${out[*]}"
 }
@@ -152,6 +182,7 @@ cmd_ls() {
     name=$(basename "$d"); n=$(cat "$d/number")
     owner=$(cat "$d/owner" 2>/dev/null || echo "(공용)")
     if [[ -f "$d/target.toml" ]]; then state=ready; else state=starting; fi
+    [[ -f "$d/txlog" ]] && state="$state+txlog"
     if [[ -f "$d/lock" ]] && ! flock -n "$d/lock" true 2>/dev/null; then state=busy; fi
     printf "%-10s %-6s %-40s %s\n" "$name" "$((20000 + n * 10))" "$owner" "$state"
   done

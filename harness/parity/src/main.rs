@@ -23,9 +23,13 @@ mod idtoken;
 mod normalize;
 mod runner;
 mod scenario;
+mod sqlsig;
 mod target;
 mod time;
 mod token;
+mod tracer;
+mod txlog;
+mod txshape;
 
 use scenario::Scenario;
 use std::fs::File;
@@ -94,6 +98,87 @@ fn run(args: &[String]) -> Result<bool, String> {
                 l.reset_clock();
                 r.reset_clock();
             }
+            result
+        }
+        "txshape" => {
+            let lefts = load_targets(opt(args, "--java").ok_or("--java가 필요합니다")?)?;
+            let rights = load_targets(opt(args, "--rust").ok_or("--rust가 필요합니다")?)?;
+            let (lefts, _l) = acquire(&lefts)?;
+            let (rights, _r) = acquire(&rights)?;
+            let workers: Vec<(&Target, &Target)> = lefts.into_iter().zip(rights).collect();
+            let shapes: Mutex<Vec<(usize, txshape::ScenarioShape)>> = Mutex::new(Vec::new());
+            let result = pool("모양", &scenarios, &workers, |&(java, rust), s| {
+                let (j, r) = if java.fakes_url.is_some() && java.fakes_url == rust.fakes_url {
+                    let j = runner::run_traced(java, s);
+                    (j, runner::run_traced(rust, s))
+                } else {
+                    std::thread::scope(|t| {
+                        let h = t.spawn(|| runner::run_traced(java, s));
+                        let r = runner::run_traced(rust, s);
+                        (
+                            h.join().unwrap_or_else(|_| Err("작업 스레드 패닉".into())),
+                            r,
+                        )
+                    })
+                };
+                let ((jv, jt), (rv, rt)) = (j?, r?);
+                let steps: Vec<txshape::StepShape> = s
+                    .steps
+                    .iter()
+                    .enumerate()
+                    .map(|(i, st)| {
+                        let j = jt.get(i).cloned().unwrap_or_default();
+                        let r = rt.get(i).cloned().unwrap_or_default();
+                        let cmp = txshape::compare_step(&j, &r);
+                        txshape::StepShape {
+                            name: st.name.clone(),
+                            java: j,
+                            rust: r,
+                            cmp,
+                        }
+                    })
+                    .collect();
+                let shape = txshape::ScenarioShape {
+                    key: key(s),
+                    name: s.name.clone(),
+                    response_diff: runner::diff(&jv, &rv).is_some(),
+                    steps,
+                };
+                let different: Vec<String> = shape
+                    .steps
+                    .iter()
+                    .filter(|st| st.cmp.verdict == txshape::Verdict::Different)
+                    .map(|st| format!("  {}: {}", st.name, st.cmp.reasons.join(" / ")))
+                    .collect();
+                let raw = shape.raw_text();
+                std::fs::write(out_dir.join(format!("{}.txshape.txt", key(s))), raw)
+                    .map_err(|e| e.to_string())?;
+                shapes.lock().unwrap_or_else(|e| e.into_inner()).push((
+                    scenarios.iter().position(|x| x.path == s.path).unwrap_or(0),
+                    shape,
+                ));
+                Ok((!different.is_empty()).then(|| different.join("\n")))
+            });
+            for (l, r) in &workers {
+                l.reset_clock();
+                r.reset_clock();
+            }
+            let mut shapes = shapes.into_inner().unwrap_or_else(|e| e.into_inner());
+            shapes.sort_by_key(|(i, _)| *i);
+            let shapes: Vec<txshape::ScenarioShape> = shapes.into_iter().map(|(_, s)| s).collect();
+            let out = PathBuf::from(opt(args, "--out").unwrap_or("harness/out/txshape.md"));
+            if let Some(dir) = out.parent() {
+                std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
+            }
+            let mut header: Vec<String> = opt(args, "--note")
+                .map(|n| vec![n.to_string()])
+                .unwrap_or_default();
+            if let Some(path) = opt(args, "--note-file") {
+                header.push(std::fs::read_to_string(path).map_err(|e| format!("{path}: {e}"))?);
+            }
+            std::fs::write(&out, txshape::render_markdown(&shapes, &header))
+                .map_err(|e| format!("{}: {e}", out.display()))?;
+            println!("\n표: {}", out.display());
             result
         }
         "record" => {

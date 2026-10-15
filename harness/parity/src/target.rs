@@ -24,6 +24,8 @@ pub struct Target {
     pub lock_file: Option<PathBuf>,
     /// 시계 파일을 바꾼 뒤 기다리는 시간(ms). 생략하면 `PARITY_CLOCK_SETTLE_MS` 또는 1100.
     pub clock_settle_ms: Option<u64>,
+    /// lane DB가 문장 로그를 쓰는 파일(호스트 경로). `TXLOG=1`로 띄운 lane에만 있다(`txshape` 명령이 읽는다).
+    pub pg_log_file: Option<PathBuf>,
 }
 
 impl Target {
@@ -96,7 +98,13 @@ impl Target {
     }
 
     pub fn db(&self) -> Result<postgres::Client, String> {
-        postgres::Client::connect(&self.db_url, postgres::NoTls)
+        // 앱이 보낸 문장과 하네스 문장을 DB 문장 로그에서 구분하게 application_name을 붙인다(txshape).
+        let url = format!(
+            "{} application_name={}",
+            self.db_url,
+            crate::txlog::HARNESS_APP
+        );
+        postgres::Client::connect(&url, postgres::NoTls)
             .map_err(|e| format!("[{}] DB 연결 실패: {e}", self.name))
     }
 }

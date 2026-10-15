@@ -48,6 +48,25 @@ services:
       - pg_stat_statements.track=all
       - -c
       - pg_stat_statements.max=10000
+      # 문장 로그(기본 꺼짐). TXLOG=1로 lane을 띄우면 lane.sh가 아래 변수를 채우고 compose.txlog.yaml을 겹친다.
+      # 꺼져 있을 때의 값은 PostgreSQL 기본값이라 기존 동작과 같다.
+      - -c
+      - log_statement=${LANE_PG_LOG_STATEMENT:-none}
+      - -c
+      - log_line_prefix=${LANE_PG_LOG_PREFIX:-%m [%p] }
+      - -c
+      - logging_collector=${LANE_PG_LOGGING_COLLECTOR:-off}
+      - -c
+      - log_directory=${LANE_PG_LOG_DIR:-log}
+      - -c
+      - log_filename=postgres.log
+      - -c
+      - log_rotation_age=0
+      - -c
+      - log_rotation_size=0
+      # 호스트의 다른 사용자(하네스를 돌리는 사람)도 읽게 한다.
+      - -c
+      - log_file_mode=0644
     environment:
       POSTGRES_DB: chalkak
       POSTGRES_USER: chalkak
