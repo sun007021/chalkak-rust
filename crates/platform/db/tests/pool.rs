@@ -191,3 +191,146 @@ fn close_rejects_new_borrows() {
     pool.close();
     assert!(matches!(pool.get(), Err(DbError::PoolClosed)));
 }
+
+// ---- 빈자리 백그라운드 채우기(HikariCP `closeConnection` -> `fillPool`) ----
+
+/// 관리용 연결(테스트 DB가 아니라 `CHALKAK_TEST_DB_URL`이 가리키는 기본 DB).
+fn admin() -> postgres::Client {
+    let url = std::env::var(common::ENV_URL).unwrap();
+    let pg: postgres::Config = url.parse().unwrap();
+    pg.connect(postgres::NoTls).unwrap()
+}
+
+/// 풀이 테스트 DB에 맺어 둔 연결 수(관리 연결은 제외).
+fn backends(admin: &mut postgres::Client, db: &str) -> i64 {
+    admin
+        .query_one(
+            "select count(*) from pg_stat_activity where datname = $1 and pid <> pg_backend_pid()",
+            &[&db],
+        )
+        .unwrap()
+        .get(0)
+}
+
+fn terminate_all(admin: &mut postgres::Client, db: &str) {
+    admin
+        .execute(
+            "select pg_terminate_backend(pid) from pg_stat_activity \
+             where datname = $1 and pid <> pg_backend_pid()",
+            &[&db],
+        )
+        .unwrap();
+}
+
+/// 조건이 될 때까지 `limit` 동안 기다린다.
+fn wait_until(limit: Duration, mut cond: impl FnMut() -> bool) -> bool {
+    let end = Instant::now() + limit;
+    while Instant::now() < end {
+        if cond() {
+            return true;
+        }
+        thread::sleep(Duration::from_millis(50));
+    }
+    cond()
+}
+
+#[test]
+fn pool_refills_in_background_after_all_connections_are_killed() {
+    let Some(db) = TestDb::create() else { return };
+    let mut admin = admin();
+    let pool = Pool::connect(&db.config, 5).unwrap();
+    assert_eq!(backends(&mut admin, &db.name), 5);
+
+    terminate_all(&mut admin, &db.name);
+    thread::sleep(Duration::from_millis(700)); // alive_bypass_window를 넘겨 검사가 돌게 한다.
+    // 버림을 일으키는 요청 한 번. 끊긴 유휴 연결을 모두 걸러내고 하나는 직접 맺는다.
+    drop(pool.get());
+
+    // 추가 요청 없이 풀이 크기만큼 다시 채워져야 한다.
+    let refilled = wait_until(Duration::from_secs(5), || {
+        let s = pool.stats();
+        s.total == 5 && s.idle == 5
+    });
+    assert!(refilled, "풀이 채워지지 않음: {:?}", pool.stats());
+    assert_eq!(backends(&mut admin, &db.name), 5);
+}
+
+#[test]
+fn pool_refills_by_retrying_while_database_refuses_connections() {
+    let Some(db) = TestDb::create() else { return };
+    let mut admin = admin();
+    let mut config = db.config.clone();
+    config.connection_timeout = Duration::from_millis(400);
+    let pool = Pool::connect(&config, 3).unwrap();
+
+    admin
+        .batch_execute(&format!(
+            "alter database {} allow_connections false",
+            db.name
+        ))
+        .unwrap();
+    terminate_all(&mut admin, &db.name);
+    thread::sleep(Duration::from_millis(700));
+    // 접속이 거부되는 동안의 요청은 실패한다(버림만 일으키면 된다).
+    assert!(pool.get().is_err());
+    thread::sleep(Duration::from_millis(600));
+    assert_eq!(pool.stats().total, 0, "거부되는 동안에는 채워질 수 없다");
+    assert_eq!(backends(&mut admin, &db.name), 0);
+
+    admin
+        .batch_execute(&format!(
+            "alter database {} allow_connections true",
+            db.name
+        ))
+        .unwrap();
+    // 재시도 간격은 250ms에서 시작해 늘어난다. 몇 초 안에 채워져야 한다.
+    let refilled = wait_until(Duration::from_secs(8), || {
+        let s = pool.stats();
+        s.total == 3 && s.idle == 3
+    });
+    assert!(refilled, "재시도로 채워지지 않음: {:?}", pool.stats());
+    assert_eq!(backends(&mut admin, &db.name), 3);
+}
+
+#[test]
+fn refill_never_exceeds_pool_size_while_borrowers_compete() {
+    let Some(db) = TestDb::create() else { return };
+    let mut admin = admin();
+    let pool = Pool::connect(&db.config, 4).unwrap();
+    terminate_all(&mut admin, &db.name);
+    thread::sleep(Duration::from_millis(700));
+
+    // 채우기와 get의 직접 맺기가 경쟁해도 total은 size를 넘지 않고 모든 get이 연결을 받는다.
+    let workers: Vec<_> = (0..12)
+        .map(|_| {
+            let pool = pool.clone();
+            thread::spawn(move || {
+                for _ in 0..20 {
+                    let mut conn = pool.get().unwrap();
+                    let _: i32 = conn.query_one("select 1", &[]).unwrap().get(0);
+                    assert!(pool.stats().total <= 4);
+                }
+            })
+        })
+        .collect();
+    for w in workers {
+        w.join().unwrap();
+    }
+    assert!(wait_until(Duration::from_secs(5), || pool.stats().idle == 4));
+    assert_eq!(backends(&mut admin, &db.name), 4);
+}
+
+#[test]
+fn dropping_the_pool_stops_the_refill_thread() {
+    let Some(db) = TestDb::create() else { return };
+    let mut admin = admin();
+    let pool = Pool::connect(&db.config, 3).unwrap();
+    terminate_all(&mut admin, &db.name);
+    thread::sleep(Duration::from_millis(700));
+    drop(pool.get());
+    pool.close();
+    drop(pool);
+    // 풀이 사라진 뒤에는 채우기가 연결을 다시 맺지 않는다.
+    thread::sleep(Duration::from_secs(1));
+    assert_eq!(backends(&mut admin, &db.name), 0);
+}

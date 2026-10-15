@@ -2,7 +2,8 @@
 
 use std::collections::VecDeque;
 use std::ops::{Deref, DerefMut};
-use std::sync::{Arc, Condvar, Mutex, MutexGuard};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{Arc, Condvar, Mutex, MutexGuard, Weak};
 use std::time::{Duration, Instant};
 
 use postgres::Client;
@@ -29,7 +30,15 @@ struct Inner {
     size: usize,
     state: Mutex<State>,
     available: Condvar,
+    /// 채우기 스레드가 돌고 있는지. 동시에 하나만 돈다.
+    filling: AtomicBool,
+    /// 채우기 스레드가 풀을 붙잡아 두지 않도록 약한 참조로 넘기기 위한 자기 참조.
+    me: Weak<Inner>,
 }
+
+/// 채우기 재시도 간격(연속 실패마다 두 배, 상한까지).
+const FILL_RETRY_MIN: Duration = Duration::from_millis(250);
+const FILL_RETRY_MAX: Duration = Duration::from_secs(5);
 
 impl Inner {
     fn lock(&self) -> MutexGuard<'_, State> {
@@ -43,9 +52,53 @@ impl Inner {
         crate::tls::connect(&pg)
     }
 
+    /// 연결 자리를 반납한다(`total` 감소). 풀이 열려 있으면 빈자리를 채우도록 요청한다.
     fn give_up_slot(&self) {
-        self.lock().total -= 1;
+        let closed = {
+            let mut state = self.lock();
+            state.total -= 1;
+            state.closed
+        };
         self.available.notify_one();
+        if !closed {
+            self.request_fill();
+        }
+    }
+
+    // 주기 점검(Hikari housekeeper) 스레드는 두지 않는다. Hikari의 `fillPool`도 연결을
+    // 버리는 순간(`closeConnection`)에 호출되고, housekeeper는 유휴 연결 정리·시계 점프
+    // 대응만 한다(`minimumIdle == maximumPoolSize`이면 유휴 정리는 꺼진다). 여기서는 연결을
+    // 버리는 모든 경로(release 불가, get의 usable 실패, open 실패의 자리 반납)가
+    // `request_fill`로 이어지므로 이벤트만으로 덮인다. 조용히 끊긴 유휴 연결은 Hikari처럼
+    // 다음 `get`이 찾아내 한꺼번에 버리고(그 경로가 채우기를 요청한다) 주기 검사로 찾지 않는다.
+    // 주기 스레드는 오히려 유휴 풀에 쓸데없는 검사 쿼리를 보내는 상시 비용이 된다.
+
+    /// 비어 있는 자리를 백그라운드에서 채우도록 요청한다. 이미 돌고 있으면 아무것도 안 한다.
+    fn request_fill(&self) {
+        if self.filling.swap(true, Ordering::AcqRel) {
+            return;
+        }
+        let weak = self.me.clone();
+        let spawned = std::thread::Builder::new()
+            .name("chalkak-pool-fill".to_string())
+            .spawn(move || fill_loop(weak));
+        if spawned.is_err() {
+            // 스레드를 못 만들면 다음 버림 때 다시 시도한다.
+            self.filling.store(false, Ordering::Release);
+        }
+    }
+
+    /// 채울 자리가 있으면 하나 예약한다(`total += 1`). 채울 것이 없거나 풀이 닫혔으면
+    /// 같은 잠금 안에서 `filling`을 내려 `None`을 돌려준다. 잠금 안에서 내리는 이유는,
+    /// 그 뒤에 `total`을 줄이고 `request_fill`을 부르는 쪽이 반드시 새 스레드를 띄우게 하기 위해서다.
+    fn reserve_fill_slot(&self) -> bool {
+        let mut state = self.lock();
+        if state.closed || state.total >= self.size {
+            self.filling.store(false, Ordering::Release);
+            return false;
+        }
+        state.total += 1;
+        true
     }
 
     fn release(&self, client: Client, created: Instant) {
@@ -58,12 +111,82 @@ impl Inner {
                 returned: Instant::now(),
             });
             drop(state);
+            self.available.notify_one();
         } else {
+            let closed = state.closed;
             state.total -= 1;
             drop(state);
             drop(client);
+            self.available.notify_one();
+            if !closed {
+                self.request_fill();
+            }
         }
-        self.available.notify_one();
+    }
+}
+
+/// 채우기 스레드 본체. 풀이 사라지거나 닫히거나 자리가 다 차면 끝난다.
+/// 반복마다 `Weak`를 올려 쓰고 쉬는 동안에는 놓으므로 풀의 수명을 늘리지 않는다.
+fn fill_loop(weak: Weak<Inner>) {
+    let mut delay = FILL_RETRY_MIN;
+    loop {
+        let Some(inner) = weak.upgrade() else { return };
+        if !inner.reserve_fill_slot() {
+            return;
+        }
+        match inner.open() {
+            Ok(client) => {
+                delay = FILL_RETRY_MIN;
+                let now = Instant::now();
+                let mut state = inner.lock();
+                if state.closed {
+                    state.total -= 1;
+                    drop(state);
+                    drop(client);
+                } else {
+                    state.idle.push_back(Idle {
+                        client,
+                        created: now,
+                        returned: now,
+                    });
+                    drop(state);
+                }
+                inner.available.notify_one();
+            }
+            Err(_) => {
+                // 자리만 돌려주고(기다리는 get이 직접 맺어 볼 수 있다) 쉬었다 다시 시도한다.
+                {
+                    inner.lock().total -= 1;
+                }
+                inner.available.notify_one();
+                drop(inner);
+                if !fill_sleep(&weak, delay) {
+                    return;
+                }
+                delay = (delay * 2).min(FILL_RETRY_MAX);
+            }
+        }
+    }
+}
+
+/// `delay`만큼 쉰다. 쉬는 도중 풀이 사라지거나 닫히면 `false`(스레드 종료 신호).
+/// 종료 직전 `filling`을 내려 둔다.
+fn fill_sleep(weak: &Weak<Inner>, delay: Duration) -> bool {
+    let end = Instant::now() + delay;
+    loop {
+        let Some(inner) = weak.upgrade() else {
+            return false;
+        };
+        if inner.lock().closed {
+            inner.filling.store(false, Ordering::Release);
+            return false;
+        }
+        drop(inner);
+        let left = end.saturating_duration_since(Instant::now());
+        if left.is_zero() {
+            return true;
+        }
+        std::thread::sleep(left.min(Duration::from_millis(100)));
     }
 }
 
@@ -92,7 +215,7 @@ impl Pool {
         if size == 0 {
             return Err(DbError::Config("pool size must be at least 1".to_string()));
         }
-        let inner = Inner {
+        let inner = Arc::new_cyclic(|me| Inner {
             config: config.clone(),
             size,
             state: Mutex::new(State {
@@ -102,7 +225,9 @@ impl Pool {
                 closed: false,
             }),
             available: Condvar::new(),
-        };
+            filling: AtomicBool::new(false),
+            me: me.clone(),
+        });
         let mut idle = VecDeque::with_capacity(size);
         for _ in 0..size {
             let client = inner.open()?;
@@ -118,9 +243,7 @@ impl Pool {
             state.total = size;
             state.idle = idle;
         }
-        Ok(Pool {
-            inner: Arc::new(inner),
-        })
+        Ok(Pool { inner })
     }
 
     /// 연결을 빌린다. 없으면 `connection_timeout`까지 기다리고 넘으면 `PoolTimeout`.
