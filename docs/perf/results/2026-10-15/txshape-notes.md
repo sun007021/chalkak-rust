@@ -41,3 +41,7 @@
 - `읽기 묶음 다름`: Java `BEGIN READ ONLY`로 SELECT 여러 개를 묶고 Rust가 자동 커밋으로 보낸다. READ COMMITTED에서는 문장마다 스냅샷이라 응답이
   같고, 한 트랜잭션 안에서 읽은 여러 행의 일관성(같은 시점 스냅샷)만 Java가 더 강하다. REPEATABLE READ였다면 달랐을 것이다.
 - `SELECT 대상 다름`·`SELECT 개수 다름`: Hibernate 지연 로딩과 조인 구성 차이다.
+
+## 수정 후
+
+잠금 강도 차이(`FOR UPDATE` → `FOR NO KEY UPDATE`, `FOR SHARE OF p`)를 고친 뒤 다시 비교한 결과는 [txshape-after-fix.md](txshape-after-fix.md)에 있다.

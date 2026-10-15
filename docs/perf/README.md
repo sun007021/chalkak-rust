@@ -1,7 +1,7 @@
 # 성능·동시성·장시간 시험
 
 [전환 계획 4.5](../plan/migration-plan.md#45-성능-검증)의 성능 검증을 재현하는 방법이다. 결과는 날짜별 보고서
-(`report-*.md`)에 있다. 장시간(24시간) 시험 절차는 [soak-24h.md](soak-24h.md), 트래픽이 몰릴 때의 서버·풀 안정성 시험은 [stress.md](stress.md)에 있다.
+(`report-*.md`)에 있다. 장시간(24시간) 시험 절차는 [soak-24h.md](soak-24h.md), 트래픽이 몰릴 때의 서버·풀 안정성 시험은 [stress.md](stress.md)에 있다. 2026-10-15 동시성·풀·격리 검증 결과는 [report-2026-10-15-concurrency.md](report-2026-10-15-concurrency.md).
 
 ## 구성
 
