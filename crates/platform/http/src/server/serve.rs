@@ -9,11 +9,18 @@
 //!
 //! 종료: [`ShutdownSignal::trigger`]가 호출되면 accept를 멈추고, 처리 중인 요청은 끝까지 응답한 뒤
 //! `Connection: close`로 닫으며, 요청을 기다리던 유휴 연결은 바로 닫는다. 모든 연결이 끝나면 `serve`가 돌아온다.
+//!
+//! 연결 하나의 비용(#36 stress 시험): 유휴 연결 스레드는 다음 요청이나 keep-alive 마감까지 `read`에서 잠들어 있고
+//! 주기적으로 깨어나지 않는다(예전에는 100ms마다 깨어나 유휴 연결 1000개에 약 0.08코어를 썼다). 종료 신호는
+//! [`IdleConns`]에 등록된 유휴 연결의 읽기 쪽을 닫아 깨운다. 소켓은 `Arc`로 읽기·쓰기에 나눠 써서 연결마다 FD 하나다.
+//! 요청 줄과 헤더는 첫 바이트부터 `read_timeout` 안에 다 와야 한다(한 바이트씩 보내며 스레드를 붙잡는 연결을 끊는다).
+//! 본문은 Tomcat처럼 바이트가 올 때마다 마감이 늘어난다.
 
+use std::collections::HashMap;
 use std::io::{self, Read, Write};
 use std::net::{Ipv4Addr, Ipv6Addr, Shutdown, SocketAddr, TcpListener, TcpStream, ToSocketAddrs};
 use std::panic::{self, AssertUnwindSafe};
-use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use std::sync::{Arc, Condvar, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
@@ -27,8 +34,8 @@ use super::parse::{Conn, Head, ParseError, Version};
 use super::request::Request;
 use super::response::{Response, WriteOptions, serialize};
 
-/// 소켓 읽기를 이 간격으로 끊어서 종료 신호·마감 시각을 확인한다.
-const POLL_SLICE: Duration = Duration::from_millis(100);
+/// 오류 응답 뒤 남은 바이트를 버릴 때 읽기 한 번의 대기 한도.
+const LINGER_SLICE: Duration = Duration::from_millis(50);
 /// 오류 응답 뒤 연결을 닫기 전에 상대가 보내는 나머지를 버리며 기다리는 최대 시간·바이트.
 const LINGER: Duration = Duration::from_millis(200);
 const LINGER_MAX_BYTES: usize = 256 * 1024;
@@ -86,6 +93,11 @@ impl Server {
 
         let gate = Arc::new(Gate::new(workers));
         let active = Arc::new(AtomicUsize::new(0));
+        let idle = Arc::new(IdleConns::default());
+        {
+            let idle = Arc::clone(&idle);
+            shutdown.on_trigger(move || idle.wake_all());
+        }
 
         for incoming in listener.incoming() {
             if shutdown.is_triggered() {
@@ -108,21 +120,25 @@ impl Server {
             };
             if active.fetch_add(1, Ordering::SeqCst) >= max_connections {
                 active.fetch_sub(1, Ordering::SeqCst);
-                reject_busy(stream, &limits);
+                reject_busy(&stream, &limits);
                 continue;
             }
+            let stream = Arc::new(stream);
             let conn = Connection {
                 active: ActiveGuard(Arc::clone(&active)),
                 gate: Arc::clone(&gate),
                 handler: Arc::clone(&handler),
                 limits: Arc::clone(&limits),
                 shutdown: shutdown.clone(),
+                idle: Arc::clone(&idle),
             };
+            let for_thread = Arc::clone(&stream);
             let spawned = thread::Builder::new()
                 .name("chalkak-conn".to_owned())
-                .spawn(move || conn.run(stream));
+                .spawn(move || conn.run(for_thread));
             if spawned.is_err() {
-                // 스레드를 못 만들면(자원 고갈) 그 연결만 닫는다. 클로저와 함께 소켓·개수 표시가 정리된다.
+                // 스레드를 못 만들면(pids·메모리 한도) 그 연결에 503을 쓰고 닫는다. 클로저와 함께 개수 표시가 정리된다.
+                reject_busy(&stream, &limits);
                 thread::sleep(Duration::from_millis(10));
             }
         }
@@ -178,8 +194,27 @@ impl Drop for ActiveGuard {
     }
 }
 
-/// 연결 상한 초과: 503을 쓰고 닫는다(쓰기가 막혀도 accept 루프를 오래 붙잡지 않도록 짧게).
-fn reject_busy(mut stream: TcpStream, limits: &Limits) {
+/// 요청을 기다리는 유휴 연결 목록. 종료 신호가 오면 읽기 쪽을 닫아 `read`에서 잠든 연결 스레드를 깨운다.
+#[derive(Default)]
+struct IdleConns {
+    next_id: AtomicU64,
+    conns: Mutex<HashMap<u64, Arc<TcpStream>>>,
+}
+
+impl IdleConns {
+    fn lock(&self) -> std::sync::MutexGuard<'_, HashMap<u64, Arc<TcpStream>>> {
+        self.conns.lock().unwrap_or_else(|e| e.into_inner())
+    }
+
+    fn wake_all(&self) {
+        for stream in self.lock().values() {
+            let _ = stream.shutdown(Shutdown::Read);
+        }
+    }
+}
+
+/// 연결 상한 초과·스레드 생성 실패: 503을 쓰고 닫는다(쓰기가 막혀도 accept 루프를 오래 붙잡지 않도록 짧게).
+fn reject_busy(mut stream: &TcpStream, limits: &Limits) {
     let _ = stream.set_write_timeout(Some(limits.read_timeout.min(Duration::from_secs(1))));
     let bytes = serialize(
         &Response::new(503),
@@ -198,10 +233,11 @@ struct Connection {
     handler: Arc<dyn Handler>,
     limits: Arc<Limits>,
     shutdown: ShutdownSignal,
+    idle: Arc<IdleConns>,
 }
 
 impl Connection {
-    fn run(self, stream: TcpStream) {
+    fn run(self, stream: Arc<TcpStream>) {
         // 연결 처리 중 핸들러 패닉은 serve_connection 안에서 잡는다.
         serve_connection(
             stream,
@@ -209,6 +245,7 @@ impl Connection {
             &self.limits,
             &self.shutdown,
             &self.gate,
+            &self.idle,
         );
         drop(self.active);
     }
@@ -218,51 +255,87 @@ impl Connection {
 enum Phase {
     /// 다음 요청의 첫 바이트를 기다리는 중. 마감은 keep-alive 타임아웃이고, 종료 신호가 오면 EOF처럼 끝낸다.
     Idle,
-    /// 요청을 읽는 중. 새 바이트가 `read_timeout` 안에 와야 한다.
-    Active,
+    /// 요청 줄과 헤더를 읽는 중. 첫 바이트부터 `read_timeout` 안에 다 와야 한다.
+    Head,
+    /// 본문을 읽는 중. 새 바이트가 `read_timeout` 안에 와야 한다(올 때마다 마감이 늘어난다).
+    Body,
 }
 
-/// 소켓 읽기에 유휴/활성 타임아웃과 종료 신호 확인을 입힌다.
+/// 소켓 읽기에 단계별 마감과 종료 신호 확인을 입힌다. 마감까지 남은 시간을 소켓 읽기 제한으로 걸고 잠든다.
 struct PollReader {
-    stream: TcpStream,
+    stream: Arc<TcpStream>,
     shutdown: ShutdownSignal,
     read_timeout: Duration,
     phase: Phase,
     deadline: Instant,
+    idle: Arc<IdleConns>,
+    /// 유휴 목록에 올라 있으면 그 번호.
+    idle_id: Option<u64>,
 }
 
 impl PollReader {
     fn wait_for_request(&mut self, idle_timeout: Duration) {
         self.phase = Phase::Idle;
         self.deadline = Instant::now() + idle_timeout;
+        if self.idle_id.is_none() {
+            let id = self.idle.next_id.fetch_add(1, Ordering::Relaxed);
+            self.idle.lock().insert(id, Arc::clone(&self.stream));
+            self.idle_id = Some(id);
+        }
     }
 
-    fn continue_request(&mut self) {
-        self.phase = Phase::Active;
+    fn start_request(&mut self) {
+        self.phase = Phase::Head;
         self.deadline = Instant::now() + self.read_timeout;
+        self.leave_idle();
+    }
+
+    fn start_body(&mut self) {
+        self.phase = Phase::Body;
+        self.deadline = Instant::now() + self.read_timeout;
+    }
+
+    fn leave_idle(&mut self) {
+        if let Some(id) = self.idle_id.take() {
+            self.idle.lock().remove(&id);
+        }
+    }
+}
+
+impl Drop for PollReader {
+    fn drop(&mut self) {
+        self.leave_idle();
     }
 }
 
 impl Read for PollReader {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         loop {
-            match self.stream.read(buf) {
+            // 유휴 목록에 오른 뒤에 확인하므로, 신호가 목록을 훑은 뒤에 들어온 연결도 놓치지 않는다.
+            if self.phase == Phase::Idle && self.shutdown.is_triggered() {
+                return Ok(0);
+            }
+            let remaining = self.deadline.saturating_duration_since(Instant::now());
+            if remaining.is_zero() {
+                return Err(io::ErrorKind::TimedOut.into());
+            }
+            self.stream.set_read_timeout(Some(remaining))?;
+            match (&*self.stream).read(buf) {
                 Ok(n) => {
                     if n > 0 {
-                        self.continue_request();
+                        match self.phase {
+                            Phase::Idle => self.start_request(),
+                            Phase::Body => self.start_body(),
+                            Phase::Head => {}
+                        }
                     }
                     return Ok(n);
                 }
                 Err(e) => match e.kind() {
-                    io::ErrorKind::Interrupted => {}
-                    io::ErrorKind::WouldBlock | io::ErrorKind::TimedOut => {
-                        if Instant::now() >= self.deadline {
-                            return Err(io::ErrorKind::TimedOut.into());
-                        }
-                        if self.phase == Phase::Idle && self.shutdown.is_triggered() {
-                            return Ok(0);
-                        }
-                    }
+                    // 마감 전에 깨어났으면(읽기 제한은 근사치다) 남은 시간으로 다시 잔다.
+                    io::ErrorKind::Interrupted
+                    | io::ErrorKind::WouldBlock
+                    | io::ErrorKind::TimedOut => {}
                     _ => return Err(e),
                 },
             }
@@ -271,31 +344,33 @@ impl Read for PollReader {
 }
 
 fn serve_connection(
-    stream: TcpStream,
+    stream: Arc<TcpStream>,
     handler: &dyn Handler,
     limits: &Limits,
     shutdown: &ShutdownSignal,
     gate: &Gate,
+    idle: &Arc<IdleConns>,
 ) {
     let _ = stream.set_nodelay(true);
     let _ = stream.set_write_timeout(Some(limits.read_timeout));
-    if stream.set_read_timeout(Some(POLL_SLICE)).is_err() {
-        return;
-    }
-    let (Ok(peer), Ok(mut writer)) = (stream.peer_addr(), stream.try_clone()) else {
+    let Ok(peer) = stream.peer_addr() else {
         return;
     };
+    let write_half = Arc::clone(&stream);
+    let mut writer: &TcpStream = &write_half;
     let mut conn = Conn::new(PollReader {
         stream,
         shutdown: shutdown.clone(),
         read_timeout: limits.read_timeout,
         phase: Phase::Idle,
         deadline: Instant::now() + limits.keep_alive_timeout,
+        idle: Arc::clone(idle),
+        idle_id: None,
     });
 
     loop {
         if conn.has_buffered() {
-            conn.reader_mut().continue_request();
+            conn.reader_mut().start_request();
         } else {
             conn.reader_mut()
                 .wait_for_request(limits.keep_alive_timeout);
@@ -312,6 +387,7 @@ fn serve_connection(
         if head.expects_continue && writer.write_all(b"HTTP/1.1 100 Continue\r\n\r\n").is_err() {
             break;
         }
+        conn.reader_mut().start_body();
         let body = match conn.read_body(&head, limits) {
             Ok(b) => b,
             Err(e) => {
@@ -369,7 +445,7 @@ fn into_request(head: Head, body: Vec<u8>, remote_addr: SocketAddr) -> Request {
 fn reject(
     handler: &dyn Handler,
     conn: &mut Conn<PollReader>,
-    writer: &mut TcpStream,
+    writer: &mut &TcpStream,
     err: &ParseError,
 ) {
     let Some(status) = err.status() else { return };
@@ -387,11 +463,13 @@ fn reject(
     // 쓰기 쪽을 닫아 응답을 먼저 내보내고, 상대가 보내는 나머지를 잠깐 버린다.
     let _ = writer.shutdown(Shutdown::Write);
     let reader = conn.reader_mut();
+    reader.leave_idle();
+    let _ = reader.stream.set_read_timeout(Some(LINGER_SLICE));
     let until = Instant::now() + LINGER;
     let mut drained = 0usize;
     let mut sink = [0u8; 4096];
     while Instant::now() < until && drained < LINGER_MAX_BYTES {
-        match reader.stream.read(&mut sink) {
+        match (&*reader.stream).read(&mut sink) {
             Ok(0) => break,
             Ok(n) => drained += n,
             Err(e)
