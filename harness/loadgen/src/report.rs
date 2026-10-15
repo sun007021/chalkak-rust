@@ -545,8 +545,210 @@ pub fn build(dir: &Path) -> (String, bool) {
         }
     }
 
+    stress_section(&mut md, dir);
+
     let failed = fail > 0;
     (md, failed)
+}
+
+/// 스트레스 케이스 하나의 핵심 수치를 한 줄로(표의 셀). 없는 항목은 건너뛴다.
+pub fn stress_metric(c: &Value) -> String {
+    let ms = |v: &Value| v.as_f64().map(|u| format!("{:.0}ms", u / 1000.0));
+    let phase = |name: &str| {
+        c["phases"]
+            .as_array()
+            .and_then(|a| a.iter().find(|p| p["name"] == name))
+    };
+    let errs = |p: Option<&Value>| p.and_then(|p| p["errors"]["total"].as_u64()).unwrap_or(0);
+    let x = &c["extra"];
+    let mut parts: Vec<String> = Vec::new();
+    match c["case"].as_str().unwrap_or("") {
+        "spike" => {
+            if let Some(p) = phase("급증") {
+                parts.push(format!(
+                    "급증 p99 {} max {} 오류 {}",
+                    ms(&p["p99_us"]).unwrap_or_default(),
+                    ms(&p["max_us"]).unwrap_or_default(),
+                    errs(Some(p))
+                ));
+            }
+            parts.push(format!(
+                "복귀 {}초",
+                x["recovery_secs"]
+                    .as_u64()
+                    .map_or("못 돌아옴".to_owned(), |s| s.to_string())
+            ));
+        }
+        "storm" => {
+            if let Some(p) = c["phases"].get(0) {
+                let ok = p["ok"].as_u64().unwrap_or(0);
+                let bad = errs(Some(p));
+                parts.push(format!(
+                    "성공 {ok}/{} 오류 {bad} 전체 {:.1}초",
+                    ok + bad,
+                    x["wall_secs"].as_f64().unwrap_or(0.0)
+                ));
+                parts.push(format!("p99 {}", ms(&p["p99_us"]).unwrap_or_default()));
+            }
+        }
+        "idle" => {
+            parts.push(format!(
+                "붙음 {}/{} 유휴 CPU {:.2}코어(1000개당 {:.3}) RSS {:.0}MB 스레드 {}",
+                x["opened"],
+                x["idle_conns"],
+                x["cpu_idle_only"]["cpu_cores"].as_f64().unwrap_or(0.0),
+                x["cpu_cores_per_1000_idle"].as_f64().unwrap_or(0.0),
+                x["rss_mb_idle_only"].as_f64().unwrap_or(0.0),
+                x["threads_idle_only"]
+            ));
+            if let (Some(a), Some(b)) = (c["phases"].get(0), c["phases"].get(1)) {
+                parts.push(format!(
+                    "p99 {} -> {}",
+                    ms(&a["p99_us"]).unwrap_or_default(),
+                    ms(&b["p99_us"]).unwrap_or_default()
+                ));
+            }
+        }
+        "slow" => {
+            parts.push(format!(
+                "멈춘 연결 끊김 {}/{} (최초 {}초)",
+                x["stalled"]["closed"],
+                x["stalled"]["conns"],
+                x["stalled"]["first_close_secs"]
+                    .as_f64()
+                    .map_or("-".to_owned(), |v| format!("{v:.1}"))
+            ));
+            parts.push(format!(
+                "한 바이트씩 끊김 {}/{}",
+                x["drip"]["closed"], x["drip"]["conns"]
+            ));
+            if let Some(p) = c["phases"].get(1) {
+                parts.push(format!(
+                    "일반 p99 {} 오류 {}",
+                    ms(&p["p99_us"]).unwrap_or_default(),
+                    errs(Some(p))
+                ));
+            }
+        }
+        "fairness" => {
+            if let Some(p) = c["phases"].get(0) {
+                parts.push(format!(
+                    "p99 {} p99.9 {} max {} 500 {}",
+                    ms(&p["p99_us"]).unwrap_or_default(),
+                    ms(&p["p999_us"]).unwrap_or_default(),
+                    ms(&p["max_us"]).unwrap_or_default(),
+                    p["errors"]["status_500"]
+                ));
+            }
+            parts.push(format!(
+                "연결별 최소/중앙 {}/{}",
+                x["per_conn_completed"]["min"], x["per_conn_completed"]["median"]
+            ));
+        }
+        "dbkill" => {
+            let rounds: Vec<String> = x["rounds"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .map(|r| {
+                    format!(
+                        "오류 {} 복구 {:.1}초",
+                        r["errors"]["total"],
+                        r["recovery_secs"].as_f64().unwrap_or(0.0)
+                    )
+                })
+                .collect();
+            parts.push(rounds.join(" / "));
+            parts.push(format!(
+                "저부하 뒤 연결 {} 채운 뒤 {}",
+                x["app_conns_low_load_end"], x["app_conns_after_refill"]
+            ));
+        }
+        "outage" => {
+            parts.push(format!(
+                "{} 복구 {:.1}초 중단 중 오류 {}",
+                x["mode"].as_str().unwrap_or(""),
+                x["recovery_secs"].as_f64().unwrap_or(0.0),
+                x["errors_during"]["total"]
+            ));
+            parts.push(format!("health {}", x["health_during"]));
+        }
+        "abort" => parts.push(format!(
+            "끊긴 {} 처리된 행 {}",
+            x["sent"], x["rows_inserted_after_unlock"]
+        )),
+        _ => {}
+    }
+    let leak = &c["leak"]["after"];
+    parts.push(format!(
+        "누수검사 후 DB연결 {} 스레드 {}",
+        leak["app_db_conns"], leak["threads"]
+    ));
+    parts.join("; ")
+}
+
+fn stress_section(md: &mut String, dir: &Path) {
+    let java = load_json(&dir.join("stress-java.json"));
+    let rust = load_json(&dir.join("stress-rust.json"));
+    if java.is_none() && rust.is_none() {
+        return;
+    }
+    let _ = writeln!(md, "\n## 스트레스 시험 (`perf.sh stress`)\n");
+    let _ = writeln!(
+        md,
+        "기준은 두 구현에 같다(docs/perf/stress.md). 이 표는 통과·실패가 Rust 대 Java 비교가 아니라 케이스별 절대 기준이다. 호스트가 공유일 때 수치는 참고용이다.\n"
+    );
+    let _ = writeln!(
+        md,
+        "| 케이스 | Java | Java 핵심 수치 | Rust | Rust 핵심 수치 |\n| --- | --- | --- | --- | --- |"
+    );
+    let mut names: Vec<String> = Vec::new();
+    for v in [&java, &rust].into_iter().flatten() {
+        for c in v["cases"].as_array().into_iter().flatten() {
+            let n = c["name"].as_str().unwrap_or("").to_owned();
+            if !names.contains(&n) {
+                names.push(n);
+            }
+        }
+    }
+    let find = |v: &Option<Value>, n: &str| -> Option<Value> {
+        v.as_ref()?["cases"]
+            .as_array()?
+            .iter()
+            .find(|c| c["name"] == n)
+            .cloned()
+    };
+    let cell = |c: &Option<Value>| match c {
+        None => ("-".to_owned(), "-".to_owned()),
+        Some(c) => (
+            if c["passed"].as_bool().unwrap_or(false) {
+                "통과"
+            } else {
+                "실패"
+            }
+            .to_owned(),
+            stress_metric(c),
+        ),
+    };
+    let mut failures: Vec<String> = Vec::new();
+    for n in &names {
+        let (cj, cr) = (find(&java, n), find(&rust, n));
+        let (vj, mj) = cell(&cj);
+        let (vr, mr) = cell(&cr);
+        let _ = writeln!(md, "| {n} | {vj} | {mj} | {vr} | {mr} |");
+        for (side, c) in [("Java", &cj), ("Rust", &cr)] {
+            for f in c
+                .iter()
+                .flat_map(|c| c["failures"].as_array().into_iter().flatten())
+                .filter_map(Value::as_str)
+            {
+                failures.push(format!("- {side} {n}: {f}"));
+            }
+        }
+    }
+    if !failures.is_empty() {
+        let _ = writeln!(md, "\n실패 사유:\n\n{}", failures.join("\n"));
+    }
 }
 
 pub fn command(args: &Args) -> Result<u8, String> {
@@ -608,6 +810,33 @@ mod tests {
     fn 데이터가_없으면_판정하지_않는다() {
         let g = gate("x", "y", vec![], vec![1.0], true);
         assert!(g.verdict.is_none());
+    }
+
+    #[test]
+    fn 스트레스_결과를_표로_만든다() {
+        let dir =
+            std::env::temp_dir().join(format!("loadgen-stress-report-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(&dir).unwrap();
+        let case = |pass: bool| {
+            serde_json::json!({ "kind": "stress", "label": "x", "cases": [{
+                "name": "spike-200", "case": "spike", "passed": pass,
+                "failures": if pass { vec![] } else { vec!["급증 구간 오류: 503 3"] },
+                "phases": [{ "name": "급증", "p99_us": 120000, "max_us": 900000, "errors": { "total": 3 } }],
+                "extra": { "recovery_secs": 2 },
+                "leak": { "after": { "app_db_conns": 10, "threads": 40 } },
+            }]})
+        };
+        fs::write(dir.join("stress-java.json"), case(true).to_string()).unwrap();
+        fs::write(dir.join("stress-rust.json"), case(false).to_string()).unwrap();
+        let (md, _) = build(&dir);
+        assert!(md.contains("## 스트레스 시험"), "{md}");
+        assert!(md.contains("| spike-200 | 통과 | 급증 p99 120ms max 900ms 오류 3; 복귀 2초; 누수검사 후 DB연결 10 스레드 40 | 실패 |"), "{md}");
+        assert!(
+            md.contains("- Rust spike-200: 급증 구간 오류: 503 3"),
+            "{md}"
+        );
+        let _ = fs::remove_dir_all(&dir);
     }
 
     #[test]
