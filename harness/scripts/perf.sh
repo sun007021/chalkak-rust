@@ -5,7 +5,8 @@
 #   harness/scripts/perf.sh startup [N]        # 두 앱을 N번씩 재시작하며 기동 시간(컨테이너 시작 -> /actuator/health UP) 측정
 #   harness/scripts/perf.sh sql [java|rust]    # 엔드포인트별 요청당 SQL 수·DB 시간 (pg_stat_statements)
 #   harness/scripts/perf.sh bench [라운드]     # 번갈아 가며 혼합 부하(고정 RPS, 최대 처리량)와 엔드포인트별 최대 처리량
-#   harness/scripts/perf.sh race               # 동시성 시험(같은 자원 동시 요청, 풀 고갈) 두 구현
+#   harness/scripts/perf.sh race [시험이름]    # 동시성·격리 시험(같은 자원 동시 요청, 풀 고갈, 트랜잭션 원자성·가시성, 리프레시·가입 토큰 경쟁) 두 구현
+#                                              #   PERF_RACE_SKIP_SLOW=1이면 풀 고갈 35초 시험을 건너뛴다
 #   harness/scripts/perf.sh soak <java|rust> <기간>   # 장시간 시험(예: 30m, 24h). 메모리·FD·DB 연결 추세를 1분마다 찍는다
 #   harness/scripts/perf.sh trend <java|rust>  # soak 로그에서 메모리·FD·스레드·DB 연결 누수 추세 판정
 #   harness/scripts/perf.sh report             # 결과 디렉터리를 비교해 게이트 판정(마크다운)
@@ -25,12 +26,13 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 COMPOSE_FILE="$ROOT/harness/perf/compose.yaml"
 export PERF_PROJECT="${PERF_PROJECT:-chalkak-perf-$(printf '%s' "$ROOT" | md5sum | cut -c1-6)}"
 BASE="${PERF_PORT_BASE:-21000}"
-export PERF_PORT_JAVA=$BASE PERF_PORT_PG_JAVA=$((BASE + 1)) PERF_PORT_RUST=$((BASE + 10)) PERF_PORT_PG_RUST=$((BASE + 11))
+export PERF_PORT_JAVA=$BASE PERF_PORT_PG_JAVA=$((BASE + 1)) PERF_PORT_RUST=$((BASE + 10)) PERF_PORT_PG_RUST=$((BASE + 11)) PERF_PORT_FAKES=$((BASE + 20))
 export PERF_FAKES_BIN="$ROOT/target/release/chalkak-fakes" PERF_RUST_BIN="$ROOT/target/release/chalkak-server"
 export PERF_JAVA_JAR="${ORACLE_JAR:-/tmp/chalkak-lanes/oracle/app.jar}"
 LOADGEN="$ROOT/target/release/chalkak-loadgen"
 OUT="${PERF_OUT:-$ROOT/target/perf/latest}"
 SECRET="$(grep '^ACCESS_TOKEN_SECRET=' "$ROOT/harness/env/oracle.env" | cut -d= -f2)"
+SIGNUP_SECRET="$(grep '^SOCIAL_SIGNUP_TOKEN_SECRET=' "$ROOT/harness/env/oracle.env" | cut -d= -f2)"
 CONNS="${PERF_CONNS:-64}" RPS="${PERF_RPS:-300}" DURATION="${PERF_DURATION:-30}" WARMUP="${PERF_WARMUP:-60}"
 EP_DURATION="${PERF_EP_DURATION:-8}" ROUNDS="${PERF_ROUNDS:-3}"
 
@@ -135,13 +137,17 @@ cmd_bench() {
   done
 }
 
-cmd_race() {
+cmd_race() { # [시험이름]
   mkdir -p "$OUT"
+  local only=() skip=()
+  [[ -z "${1:-}" ]] || only=(--only "$1")
+  [[ -z "${PERF_RACE_SKIP_SLOW:-}" ]] || skip=(--skip-slow)
   for side in java rust; do
     wait_health "$side"
     echo "== $side 동시성 =="
     "$LOADGEN" race --base "127.0.0.1:$(port_of "$side")" --secret "$SECRET" --db "$(db_url "$side")" \
-      --label "$side" --out "$OUT/race-$side.json" || true
+      --fakes "127.0.0.1:$PERF_PORT_FAKES" --signup-secret "$SIGNUP_SECRET" \
+      --label "$side" --out "$OUT/race-$side.json" "${only[@]}" "${skip[@]}" || true
   done
 }
 
@@ -165,7 +171,7 @@ case "${1:-}" in
   startup) shift; cmd_startup "$@" ;;
   sql) shift; cmd_sql "$@" ;;
   bench) shift; cmd_bench "$@" ;;
-  race) cmd_race ;;
+  race) shift; cmd_race "$@" ;;
   soak) shift; cmd_soak "$@" ;;
   report) cmd_report ;;
   trend) shift; "$LOADGEN" trend --log "$OUT/${1:?java|rust}/soak.log" ;;

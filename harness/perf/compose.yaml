@@ -52,6 +52,8 @@ services:
   fakes:
     image: debian:trixie-slim
     entrypoint: ["/usr/local/bin/chalkak-fakes"]
+    # 호스트의 시험 도구(race 가입 시험)가 S3 HeadObject 응답을 지정하는 관리 경로를 쓴다.
+    ports: ["127.0.0.1:${PERF_PORT_FAKES}:9000"]
     environment:
       FAKES_ADDR: 0.0.0.0:9000
       FAKES_S3_BUCKET: test-bucket

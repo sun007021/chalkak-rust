@@ -545,8 +545,107 @@ pub fn build(dir: &Path) -> (String, bool) {
         }
     }
 
-    let failed = fail > 0;
+    // Java와 Rust의 같은 시험 결과 대조(상태 코드 분포, DB 최종 상태)
+    let mut race_mismatch = false;
+    if let (Some(java), Some(rust)) = (
+        load_json(&dir.join("race-java.json")),
+        load_json(&dir.join("race-rust.json")),
+    ) {
+        let diffs = race_diffs(&java, &rust);
+        let _ = writeln!(
+            md,
+            "\n## 동시성 시험: Java 대 Rust 대조\n\n| 시험 | 상태 코드 분포 | DB 최종 상태 | 비고 |\n| --- | --- | --- | --- |"
+        );
+        for d in &diffs {
+            race_mismatch |= d.blocks();
+            let note = match (&d.known, d.differs()) {
+                (Some(k), true) => format!("알려진 차이: {k}"),
+                _ => String::new(),
+            };
+            let _ = writeln!(
+                md,
+                "| {} | {} | {} | {} |",
+                d.name,
+                diff_cell(d.statuses),
+                diff_cell(d.state),
+                note
+            );
+        }
+    }
+
+    let failed = fail > 0 || race_mismatch;
     (md, failed)
+}
+
+/// 같은 시험의 Java 결과와 Rust 결과를 대조한 한 줄.
+#[derive(Debug, PartialEq, Eq)]
+pub struct RaceDiff {
+    pub name: String,
+    /// `Some(true)`: 같다, `Some(false)`: 다르다, `None`: 비교 대상이 아니다(분포가 요청 순서에 달려 있는 시험).
+    pub statuses: Option<bool>,
+    /// 같은 뜻. DB 최종 상태(`state`)가 비어 있으면 `None`.
+    pub state: Option<bool>,
+    /// 알려진 차이의 설명(시험이 `known_diff`로 적은 것). 있으면 다르더라도 게이트를 막지 않는다.
+    pub known: Option<String>,
+}
+
+impl RaceDiff {
+    pub fn differs(&self) -> bool {
+        self.statuses == Some(false) || self.state == Some(false)
+    }
+
+    /// 게이트를 막는 차이인가.
+    pub fn blocks(&self) -> bool {
+        self.differs() && self.known.is_none()
+    }
+}
+
+/// 두 쪽 `race-*.json`의 시험을 이름으로 맞춰 상태 코드 분포(시험이 `compare_statuses`를 켠 경우)와 DB 최종 상태(`state`)를
+/// 대조한다. 한쪽에만 있는 시험은 두 쪽 모두 다르다고 본다.
+pub fn race_diffs(java: &Value, rust: &Value) -> Vec<RaceDiff> {
+    let index = |v: &Value| -> BTreeMap<String, Value> {
+        v["cases"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter_map(|c| Some((c["name"].as_str()?.to_owned(), c.clone())))
+            .collect()
+    };
+    let (j, r) = (index(java), index(rust));
+    let mut names: Vec<&String> = j.keys().chain(r.keys()).collect();
+    names.sort();
+    names.dedup();
+    names
+        .into_iter()
+        .map(|name| match (j.get(name), r.get(name)) {
+            (Some(a), Some(b)) => RaceDiff {
+                known: a["known_diff"]
+                    .as_str()
+                    .or_else(|| b["known_diff"].as_str())
+                    .map(str::to_owned),
+                name: name.clone(),
+                statuses: (a["compare_statuses"].as_bool() == Some(true)
+                    && b["compare_statuses"].as_bool() == Some(true))
+                .then(|| a["statuses"] == b["statuses"]),
+                state: (!a["state"].is_null() || !b["state"].is_null())
+                    .then(|| a["state"] == b["state"]),
+            },
+            _ => RaceDiff {
+                name: name.clone(),
+                statuses: Some(false),
+                state: Some(false),
+                known: None,
+            },
+        })
+        .collect()
+}
+
+fn diff_cell(v: Option<bool>) -> &'static str {
+    match v {
+        Some(true) => "같음",
+        Some(false) => "**다름**",
+        None => "-",
+    }
 }
 
 pub fn command(args: &Args) -> Result<u8, String> {
@@ -639,5 +738,38 @@ mod tests {
         assert!(md.contains("| p99(고정 RPS 혼합) | GET /a |"), "{md}");
         assert!(md.contains("통과 4"), "{md}");
         let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn 동시성_대조는_분포와_최종_상태를_이름으로_맞춘다() {
+        let case = |name: &str, st: Value, state: Value, cmp: bool| serde_json::json!({"name": name, "statuses": st, "state": state, "compare_statuses": cmp});
+        let known_case = |name: &str, state: Value, note: &str| serde_json::json!({"name": name, "statuses": {}, "state": state, "compare_statuses": false, "known_diff": note});
+        let java = serde_json::json!({"cases": [
+            case("a", serde_json::json!({"200": 1, "409": 7}), serde_json::json!({"n": 1}), true),
+            case("b", serde_json::json!({"200": 3}), serde_json::json!({"n": 1}), false),
+            case("c", serde_json::json!({"200": 1}), Value::Null, false),
+            case("only-java", serde_json::json!({}), Value::Null, false),
+            known_case("k", serde_json::json!({"x": true}), "알려진 차이"),
+        ]});
+        let rust = serde_json::json!({"cases": [
+            case("a", serde_json::json!({"200": 1, "409": 7}), serde_json::json!({"n": 1}), true),
+            case("b", serde_json::json!({"200": 2, "404": 1}), serde_json::json!({"n": 2}), false),
+            case("c", serde_json::json!({"200": 1}), Value::Null, false),
+            known_case("k", serde_json::json!({"x": false}), "알려진 차이"),
+        ]});
+        let d = race_diffs(&java, &rust);
+        let by = |n: &str| d.iter().find(|x| x.name == n).unwrap();
+        assert_eq!((by("a").statuses, by("a").state), (Some(true), Some(true)));
+        assert!(!by("a").differs());
+        assert_eq!(by("b").statuses, None, "분포를 비교하지 않는 시험");
+        assert_eq!(by("b").state, Some(false));
+        assert!(by("b").blocks());
+        assert_eq!((by("c").statuses, by("c").state), (None, None));
+        assert!(!by("c").differs());
+        assert!(by("only-java").blocks(), "한쪽에만 있으면 다르다");
+        assert!(
+            by("k").differs() && !by("k").blocks(),
+            "알려진 차이는 게이트를 막지 않는다"
+        );
     }
 }
