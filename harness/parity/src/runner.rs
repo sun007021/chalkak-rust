@@ -5,6 +5,8 @@ use crate::normalize::Normalizer;
 use crate::scenario::FakesSpec;
 use crate::scenario::{Auth, Scenario};
 use crate::target::{self, Target};
+use crate::tracer::Tracer;
+use crate::txlog::Tx;
 use crate::{callback, fakes, idtoken};
 use crate::{time, token};
 use serde_json::{Value, json};
@@ -58,10 +60,23 @@ const EMPTY_RESPONSE_MARK: &str = "잘못된 상태 줄: \"\"";
 /// 다시 보내지 않고 시나리오 전체를 다시 한다. 세 번 모두 같으면 그 오류를 그대로 낸다(구현이 실제로
 /// 응답 없이 연결을 닫는 경우를 가리지 않는다). 다른 오류는 바로 낸다.
 pub fn run(target: &Target, scenario: &Scenario) -> Result<Value, String> {
+    run_with(target, scenario, false).map(|(v, _)| v)
+}
+
+/// `run`과 같되, DB 문장 로그에서 단계마다 앱이 연 트랜잭션 목록도 함께 낸다(`txshape` 명령).
+/// 대상 lane이 `TXLOG=1`로 떠 있어야 한다.
+pub fn run_traced(target: &Target, scenario: &Scenario) -> Result<(Value, Vec<Vec<Tx>>), String> {
+    let (v, txs) = run_with(target, scenario, true)?;
+    Ok((v, txs.unwrap_or_default()))
+}
+
+type Traced = Option<Vec<Vec<Tx>>>;
+
+fn run_with(target: &Target, scenario: &Scenario, trace: bool) -> Result<(Value, Traced), String> {
     const ATTEMPTS: usize = 3;
     let mut last = String::new();
     for attempt in 1..=ATTEMPTS {
-        match run_once(target, scenario) {
+        match run_once(target, scenario, trace) {
             Err(e) if e.contains(CLOCK_ERROR_MARK) || e.contains(EMPTY_RESPONSE_MARK) => {
                 eprintln!("경고: {e} (시나리오를 다시 실행합니다, {attempt}/{ATTEMPTS})");
                 last = e;
@@ -72,7 +87,7 @@ pub fn run(target: &Target, scenario: &Scenario) -> Result<Value, String> {
     Err(last)
 }
 
-fn run_once(target: &Target, scenario: &Scenario) -> Result<Value, String> {
+fn run_once(target: &Target, scenario: &Scenario, trace: bool) -> Result<(Value, Traced), String> {
     let clock = time::parse(scenario.clock.as_deref().unwrap_or(DEFAULT_CLOCK))
         .ok_or("clock 형식이 올바르지 않습니다")?
         .epoch as i64;
@@ -82,6 +97,11 @@ fn run_once(target: &Target, scenario: &Scenario) -> Result<Value, String> {
     sync.ensure(target, clock)?;
     target::reset_db(&mut db, &scenario.setup.sql)?;
 
+    let tracer = if trace {
+        Some(Tracer::start(target)?)
+    } else {
+        None
+    };
     let mut norm = Normalizer::new(clock as f64);
     let mut vars: HashMap<String, String> = HashMap::new();
 
@@ -107,7 +127,7 @@ fn run_once(target: &Target, scenario: &Scenario) -> Result<Value, String> {
     let mut app_offset = 0i64;
     let mut steps = Vec::new();
 
-    for step in &scenario.steps {
+    for (step_no, step) in scenario.steps.iter().enumerate() {
         // 각 단계가 같은 시각 칸에서 출발하도록 필요할 때 시계를 다시 맞춘다(ClockSync 참고).
         sync.ensure(target, clock + app_offset)?;
         if let Some(over) = &step.fakes {
@@ -154,6 +174,9 @@ fn run_once(target: &Target, scenario: &Scenario) -> Result<Value, String> {
             headers,
             body,
         };
+        if let Some(t) = &tracer {
+            t.mark(&mut db, &format!("b{step_no}"))?;
+        }
         let mut res = http::send(&target.base_url, &req)
             .map_err(|e| format!("[{}] {}: {e}", target.name, step.name))?;
         mask_base_url(&mut res, &target.base_url);
@@ -206,6 +229,10 @@ fn run_once(target: &Target, scenario: &Scenario) -> Result<Value, String> {
         .map(|url| fakes::records(url).map(|r| fakes::normalize(&r, &mut norm)))
         .transpose()?;
 
+    let traced = tracer
+        .map(|t| t.finish(&mut db, scenario.steps.len()))
+        .transpose()?;
+
     let db_state = if scenario.compare_db {
         db_snapshot(&mut db, &mut norm, &scenario.db_opaque)?
     } else {
@@ -219,7 +246,7 @@ fn run_once(target: &Target, scenario: &Scenario) -> Result<Value, String> {
     {
         outcome["fakes"] = calls;
     }
-    Ok(outcome)
+    Ok((outcome, traced))
 }
 
 /// 서버가 요청의 `Host`로 만들어 응답에 싣는 자기 주소(OpenAPI `servers`, `Location` 등)는 레인마다 포트가 달라
