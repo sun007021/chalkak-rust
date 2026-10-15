@@ -24,7 +24,7 @@ use crate::client::{Client, Request, read_response};
 use crate::mix::{self, Ctx};
 use crate::run_cmd::{connect_db, db_err};
 use crate::seed::SeedSize;
-use crate::stress_judge::{self as judge, CaseKind, ErrCounts, Runtime, Snapshot};
+use crate::stress_judge::{self as judge, CaseKind, ErrCounts, ErrKind, Runtime, Snapshot};
 use crate::stress_load::{self as load, MixCfg, Recorder};
 use crate::sys;
 
@@ -70,15 +70,27 @@ fn read_proc(pid: u32, file: &str) -> Option<String> {
     std::fs::read_to_string(format!("/proc/{pid}/{file}")).ok()
 }
 
-/// 서버 프로세스가 속한 cgroup(v2)의 `pids.max`·`pids.current`.
+/// `/proc/<pid>/cgroup` 내용에서 `pids.max`·`pids.current`가 있는 디렉터리. cgroup v1(`N:pids:/경로`, `/sys/fs/cgroup/pids/경로`)과
+/// v2(`0::/경로`, `/sys/fs/cgroup/경로`)를 모두 읽는다.
+pub fn pids_cgroup_dir(cgroup: &str) -> Option<String> {
+    for line in cgroup.lines() {
+        let mut it = line.splitn(3, ':');
+        let (_, ctrl, path) = (it.next()?, it.next()?, it.next()?);
+        if ctrl.split(',').any(|c| c == "pids") {
+            return Some(format!("/sys/fs/cgroup/pids{}", path.trim()));
+        }
+    }
+    cgroup
+        .lines()
+        .find_map(|l| l.strip_prefix("0::"))
+        .map(|p| format!("/sys/fs/cgroup{}", p.trim()))
+}
+
+/// 서버 프로세스가 속한 cgroup의 `pids.max`·`pids.current`.
 fn pids_limits(pid: u32) -> (Option<u64>, Option<u64>) {
-    let Some(cg) = read_proc(pid, "cgroup") else {
+    let Some(dir) = read_proc(pid, "cgroup").and_then(|c| pids_cgroup_dir(&c)) else {
         return (None, None);
     };
-    let Some(path) = cg.lines().find_map(|l| l.strip_prefix("0::")) else {
-        return (None, None);
-    };
-    let dir = format!("/sys/fs/cgroup{}", path.trim());
     let read = |f: &str| {
         std::fs::read_to_string(Path::new(&dir).join(f))
             .ok()
@@ -782,33 +794,62 @@ fn idle(t: &Target, obs: &mut Obs, n: u64) -> CaseResult {
     g.stop();
     rec.end_phase();
 
-    // 3) 유휴 연결 N개를 붙인다
+    // 3) 유휴 연결 N개를 붙인다. 하나씩 맺고 바로 요청 하나를 보내 실제 keep-alive 연결로 만든다.
+    //    연달아 20번 실패하면 서버가 더 못 받는 것으로 보고 멈춘다(실패마다 시간 초과를 기다리지 않는다).
     let mut streams = Vec::with_capacity(n as usize);
     let mut open_errors = ErrCounts::default();
     let t_open = Instant::now();
-    for _ in 0..n {
-        match TcpStream::connect_timeout(&t.addr, Duration::from_secs(5)) {
-            Ok(s) => {
-                let _ = s.set_read_timeout(Some(Duration::from_secs(10)));
-                let _ = s.set_write_timeout(Some(Duration::from_secs(10)));
-                streams.push(s);
+    let (mut consecutive, mut first_failure_at, mut connected) = (0u32, None, 0u64);
+    let (mut peak_fds, mut peak_threads, mut peak_pids) = (0u64, 0u64, 0u64);
+    for i in 0..n {
+        if i % 50 == 0 {
+            let lim = t.server_limits();
+            peak_fds = peak_fds.max(lim["fds"].as_u64().unwrap_or(0));
+            peak_threads = peak_threads.max(lim["threads"].as_u64().unwrap_or(0));
+            peak_pids = peak_pids.max(lim["pids_current"].as_u64().unwrap_or(0));
+        }
+        let failure = match TcpStream::connect_timeout(&t.addr, Duration::from_secs(5)) {
+            Ok(mut s) => {
+                connected += 1;
+                let _ = s.set_read_timeout(Some(Duration::from_secs(3)));
+                let _ = s.set_write_timeout(Some(Duration::from_secs(3)));
+                match ping(&mut s) {
+                    Ok(200) => {
+                        streams.push(s);
+                        None
+                    }
+                    Ok(_) => Some(ErrKind::Status4xx),
+                    Err(e) => Some(judge::classify_io(e.kind(), false)),
+                }
             }
-            Err(e) => open_errors.add(judge::classify_io(e.kind(), true)),
+            Err(e) => Some(judge::classify_io(e.kind(), true)),
+        };
+        match failure {
+            None => consecutive = 0,
+            Some(k) => {
+                open_errors.add(k);
+                first_failure_at.get_or_insert(streams.len());
+                consecutive += 1;
+                if consecutive >= 20 {
+                    break;
+                }
+            }
         }
     }
-    // 모두 한 번씩 요청해서 실제 keep-alive 연결로 만든다.
-    let connected = streams.len();
-    streams.retain_mut(|s| ping(s).is_ok_and(|c| c == 200));
     let opened = streams.len() as u64;
     let open_secs = t_open.elapsed().as_secs_f64();
+    let lim = t.server_limits();
+    peak_fds = peak_fds.max(lim["fds"].as_u64().unwrap_or(0));
+    peak_threads = peak_threads.max(lim["threads"].as_u64().unwrap_or(0));
+    peak_pids = peak_pids.max(lim["pids_current"].as_u64().unwrap_or(0));
     let open_diag = judge::diagnose_open_failure(
         opened,
         n,
         loadgen_nofile(),
-        t.server_limits()["nofile"].as_u64().unwrap_or(u64::MAX),
-        t.server_limits()["fds"].as_u64().unwrap_or(0),
-        t.server_limits()["pids_max"].as_u64(),
-        t.server_limits()["pids_current"].as_u64(),
+        lim["nofile"].as_u64().unwrap_or(u64::MAX),
+        peak_fds,
+        lim["pids_max"].as_u64(),
+        (peak_pids > 0).then_some(peak_pids),
     );
     let holder = IdleHolder::start(streams);
     sleep(Duration::from_secs(3));
@@ -848,6 +889,8 @@ fn idle(t: &Target, obs: &mut Obs, n: u64) -> CaseResult {
         "idle_conns": n,
         "connected": connected,
         "opened": opened,
+        "first_failure_after_opened": first_failure_at,
+        "server_peak": { "fds": peak_fds, "threads": peak_threads, "pids": peak_pids },
         "open_errors": open_errors.to_json(),
         "open_secs": open_secs,
         "still_alive_at_end": alive,
@@ -1656,6 +1699,21 @@ mod tests {
         assert_eq!(parse_netstat(text, "ListenDrops"), Some(15));
         assert_eq!(parse_netstat(text, "Nope"), None);
         assert_eq!(parse_netstat("", "x"), None);
+    }
+
+    #[test]
+    fn cgroup_v1과_v2에서_pids_디렉터리를_찾는다() {
+        let v1 = "9:name=systemd:/docker/abc\n8:pids:/docker/abc\n0::/docker/abc\n";
+        assert_eq!(
+            pids_cgroup_dir(v1).as_deref(),
+            Some("/sys/fs/cgroup/pids/docker/abc")
+        );
+        let v2 = "0::/system.slice/docker-abc.scope\n";
+        assert_eq!(
+            pids_cgroup_dir(v2).as_deref(),
+            Some("/sys/fs/cgroup/system.slice/docker-abc.scope")
+        );
+        assert_eq!(pids_cgroup_dir(""), None);
     }
 
     #[test]

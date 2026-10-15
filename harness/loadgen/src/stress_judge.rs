@@ -758,7 +758,7 @@ pub fn diagnose_open_failure(
             loadgen_fds_needed(requested)
         ));
     }
-    if server_fds + 64 >= server_nofile {
+    if server_fds + 8 >= server_nofile {
         return Some(format!(
             "서버 컨테이너 nofile 한도: FD {server_fds} / {server_nofile}"
         ));
@@ -1197,7 +1197,7 @@ mod tests {
                 .contains("부하 발생기")
         );
         assert!(
-            diag(20_000, 8192, 8150, None, None)
+            diag(20_000, 8192, 8190, None, None)
                 .unwrap()
                 .contains("nofile")
         );
