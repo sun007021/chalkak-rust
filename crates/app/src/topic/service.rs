@@ -62,9 +62,7 @@ impl TopicService {
         let now = self.clock.now();
         let date = validate_not_future(topic_date, now)?;
         let mut conn = self.pool.get()?;
-        let topic = self
-            .repository
-            .find_active_by_topic_date(&mut *conn, date)?;
+        let topic = self.repository.find_active_by_topic_date(&mut conn, date)?;
         let topic = topic.ok_or_else(|| {
             ApiError::App(AppError::not_found(
                 ErrorCode::BUSINESS_ERROR,

@@ -3,9 +3,10 @@
 //!
 //! enum 열(`social_provider`)은 `CAST($n::text AS social_provider)`로 쓰고 `::text`로 읽는다.
 
+use chalkak_db::Db;
 use chalkak_db::DbError;
 use jiff::Timestamp;
-use postgres::{GenericClient, Row};
+use postgres::Row;
 use uuid::Uuid;
 
 use super::domain::{RefreshToken, SocialProvider};
@@ -31,7 +32,7 @@ impl SocialAccountRepository {
     /// `findByProviderAndSubjectHmac`(회원을 함께 읽는다).
     pub fn find_by_provider_and_subject_hmac(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         provider: SocialProvider,
         subject_hmac: &str,
     ) -> Result<Option<(SocialAccount, User)>, DbError> {
@@ -59,7 +60,7 @@ impl SocialAccountRepository {
     /// `findByUserId`: 회원의 소셜 계정 식별자.
     pub fn find_id_by_user_id(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         user_id: Uuid,
     ) -> Result<Option<Uuid>, DbError> {
         db.query_opt(
@@ -73,7 +74,7 @@ impl SocialAccountRepository {
     /// `save`.
     pub fn insert(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         user_id: Uuid,
         provider: SocialProvider,
         subject_hmac: &str,
@@ -89,11 +90,7 @@ impl SocialAccountRepository {
     }
 
     /// `deleteByUserId`.
-    pub fn delete_by_user_id(
-        &self,
-        db: &mut impl GenericClient,
-        user_id: Uuid,
-    ) -> Result<u64, DbError> {
+    pub fn delete_by_user_id(&self, db: &mut impl Db, user_id: Uuid) -> Result<u64, DbError> {
         Ok(db.execute(
             "DELETE FROM social_accounts WHERE user_id = $1",
             &[&user_id],
@@ -138,7 +135,7 @@ impl RefreshTokenRepository {
     /// 계보 잠금 대상을 고르려고 토큰이 속한 계보만 읽는다(잠금 없음, 판단에 쓰지 않는다).
     pub fn find_session_id_by_token_hash(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         token_hash: &str,
     ) -> Result<Option<Uuid>, DbError> {
         db.query_opt(
@@ -152,7 +149,7 @@ impl RefreshTokenRepository {
     /// 한 회원의 살아 있는 계보 식별자(`ORDER BY session_id`).
     pub fn find_live_session_ids_by_user_id(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         user_id: Uuid,
     ) -> Result<Vec<Uuid>, DbError> {
         db.query(
@@ -166,11 +163,7 @@ impl RefreshTokenRepository {
     }
 
     /// 계보를 트랜잭션이 끝날 때까지 잠근다(`pg_advisory_xact_lock`).
-    pub fn lock_session(
-        &self,
-        db: &mut impl GenericClient,
-        session_id: Uuid,
-    ) -> Result<(), DbError> {
+    pub fn lock_session(&self, db: &mut impl Db, session_id: Uuid) -> Result<(), DbError> {
         db.query_one(
             "SELECT pg_advisory_xact_lock(hashtext(CAST($1::uuid AS text)))",
             &[&session_id],
@@ -180,7 +173,7 @@ impl RefreshTokenRepository {
 
     pub fn find_by_token_hash(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         token_hash: &str,
     ) -> Result<Option<RefreshToken>, DbError> {
         db.query_opt(
@@ -192,11 +185,7 @@ impl RefreshTokenRepository {
     }
 
     /// `save`(새 토큰).
-    pub fn insert(
-        &self,
-        db: &mut impl GenericClient,
-        token: &NewRefreshToken<'_>,
-    ) -> Result<(), DbError> {
+    pub fn insert(&self, db: &mut impl Db, token: &NewRefreshToken<'_>) -> Result<(), DbError> {
         db.execute(
             "INSERT INTO user_refresh_tokens (user_id, session_id, token_hash, expires_at, \
              absolute_expires_at, created_at) VALUES ($1, $2, $3, $4, $5, $6)",
@@ -215,7 +204,7 @@ impl RefreshTokenRepository {
     /// 회전 시각을 기록한다.
     pub fn mark_rotated(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         id: Uuid,
         rotated_at: Timestamp,
     ) -> Result<(), DbError> {
@@ -230,7 +219,7 @@ impl RefreshTokenRepository {
     /// 두 조건은 서로 다른 컬럼을 보므로 문장을 나눠 각자의 인덱스를 쓴다(원본 주석). 지운 총 개수를 돌려준다.
     pub fn delete_unusable_before(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         now: Timestamp,
         revoked_threshold: Timestamp,
     ) -> Result<u64, DbError> {
@@ -248,7 +237,7 @@ impl RefreshTokenRepository {
     /// 계보 하나를 통째로 폐기하고 폐기된 토큰 수를 돌려준다.
     pub fn revoke_session(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         session_id: Uuid,
         revoked_at: Timestamp,
     ) -> Result<u64, DbError> {
@@ -262,7 +251,7 @@ impl RefreshTokenRepository {
     /// 한 회원의 모든 기기 세션을 폐기한다.
     pub fn revoke_all_by_user_id(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         user_id: Uuid,
         revoked_at: Timestamp,
     ) -> Result<u64, DbError> {
@@ -285,7 +274,7 @@ impl ConsumedSignupTokenRepository {
     /// `createIfAbsent`: 처음 기록했으면 `true`.
     pub fn consume_if_absent(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         jti: &str,
         expires_at: Timestamp,
     ) -> Result<bool, DbError> {
@@ -300,7 +289,7 @@ impl ConsumedSignupTokenRepository {
     /// `deleteAllExpiredBefore`: 만료 시각이 `now`보다 앞선 기록만 지운다(같으면 남긴다).
     pub fn delete_all_expired_before(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         now: Timestamp,
     ) -> Result<u64, DbError> {
         Ok(db.execute(
@@ -341,7 +330,7 @@ impl PendingAppleAuthorizationRepository {
     /// `findLatestUnexpiredBySubjectHmacForUpdate`.
     pub fn find_latest_unexpired_for_update(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         subject_hmac: &str,
         now: Timestamp,
     ) -> Result<Option<PendingAppleAuthorization>, DbError> {
@@ -366,7 +355,7 @@ impl PendingAppleAuthorizationRepository {
     /// `findAllExpiredAtOrBefore`: 만료 시각이 `now` 이하인 행을 만료가 이른 순서로.
     pub fn find_all_expired_at_or_before(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         now: Timestamp,
     ) -> Result<Vec<PendingAppleAuthorization>, DbError> {
         db.query(
@@ -388,7 +377,7 @@ impl PendingAppleAuthorizationRepository {
 
     pub fn insert(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         subject_hmac: &str,
         encrypted_refresh_token: &str,
         expires_at: Timestamp,
@@ -404,7 +393,7 @@ impl PendingAppleAuthorizationRepository {
 
     pub fn update_expires_at(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         id: Uuid,
         expires_at: Timestamp,
     ) -> Result<(), DbError> {
@@ -415,7 +404,7 @@ impl PendingAppleAuthorizationRepository {
         Ok(())
     }
 
-    pub fn delete(&self, db: &mut impl GenericClient, id: Uuid) -> Result<(), DbError> {
+    pub fn delete(&self, db: &mut impl Db, id: Uuid) -> Result<(), DbError> {
         db.execute(
             "DELETE FROM pending_apple_authorizations WHERE id = $1",
             &[&id],
@@ -436,7 +425,7 @@ pub struct AppleAuthorizationRepository;
 impl AppleAuthorizationRepository {
     pub fn find_all_by_social_account_id(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         social_account_id: Uuid,
     ) -> Result<Vec<AppleAuthorization>, DbError> {
         db.query(
@@ -456,7 +445,7 @@ impl AppleAuthorizationRepository {
 
     pub fn insert(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         social_account_id: Uuid,
         encrypted_refresh_token: &str,
         now: Timestamp,
@@ -471,7 +460,7 @@ impl AppleAuthorizationRepository {
 
     pub fn delete_all_by_social_account_id(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         social_account_id: Uuid,
     ) -> Result<u64, DbError> {
         Ok(db.execute(

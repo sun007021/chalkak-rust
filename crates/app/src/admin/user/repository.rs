@@ -2,9 +2,9 @@
 //!
 //! users·posts·social_accounts를 직접 읽고 쓴다(사용자 모듈의 저장소를 거치지 않는다).
 
+use chalkak_db::Db;
 use chalkak_db::DbError;
 use jiff::Timestamp;
-use postgres::GenericClient;
 use uuid::Uuid;
 
 use crate::admin::support::{AdminPage, SqlFilter, limit_offset};
@@ -167,7 +167,7 @@ pub struct AdminUserRepository;
 impl AdminUserRepository {
     pub fn find_users(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         criteria: &UserQueryCriteria,
         page: i32,
         page_size: i32,
@@ -212,7 +212,7 @@ impl AdminUserRepository {
 
     pub fn find_user_by_id(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         user_id: Uuid,
     ) -> Result<Option<UserDetailRow>, DbError> {
         let sql = format!(
@@ -226,7 +226,7 @@ impl AdminUserRepository {
     /// `UserRepository.findByIdForUpdate`
     pub fn find_by_id_for_update(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         user_id: Uuid,
     ) -> Result<Option<UserRow>, DbError> {
         let row = db.query_opt(
@@ -248,7 +248,7 @@ impl AdminUserRepository {
     /// 상태를 바꾸고 `updated_at`을 갱신한다(`@UpdateTimestamp`).
     pub fn update_status(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         user_id: Uuid,
         status: UserStatus,
         now: Timestamp,

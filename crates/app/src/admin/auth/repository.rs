@@ -1,8 +1,8 @@
 //! 원본 `AdminRepositoryImpl`·`AdminRefreshTokenRepositoryImpl`: 관리자 계정과 리프레시 토큰 저장.
 
+use chalkak_db::Db;
 use chalkak_db::DbError;
 use jiff::Timestamp;
-use postgres::GenericClient;
 use uuid::Uuid;
 
 use super::domain::{Admin, RefreshTokenRecord};
@@ -13,7 +13,7 @@ pub struct AdminRepository;
 impl AdminRepository {
     pub fn find_by_username(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         username: &str,
     ) -> Result<Option<Admin>, DbError> {
         let row = db.query_opt(
@@ -23,11 +23,7 @@ impl AdminRepository {
         row.map(|row| admin_from_row(&row)).transpose()
     }
 
-    pub fn find_by_id(
-        &self,
-        db: &mut impl GenericClient,
-        admin_id: Uuid,
-    ) -> Result<Option<Admin>, DbError> {
+    pub fn find_by_id(&self, db: &mut impl Db, admin_id: Uuid) -> Result<Option<Admin>, DbError> {
         let row = db.query_opt(
             "SELECT id, username, password FROM admins WHERE id = $1",
             &[&admin_id],
@@ -36,7 +32,7 @@ impl AdminRepository {
     }
 
     /// 새 관리자를 넣는다. 시각은 DB 기본값이 채운다.
-    pub fn save(&self, db: &mut impl GenericClient, admin: &mut Admin) -> Result<(), DbError> {
+    pub fn save(&self, db: &mut impl Db, admin: &mut Admin) -> Result<(), DbError> {
         let row = db.query_one(
             "INSERT INTO admins (username, password) VALUES ($1, $2) RETURNING id",
             &[&admin.username, &admin.password_hash],
@@ -71,7 +67,7 @@ pub struct AdminRefreshTokenRepository;
 impl AdminRefreshTokenRepository {
     pub fn find_session_id_by_token_hash(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         token_hash: &str,
     ) -> Result<Option<Uuid>, DbError> {
         let row = db.query_opt(
@@ -82,11 +78,7 @@ impl AdminRefreshTokenRepository {
     }
 
     /// 계보 하나를 트랜잭션이 끝날 때까지 잠근다(`pg_advisory_xact_lock`).
-    pub fn lock_session(
-        &self,
-        db: &mut impl GenericClient,
-        session_id: Uuid,
-    ) -> Result<(), DbError> {
+    pub fn lock_session(&self, db: &mut impl Db, session_id: Uuid) -> Result<(), DbError> {
         db.query_one(
             "SELECT pg_advisory_xact_lock(hashtext(CAST($1::uuid AS text)))",
             &[&session_id],
@@ -96,7 +88,7 @@ impl AdminRefreshTokenRepository {
 
     pub fn find_by_token_hash(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         token_hash: &str,
     ) -> Result<Option<RefreshTokenRecord>, DbError> {
         let row = db.query_opt(
@@ -118,11 +110,7 @@ impl AdminRefreshTokenRepository {
         .transpose()
     }
 
-    pub fn save(
-        &self,
-        db: &mut impl GenericClient,
-        token: &NewRefreshToken,
-    ) -> Result<(), DbError> {
+    pub fn save(&self, db: &mut impl Db, token: &NewRefreshToken) -> Result<(), DbError> {
         db.execute(
             "INSERT INTO admin_refresh_tokens \
              (admin_id, session_id, token_hash, expires_at, absolute_expires_at, created_at) \
@@ -140,12 +128,7 @@ impl AdminRefreshTokenRepository {
     }
 
     /// `consumed.rotate(now)`: 최초 회전 시각을 덮어쓰지 않는다.
-    pub fn mark_rotated(
-        &self,
-        db: &mut impl GenericClient,
-        id: Uuid,
-        now: Timestamp,
-    ) -> Result<(), DbError> {
+    pub fn mark_rotated(&self, db: &mut impl Db, id: Uuid, now: Timestamp) -> Result<(), DbError> {
         db.execute(
             "UPDATE admin_refresh_tokens SET rotated_at = $2 WHERE id = $1 AND rotated_at IS NULL",
             &[&id, &now],
@@ -156,7 +139,7 @@ impl AdminRefreshTokenRepository {
     /// `deleteUnusableBefore`: 회원 토큰과 같은 기준으로 지운다. 지운 총 개수를 돌려준다.
     pub fn delete_unusable_before(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         now: Timestamp,
         revoked_threshold: Timestamp,
     ) -> Result<u64, DbError> {
@@ -173,7 +156,7 @@ impl AdminRefreshTokenRepository {
 
     pub fn revoke_session(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         session_id: Uuid,
         revoked_at: Timestamp,
     ) -> Result<u64, DbError> {

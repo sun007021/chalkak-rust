@@ -1,8 +1,8 @@
 //! 원본 `FeedbackRepositoryImpl.save`.
 
+use chalkak_db::Db;
 use chalkak_db::DbError;
 use jiff::Timestamp;
-use postgres::GenericClient;
 
 use super::domain::Feedback;
 
@@ -13,7 +13,7 @@ impl FeedbackRepository {
     /// INSERT. `created_at`은 `@CreationTimestamp`처럼 앱 시각(`now`)으로 채우고, `id`는 DB 기본값(`uuidv7()`)이 만든다.
     pub fn save(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         feedback: &mut Feedback,
         now: Timestamp,
     ) -> Result<(), DbError> {

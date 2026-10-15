@@ -8,9 +8,9 @@ use std::sync::Arc;
 
 use chalkak_core::Clock;
 use chalkak_core::error::{AppError, ErrorCode};
+use chalkak_db::Db;
 use chalkak_db::Pool;
 use jiff::{SignedDuration, Timestamp};
-use postgres::GenericClient;
 use uuid::Uuid;
 
 use super::apple::AppleTokenClient;
@@ -122,7 +122,7 @@ impl AppleSignupAuthorizationService {
         validate_pending_apple_authorization(&hmac, encrypted_refresh_token)?;
         let mut conn = self.pool.get()?;
         self.pending.insert(
-            &mut *conn,
+            &mut conn,
             &hmac,
             encrypted_refresh_token,
             self.expires_at(),
@@ -157,7 +157,7 @@ impl AppleSignupAuthorizationService {
     /// 가입 트랜잭션 안에서 최신 임시 보관분 하나를 정식 보관으로 옮긴다(`saveIfApple`). 나머지 행은 폐기용으로 남긴다.
     pub fn save_if_apple(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         token: &VerifiedSocialSignupToken,
         social_account_id: Uuid,
         subject_hmac: &str,
@@ -176,7 +176,7 @@ impl AppleSignupAuthorizationService {
 
     fn latest_for_update(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         subject_hmac: &str,
     ) -> Result<super::repository::PendingAppleAuthorization, ApiError> {
         self.pending
@@ -444,7 +444,7 @@ impl SocialSignupService {
             .encode(identity.provider, &identity.subject);
         let mut conn = self.pool.get()?;
         let found = self.social_accounts.find_by_provider_and_subject_hmac(
-            &mut *conn,
+            &mut conn,
             identity.provider,
             &hmac,
         )?;
@@ -508,7 +508,7 @@ impl SocialSignupService {
 
     fn existing_user_result(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         user: User,
     ) -> Result<SocialSignupResult, ApiError> {
         if user.status == UserStatus::Banned {
@@ -523,7 +523,7 @@ impl SocialSignupService {
     /// 리프레시 토큰 계보는 회원 행에 FK로 매달리므로 가입 직후 액세스 토큰과 함께 발급한다.
     fn signup_result(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         user_id: Uuid,
     ) -> Result<SocialSignupResult, ApiError> {
         Ok(SocialSignupResult {
@@ -537,7 +537,7 @@ impl SocialSignupService {
     /// 뒤 단계가 실패하면 가입 트랜잭션과 함께 롤백된다.
     fn consume_signup_token(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         verified: &VerifiedSocialSignupToken,
     ) -> Result<(), ApiError> {
         validate_consumed_signup_token(&verified.token_id)?;

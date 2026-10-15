@@ -4,10 +4,10 @@ use std::sync::Arc;
 
 use chalkak_core::Clock;
 use chalkak_core::error::{AppError, ErrorCode};
+use chalkak_db::Db;
 use chalkak_db::Pool;
 use jiff::Timestamp;
 use jiff::civil::Date;
-use postgres::GenericClient;
 use uuid::Uuid;
 
 use super::domain::ModerationStatus;
@@ -164,15 +164,15 @@ impl PostQueryService {
     /// `getPost`
     pub fn get_post(&self, post_id: Uuid, user_id: Uuid) -> Result<PostDetail, ApiError> {
         let mut conn = self.pool.get()?;
-        require_active_user(&mut *conn, user_id)?;
+        require_active_user(&mut conn, user_id)?;
         let post = self
             .posts
-            .find_visible_by_id(&mut *conn, post_id, false)?
+            .find_visible_by_id(&mut conn, post_id, false)?
             .ok_or_else(|| not_found("게시물을 찾을 수 없습니다."))?;
-        let like_count = self.likes.count_by_post_id(&mut *conn, post_id)?;
+        let like_count = self.likes.count_by_post_id(&mut conn, post_id)?;
         let is_liked = self
             .likes
-            .exists_by_post_id_and_user_id(&mut *conn, post_id, user_id)?;
+            .exists_by_post_id_and_user_id(&mut conn, post_id, user_id)?;
         Ok(PostDetail {
             id: post.id,
             topic: TopicBrief {
@@ -193,17 +193,17 @@ impl PostQueryService {
     /// 참여 기간으로 고른다.
     pub fn get_my_today_post_status(&self, user_id: Uuid) -> Result<TodayPostStatus, ApiError> {
         let mut conn = self.pool.get()?;
-        require_active_user(&mut *conn, user_id)?;
+        require_active_user(&mut conn, user_id)?;
         let now = self.clock.now();
         let topic = self
             .topics
-            .find_active_open_at(&mut *conn, now)?
+            .find_active_open_at(&mut conn, now)?
             .ok_or_else(|| not_found("참여할 수 있는 주제가 없습니다."))?;
         let topic_date = topic.topic_date;
         let topic_id = topic.id.expect("저장된 주제에는 식별자가 있다");
         let post = self
             .posts
-            .find_active_by_author_and_topic(&mut *conn, user_id, topic_id, false)?;
+            .find_active_by_author_and_topic(&mut conn, user_id, topic_id, false)?;
         // 이미지 처리 대기 시간을 넘긴 게시물은 생성 흐름이 거절 처리하고 재작성을 열어 주므로 여기서도 막지 않는다.
         let blocking = post.filter(|post| {
             !post.is_validating()
@@ -235,7 +235,7 @@ impl PostQueryService {
         month: i32,
     ) -> Result<PostCalendarResult, ApiError> {
         let mut conn = self.pool.get()?;
-        require_active_user(&mut *conn, user_id)?;
+        require_active_user(&mut conn, user_id)?;
         let first = Date::new(
             i16::try_from(year).map_err(|_| ApiError::Internal("year".to_owned()))?,
             i8::try_from(month).map_err(|_| ApiError::Internal("month".to_owned()))?,
@@ -245,7 +245,7 @@ impl PostQueryService {
         let last = first.last_of_month();
         let rows = self
             .posts
-            .find_calendar_posts(&mut *conn, user_id, first, last)?;
+            .find_calendar_posts(&mut conn, user_id, first, last)?;
         let posts = rows
             .into_iter()
             .map(|row| {
@@ -263,8 +263,8 @@ impl PostQueryService {
     /// `getMyPostCalendarMonths`
     pub fn get_my_post_calendar_months(&self, user_id: Uuid) -> Result<Vec<(i32, i32)>, ApiError> {
         let mut conn = self.pool.get()?;
-        require_active_user(&mut *conn, user_id)?;
-        Ok(self.posts.find_calendar_months(&mut *conn, user_id)?)
+        require_active_user(&mut conn, user_id)?;
+        Ok(self.posts.find_calendar_months(&mut conn, user_id)?)
     }
 
     /// `getPosts`: 검사 순서는 원본과 같다. 시드 조합, 미래 날짜, 로그인 회원 확인, 주제 조회.
@@ -281,11 +281,11 @@ impl PostQueryService {
         let date = self.validate_topic_date(topic_date)?;
         let mut conn = self.pool.get()?;
         if let Some(user_id) = user_id {
-            require_active_user(&mut *conn, user_id)?;
+            require_active_user(&mut conn, user_id)?;
         }
         let topic = self
             .topics
-            .find_active_by_topic_date(&mut *conn, date)?
+            .find_active_by_topic_date(&mut conn, date)?
             .ok_or_else(|| not_found("해당 날짜의 주제를 찾을 수 없습니다."))?;
         let topic_id = topic.id.expect("저장된 주제에는 식별자가 있다");
 
@@ -310,18 +310,18 @@ impl PostQueryService {
             ));
         }
         let slice = self.posts.find_visible_slice(
-            &mut *conn,
+            &mut conn,
             topic_id,
             order,
             i64::from(page - 1),
             i64::from(page_size),
         )?;
-        self.create_list_result(&mut *conn, slice, page, page_size, effective_seed, user_id)
+        self.create_list_result(&mut conn, slice, page, page_size, effective_seed, user_id)
     }
 
     fn create_list_result(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         slice: PostSlice,
         page: i32,
         page_size: i32,

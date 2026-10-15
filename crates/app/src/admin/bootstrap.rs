@@ -37,14 +37,14 @@ pub fn ensure_admin_account(
     let mut conn = pool.get().map_err(|e| e.to_string())?;
     let repo = AdminRepository;
     if repo
-        .find_by_username(&mut *conn, &admin.username)
+        .find_by_username(&mut conn, &admin.username)
         .map_err(|e| e.to_string())?
         .is_some()
     {
         return Ok(());
     }
     let mut admin = admin;
-    repo.save(&mut *conn, &mut admin).map_err(|e| e.to_string())
+    repo.save(&mut conn, &mut admin).map_err(|e| e.to_string())
 }
 
 #[cfg(test)]

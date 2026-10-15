@@ -6,10 +6,11 @@
 //! 연결(또는 트랜잭션)은 호출 측이 넘긴다. 원본의 `@Transactional` 경계가 서비스에 있듯 여기서는 트랜잭션을 열지 않는다.
 
 use chalkak_core::error::{AppError, ErrorCode};
+use chalkak_db::Db;
 use chalkak_db::DbError;
 use jiff::Timestamp;
 use jiff::civil::Date;
-use postgres::{GenericClient, Row};
+use postgres::Row;
 use serde_json::{Map, Value};
 use uuid::Uuid;
 
@@ -136,12 +137,7 @@ const VISIBLE_CONDITIONS: &str = "p.moderation_status = 'APPROVED' AND p.deleted
 
 impl PostRepository {
     /// `save`: 사진과 게시물을 INSERT한다. 중복 제약 위반은 업무 오류(`이미 사용된 게시물 생성 정보입니다.`)로 바꾼다.
-    pub fn save(
-        &self,
-        db: &mut impl GenericClient,
-        post: &mut Post,
-        now: Timestamp,
-    ) -> Result<(), ApiError> {
+    pub fn save(&self, db: &mut impl Db, post: &mut Post, now: Timestamp) -> Result<(), ApiError> {
         match self.insert(db, post, now) {
             Ok(()) => Ok(()),
             Err(error) => {
@@ -156,12 +152,7 @@ impl PostRepository {
         }
     }
 
-    fn insert(
-        &self,
-        db: &mut impl GenericClient,
-        post: &mut Post,
-        now: Timestamp,
-    ) -> Result<(), DbError> {
+    fn insert(&self, db: &mut impl Db, post: &mut Post, now: Timestamp) -> Result<(), DbError> {
         self.photos.insert(db, &mut post.photo, now)?;
         let title = post.title_value().map(str::to_owned);
         let status = post.moderation_status.as_str();
@@ -191,7 +182,7 @@ impl PostRepository {
     /// `findActiveByAuthorIdAndTopicIdForUpdate`/`findActiveByAuthorIdAndTopicId`: 거절되지 않은 살아 있는 게시물.
     pub fn find_active_by_author_and_topic(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         author_id: Uuid,
         topic_id: Uuid,
         for_update: bool,
@@ -215,7 +206,7 @@ impl PostRepository {
     /// `findActiveByIdForUpdate`: 삭제되지 않은 게시물을 잠그고 읽는다.
     pub fn find_active_by_id_for_update(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         post_id: Uuid,
     ) -> Result<Option<Post>, DbError> {
         let sql = format!(
@@ -231,7 +222,7 @@ impl PostRepository {
     /// `findByIdForUpdate`: 삭제된 게시물도 읽는다(삭제는 멱등이다). 게시물 행만 잠근다.
     pub fn find_by_id_for_update(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         post_id: Uuid,
     ) -> Result<Option<Post>, DbError> {
         let sql =
@@ -245,7 +236,7 @@ impl PostRepository {
     /// `findValidatingByPostImageUploadIdForUpdate`: 이미지 처리를 기다리는 게시물.
     pub fn find_validating_by_upload_id_for_update(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         upload_id: Uuid,
     ) -> Result<Option<Post>, DbError> {
         let sql = format!(
@@ -262,7 +253,7 @@ impl PostRepository {
     /// 주제가 열려 있는지 판정할 참여 기간. 삭제된 주제도 읽는다(게시물이 가리키는 주제).
     pub fn find_topic_period(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         topic_id: Uuid,
     ) -> Result<Option<ParticipationPeriod>, DbError> {
         let row = db.query_opt(
@@ -281,7 +272,7 @@ impl PostRepository {
     /// 제목 변경을 반영한다(`@UpdateTimestamp`처럼 `updated_at`도 갱신).
     pub fn update_title(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         post: &Post,
         now: Timestamp,
     ) -> Result<(), DbError> {
@@ -296,7 +287,7 @@ impl PostRepository {
     /// 검수 상태 변경(`moderation_status`, `moderated_at`)을 반영한다.
     pub fn update_moderation(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         post: &Post,
         now: Timestamp,
     ) -> Result<(), DbError> {
@@ -312,7 +303,7 @@ impl PostRepository {
     /// 소프트 삭제를 반영한다. 사진도 같은 시각으로 지워진다(`Post.delete*`가 `Photo.delete`를 부른다).
     pub fn update_deleted(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         post: &Post,
         now: Timestamp,
     ) -> Result<(), DbError> {
@@ -330,7 +321,7 @@ impl PostRepository {
     /// 사진 처리 결과를 반영한다.
     pub fn update_photo_processing(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         post: &Post,
         now: Timestamp,
     ) -> Result<(), DbError> {
@@ -344,7 +335,7 @@ impl PostRepository {
     /// `findVisibleById`/`findVisibleByIdForShare`: 공개된(`APPROVED`) 게시물. 주제·사진·작성자도 삭제되지 않아야 한다.
     pub fn find_visible_by_id(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         post_id: Uuid,
         for_share: bool,
     ) -> Result<Option<VisiblePost>, DbError> {
@@ -376,7 +367,7 @@ impl PostRepository {
     /// `findCalendarPostsByAuthorIdAndTopicDateBetween`: 검수 대기·승인 게시물을 주제 날짜, 게시물 id 순으로.
     pub fn find_calendar_posts(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         author_id: Uuid,
         start_date: Date,
         end_date: Date,
@@ -409,7 +400,7 @@ impl PostRepository {
     /// `findCalendarMonthsByAuthorId`: 게시물이 있는 연월을 최근 순으로.
     pub fn find_calendar_months(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         author_id: Uuid,
     ) -> Result<Vec<(i32, i32)>, DbError> {
         let rows = db.query(
@@ -431,7 +422,7 @@ impl PostRepository {
     /// 공개된 게시물 목록의 한 쪽. `page`는 0부터, 다음 쪽 유무를 알기 위해 한 건 더 읽는다(Spring `Slice`).
     pub fn find_visible_slice(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         topic_id: Uuid,
         order: ListOrder<'_>,
         page: i64,

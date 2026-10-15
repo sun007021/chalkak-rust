@@ -8,10 +8,11 @@
 //! - `ex_topics_active_participation_period`(참여 기간 겹침) -> `다른 주제의 참여 기간과 겹칩니다.`
 
 use chalkak_core::error::{AppError, ErrorCode};
+use chalkak_db::Db;
 use chalkak_db::DbError;
 use jiff::Timestamp;
 use jiff::civil::Date;
-use postgres::{GenericClient, Row};
+use postgres::Row;
 use uuid::Uuid;
 
 use super::domain::{ParticipationPeriod, Topic};
@@ -57,7 +58,7 @@ impl TopicRepository {
     /// `findActiveById`
     pub fn find_active_by_id(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         topic_id: Uuid,
     ) -> Result<Option<Topic>, DbError> {
         let sql = format!("SELECT {COLUMNS} FROM topics WHERE id = $1 AND deleted_at IS NULL");
@@ -70,7 +71,7 @@ impl TopicRepository {
     /// `findActiveByTopicDate`
     pub fn find_active_by_topic_date(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         topic_date: Date,
     ) -> Result<Option<Topic>, DbError> {
         let sql =
@@ -84,7 +85,7 @@ impl TopicRepository {
     /// `findActiveOpenAt`: 그 시각에 참여할 수 있는 주제. 날짜가 아니라 참여 기간으로 고른다.
     pub fn find_active_open_at(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         now: Timestamp,
     ) -> Result<Option<Topic>, DbError> {
         let sql = format!(
@@ -100,7 +101,7 @@ impl TopicRepository {
     /// `findActiveByIdForUpdate`: 비관적 쓰기 락(Hibernate PostgreSQL 방언의 `for no key update`). 트랜잭션 안에서 불러야 한다.
     pub fn find_active_by_id_for_update(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         topic_id: Uuid,
     ) -> Result<Option<Topic>, DbError> {
         let sql = format!(
@@ -115,7 +116,7 @@ impl TopicRepository {
     /// `existsActiveByTopicDate`
     pub fn exists_active_by_topic_date(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         topic_date: Date,
     ) -> Result<bool, DbError> {
         exists(
@@ -128,7 +129,7 @@ impl TopicRepository {
     /// `existsActiveByTopicDateExcludingId`
     pub fn exists_active_by_topic_date_excluding_id(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         topic_date: Date,
         topic_id: Uuid,
     ) -> Result<bool, DbError> {
@@ -142,7 +143,7 @@ impl TopicRepository {
     /// `existsActiveOverlappingPeriod`: 반열린 구간 `[starts, ends)`가 겹치는 활성 주제가 있는가.
     pub fn exists_active_overlapping_period(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         starts_at: Timestamp,
         ends_at: Timestamp,
     ) -> Result<bool, DbError> {
@@ -157,7 +158,7 @@ impl TopicRepository {
     /// `existsActiveOverlappingPeriodExcludingId`
     pub fn exists_active_overlapping_period_excluding_id(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         starts_at: Timestamp,
         ends_at: Timestamp,
         topic_id: Uuid,
@@ -174,7 +175,7 @@ impl TopicRepository {
     /// `created_at`·`updated_at`은 JPA의 `@CreationTimestamp`·`@UpdateTimestamp`처럼 앱 시각(`now`)으로 채운다.
     pub fn save_and_flush(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         topic: &mut Topic,
         now: Timestamp,
     ) -> Result<(), SaveError> {
@@ -219,7 +220,7 @@ impl TopicRepository {
 }
 
 fn exists(
-    db: &mut impl GenericClient,
+    db: &mut impl Db,
     sql: &str,
     params: &[&(dyn postgres::types::ToSql + Sync)],
 ) -> Result<bool, DbError> {

@@ -144,7 +144,7 @@ impl AdminAuthenticationService {
     /// `issue`: 새 회전 계보를 시작한다.
     fn issue_refresh_token(
         &self,
-        tx: &mut postgres::Transaction<'_>,
+        tx: &mut chalkak_db::Tx<'_>,
         admin_id: Uuid,
         now: Timestamp,
     ) -> Result<IssuedRefreshToken, ApiError> {
@@ -172,7 +172,7 @@ impl AdminAuthenticationService {
     pub fn get_current_admin(&self, admin_id: Uuid) -> Result<CurrentAdminResult, ApiError> {
         let mut conn = self.deps.pool.get()?;
         let admin = AdminRepository
-            .find_by_id(&mut *conn, admin_id)?
+            .find_by_id(&mut conn, admin_id)?
             .ok_or_else(authentication_failure)?;
         Ok(CurrentAdminResult {
             admin_id,
@@ -265,7 +265,7 @@ impl AdminRefreshTokenService {
 
 /// 계보 식별자를 읽고(잠금 없이) 잠근 뒤, 잠금 아래에서 다시 읽는다.
 fn lock_lineage_and_read(
-    tx: &mut postgres::Transaction<'_>,
+    tx: &mut chalkak_db::Tx<'_>,
     token_hash: &str,
 ) -> Result<Option<super::domain::RefreshTokenRecord>, ApiError> {
     let repo = AdminRefreshTokenRepository;

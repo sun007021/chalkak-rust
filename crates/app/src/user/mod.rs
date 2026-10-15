@@ -6,8 +6,8 @@ pub mod repository;
 pub mod service;
 pub mod storage;
 
+use chalkak_db::Db;
 use chalkak_db::DbError;
-use postgres::GenericClient;
 use uuid::Uuid;
 
 /// 회원 행의 존재 여부와 탈퇴 여부(`UserRepository.findById`에서 필요한 부분).
@@ -23,11 +23,7 @@ pub struct UserRepository;
 
 impl UserRepository {
     /// 탈퇴 회원도 읽어야 없는 회원과 구분할 수 있으므로 `deleted_at`을 거르지 않는다.
-    pub fn presence(
-        &self,
-        db: &mut impl GenericClient,
-        user_id: Uuid,
-    ) -> Result<UserPresence, DbError> {
+    pub fn presence(&self, db: &mut impl Db, user_id: Uuid) -> Result<UserPresence, DbError> {
         let row = db.query_opt(
             "SELECT deleted_at IS NOT NULL AS withdrawn FROM users WHERE id = $1",
             &[&user_id],

@@ -16,9 +16,9 @@ pub mod slack;
 use std::fmt;
 
 use chalkak_core::error::AppError;
+use chalkak_db::Db;
 use chalkak_db::DbError;
 use jiff::Timestamp;
-use postgres::GenericClient;
 use uuid::Uuid;
 
 use self::domain::Notification;
@@ -78,7 +78,7 @@ impl From<NotificationError> for ApiError {
 /// `(user_id, event_key)`가 유일해 같은 검수 사건의 알림은 한 번만 들어간다(중복이면 DB 제약 오류).
 /// `rejection_reason`은 승인일 때 무시하고 반려일 때 비어 있으면 안 된다.
 pub fn create_for_moderation(
-    tx: &mut impl GenericClient,
+    tx: &mut impl Db,
     user_id: Uuid,
     post_id: Uuid,
     event_key: Uuid,

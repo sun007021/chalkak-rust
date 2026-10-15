@@ -92,7 +92,7 @@ impl AdminPostQueryService {
             sort: sort.unwrap_or(AdminPostSort::CreatedAtDesc),
         };
         let mut conn = self.deps.pool.get()?;
-        let result = AdminPostRepository.find_posts(&mut *conn, &criteria, page, page_size)?;
+        let result = AdminPostRepository.find_posts(&mut conn, &criteria, page, page_size)?;
         let urls = &self.deps.image_urls;
         let mut items = Vec::with_capacity(result.items.len());
         for row in result.items {
@@ -113,7 +113,7 @@ impl AdminPostQueryService {
     pub fn get_post(&self, post_id: Uuid) -> Result<PostDetail, ApiError> {
         let mut conn = self.deps.pool.get()?;
         let row = AdminPostRepository
-            .find_post_by_id(&mut *conn, post_id)?
+            .find_post_by_id(&mut conn, post_id)?
             .ok_or_else(|| not_found(NOT_FOUND_MESSAGE))?;
         let urls = &self.deps.image_urls;
         Ok(PostDetail {

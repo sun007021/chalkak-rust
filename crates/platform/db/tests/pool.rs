@@ -274,7 +274,8 @@ fn pool_refills_by_retrying_while_database_refuses_connections() {
     // 접속이 거부되는 동안의 요청은 실패한다(버림만 일으키면 된다).
     assert!(pool.get().is_err());
     thread::sleep(Duration::from_millis(600));
-    assert_eq!(pool.stats().total, 0, "거부되는 동안에는 채워질 수 없다");
+    // 채우기 스레드가 맺기를 시도하는 순간에는 자리를 예약해 total이 1일 수 있다. 유휴 연결은 생기지 않는다.
+    assert_eq!(pool.stats().idle, 0, "거부되는 동안에는 채워질 수 없다");
     assert_eq!(backends(&mut admin, &db.name), 0);
 
     admin
@@ -333,4 +334,73 @@ fn dropping_the_pool_stops_the_refill_thread() {
     // 풀이 사라진 뒤에는 채우기가 연결을 다시 맺지 않는다.
     thread::sleep(Duration::from_secs(1));
     assert_eq!(backends(&mut admin, &db.name), 0);
+}
+
+// #36: 같은 SQL을 보낼 때마다 계획을 다시 세우지 않도록 연결마다 준비된 문장을 캐시한다(pgjdbc와 같은 효과).
+fn prepared_count(conn: &mut chalkak_db::Conn, like: &str) -> i64 {
+    let client: &mut postgres::Client = conn;
+    client
+        .query_one(
+            "SELECT count(*) FROM pg_prepared_statements WHERE statement LIKE $1",
+            &[&like],
+        )
+        .unwrap()
+        .get(0)
+}
+
+#[test]
+fn repeated_queries_reuse_one_prepared_statement_per_connection() {
+    let Some(db) = TestDb::create() else { return };
+    let pool = Pool::connect(&db.config, 1).unwrap();
+    let sql = "SELECT $1::int + 41 AS answer";
+    {
+        let mut conn = pool.get().unwrap();
+        for _ in 0..3 {
+            let row = conn.query_one(sql, &[&1i32]).unwrap();
+            assert_eq!(row.get::<_, i32>("answer"), 42);
+        }
+        assert_eq!(prepared_count(&mut conn, "SELECT $1::int + 41%"), 1);
+        assert_eq!(conn.cached_statements(), 1);
+    }
+    // 풀로 돌아갔다 다시 빌려도(크기 1이라 같은 연결) 캐시가 남고, 트랜잭션 안에서도 같은 문장을 쓴다.
+    let mut conn = pool.get().unwrap();
+    assert_eq!(conn.cached_statements(), 1);
+    conn.transaction(|tx| {
+        let row = tx.query_one(sql, &[&2i32])?;
+        assert_eq!(row.get::<_, i32>("answer"), 43);
+        Ok(())
+    })
+    .unwrap();
+    assert_eq!(prepared_count(&mut conn, "SELECT $1::int + 41%"), 1);
+}
+
+#[test]
+fn statement_cache_is_bounded() {
+    use chalkak_db::STATEMENT_CACHE_CAPACITY;
+    let Some(db) = TestDb::create() else { return };
+    let pool = Pool::connect(&db.config, 1).unwrap();
+    let mut conn = pool.get().unwrap();
+    for i in 0..STATEMENT_CACHE_CAPACITY + 10 {
+        conn.query_one(&format!("SELECT {i} AS n"), &[]).unwrap();
+    }
+    assert!(conn.cached_statements() <= STATEMENT_CACHE_CAPACITY);
+}
+
+#[test]
+fn replaced_connection_starts_with_an_empty_cache() {
+    let Some(db) = TestDb::create() else { return };
+    let pool = Pool::connect(&db.config, 1).unwrap();
+    let victim = {
+        let mut conn = pool.get().unwrap();
+        conn.query_one("SELECT 1 AS one", &[]).unwrap();
+        pid(&mut conn)
+    };
+    db.client()
+        .execute("SELECT pg_terminate_backend($1)", &[&victim])
+        .unwrap();
+    thread::sleep(Duration::from_millis(600)); // alive_bypass_window(500ms)가 지나야 빌릴 때 검사한다
+    let mut conn = pool.get().unwrap();
+    assert_eq!(conn.cached_statements(), 0);
+    assert_ne!(pid(&mut conn), victim);
+    conn.query_one("SELECT 1 AS one", &[]).unwrap();
 }

@@ -1,10 +1,10 @@
 //! 원본 `AdminPostQueryRepositoryImpl`·`AdminPostJpaRepository`와 검수·삭제가 쓰는 `PostRepository`·`PostLikeRepository`
 //! 조각. posts·photos·post_likes·post_image_uploads를 직접 읽고 쓴다.
 
+use chalkak_db::Db;
 use chalkak_db::DbError;
 use jiff::Timestamp;
 use jiff::civil::Date;
-use postgres::GenericClient;
 use serde_json::Value;
 use uuid::Uuid;
 
@@ -164,7 +164,7 @@ pub struct AdminPostRepository;
 impl AdminPostRepository {
     pub fn find_posts(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         criteria: &PostQueryCriteria,
         page: i32,
         page_size: i32,
@@ -231,7 +231,7 @@ impl AdminPostRepository {
 
     pub fn find_post_by_id(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         post_id: Uuid,
     ) -> Result<Option<PostDetailRow>, DbError> {
         let sql = format!(
@@ -300,7 +300,7 @@ impl AdminPostRepository {
     /// `findActiveByIdForUpdate` / `findByIdForUpdate`. 삭제된 게시물은 `include_deleted`일 때만 돌려준다.
     pub fn find_for_update(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         post_id: Uuid,
         include_deleted: bool,
     ) -> Result<Option<PostForUpdate>, DbError> {
@@ -334,7 +334,7 @@ impl AdminPostRepository {
     /// 검수 결정을 저장한다(`@UpdateTimestamp`로 `updated_at`도 갱신).
     pub fn save_moderation(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         post_id: Uuid,
         status: ModerationStatus,
         moderated_at: Timestamp,
@@ -351,7 +351,7 @@ impl AdminPostRepository {
     /// 관리자 삭제: 게시물과 사진을 같은 시각으로 삭제 표시한다.
     pub fn save_deletion(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         post_id: Uuid,
         photo_id: Uuid,
         deleted_at: Timestamp,
@@ -367,7 +367,7 @@ impl AdminPostRepository {
     /// `Photo.delete`: 이미 삭제된 사진은 건드리지 않는다.
     pub fn mark_photo_deleted(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         photo_id: Uuid,
         deleted_at: Timestamp,
         now: Timestamp,
@@ -380,7 +380,7 @@ impl AdminPostRepository {
     }
 
     /// `PostLikeRepository.deleteByPostId`
-    pub fn delete_likes(&self, db: &mut impl GenericClient, post_id: Uuid) -> Result<u64, DbError> {
+    pub fn delete_likes(&self, db: &mut impl Db, post_id: Uuid) -> Result<u64, DbError> {
         Ok(db.execute("DELETE FROM post_likes WHERE post_id = $1", &[&post_id])?)
     }
 }

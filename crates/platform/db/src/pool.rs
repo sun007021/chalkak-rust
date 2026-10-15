@@ -10,9 +10,12 @@ use postgres::Client;
 
 use crate::config::DbConfig;
 use crate::error::DbError;
+use crate::session::{StatementCache, Tx, cached_db};
 
 struct Idle {
     client: Client,
+    /// 이 연결에 준비해 둔 문장. 연결과 함께 풀을 오간다.
+    cache: StatementCache,
     created: Instant,
     returned: Instant,
 }
@@ -101,12 +104,13 @@ impl Inner {
         true
     }
 
-    fn release(&self, client: Client, created: Instant) {
+    fn release(&self, client: Client, cache: StatementCache, created: Instant) {
         let reusable = !client.is_closed() && created.elapsed() < self.config.max_lifetime;
         let mut state = self.lock();
         if reusable && !state.closed {
             state.idle.push_back(Idle {
                 client,
+                cache,
                 created,
                 returned: Instant::now(),
             });
@@ -146,6 +150,7 @@ fn fill_loop(weak: Weak<Inner>) {
                 } else {
                     state.idle.push_back(Idle {
                         client,
+                        cache: StatementCache::default(),
                         created: now,
                         returned: now,
                     });
@@ -234,6 +239,7 @@ impl Pool {
             let now = Instant::now();
             idle.push_back(Idle {
                 client,
+                cache: StatementCache::default(),
                 created: now,
                 returned: now,
             });
@@ -262,7 +268,7 @@ impl Pool {
             if let Some(mut entry) = state.idle.pop_back() {
                 drop(state);
                 if self.usable(&mut entry) {
-                    return Ok(self.lend(entry.client, entry.created));
+                    return Ok(self.lend(entry.client, entry.cache, entry.created));
                 }
                 drop(entry);
                 inner.give_up_slot();
@@ -273,7 +279,9 @@ impl Pool {
                 state.total += 1;
                 drop(state);
                 match inner.open() {
-                    Ok(client) => return Ok(self.lend(client, Instant::now())),
+                    Ok(client) => {
+                        return Ok(self.lend(client, StatementCache::default(), Instant::now()));
+                    }
                     Err(e) => {
                         inner.give_up_slot();
                         last_connect_error = Some(e);
@@ -318,9 +326,10 @@ impl Pool {
         true
     }
 
-    fn lend(&self, client: Client, created: Instant) -> Conn {
+    fn lend(&self, client: Client, cache: StatementCache, created: Instant) -> Conn {
         Conn {
             client: Some(client),
+            cache,
             created,
             inner: Arc::clone(&self.inner),
         }
@@ -351,20 +360,33 @@ impl Pool {
     }
 }
 
-/// 빌린 연결. 놓으면 풀로 돌아간다. `postgres::Client`처럼 쓸 수 있다.
+/// 빌린 연결. 놓으면 풀로 돌아간다. 질의는 [`Db`]로 보내면 연결별 문장 캐시를 쓴다
+/// (`postgres::Client`로 deref해서 보내면 캐시를 거치지 않는다).
 pub struct Conn {
     client: Option<Client>,
+    cache: StatementCache,
     created: Instant,
     inner: Arc<Inner>,
 }
 
 impl Conn {
+    /// 트랜잭션을 연다(`BEGIN`). 커밋하지 않고 놓으면 롤백된다.
+    pub fn begin(&mut self) -> Result<Tx<'_>, postgres::Error> {
+        let client = self.client.as_mut().expect("connection already returned");
+        Ok(Tx::new(client.transaction()?, &mut self.cache))
+    }
+
+    /// 이 연결에 캐시된 문장 수.
+    pub fn cached_statements(&self) -> usize {
+        self.cache.len()
+    }
+
     /// 트랜잭션 안에서 `f`를 실행한다. `Ok`면 커밋, `Err`이거나 패닉하면 롤백한다.
     pub fn transaction<T>(
         &mut self,
-        f: impl FnOnce(&mut postgres::Transaction) -> Result<T, DbError>,
+        f: impl FnOnce(&mut Tx<'_>) -> Result<T, DbError>,
     ) -> Result<T, DbError> {
-        let mut tx = self.deref_mut().transaction()?;
+        let mut tx = self.begin()?;
         match f(&mut tx) {
             Ok(value) => {
                 tx.commit()?;
@@ -378,6 +400,11 @@ impl Conn {
         }
     }
 }
+
+cached_db!(Conn, client, cache, |s| (
+    s.client.as_mut().expect("connection already returned"),
+    &mut s.cache
+));
 
 impl Deref for Conn {
     type Target = Client;
@@ -396,7 +423,8 @@ impl DerefMut for Conn {
 impl Drop for Conn {
     fn drop(&mut self) {
         if let Some(client) = self.client.take() {
-            self.inner.release(client, self.created);
+            let cache = std::mem::take(&mut self.cache);
+            self.inner.release(client, cache, self.created);
         }
     }
 }

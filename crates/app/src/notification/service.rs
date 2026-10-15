@@ -88,7 +88,7 @@ impl NotificationInboxService {
         let mut conn = self.pool.get()?;
         let slice =
             self.repository
-                .find_by_user_id(&mut *conn, user_id, offset, i64::from(page_size))?;
+                .find_by_user_id(&mut conn, user_id, offset, i64::from(page_size))?;
         let mut notifications = Vec::with_capacity(slice.notifications.len());
         for summary in slice.notifications {
             let n = summary.notification;
@@ -119,7 +119,7 @@ impl NotificationInboxService {
         let mut conn = self.pool.get()?;
         let detail = self
             .repository
-            .find_detail_by_id_and_user_id(&mut *conn, notification_id, user_id)?
+            .find_detail_by_id_and_user_id(&mut conn, notification_id, user_id)?
             .ok_or_else(not_found)?;
         let n = detail.notification;
         Ok(NotificationDetailResult {
@@ -139,7 +139,7 @@ impl NotificationInboxService {
         let mut conn = self.pool.get()?;
         Ok(self
             .repository
-            .exists_unread_by_user_id(&mut *conn, user_id)?)
+            .exists_unread_by_user_id(&mut conn, user_id)?)
     }
 
     /// `markRead`: 반복 호출해도 처음 읽은 시각을 유지한다. 없거나 남의 알림이면 404.
@@ -147,7 +147,7 @@ impl NotificationInboxService {
         let mut conn = self.pool.get()?;
         let updated =
             self.repository
-                .mark_read(&mut *conn, notification_id, user_id, self.clock.now())?;
+                .mark_read(&mut conn, notification_id, user_id, self.clock.now())?;
         if updated == 0 {
             return Err(not_found());
         }
@@ -158,7 +158,7 @@ impl NotificationInboxService {
     pub fn mark_all_read(&self, user_id: Uuid) -> Result<(), ApiError> {
         let mut conn = self.pool.get()?;
         self.repository
-            .mark_all_read(&mut *conn, user_id, self.clock.now())?;
+            .mark_all_read(&mut conn, user_id, self.clock.now())?;
         Ok(())
     }
 }

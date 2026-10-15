@@ -2,8 +2,8 @@
 
 use std::collections::{HashMap, HashSet};
 
+use chalkak_db::Db;
 use chalkak_db::DbError;
-use postgres::GenericClient;
 use uuid::Uuid;
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -13,7 +13,7 @@ impl PostLikeRepository {
     /// `createIfAbsent`: 이미 있으면 아무것도 하지 않는다. `created_at`은 DB 기본값이다.
     pub fn create_if_absent(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         post_id: Uuid,
         user_id: Uuid,
     ) -> Result<u64, DbError> {
@@ -26,7 +26,7 @@ impl PostLikeRepository {
 
     pub fn delete_by_post_id_and_user_id(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         post_id: Uuid,
         user_id: Uuid,
     ) -> Result<u64, DbError> {
@@ -36,19 +36,11 @@ impl PostLikeRepository {
         )?)
     }
 
-    pub fn delete_by_post_id(
-        &self,
-        db: &mut impl GenericClient,
-        post_id: Uuid,
-    ) -> Result<u64, DbError> {
+    pub fn delete_by_post_id(&self, db: &mut impl Db, post_id: Uuid) -> Result<u64, DbError> {
         Ok(db.execute("DELETE FROM post_likes WHERE post_id = $1", &[&post_id])?)
     }
 
-    pub fn count_by_post_id(
-        &self,
-        db: &mut impl GenericClient,
-        post_id: Uuid,
-    ) -> Result<i64, DbError> {
+    pub fn count_by_post_id(&self, db: &mut impl Db, post_id: Uuid) -> Result<i64, DbError> {
         let row = db.query_one(
             "SELECT COUNT(*) AS count FROM post_likes WHERE post_id = $1",
             &[&post_id],
@@ -58,7 +50,7 @@ impl PostLikeRepository {
 
     pub fn exists_by_post_id_and_user_id(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         post_id: Uuid,
         user_id: Uuid,
     ) -> Result<bool, DbError> {
@@ -73,7 +65,7 @@ impl PostLikeRepository {
     /// `countByPostIds`: 좋아요가 하나도 없는 게시물은 결과에 없다.
     pub fn count_by_post_ids(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         post_ids: &[Uuid],
     ) -> Result<HashMap<Uuid, i64>, DbError> {
         let rows = db.query(
@@ -88,7 +80,7 @@ impl PostLikeRepository {
 
     pub fn find_liked_post_ids(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         post_ids: &[Uuid],
         user_id: Uuid,
     ) -> Result<HashSet<Uuid>, DbError> {

@@ -6,9 +6,9 @@ use std::sync::Arc;
 use chalkak_core::Clock;
 use chalkak_core::error::{AppError, ErrorCode};
 use chalkak_core::log::Logger;
+use chalkak_db::Tx;
 use chalkak_db::{DbError, Pool};
 use jiff::Timestamp;
-use postgres::Transaction;
 use uuid::Uuid;
 
 use super::config::AdminConfig;
@@ -108,10 +108,9 @@ pub fn path_uuid(req: &chalkak_http::Request, name: &str) -> Result<Uuid, ApiErr
 /// 트랜잭션 안에서 `f`를 실행한다. `Ok`면 커밋, `Err`면 롤백한다(`@Transactional`의 기본 동작).
 pub fn in_transaction<T>(
     conn: &mut chalkak_db::Conn,
-    f: impl FnOnce(&mut Transaction<'_>) -> Result<T, ApiError>,
+    f: impl FnOnce(&mut Tx<'_>) -> Result<T, ApiError>,
 ) -> Result<T, ApiError> {
-    let client: &mut postgres::Client = conn;
-    let mut tx = client.transaction().map_err(DbError::from)?;
+    let mut tx = conn.begin().map_err(DbError::from)?;
     match f(&mut tx) {
         Ok(value) => {
             tx.commit().map_err(DbError::from)?;

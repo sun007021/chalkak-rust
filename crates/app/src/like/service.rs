@@ -62,11 +62,7 @@ impl PostLikeService {
     }
 
     /// 공개된 게시물만 좋아요를 받는다. 게시물 행을 공유 잠금으로 읽어 삭제와 겹치지 않게 한다.
-    fn validate_post(
-        &self,
-        tx: &mut impl postgres::GenericClient,
-        post_id: Uuid,
-    ) -> Result<(), ApiError> {
+    fn validate_post(&self, tx: &mut impl chalkak_db::Db, post_id: Uuid) -> Result<(), ApiError> {
         self.posts
             .find_visible_by_id(tx, post_id, true)?
             .map(|_| ())

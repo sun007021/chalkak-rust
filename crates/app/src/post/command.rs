@@ -8,9 +8,9 @@ use std::sync::Arc;
 use chalkak_core::Clock;
 use chalkak_core::error::{AppError, ErrorCode};
 use chalkak_core::log::{Logger, fields};
+use chalkak_db::Db;
 use chalkak_db::Pool;
 use jiff::Timestamp;
-use postgres::GenericClient;
 use serde_json::{Map, Value};
 use uuid::Uuid;
 
@@ -150,7 +150,7 @@ impl PostCommandService {
 
     fn create_post_in(
         &self,
-        tx: &mut impl GenericClient,
+        tx: &mut impl Db,
         user_id: Uuid,
         topic_id: Uuid,
         photo_upload_id: Uuid,
@@ -358,7 +358,7 @@ impl PostCommandService {
     /// 않으면서 같은 주제 재작성만 막으므로, 처리 대기 시간을 넘긴 게시물은 여기서 거절 처리하고 길을 터 준다.
     fn validate_post_not_created(
         &self,
-        tx: &mut impl GenericClient,
+        tx: &mut impl Db,
         user_id: Uuid,
         topic_id: Uuid,
         now: Timestamp,
@@ -385,7 +385,7 @@ impl PostCommandService {
     /// 다른 회원의 uploadId는 권한 없음이 아니라 없는 것으로 답한다. 존재 여부를 알려주지 않기 위해서다.
     fn claimable_upload(
         &self,
-        tx: &mut impl GenericClient,
+        tx: &mut impl Db,
         user_id: Uuid,
         upload_id: Uuid,
     ) -> Result<PostImageUpload, ApiError> {
@@ -399,7 +399,7 @@ impl PostCommandService {
     /// [`Self::claimable_upload`]가 없는 것으로 답하므로 S3까지 갈 이유가 없다.
     fn needs_staging_image_check(
         &self,
-        tx: &mut impl GenericClient,
+        tx: &mut impl Db,
         user_id: Uuid,
         upload_id: Uuid,
     ) -> Result<bool, ApiError> {
