@@ -13,6 +13,8 @@ mod db_tests;
 #[cfg(test)]
 mod endpoint_tests;
 pub mod feedback;
+#[cfg(test)]
+mod lock_db_tests;
 pub mod post;
 pub mod support;
 #[cfg(test)]

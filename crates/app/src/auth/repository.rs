@@ -349,7 +349,7 @@ impl PendingAppleAuthorizationRepository {
             "SELECT id, subject_hmac, encrypted_refresh_token, expires_at \
              FROM pending_apple_authorizations \
              WHERE subject_hmac = $1 AND expires_at > $2 \
-             ORDER BY created_at DESC, id DESC LIMIT 1 FOR UPDATE",
+             ORDER BY created_at DESC, id DESC LIMIT 1 FOR NO KEY UPDATE",
             &[&subject_hmac, &now],
         )?
         .map(|row| {

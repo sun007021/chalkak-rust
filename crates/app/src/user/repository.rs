@@ -56,7 +56,7 @@ impl UserRepository {
     ) -> Result<Option<User>, DbError> {
         let sql = format!(
             "SELECT {COLUMNS} FROM users u WHERE {condition}{}",
-            if lock { " FOR UPDATE" } else { "" }
+            if lock { " FOR NO KEY UPDATE" } else { "" }
         );
         db.query_opt(&sql, &[param])?
             .map(|row| user_from_row(&row))

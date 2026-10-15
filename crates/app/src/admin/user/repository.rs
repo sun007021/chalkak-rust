@@ -230,7 +230,7 @@ impl AdminUserRepository {
         user_id: Uuid,
     ) -> Result<Option<UserRow>, DbError> {
         let row = db.query_opt(
-            "SELECT id, status::text AS status, deleted_at FROM users WHERE id = $1 FOR UPDATE",
+            "SELECT id, status::text AS status, deleted_at FROM users WHERE id = $1 FOR NO KEY UPDATE",
             &[&user_id],
         )?;
         row.map(|row| {

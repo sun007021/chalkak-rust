@@ -1,7 +1,8 @@
 //! 게시물 저장소. 원본 `PostRepositoryImpl`과 `PostJpaRepository`의 JPQL을 손으로 쓴 SQL로 옮겼다.
 //!
 //! 잠금은 Hibernate PostgreSQL 방언의 번역을 따른다: `PESSIMISTIC_WRITE` -> `FOR NO KEY UPDATE`,
-//! `PESSIMISTIC_READ` -> `FOR SHARE`. 사진을 함께 불러오는(`JOIN FETCH`) 잠금 조회는 사진 행도 같이 잠근다.
+//! `PESSIMISTIC_READ` -> `FOR SHARE`. 사진을 함께 불러오는(`JOIN FETCH`) 잠금 조회도
+//! 게시물 행만 잠근다(`OF p`, 원본 문장 로그의 `for share of p1_0`). 사진 갱신은 항상 게시물 잠금을 잡은 뒤에 한다.
 //! 연결(또는 트랜잭션)은 호출 측이 넘긴다. 원본의 `@Transactional` 경계가 서비스에 있듯 여기서는 트랜잭션을 열지 않는다.
 
 use chalkak_core::error::{AppError, ErrorCode};
@@ -227,14 +228,14 @@ impl PostRepository {
             .transpose()
     }
 
-    /// `findByIdForUpdate`: 삭제된 게시물도 읽는다(삭제는 멱등이다). 사진 행도 함께 잠근다.
+    /// `findByIdForUpdate`: 삭제된 게시물도 읽는다(삭제는 멱등이다). 게시물 행만 잠근다.
     pub fn find_by_id_for_update(
         &self,
         db: &mut impl GenericClient,
         post_id: Uuid,
     ) -> Result<Option<Post>, DbError> {
         let sql =
-            format!("SELECT {POST_COLUMNS} {POST_FROM} WHERE p.id = $1 FOR NO KEY UPDATE OF p, ph");
+            format!("SELECT {POST_COLUMNS} {POST_FROM} WHERE p.id = $1 FOR NO KEY UPDATE OF p");
         db.query_opt(&sql, &[&post_id])?
             .as_ref()
             .map(post_from_row)
@@ -250,7 +251,7 @@ impl PostRepository {
         let sql = format!(
             "SELECT {POST_COLUMNS} {POST_FROM} \
              WHERE p.post_image_upload_id = $1 AND p.moderation_status = 'VALIDATING' \
-             AND p.deleted_at IS NULL AND ph.deleted_at IS NULL FOR NO KEY UPDATE OF p, ph"
+             AND p.deleted_at IS NULL AND ph.deleted_at IS NULL FOR NO KEY UPDATE OF p"
         );
         db.query_opt(&sql, &[&upload_id])?
             .as_ref()
@@ -347,7 +348,7 @@ impl PostRepository {
         post_id: Uuid,
         for_share: bool,
     ) -> Result<Option<VisiblePost>, DbError> {
-        let lock = if for_share { " FOR SHARE OF p, ph" } else { "" };
+        let lock = if for_share { " FOR SHARE OF p" } else { "" };
         let sql = format!(
             "SELECT p.id, p.title, t.id AS topic_id, t.title AS topic_title, t.topic_date, \
              ph.original_storage_key, ph.thumbnail_storage_key, u.signature_original_storage_key \

@@ -313,7 +313,7 @@ impl AdminPostRepository {
             "SELECT p.id, p.user_id, p.moderation_status::text AS moderation_status, p.moderated_at, \
              p.created_at, p.deleted_at, ph.id AS photo_id, ph.deleted_at AS photo_deleted_at \
              FROM posts p JOIN photos ph ON ph.id = p.photo_id WHERE p.id = $1{deleted_filter} \
-             FOR NO KEY UPDATE OF p, ph"
+             FOR NO KEY UPDATE OF p"
         );
         let Some(row) = db.query_opt(&sql, &[&post_id])? else {
             return Ok(None);
