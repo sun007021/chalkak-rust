@@ -1,0 +1,16 @@
+# PostgreSQL 데이터를 tmpfs 대신 이름 있는 볼륨에 둔다(`PERF_PG_PERSIST=1`일 때 perf.sh가 compose.yaml 위에 겹친다).
+# tmpfs는 컨테이너를 멈추면 사라지므로 `docker stop` -> `start`(DB 재시작) 시험(`perf.sh stress ... outage`)에는 이 설정이 필요하다.
+# 일반 비교 측정에는 tmpfs(기본)를 쓴다: 디스크 흔들림을 피하려는 것이다. `perf.sh down`이 볼륨도 지운다.
+services:
+  pg-java:
+    tmpfs: !reset []
+    volumes:
+      - pgdata-java:/var/lib/postgresql
+  pg-rust:
+    tmpfs: !reset []
+    volumes:
+      - pgdata-rust:/var/lib/postgresql
+
+volumes:
+  pgdata-java: {}
+  pgdata-rust: {}

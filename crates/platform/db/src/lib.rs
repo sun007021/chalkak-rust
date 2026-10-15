@@ -7,9 +7,11 @@ mod config;
 mod error;
 pub mod migrate;
 mod pool;
+mod session;
 mod tls;
 
 pub use config::DbConfig;
 pub use error::DbError;
 pub use pool::{Conn, Pool, PoolStats};
+pub use session::{Db, STATEMENT_CACHE_CAPACITY, StatementCache, Tx};
 pub use tls::connect;

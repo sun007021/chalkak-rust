@@ -134,7 +134,7 @@ impl UserService {
     fn active_user(&self, user_id: Uuid) -> Result<User, ApiError> {
         let mut conn = self.pool.get()?;
         self.users
-            .find_active_by_id(&mut *conn, user_id)?
+            .find_active_by_id(&mut conn, user_id)?
             .ok_or_else(unauthorized)
     }
 

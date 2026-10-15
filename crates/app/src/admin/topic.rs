@@ -4,11 +4,11 @@
 //! 주제 쓰기(생성·수정·삭제 규칙과 제약 위반 번역)는 `topic` 모듈의 도메인·저장소를 그대로 쓰고, 여기서는 관리자 목록·상세
 //! 조회(게시물 수 집계)와 감사 로그 연결만 더한다.
 
+use chalkak_db::Db;
 use chalkak_db::DbError;
 use chalkak_http::{Method, Request};
 use jiff::Timestamp;
 use jiff::civil::Date;
-use postgres::GenericClient;
 use serde::Serialize;
 use uuid::Uuid;
 
@@ -143,7 +143,7 @@ pub struct AdminTopicQueryRepository;
 impl AdminTopicQueryRepository {
     pub fn find_topics(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         criteria: &TopicQueryCriteria,
         page: i32,
         page_size: i32,
@@ -180,7 +180,7 @@ impl AdminTopicQueryRepository {
 
     pub fn find_active_topic_by_id(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         topic_id: Uuid,
         now: Timestamp,
     ) -> Result<Option<AdminTopicDetail>, DbError> {
@@ -221,17 +221,17 @@ impl AdminTopicQueryService {
             now,
         };
         let mut conn = self.deps.pool.get()?;
-        Ok(AdminTopicQueryRepository.find_topics(&mut *conn, &criteria, page, page_size)?)
+        Ok(AdminTopicQueryRepository.find_topics(&mut conn, &criteria, page, page_size)?)
     }
 
     pub fn get_topic(&self, topic_id: Uuid) -> Result<AdminTopicDetail, ApiError> {
         let mut conn = self.deps.pool.get()?;
-        read_topic(&mut *conn, topic_id, self.deps.now())
+        read_topic(&mut conn, topic_id, self.deps.now())
     }
 }
 
 fn read_topic(
-    db: &mut impl GenericClient,
+    db: &mut impl Db,
     topic_id: Uuid,
     now: Timestamp,
 ) -> Result<AdminTopicDetail, ApiError> {

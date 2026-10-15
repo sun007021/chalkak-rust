@@ -125,20 +125,20 @@ fn now_unix() -> i64 {
         .unwrap_or(0)
 }
 
-struct Tokens {
+pub struct Tokens {
     signer: Signer,
     cache: Vec<Option<(Instant, String)>>,
 }
 
 impl Tokens {
-    fn new(secret_hex: &str, users: u64) -> Tokens {
+    pub fn new(secret_hex: &str, users: u64) -> Tokens {
         Tokens {
             signer: Signer::from_hex(secret_hex).expect("ACCESS_TOKEN_SECRET은 hex여야 한다"),
             cache: vec![None; users as usize + 1],
         }
     }
 
-    fn get(&mut self, user: u64) -> &str {
+    pub fn get(&mut self, user: u64) -> &str {
         let slot = &mut self.cache[user as usize];
         if slot
             .as_ref()

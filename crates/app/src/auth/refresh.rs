@@ -10,9 +10,9 @@ use std::sync::Arc;
 
 use chalkak_core::Clock;
 use chalkak_core::error::{AppError, ErrorCode, ErrorKind};
+use chalkak_db::Db;
 use chalkak_db::Pool;
 use jiff::Timestamp;
-use postgres::GenericClient;
 use uuid::Uuid;
 
 use super::domain::{
@@ -84,11 +84,7 @@ impl UserRefreshTokenService {
 
     /// 새 회전 계보를 시작한다(`issue`). 호출자의 트랜잭션에 참여한다. 기기마다 계보를 나누려고 세션 식별자를 새로
     /// 만든다.
-    pub fn issue(
-        &self,
-        db: &mut impl GenericClient,
-        user_id: Uuid,
-    ) -> Result<IssuedRefreshToken, ApiError> {
+    pub fn issue(&self, db: &mut impl Db, user_id: Uuid) -> Result<IssuedRefreshToken, ApiError> {
         let now = self.clock.now();
         let absolute_expires_at = self.policy.absolute_expires_at(now);
         let expires_at = self.policy.next_expires_at(now, absolute_expires_at);
@@ -141,7 +137,7 @@ impl UserRefreshTokenService {
 
     /// 한 회원의 모든 기기 세션을 끊는다(`revokeAll`). 회전과 같은 계보 잠금을 먼저 잡아, 그 사이 커밋된 후속 토큰이
     /// 폐기를 빠져나가지 않게 한다. 호출자의 트랜잭션에 참여한다.
-    pub fn revoke_all(&self, db: &mut impl GenericClient, user_id: Uuid) -> Result<(), ApiError> {
+    pub fn revoke_all(&self, db: &mut impl Db, user_id: Uuid) -> Result<(), ApiError> {
         let session_ids = self
             .repository
             .find_live_session_ids_by_user_id(db, user_id)?;
@@ -156,7 +152,7 @@ impl UserRefreshTokenService {
     /// 계보 잠금 -> 잠금 아래에서 다시 읽기. 첫 조회는 잠금 없이 하므로 곧 낡을 수 있고, 판단은 두 번째 조회로 한다.
     fn lock_lineage_and_read(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         token_hash: &str,
     ) -> Result<Option<RefreshToken>, ApiError> {
         let Some(session_id) = self
@@ -171,7 +167,7 @@ impl UserRefreshTokenService {
 
     fn rotate(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         consumed: &RefreshToken,
         now: Timestamp,
     ) -> Result<TokenRefreshResult, ApiError> {

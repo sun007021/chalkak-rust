@@ -1,8 +1,8 @@
 //! 게시물 이미지 업로드 저장소. 원본 `PostImageUploadRepositoryImpl`·`PostImageUploadJpaRepository`.
 
+use chalkak_db::Db;
 use chalkak_db::DbError;
 use jiff::Timestamp;
-use postgres::GenericClient;
 use serde_json::Value;
 use uuid::Uuid;
 
@@ -42,7 +42,7 @@ impl PostImageUploadRepository {
     /// `save`(새 행): 식별자는 DB가 만든다.
     pub fn insert(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         upload: &mut PostImageUpload,
         now: Timestamp,
     ) -> Result<(), DbError> {
@@ -70,7 +70,7 @@ impl PostImageUploadRepository {
     /// `findByIdForUpdate`: 비관적 쓰기 잠금(`FOR NO KEY UPDATE`).
     pub fn find_by_id_for_update(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         upload_id: Uuid,
     ) -> Result<Option<PostImageUpload>, DbError> {
         let sql =
@@ -84,7 +84,7 @@ impl PostImageUploadRepository {
     /// `findStatusByIdAndUserId`: 상태만 읽는다(잠그지 않는다).
     pub fn find_status_by_id_and_user_id(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         upload_id: Uuid,
         user_id: Uuid,
     ) -> Result<Option<PostImageUploadStatus>, DbError> {
@@ -103,7 +103,7 @@ impl PostImageUploadRepository {
     /// 변경 감지처럼 바뀔 수 있는 열을 모두 쓴다.
     pub fn update(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         upload: &PostImageUpload,
         now: Timestamp,
     ) -> Result<(), DbError> {

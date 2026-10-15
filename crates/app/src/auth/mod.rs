@@ -38,7 +38,7 @@ impl UsableUserPolicy {
     pub fn validate_existing(&self) -> Result<AuthenticatedUser, ApiError> {
         let user = login_user()?;
         let mut conn = self.pool.get()?;
-        match self.users.presence(&mut *conn, user.user_id)? {
+        match self.users.presence(&mut conn, user.user_id)? {
             UserPresence::Present => Ok(user),
             UserPresence::Missing | UserPresence::Withdrawn => Err(ApiError::App(
                 AppError::unauthorized(ErrorCode::UNAUTHORIZED, "유효하지 않은 인증 정보입니다."),
@@ -50,7 +50,7 @@ impl UsableUserPolicy {
     pub fn validate_usable(&self) -> Result<AuthenticatedUser, ApiError> {
         let user = login_user()?;
         let mut conn = self.pool.get()?;
-        let found = self.users.find_by_id(&mut *conn, user.user_id)?;
+        let found = self.users.find_by_id(&mut conn, user.user_id)?;
         let Some(found) = found else {
             return Err(ApiError::App(AppError::unauthorized(
                 ErrorCode::UNAUTHORIZED,

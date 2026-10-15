@@ -48,11 +48,11 @@ impl SocialConnectionRevoker for AppleSocialConnectionRevoker {
             let mut conn = self.pool.get()?;
             match self
                 .social_accounts
-                .find_id_by_user_id(&mut *conn, user_id)?
+                .find_id_by_user_id(&mut conn, user_id)?
             {
                 Some(social_account_id) => self
                     .apple
-                    .find_all_by_social_account_id(&mut *conn, social_account_id)?,
+                    .find_all_by_social_account_id(&mut conn, social_account_id)?,
                 None => Vec::new(),
             }
         };

@@ -1,10 +1,10 @@
 //! 관리자 피드백 조회(원본 `AdminFeedbackController`, `AdminFeedbackQueryService`,
 //! `AdminFeedbackQueryRepositoryImpl`): `GET /api/v1/admin/feedbacks`.
 
+use chalkak_db::Db;
 use chalkak_db::DbError;
 use chalkak_http::Request;
 use jiff::Timestamp;
-use postgres::GenericClient;
 use serde::Serialize;
 use uuid::Uuid;
 
@@ -50,7 +50,7 @@ pub struct AdminFeedbackRepository;
 impl AdminFeedbackRepository {
     pub fn find_feedbacks(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         sort: AdminFeedbackSort,
         page: i32,
         page_size: i32,
@@ -108,7 +108,7 @@ impl AdminFeedbackQueryService {
         validate_pagination(page, page_size, INVALID_QUERY_MESSAGE)?;
         let mut conn = self.deps.pool.get()?;
         Ok(AdminFeedbackRepository.find_feedbacks(
-            &mut *conn,
+            &mut conn,
             sort.unwrap_or(AdminFeedbackSort::CreatedAtDesc),
             page,
             page_size,

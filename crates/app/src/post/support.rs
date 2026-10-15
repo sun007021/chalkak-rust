@@ -3,8 +3,8 @@
 //! 회원 테이블 질의는 이 모듈 안에 직접 둔다(다른 도메인 모듈을 기다리지 않기 위해서다).
 
 use chalkak_core::error::{AppError, ErrorCode};
+use chalkak_db::{Db, Tx};
 use chalkak_db::{DbError, Pool};
-use postgres::{GenericClient, Transaction};
 use uuid::Uuid;
 
 use crate::auth::UsableUserPolicy;
@@ -17,11 +17,10 @@ use crate::web::ApiError;
 /// 호출자에게 닿기 전에 끝나므로, 커밋 뒤에 할 일(알림)은 호출자가 이 함수가 `Ok`를 돌려준 뒤에 한다.
 pub fn in_transaction<T>(
     pool: &Pool,
-    f: impl FnOnce(&mut Transaction<'_>) -> Result<T, ApiError>,
+    f: impl FnOnce(&mut Tx<'_>) -> Result<T, ApiError>,
 ) -> Result<T, ApiError> {
     let mut conn = pool.get()?;
-    let client: &mut postgres::Client = &mut conn;
-    let mut tx = client.transaction().map_err(DbError::from)?;
+    let mut tx = conn.begin().map_err(DbError::from)?;
     match f(&mut tx) {
         Ok(value) => {
             tx.commit().map_err(DbError::from)?;
@@ -43,7 +42,7 @@ pub fn unauthorized() -> ApiError {
 }
 
 /// `UserRepository.findActiveById(...).orElseThrow(401)`: 탈퇴하지 않은 회원이어야 한다.
-pub fn require_active_user(db: &mut impl GenericClient, user_id: Uuid) -> Result<(), ApiError> {
+pub fn require_active_user(db: &mut impl Db, user_id: Uuid) -> Result<(), ApiError> {
     let found = db
         .query_opt(
             "SELECT 1 FROM users WHERE id = $1 AND deleted_at IS NULL",

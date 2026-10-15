@@ -4,9 +4,9 @@
 
 use std::time::Duration;
 
+use chalkak_db::Db;
 use chalkak_db::DbError;
 use jiff::{SignedDuration, Timestamp};
-use postgres::GenericClient;
 
 use super::repository::NotificationRepository;
 
@@ -23,10 +23,7 @@ pub struct Deleted {
 }
 
 /// `deleteExpiredNotifications`: 두 삭제를 같은 트랜잭션에서 하라는 뜻으로 `tx`를 받는다(원본은 `@Transactional`).
-pub fn delete_expired_notifications(
-    tx: &mut impl GenericClient,
-    now: Timestamp,
-) -> Result<Deleted, DbError> {
+pub fn delete_expired_notifications(tx: &mut impl Db, now: Timestamp) -> Result<Deleted, DbError> {
     let minus = |d: Duration| {
         now.checked_sub(
             SignedDuration::try_from(d).expect("보관 기간은 SignedDuration 범위 안이다"),

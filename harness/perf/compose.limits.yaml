@@ -1,0 +1,12 @@
+# 앱 컨테이너의 nofile·pids 한도를 바꾼다. `PERF_APP_NOFILE`나 `PERF_APP_PIDS`를 주면 perf.sh가 compose.yaml 위에 겹친다.
+# 연결 폭주·유휴 연결 시험(`perf.sh stress`)이 한도에 걸릴 때 원인(부하 발생기 / 서버 FD / 서버 pids)을 가르는 데 쓴다.
+# 안 주면 Docker 기본값(이 환경은 nofile 20000, pids 무제한)을 그대로 쓴다. 호스트가 허용하는 값보다 큰 nofile은 컨테이너가 안 뜬다.
+services:
+  java:
+    ulimits:
+      nofile: { soft: "${PERF_APP_NOFILE:-20000}", hard: "${PERF_APP_NOFILE:-20000}" }
+    pids_limit: ${PERF_APP_PIDS:--1}
+  rust:
+    ulimits:
+      nofile: { soft: "${PERF_APP_NOFILE:-20000}", hard: "${PERF_APP_NOFILE:-20000}" }
+    pids_limit: ${PERF_APP_PIDS:--1}

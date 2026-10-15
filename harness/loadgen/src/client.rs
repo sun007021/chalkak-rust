@@ -14,13 +14,14 @@ pub struct Request<'a> {
     pub body: Option<&'a str>,
 }
 
+#[derive(Debug)]
 pub struct Response {
     pub status: u16,
     /// 응답 본문 앞부분(검사용). 전부 읽되 앞 `KEEP`바이트만 남긴다.
     pub body_head: Vec<u8>,
 }
 
-const KEEP: usize = 512;
+const KEEP: usize = 4096;
 
 pub struct Client {
     addr: SocketAddr,
@@ -28,6 +29,10 @@ pub struct Client {
     conn: Option<BufReader<TcpStream>>,
     /// 지금까지 새로 맺은 연결 수.
     pub connects: u64,
+    /// 마지막 `send`가 연결을 맺다가 실패했는가(연결 실패와 요청 실패를 가르는 데 쓴다).
+    pub connect_failed: bool,
+    connect_timeout: Duration,
+    io_timeout: Duration,
 }
 
 impl Client {
@@ -37,7 +42,17 @@ impl Client {
             keep_alive,
             conn: None,
             connects: 0,
+            connect_failed: false,
+            connect_timeout: Duration::from_secs(10),
+            io_timeout: IO_TIMEOUT,
         }
+    }
+
+    /// 연결·읽기/쓰기 제한 시간을 바꾼다(기본 10초·60초).
+    pub fn with_timeouts(mut self, connect: Duration, io: Duration) -> Client {
+        self.connect_timeout = connect;
+        self.io_timeout = io;
+        self
     }
 
     /// 연결만 미리 맺어 둔다(첫 요청이 연결 시간을 먹지 않게). 이미 있으면 그대로 둔다.
@@ -49,10 +64,10 @@ impl Client {
     }
 
     fn connect(&mut self) -> io::Result<()> {
-        let stream = TcpStream::connect_timeout(&self.addr, Duration::from_secs(10))?;
+        let stream = TcpStream::connect_timeout(&self.addr, self.connect_timeout)?;
         stream.set_nodelay(true)?;
-        stream.set_read_timeout(Some(IO_TIMEOUT))?;
-        stream.set_write_timeout(Some(IO_TIMEOUT))?;
+        stream.set_read_timeout(Some(self.io_timeout))?;
+        stream.set_write_timeout(Some(self.io_timeout))?;
         self.conn = Some(BufReader::with_capacity(16 * 1024, stream));
         self.connects += 1;
         Ok(())
@@ -60,8 +75,12 @@ impl Client {
 
     /// 요청 하나를 보내고 응답을 끝까지 읽는다. 실패하면 연결을 버린다(다음 호출이 새로 맺는다).
     pub fn send(&mut self, req: &Request) -> io::Result<Response> {
-        if self.conn.is_none() {
-            self.connect()?;
+        self.connect_failed = false;
+        if self.conn.is_none()
+            && let Err(e) = self.connect()
+        {
+            self.connect_failed = true;
+            return Err(e);
         }
         let result = self.exchange(req);
         match &result {
@@ -115,7 +134,7 @@ fn read_line(r: &mut impl BufRead, buf: &mut String) -> io::Result<()> {
 }
 
 /// 응답을 읽는다. 반환값의 bool은 서버가 연결을 닫겠다고 한 것(`Connection: close`, 닫힐 때까지 읽은 본문).
-fn read_response(r: &mut impl BufRead, head_only: bool) -> io::Result<(Response, bool)> {
+pub fn read_response(r: &mut impl BufRead, head_only: bool) -> io::Result<(Response, bool)> {
     let mut line = String::new();
     read_line(r, &mut line)?;
     let status: u16 = line
@@ -298,6 +317,48 @@ mod tests {
             assert_eq!(c.send(&get("/")).unwrap().status, 200);
         }
         assert_eq!(c.connects, 3);
+    }
+
+    #[test]
+    fn 연결_실패와_요청_실패를_구분한다() {
+        // 닫힌 포트: 연결 단계에서 실패
+        let closed = {
+            let l = TcpListener::bind("127.0.0.1:0").unwrap();
+            l.local_addr().unwrap()
+        };
+        let mut c = Client::new(closed, true);
+        assert!(c.send(&get("/")).is_err());
+        assert!(c.connect_failed, "연결 단계 실패");
+        // 받자마자 닫는 서버: 연결은 되고 요청 단계에서 실패
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let addr = listener.local_addr().unwrap();
+        thread::spawn(move || {
+            let (s, _) = listener.accept().unwrap();
+            drop(s);
+        });
+        let mut c = Client::new(addr, true);
+        assert!(c.send(&get("/")).is_err());
+        assert!(!c.connect_failed, "요청 단계 실패");
+    }
+
+    #[test]
+    fn 읽기_제한_시간을_줄일_수_있다() {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let addr = listener.local_addr().unwrap();
+        thread::spawn(move || {
+            let (_s, _) = listener.accept().unwrap();
+            thread::sleep(Duration::from_secs(2)); // 응답하지 않는다
+        });
+        let mut c = Client::new(addr, true)
+            .with_timeouts(Duration::from_secs(1), Duration::from_millis(200));
+        let t0 = std::time::Instant::now();
+        let e = c.send(&get("/")).unwrap_err();
+        assert!(t0.elapsed() < Duration::from_secs(1));
+        assert!(matches!(
+            e.kind(),
+            io::ErrorKind::WouldBlock | io::ErrorKind::TimedOut
+        ));
+        assert!(!c.connect_failed);
     }
 
     #[test]

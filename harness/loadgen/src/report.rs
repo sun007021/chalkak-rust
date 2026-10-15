@@ -545,8 +545,309 @@ pub fn build(dir: &Path) -> (String, bool) {
         }
     }
 
-    let failed = fail > 0;
+    // Java와 Rust의 같은 시험 결과 대조(상태 코드 분포, DB 최종 상태)
+    let mut race_mismatch = false;
+    if let (Some(java), Some(rust)) = (
+        load_json(&dir.join("race-java.json")),
+        load_json(&dir.join("race-rust.json")),
+    ) {
+        let diffs = race_diffs(&java, &rust);
+        let _ = writeln!(
+            md,
+            "\n## 동시성 시험: Java 대 Rust 대조\n\n| 시험 | 상태 코드 분포 | DB 최종 상태 | 비고 |\n| --- | --- | --- | --- |"
+        );
+        for d in &diffs {
+            race_mismatch |= d.blocks();
+            let note = match (&d.known, d.differs()) {
+                (Some(k), true) => format!("알려진 차이: {k}"),
+                _ => String::new(),
+            };
+            let _ = writeln!(
+                md,
+                "| {} | {} | {} | {} |",
+                d.name,
+                diff_cell(d.statuses),
+                diff_cell(d.state),
+                note
+            );
+        }
+    }
+
+    stress_section(&mut md, dir);
+
+    let failed = fail > 0 || race_mismatch;
     (md, failed)
+}
+
+/// 같은 시험의 Java 결과와 Rust 결과를 대조한 한 줄.
+#[derive(Debug, PartialEq, Eq)]
+pub struct RaceDiff {
+    pub name: String,
+    /// `Some(true)`: 같다, `Some(false)`: 다르다, `None`: 비교 대상이 아니다(분포가 요청 순서에 달려 있는 시험).
+    pub statuses: Option<bool>,
+    /// 같은 뜻. DB 최종 상태(`state`)가 비어 있으면 `None`.
+    pub state: Option<bool>,
+    /// 알려진 차이의 설명(시험이 `known_diff`로 적은 것). 있으면 다르더라도 게이트를 막지 않는다.
+    pub known: Option<String>,
+}
+
+impl RaceDiff {
+    pub fn differs(&self) -> bool {
+        self.statuses == Some(false) || self.state == Some(false)
+    }
+
+    /// 게이트를 막는 차이인가.
+    pub fn blocks(&self) -> bool {
+        self.differs() && self.known.is_none()
+    }
+}
+
+/// 두 쪽 `race-*.json`의 시험을 이름으로 맞춰 상태 코드 분포(시험이 `compare_statuses`를 켠 경우)와 DB 최종 상태(`state`)를
+/// 대조한다. 한쪽에만 있는 시험은 두 쪽 모두 다르다고 본다.
+pub fn race_diffs(java: &Value, rust: &Value) -> Vec<RaceDiff> {
+    let index = |v: &Value| -> BTreeMap<String, Value> {
+        v["cases"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter_map(|c| Some((c["name"].as_str()?.to_owned(), c.clone())))
+            .collect()
+    };
+    let (j, r) = (index(java), index(rust));
+    let mut names: Vec<&String> = j.keys().chain(r.keys()).collect();
+    names.sort();
+    names.dedup();
+    names
+        .into_iter()
+        .map(|name| match (j.get(name), r.get(name)) {
+            (Some(a), Some(b)) => RaceDiff {
+                known: a["known_diff"]
+                    .as_str()
+                    .or_else(|| b["known_diff"].as_str())
+                    .map(str::to_owned),
+                name: name.clone(),
+                statuses: (a["compare_statuses"].as_bool() == Some(true)
+                    && b["compare_statuses"].as_bool() == Some(true))
+                .then(|| a["statuses"] == b["statuses"]),
+                state: (!a["state"].is_null() || !b["state"].is_null())
+                    .then(|| a["state"] == b["state"]),
+            },
+            _ => RaceDiff {
+                name: name.clone(),
+                statuses: Some(false),
+                state: Some(false),
+                known: None,
+            },
+        })
+        .collect()
+}
+
+fn diff_cell(v: Option<bool>) -> &'static str {
+    match v {
+        Some(true) => "같음",
+        Some(false) => "**다름**",
+        None => "-",
+    }
+}
+
+/// 스트레스 케이스 하나의 핵심 수치를 한 줄로(표의 셀). 없는 항목은 건너뛴다.
+pub fn stress_metric(c: &Value) -> String {
+    let ms = |v: &Value| v.as_f64().map(|u| format!("{:.0}ms", u / 1000.0));
+    let phase = |name: &str| {
+        c["phases"]
+            .as_array()
+            .and_then(|a| a.iter().find(|p| p["name"] == name))
+    };
+    let errs = |p: Option<&Value>| p.and_then(|p| p["errors"]["total"].as_u64()).unwrap_or(0);
+    let x = &c["extra"];
+    let mut parts: Vec<String> = Vec::new();
+    match c["case"].as_str().unwrap_or("") {
+        "spike" => {
+            if let Some(p) = phase("급증") {
+                parts.push(format!(
+                    "급증 p99 {} max {} 오류 {}",
+                    ms(&p["p99_us"]).unwrap_or_default(),
+                    ms(&p["max_us"]).unwrap_or_default(),
+                    errs(Some(p))
+                ));
+            }
+            parts.push(format!(
+                "복귀 {}초",
+                x["recovery_secs"]
+                    .as_u64()
+                    .map_or("못 돌아옴".to_owned(), |s| s.to_string())
+            ));
+        }
+        "storm" => {
+            if let Some(p) = c["phases"].get(0) {
+                let ok = p["ok"].as_u64().unwrap_or(0);
+                let bad = errs(Some(p));
+                parts.push(format!(
+                    "성공 {ok}/{} 오류 {bad} 전체 {:.1}초",
+                    ok + bad,
+                    x["wall_secs"].as_f64().unwrap_or(0.0)
+                ));
+                parts.push(format!("p99 {}", ms(&p["p99_us"]).unwrap_or_default()));
+            }
+        }
+        "idle" => {
+            parts.push(format!(
+                "붙음 {}/{} 유휴 CPU {:.2}코어(1000개당 {:.3}) RSS {:.0}MB 스레드 {}",
+                x["opened"],
+                x["idle_conns"],
+                x["cpu_idle_only"]["cpu_cores"].as_f64().unwrap_or(0.0),
+                x["cpu_cores_per_1000_idle"].as_f64().unwrap_or(0.0),
+                x["rss_mb_idle_only"].as_f64().unwrap_or(0.0),
+                x["threads_idle_only"]
+            ));
+            if let (Some(a), Some(b)) = (c["phases"].get(0), c["phases"].get(1)) {
+                parts.push(format!(
+                    "p99 {} -> {}",
+                    ms(&a["p99_us"]).unwrap_or_default(),
+                    ms(&b["p99_us"]).unwrap_or_default()
+                ));
+            }
+        }
+        "slow" => {
+            parts.push(format!(
+                "멈춘 연결 끊김 {}/{} (최초 {}초)",
+                x["stalled"]["closed"],
+                x["stalled"]["conns"],
+                x["stalled"]["first_close_secs"]
+                    .as_f64()
+                    .map_or("-".to_owned(), |v| format!("{v:.1}"))
+            ));
+            parts.push(format!(
+                "한 바이트씩 끊김 {}/{}",
+                x["drip"]["closed"], x["drip"]["conns"]
+            ));
+            if let Some(p) = c["phases"].get(1) {
+                parts.push(format!(
+                    "일반 p99 {} 오류 {}",
+                    ms(&p["p99_us"]).unwrap_or_default(),
+                    errs(Some(p))
+                ));
+            }
+        }
+        "fairness" => {
+            if let Some(p) = c["phases"].get(0) {
+                parts.push(format!(
+                    "p99 {} p99.9 {} max {} 500 {}",
+                    ms(&p["p99_us"]).unwrap_or_default(),
+                    ms(&p["p999_us"]).unwrap_or_default(),
+                    ms(&p["max_us"]).unwrap_or_default(),
+                    p["errors"]["status_500"]
+                ));
+            }
+            parts.push(format!(
+                "연결별 최소/중앙 {}/{}",
+                x["per_conn_completed"]["min"], x["per_conn_completed"]["median"]
+            ));
+        }
+        "dbkill" => {
+            let rounds: Vec<String> = x["rounds"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .map(|r| {
+                    format!(
+                        "오류 {} 복구 {:.1}초",
+                        r["errors"]["total"],
+                        r["recovery_secs"].as_f64().unwrap_or(0.0)
+                    )
+                })
+                .collect();
+            parts.push(rounds.join(" / "));
+            parts.push(format!(
+                "저부하 뒤 연결 {} 채운 뒤 {}",
+                x["app_conns_low_load_end"], x["app_conns_after_refill"]
+            ));
+        }
+        "outage" => {
+            parts.push(format!(
+                "{} 복구 {:.1}초 중단 중 오류 {}",
+                x["mode"].as_str().unwrap_or(""),
+                x["recovery_secs"].as_f64().unwrap_or(0.0),
+                x["errors_during"]["total"]
+            ));
+            parts.push(format!("health {}", x["health_during"]));
+        }
+        "abort" => parts.push(format!(
+            "끊긴 {} 처리된 행 {}",
+            x["sent"], x["rows_inserted_after_unlock"]
+        )),
+        _ => {}
+    }
+    let leak = &c["leak"]["after"];
+    parts.push(format!(
+        "누수검사 후 DB연결 {} 스레드 {}",
+        leak["app_db_conns"], leak["threads"]
+    ));
+    parts.join("; ")
+}
+
+fn stress_section(md: &mut String, dir: &Path) {
+    let java = load_json(&dir.join("stress-java.json"));
+    let rust = load_json(&dir.join("stress-rust.json"));
+    if java.is_none() && rust.is_none() {
+        return;
+    }
+    let _ = writeln!(md, "\n## 스트레스 시험 (`perf.sh stress`)\n");
+    let _ = writeln!(
+        md,
+        "기준은 두 구현에 같다(docs/perf/stress.md). 이 표는 통과·실패가 Rust 대 Java 비교가 아니라 케이스별 절대 기준이다. 호스트가 공유일 때 수치는 참고용이다.\n"
+    );
+    let _ = writeln!(
+        md,
+        "| 케이스 | Java | Java 핵심 수치 | Rust | Rust 핵심 수치 |\n| --- | --- | --- | --- | --- |"
+    );
+    let mut names: Vec<String> = Vec::new();
+    for v in [&java, &rust].into_iter().flatten() {
+        for c in v["cases"].as_array().into_iter().flatten() {
+            let n = c["name"].as_str().unwrap_or("").to_owned();
+            if !names.contains(&n) {
+                names.push(n);
+            }
+        }
+    }
+    let find = |v: &Option<Value>, n: &str| -> Option<Value> {
+        v.as_ref()?["cases"]
+            .as_array()?
+            .iter()
+            .find(|c| c["name"] == n)
+            .cloned()
+    };
+    let cell = |c: &Option<Value>| match c {
+        None => ("-".to_owned(), "-".to_owned()),
+        Some(c) => (
+            if c["passed"].as_bool().unwrap_or(false) {
+                "통과"
+            } else {
+                "실패"
+            }
+            .to_owned(),
+            stress_metric(c),
+        ),
+    };
+    let mut failures: Vec<String> = Vec::new();
+    for n in &names {
+        let (cj, cr) = (find(&java, n), find(&rust, n));
+        let (vj, mj) = cell(&cj);
+        let (vr, mr) = cell(&cr);
+        let _ = writeln!(md, "| {n} | {vj} | {mj} | {vr} | {mr} |");
+        for (side, c) in [("Java", &cj), ("Rust", &cr)] {
+            for f in c
+                .iter()
+                .flat_map(|c| c["failures"].as_array().into_iter().flatten())
+                .filter_map(Value::as_str)
+            {
+                failures.push(format!("- {side} {n}: {f}"));
+            }
+        }
+    }
+    if !failures.is_empty() {
+        let _ = writeln!(md, "\n실패 사유:\n\n{}", failures.join("\n"));
+    }
 }
 
 pub fn command(args: &Args) -> Result<u8, String> {
@@ -611,6 +912,33 @@ mod tests {
     }
 
     #[test]
+    fn 스트레스_결과를_표로_만든다() {
+        let dir =
+            std::env::temp_dir().join(format!("loadgen-stress-report-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(&dir).unwrap();
+        let case = |pass: bool| {
+            serde_json::json!({ "kind": "stress", "label": "x", "cases": [{
+                "name": "spike-200", "case": "spike", "passed": pass,
+                "failures": if pass { vec![] } else { vec!["급증 구간 오류: 503 3"] },
+                "phases": [{ "name": "급증", "p99_us": 120000, "max_us": 900000, "errors": { "total": 3 } }],
+                "extra": { "recovery_secs": 2 },
+                "leak": { "after": { "app_db_conns": 10, "threads": 40 } },
+            }]})
+        };
+        fs::write(dir.join("stress-java.json"), case(true).to_string()).unwrap();
+        fs::write(dir.join("stress-rust.json"), case(false).to_string()).unwrap();
+        let (md, _) = build(&dir);
+        assert!(md.contains("## 스트레스 시험"), "{md}");
+        assert!(md.contains("| spike-200 | 통과 | 급증 p99 120ms max 900ms 오류 3; 복귀 2초; 누수검사 후 DB연결 10 스레드 40 | 실패 |"), "{md}");
+        assert!(
+            md.contains("- Rust spike-200: 급증 구간 오류: 503 3"),
+            "{md}"
+        );
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
     fn 보고서를_만든다() {
         let dir = std::env::temp_dir().join(format!("loadgen-report-{}", std::process::id()));
         let _ = fs::remove_dir_all(&dir);
@@ -639,5 +967,38 @@ mod tests {
         assert!(md.contains("| p99(고정 RPS 혼합) | GET /a |"), "{md}");
         assert!(md.contains("통과 4"), "{md}");
         let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn 동시성_대조는_분포와_최종_상태를_이름으로_맞춘다() {
+        let case = |name: &str, st: Value, state: Value, cmp: bool| serde_json::json!({"name": name, "statuses": st, "state": state, "compare_statuses": cmp});
+        let known_case = |name: &str, state: Value, note: &str| serde_json::json!({"name": name, "statuses": {}, "state": state, "compare_statuses": false, "known_diff": note});
+        let java = serde_json::json!({"cases": [
+            case("a", serde_json::json!({"200": 1, "409": 7}), serde_json::json!({"n": 1}), true),
+            case("b", serde_json::json!({"200": 3}), serde_json::json!({"n": 1}), false),
+            case("c", serde_json::json!({"200": 1}), Value::Null, false),
+            case("only-java", serde_json::json!({}), Value::Null, false),
+            known_case("k", serde_json::json!({"x": true}), "알려진 차이"),
+        ]});
+        let rust = serde_json::json!({"cases": [
+            case("a", serde_json::json!({"200": 1, "409": 7}), serde_json::json!({"n": 1}), true),
+            case("b", serde_json::json!({"200": 2, "404": 1}), serde_json::json!({"n": 2}), false),
+            case("c", serde_json::json!({"200": 1}), Value::Null, false),
+            known_case("k", serde_json::json!({"x": false}), "알려진 차이"),
+        ]});
+        let d = race_diffs(&java, &rust);
+        let by = |n: &str| d.iter().find(|x| x.name == n).unwrap();
+        assert_eq!((by("a").statuses, by("a").state), (Some(true), Some(true)));
+        assert!(!by("a").differs());
+        assert_eq!(by("b").statuses, None, "분포를 비교하지 않는 시험");
+        assert_eq!(by("b").state, Some(false));
+        assert!(by("b").blocks());
+        assert_eq!((by("c").statuses, by("c").state), (None, None));
+        assert!(!by("c").differs());
+        assert!(by("only-java").blocks(), "한쪽에만 있으면 다르다");
+        assert!(
+            by("k").differs() && !by("k").blocks(),
+            "알려진 차이는 게이트를 막지 않는다"
+        );
     }
 }

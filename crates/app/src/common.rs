@@ -9,7 +9,7 @@ use crate::web::ApiError;
 /// `@Transactional`의 기본 규칙이다.
 pub fn transact<T>(
     pool: &Pool,
-    f: impl FnOnce(&mut postgres::Transaction<'_>) -> Result<T, ApiError>,
+    f: impl FnOnce(&mut chalkak_db::Tx<'_>) -> Result<T, ApiError>,
 ) -> Result<T, ApiError> {
     transact_unless(pool, |_| false, f)
 }
@@ -19,11 +19,10 @@ pub fn transact<T>(
 pub fn transact_unless<T>(
     pool: &Pool,
     commit_on_error: impl Fn(&ApiError) -> bool,
-    f: impl FnOnce(&mut postgres::Transaction<'_>) -> Result<T, ApiError>,
+    f: impl FnOnce(&mut chalkak_db::Tx<'_>) -> Result<T, ApiError>,
 ) -> Result<T, ApiError> {
     let mut conn = pool.get()?;
-    let client: &mut postgres::Client = &mut conn;
-    let mut tx = client.transaction().map_err(DbError::from)?;
+    let mut tx = conn.begin().map_err(DbError::from)?;
     match f(&mut tx) {
         Ok(value) => {
             tx.commit().map_err(DbError::from)?;

@@ -14,9 +14,9 @@
 | `golden/` | Java oracle에서 녹화한 정규화 결과 |
 | `env/` | 대상별 설정(`java-a`, `java-b`, `rust`)과 앱 공통 환경변수(`oracle.env`) |
 | `scripts/check.sh` | **기본 진입점.** 빌드 → lane 준비 → 시나리오를 lane에 나눠 병렬 실행(`verify`·`compare`·`record`) |
-| `scripts/lane.sh`, `lane/compose.yaml` | lane(서로 섞이지 않는 비교 대상 하나) 띄우기·목록·정리 |
+| `scripts/lane.sh`, `lane/compose.yaml` | lane(서로 섞이지 않는 비교 대상 하나) 띄우기·목록·정리. `TXLOG=1`이면 DB 문장 로그를 켠다(`lane/compose.txlog.yaml`) |
 | `scripts/oracle-jar.sh` | Java lane이 쓰는 원본 JAR(`BASELINE` 커밋)을 호스트에서 빌드 |
-| `loadgen/`, `perf/`, `scripts/perf.sh` | 성능·동시성·장시간 시험: 부하 발생기(`chalkak-loadgen`)와, libfaketime 없는 Java 대 Rust 비교 스택. 사용법은 [docs/perf/README.md](../docs/perf/README.md) |
+| `loadgen/`, `perf/`, `scripts/perf.sh` | 성능·동시성·장시간·스트레스(트래픽 급증·연결 폭주·DB 장애) 시험: 부하 발생기(`chalkak-loadgen`)와, libfaketime 없는 Java 대 Rust 비교 스택. 사용법은 [docs/perf/README.md](../docs/perf/README.md) |
 | `scripts/up.sh`, `down.sh` | 예전 고정 환경(java-a·java-b·rust 한 벌) 기동·정리. 서비스 정의는 저장소 루트 `compose.yaml` |
 | `scripts/collect-sql.sh` | Java oracle이 시나리오를 처리하는 동안 보낸 SQL을 `pg_stat_statements`로 모아 저장 |
 | `scripts/collect-openapi.sh` | Java oracle의 `/v3/api-docs`(springdoc) 저장 |
@@ -76,6 +76,32 @@ lane 하나는 앱 1개(rust 또는 java) + 전용 PostgreSQL + 전용 가짜 �
 target/release/chalkak-parity verify --target "$(harness/scripts/lane.sh targets rust)"
 target/release/chalkak-parity compare --left "$(harness/scripts/lane.sh targets java)" --right "$(harness/scripts/lane.sh targets rust)"
 ```
+
+### 트랜잭션 모양 비교(`txshape`)
+
+Java(Spring `@Transactional` + Hibernate + pgjdbc)와 Rust가 같은 요청에 같은 트랜잭션 경계·잠금으로 DB를 쓰는지 본다.
+시나리오 단계(요청)마다 앱이 보낸 SQL을 트랜잭션 목록(시작 방식, 끝, 문장 서명)으로 잘라 두 쪽을 비교하고 표를 낸다.
+
+```bash
+harness/scripts/check.sh txshape [--filter 태그] [--jobs N] [--out 파일.md] [--note-file 머리말.md]
+```
+
+- lane DB의 문장 로그는 `TXLOG=1 harness/scripts/lane.sh up rust|java [개수]`로 켠다(기본 꺼짐, 기존 lane은 그대로).
+  `log_statement=all`과 줄 머리 `@@세션|application_name|사용자|xid|vxid|시각|`를 `<lane 디렉터리>/pglog/postgres.log`에 쓰고
+  `target.toml`에 `pg_log_file`이 들어간다. `check.sh txshape`는 `TXLOG` lane(Rust `--jobs`개, 기본 1, Java 같은 수)을 따로
+  띄워 쓰고 끝나도 내리지 않는다. `lane.sh targets rust|java --txlog`가 그런 lane만 낸다.
+- 앱 문장과 하네스 문장의 구분은 `application_name`이다. 러너의 DB 연결(준비 SQL, 덤프, 표식)은 `chalkak-harness`를 보내고,
+  pgjdbc는 `PostgreSQL JDBC Driver`, Rust 앱은 보내지 않는다(로그에 `[unknown]`). 앱 이름이 `chalkak-harness`가 아닌 세션이 앱이다.
+- 단계 경계는 러너가 요청 앞뒤로 하네스 연결에 보내는 표식 SQL(`SELECT 'txshape:<실행 id>:b<단계>'`)로 나눈다. 같은 DB의 로그 순서가
+  실제 실행 순서다. 단계 경계를 넘는 트랜잭션은 시작한 단계에 속한다.
+- 문장 서명(`parity/src/sqlsig.rs`): 종류(SELECT/INSERT/UPDATE/DELETE/UPSERT), 대상 테이블, 잠금(`FOR UPDATE`·`FOR NO KEY UPDATE`·
+  `FOR SHARE`·`FOR KEY SHARE` + `OF` 대상, `pg_advisory_xact_lock`). 풀 검증, `SET`/`SHOW`, pgjdbc 타입 조회는 뺀다.
+- 판정(`parity/src/txshape.rs`, 규칙은 머리 주석과 단위 테스트): 같음, 동등(읽기 묶음·SELECT 수 차이 등 설명이 필요한 것), 다름
+  (쓰기 분할, 쓰기·잠금 집합, 잠금 종류·대상·순서, 한쪽만 잠금, 격리 수준, 한쪽만 ROLLBACK). 다름이 있으면 종료 코드 1.
+- 결과: `--out`(기본 `harness/out/txshape.md`)의 표와 시나리오별 원문 `harness/out/<시나리오>.txshape.txt`. 2026-10-15 결과는
+  [docs/perf/results/2026-10-15/txshape.md](../docs/perf/results/2026-10-15/txshape.md).
+- 스케줄러 작업은 lane에서 꺼져 있어(`CHALKAK_SCHEDULING_ENABLED=false`) 표에 들어오지 않는다.
+- 로그가 쌓이므로 다 쓰면 `lane.sh down rust`, `lane.sh down java-<N>`으로 내린다(Java lane은 다른 작업과 공유한다).
 
 ### 예전 고정 환경
 

@@ -3,9 +3,10 @@
 //! Hibernate는 상태가 실제로 바뀐 엔티티만 `UPDATE`하고 그때마다 `updated_at`을 갱신한다. 같은 동작을 위해 읽은
 //! 시점의 값과 비교하는 [`UserRepository::update_if_changed`]를 쓴다.
 
+use chalkak_db::Db;
 use chalkak_db::DbError;
 use jiff::Timestamp;
-use postgres::{GenericClient, Row};
+use postgres::Row;
 use uuid::Uuid;
 
 use super::UserRepository;
@@ -49,14 +50,14 @@ pub fn user_from_row(row: &Row) -> Result<User, DbError> {
 impl UserRepository {
     fn find_one(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         condition: &str,
         param: &(dyn postgres::types::ToSql + Sync),
         lock: bool,
     ) -> Result<Option<User>, DbError> {
         let sql = format!(
             "SELECT {COLUMNS} FROM users u WHERE {condition}{}",
-            if lock { " FOR UPDATE" } else { "" }
+            if lock { " FOR NO KEY UPDATE" } else { "" }
         );
         db.query_opt(&sql, &[param])?
             .map(|row| user_from_row(&row))
@@ -64,27 +65,19 @@ impl UserRepository {
     }
 
     /// `findById`: 탈퇴 회원도 읽는다.
-    pub fn find_by_id(
-        &self,
-        db: &mut impl GenericClient,
-        id: Uuid,
-    ) -> Result<Option<User>, DbError> {
+    pub fn find_by_id(&self, db: &mut impl Db, id: Uuid) -> Result<Option<User>, DbError> {
         self.find_one(db, "u.id = $1", &id, false)
     }
 
     /// `findActiveById`.
-    pub fn find_active_by_id(
-        &self,
-        db: &mut impl GenericClient,
-        id: Uuid,
-    ) -> Result<Option<User>, DbError> {
+    pub fn find_active_by_id(&self, db: &mut impl Db, id: Uuid) -> Result<Option<User>, DbError> {
         self.find_one(db, "u.id = $1 AND u.deleted_at IS NULL", &id, false)
     }
 
     /// `findActiveByIdForUpdate`.
     pub fn find_active_by_id_for_update(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         id: Uuid,
     ) -> Result<Option<User>, DbError> {
         self.find_one(db, "u.id = $1 AND u.deleted_at IS NULL", &id, true)
@@ -93,7 +86,7 @@ impl UserRepository {
     /// `findActiveByPendingSignatureUploadIdForUpdate`.
     pub fn find_active_by_pending_signature_upload_id_for_update(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         upload_id: Uuid,
     ) -> Result<Option<User>, DbError> {
         self.find_one(
@@ -107,7 +100,7 @@ impl UserRepository {
     /// `existsBySignatureOriginalStorageKey`.
     pub fn exists_by_signature_original_storage_key(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         storage_key: &str,
     ) -> Result<bool, DbError> {
         Ok(db
@@ -119,12 +112,7 @@ impl UserRepository {
     }
 
     /// `save`(새 회원). 식별자는 DB 기본값(`uuidv7()`)이 만든다.
-    pub fn insert(
-        &self,
-        db: &mut impl GenericClient,
-        user: &User,
-        now: Timestamp,
-    ) -> Result<User, DbError> {
+    pub fn insert(&self, db: &mut impl Db, user: &User, now: Timestamp) -> Result<User, DbError> {
         let row = db.query_one(
             &format!(
                 "WITH u AS (INSERT INTO users (email, status, signature_original_storage_key, \
@@ -146,7 +134,7 @@ impl UserRepository {
     /// 읽은 시점(`before`)과 달라졌을 때만 `UPDATE`하고 `updated_at`을 `now`로 바꾼다. 갱신했으면 `true`.
     pub fn update_if_changed(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         before: &User,
         after: &User,
         now: Timestamp,

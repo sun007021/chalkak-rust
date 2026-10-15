@@ -80,7 +80,7 @@ pub fn revoke_and_delete_expired_authorizations(
     let repository = PendingAppleAuthorizationRepository;
     let expired = {
         let mut conn = pool.get()?;
-        repository.find_all_expired_at_or_before(&mut *conn, now)?
+        repository.find_all_expired_at_or_before(&mut conn, now)?
     };
     let mut deleted = 0;
     for authorization in expired {
@@ -93,7 +93,7 @@ pub fn revoke_and_delete_expired_authorizations(
                 .map_err(ApiError::Internal)?;
             client.revoke_refresh_token(&refresh_token)?;
             let mut conn = pool.get()?;
-            repository.delete(&mut *conn, authorization.id)?;
+            repository.delete(&mut conn, authorization.id)?;
             Ok(())
         })();
         match outcome {

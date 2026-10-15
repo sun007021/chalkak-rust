@@ -3,9 +3,10 @@
 //! 알림함 조회는 모두 게시물이 삭제되지 않은(`posts.deleted_at IS NULL`) 알림만 대상으로 한다. 게시물이 삭제돼도 알림 행은
 //! 남기고(보관 기간이 지나면 정리 쿼리가 지운다) 화면에서만 가린다. 연결(또는 트랜잭션)은 호출 측이 넘긴다.
 
+use chalkak_db::Db;
 use chalkak_db::DbError;
 use jiff::Timestamp;
-use postgres::{GenericClient, Row};
+use postgres::Row;
 use uuid::Uuid;
 
 use super::domain::{Notification, NotificationType};
@@ -57,11 +58,7 @@ fn from_row(row: &Row) -> Result<Notification, DbError> {
 
 impl NotificationRepository {
     /// `save`: INSERT 하고 DB가 만든 `id`를 채운다.
-    pub fn save(
-        &self,
-        db: &mut impl GenericClient,
-        notification: &mut Notification,
-    ) -> Result<(), DbError> {
+    pub fn save(&self, db: &mut impl Db, notification: &mut Notification) -> Result<(), DbError> {
         let row = db.query_one(
             "INSERT INTO notifications \
              (user_id, post_id, event_key, type, title, body, rejection_reason, read_at, created_at) \
@@ -86,7 +83,7 @@ impl NotificationRepository {
     /// (Spring Data `Slice`).
     pub fn find_by_user_id(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         user_id: Uuid,
         offset: i64,
         page_size: i64,
@@ -121,7 +118,7 @@ impl NotificationRepository {
     /// `findDetailByIdAndUserId`
     pub fn find_detail_by_id_and_user_id(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         notification_id: Uuid,
         user_id: Uuid,
     ) -> Result<Option<NotificationDetail>, DbError> {
@@ -146,7 +143,7 @@ impl NotificationRepository {
     /// `existsUnreadByUserId`
     pub fn exists_unread_by_user_id(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         user_id: Uuid,
     ) -> Result<bool, DbError> {
         let row = db.query_one(
@@ -161,7 +158,7 @@ impl NotificationRepository {
     /// `markRead`: 이미 읽은 알림은 처음 읽은 시각을 유지한다. 영향받은 행 수를 돌려준다.
     pub fn mark_read(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         notification_id: Uuid,
         user_id: Uuid,
         read_at: Timestamp,
@@ -177,7 +174,7 @@ impl NotificationRepository {
     /// `markAllRead`
     pub fn mark_all_read(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         user_id: Uuid,
         read_at: Timestamp,
     ) -> Result<u64, DbError> {
@@ -192,7 +189,7 @@ impl NotificationRepository {
     /// `deleteExpiredForActiveUsers`: 탈퇴하지 않은 회원의 알림 중 `created_before`보다 먼저 만들어진 것.
     pub fn delete_expired_for_active_users(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         created_before: Timestamp,
     ) -> Result<u64, DbError> {
         Ok(db.execute(
@@ -205,7 +202,7 @@ impl NotificationRepository {
     /// `deleteExpiredForWithdrawnUsers`: `withdrawn_before`보다 먼저 탈퇴한 회원의 알림 전부.
     pub fn delete_expired_for_withdrawn_users(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         withdrawn_before: Timestamp,
     ) -> Result<u64, DbError> {
         Ok(db.execute(

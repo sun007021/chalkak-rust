@@ -1,7 +1,7 @@
 //! 원본 `AdminAuditLogService`(생성)와 `AdminAuditLogQueryService`(조회).
 
+use chalkak_db::Tx;
 use jiff::Timestamp;
-use postgres::Transaction;
 use uuid::Uuid;
 
 use super::domain::{AdminAction, AdminAuditLog, AdminTargetType, AuditSnapshot};
@@ -26,7 +26,7 @@ pub struct AuditLogCommand {
 /// `createAuditLog`: 관리자 업무 변경과 **같은 트랜잭션**에서만 만든다(`Propagation.MANDATORY`). 독립 트랜잭션을 열지
 /// 않으므로 이후 업무가 실패하면 감사 INSERT도 함께 롤백된다. 현재 요청의 requestId를 붙인다.
 pub fn create_audit_log(
-    tx: &mut Transaction<'_>,
+    tx: &mut Tx<'_>,
     command: AuditLogCommand,
     now: Timestamp,
 ) -> Result<AdminAuditLog, ApiError> {
@@ -90,6 +90,6 @@ impl AuditLogQueryService {
             sort: query.sort,
         };
         let mut conn = self.deps.pool.get()?;
-        Ok(AuditLogRepository.find_audit_logs(&mut *conn, &criteria, page, page_size)?)
+        Ok(AuditLogRepository.find_audit_logs(&mut conn, &criteria, page, page_size)?)
     }
 }

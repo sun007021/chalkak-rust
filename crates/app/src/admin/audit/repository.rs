@@ -1,8 +1,8 @@
 //! 원본 `AdminAuditLogRepositoryImpl`·`AdminAuditLogJpaRepository`: 감사 로그 저장과 목록 조회.
 
+use chalkak_db::Db;
 use chalkak_db::DbError;
 use jiff::Timestamp;
-use postgres::GenericClient;
 use serde_json::Value;
 use uuid::Uuid;
 
@@ -58,11 +58,7 @@ pub struct AuditLogRepository;
 
 impl AuditLogRepository {
     /// `save`: 새 감사 로그를 넣고 DB가 정한 식별자를 채워 돌려준다.
-    pub fn save(
-        &self,
-        db: &mut impl GenericClient,
-        log: &mut AdminAuditLog,
-    ) -> Result<(), DbError> {
+    pub fn save(&self, db: &mut impl Db, log: &mut AdminAuditLog) -> Result<(), DbError> {
         let before = Value::Object(log.before_state.clone()).to_string();
         let after = Value::Object(log.after_state.clone()).to_string();
         let row = db.query_one(
@@ -89,7 +85,7 @@ impl AuditLogRepository {
     /// `findAuditLogs`
     pub fn find_audit_logs(
         &self,
-        db: &mut impl GenericClient,
+        db: &mut impl Db,
         criteria: &AuditLogCriteria,
         page: i32,
         page_size: i32,

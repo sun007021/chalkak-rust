@@ -71,7 +71,7 @@ impl AdminUserQueryService {
             sort: sort.unwrap_or(AdminUserSort::CreatedAtDesc),
         };
         let mut conn = self.deps.pool.get()?;
-        let result = AdminUserRepository.find_users(&mut *conn, &criteria, page, page_size)?;
+        let result = AdminUserRepository.find_users(&mut conn, &criteria, page, page_size)?;
         Ok(result.map(|summary| UserListItem {
             status: AdminUserStatus::from_user(summary.user_status, summary.deleted_at),
             summary,
@@ -81,7 +81,7 @@ impl AdminUserQueryService {
     pub fn get_user(&self, user_id: Uuid) -> Result<AdminUserDetail, ApiError> {
         let mut conn = self.deps.pool.get()?;
         let row = AdminUserRepository
-            .find_user_by_id(&mut *conn, user_id)?
+            .find_user_by_id(&mut conn, user_id)?
             .ok_or_else(|| not_found("사용자를 찾을 수 없습니다."))?;
         detail_of(row, &self.deps)
     }
