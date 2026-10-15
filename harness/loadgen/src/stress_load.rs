@@ -310,6 +310,11 @@ fn worker(cfg: &MixCfg, rec: &Recorder, stop: &AtomicBool, slot: usize, stagger:
     while !stop.load(Ordering::Relaxed) {
         let scheduled = match cfg.interval {
             Some(step) => {
+                // 프로브는 밀린 만큼 한꺼번에 몰아 보내지 않는다(급증 뒤 지연이 밀린 요청 때문에 부풀지 않게).
+                // 지연은 실제로 보낸 시각부터 잰다.
+                if cfg.probe && Instant::now() > next + step {
+                    next = Instant::now();
+                }
                 let at = next;
                 next += step;
                 let now = Instant::now();

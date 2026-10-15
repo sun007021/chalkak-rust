@@ -30,7 +30,8 @@ use crate::sys;
 
 /// 부하 발생기 자신의 DB 연결에 붙이는 이름. 앱 연결과 구분한다(누수 검사·연결 끊기에서 제외).
 const APP_NAME: &str = "chalkak-loadgen";
-const LIVENESS: &str = "/actuator/health/liveness";
+/// DB를 안 쓰는 가벼운 공개 엔드포인트(두 서버 모두 인증 없이 `{}`를 준다).
+const LIGHT: &str = "/actuator/info";
 const DB_ENDPOINT: &str = "GET /api/v1/posts/today";
 
 // ---- 작은 도우미 --------------------------------------------------------------------------------------------
@@ -169,7 +170,7 @@ impl Target {
     }
 
     fn server_alive(&self) -> bool {
-        self.get_status(LIVENESS) == Some(200)
+        self.get_status(LIGHT) == Some(200)
     }
 
     /// DB를 쓰는 요청 하나가 성공하는가.
@@ -322,7 +323,7 @@ impl Obs {
     fn scalar(&mut self, sql: &str) -> Result<i64, String> {
         self.db()?
             .query_one(sql, &[])
-            .map(|r| r.get(0))
+            .and_then(|r| r.try_get(0))
             .map_err(db_err)
     }
 
@@ -600,6 +601,12 @@ fn spike(t: &Target, obs: &mut Obs, n: u64) -> CaseResult {
         "recovery_threshold_us": judge::recovery_threshold_us(p_before.p99_us),
         // 풀 대기 시간은 앱이 노출하지 않아 직접 못 잰다. 급증 구간의 최대 지연이 풀 대기의 상한이다.
         "pool_wait_upper_bound_us": p_burst.max_us,
+        // 급증이 끝난 시점(0초) 기준 프로브 1초 창별 (초, 표본 수, p99 ms). 급증 앞 5초부터 보인다.
+        "probe_timeline": windows
+            .iter()
+            .filter(|w| w.second + 5 >= after_sec)
+            .map(|w| json!([w.second as i64 - after_sec as i64, w.count, w.p99_us as f64 / 1000.0]))
+            .collect::<Vec<_>>(),
         "sampler": sample.to_json(),
         "loadgen_spawn_failures": spawn_failures,
     });
@@ -629,7 +636,8 @@ fn storm(t: &Target, obs: &mut Obs, n: u64) -> CaseResult {
     let drops0 = t.netstat("ListenDrops");
     let rec = Recorder::new(1, 1);
     rec.begin_phase(0);
-    let go = Arc::new(AtomicBool::new(false));
+    // 출발 신호: 스레드가 조건 변수에서 자다가 한꺼번에 깬다(깨어서 도는 대기는 수천 개일 때 부하 발생기를 먼저 태운다).
+    let go = Arc::new((std::sync::Mutex::new(false), std::sync::Condvar::new()));
     let mut handles = Vec::new();
     let mut spawn_failures = 0u64;
     for _ in 0..n {
@@ -637,12 +645,16 @@ fn storm(t: &Target, obs: &mut Obs, n: u64) -> CaseResult {
         match thread::Builder::new()
             .stack_size(load::WORKER_STACK)
             .spawn(move || {
-                while !go.load(Ordering::Acquire) {
-                    thread::sleep(Duration::from_millis(1));
+                {
+                    let (lock, cv) = &*go;
+                    let mut started = lock.lock().unwrap_or_else(|e| e.into_inner());
+                    while !*started {
+                        started = cv.wait(started).unwrap_or_else(|e| e.into_inner());
+                    }
                 }
                 let (outcome, micros) = load::one_shot(
                     addr,
-                    LIVENESS,
+                    LIGHT,
                     Duration::from_secs(10),
                     Duration::from_secs(30),
                 );
@@ -654,7 +666,11 @@ fn storm(t: &Target, obs: &mut Obs, n: u64) -> CaseResult {
     }
     sleep(Duration::from_millis(300)); // 스레드가 모두 준비되게
     let t0 = Instant::now();
-    go.store(true, Ordering::Release);
+    {
+        let (lock, cv) = &*go;
+        *lock.lock().unwrap_or_else(|e| e.into_inner()) = true;
+        cv.notify_all();
+    }
     for h in handles {
         let _ = h.join();
     }
@@ -706,7 +722,7 @@ fn storm(t: &Target, obs: &mut Obs, n: u64) -> CaseResult {
 /// 요청 하나를 보내고 응답을 읽는다(keep-alive 연결로).
 fn ping(stream: &mut TcpStream) -> io::Result<u16> {
     stream.write_all(
-        format!("GET {LIVENESS} HTTP/1.1\r\nHost: chalkak\r\nAccept: application/json\r\n\r\n")
+        format!("GET {LIGHT} HTTP/1.1\r\nHost: chalkak\r\nAccept: application/json\r\n\r\n")
             .as_bytes(),
     )?;
     let mut r = std::io::BufReader::with_capacity(1024, &*stream);
@@ -884,7 +900,7 @@ fn slow_conn(addr: SocketAddr, stalled: bool, drip: Duration, stop: Arc<AtomicBo
     };
     let _ = s.set_nodelay(true);
     let t0 = Instant::now();
-    let prefix = format!("GET {LIVENESS} HTTP/1.1\r\nHost: slow\r\nX-Slow: ");
+    let prefix = format!("GET {LIGHT} HTTP/1.1\r\nHost: slow\r\nX-Slow: ");
     let mut to_send: Vec<u8> = prefix.into_bytes();
     to_send.extend(std::iter::repeat_n(b'a', 4096));
     let mut sent = 0usize;
@@ -1228,7 +1244,7 @@ fn wait_db(obs: &mut Obs, limit: Duration) -> Option<f64> {
     let t0 = Instant::now();
     obs.reconnect();
     while t0.elapsed() < limit {
-        if obs.scalar("SELECT 1").is_ok() {
+        if obs.scalar("SELECT 1::bigint").is_ok() {
             return Some(t0.elapsed().as_secs_f64());
         }
         obs.reconnect();
