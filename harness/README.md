@@ -8,7 +8,7 @@
 | 경로 | 내용 |
 | --- | --- |
 | `parity/` | 시나리오 러너, 정규화, 비교기, ID Token 서명 (`chalkak-parity`) |
-| `fakes/` | 가짜 외부 서버 (`chalkak-fakes`): OIDC JWKS, Apple 토큰 교환·철회, Slack Webhook, S3 HeadObject, SQS(SendMessage·Receive·Delete·ChangeMessageVisibility). 받은 요청을 기록한다 |
+| `fakes/` | 가짜 외부 서버 (`chalkak-fakes`): OIDC JWKS, Apple 토큰 교환·철회, Slack Webhook, S3 HeadObject, SQS(SendMessage·Receive·Delete·ChangeMessageVisibility), CloudWatch Logs Insights. 받은 요청을 기록한다 |
 | `keys/` | 가짜 JWKS와 러너가 ID Token 서명에 쓰는 테스트 RSA 키 쌍 (비밀 아님) |
 | `scenarios/` | 시나리오(TOML). 형식은 `parity/src/scenario.rs` 상단 주석 참고 |
 | `golden/` | Java oracle에서 녹화한 정규화 결과 |
@@ -157,6 +157,7 @@ FAKES_LOCAL=1 COMPOSE_UP_ARGS="--no-build" harness/scripts/up.sh selfcheck
 | `POST /slack/...` | Slack Incoming Webhook | 본문 기록. 지정하지 않으면 200 `ok` |
 | `HEAD /<키>` (가상 호스트 `<버킷>.fakes`) 또는 `HEAD /<버킷>/<키>` | S3 HeadObject | 키별 크기·Content-Type·상태를 시나리오가 지정. 지정하지 않은 키는 404 |
 | `POST /` + `X-Amz-Target: AmazonSQS.<작업>` | SQS (JSON 프로토콜) | `SendMessage`는 메시지를 저장하고 정상 응답(본문 MD5·`MessageId`). `ReceiveMessage`·`DeleteMessage`·`ChangeMessageVisibility`는 저장한 메시지에 대해 동작한다(롱 폴링 없음). 오류·지연은 규칙 목록(`[[fakes.sqs]]`)으로 지정 |
+| `POST /` + `X-Amz-Target: Logs_20140328.*` | CloudWatch Logs Insights(`StartQuery`·`GetQueryResults`·`StopQuery`) | 쿼리는 즉시 `Complete`. 쿼리의 `as <지표>` 이름으로 시나리오가 지정한 결과 행을 돌려주고, 지정하지 않은 지표는 행이 없다. 쿼리 ID는 `fake-query-N` |
 | `PUT /__admin/responses`, `GET /__admin/requests`, `POST /__admin/reset`, `GET /__admin/health` | 관리 | 응답 지정(통째로 교체), 기록 조회, 초기화 |
 
 ID Token은 러너가 `keys/oidc-test-private.pem`으로 RS256 서명해 만든다. **발급자(issuer)는 실제 값을 그대로** 두고
@@ -172,6 +173,8 @@ Spring은 `chalkak.*` 속성을 환경변수로 덮어쓸 수 있다. Rust 서�
 | `CHALKAK_AUTH_APPLE_TOKEN_TOKENURI`, `..._REVOKEURI` | `http://fakes:9000/apple/auth/{token,revoke}` | `chalkak.auth.apple.token.token-uri`, `revoke-uri` |
 | `AWS_ENDPOINT_URL_S3` | `http://fakes:9000` | AWS SDK 공통 환경변수. HeadObject뿐 아니라 **presigned URL의 호스트도** `test-bucket.fakes:9000`으로 바뀐다 |
 | `AWS_ENDPOINT_URL_SQS` | `http://fakes:9000` | AWS SDK 공통 환경변수. Java SDK(2.54.1)가 존중함을 확인했다(요청이 fakes에 도착한다). 큐 URL은 요청 본문에만 들어간다 |
+| `AWS_ENDPOINT_URL_CLOUDWATCH_LOGS` | `http://fakes:9000` | 서비스별 AWS SDK 환경변수. 사용자 지표 집계가 읽는 Logs Insights를 가짜 서버로 돌린다 |
+| `CHALKAK_ANALYTICS_LOGGROUP`, `CHALKAK_ANALYTICS_EXCLUDEDUSERIDS` | `/chalkak/test/application`, `01990000-0000-7000-8000-0000000000e1` | `chalkak.analytics.*`. 쿼리 본문의 로그 그룹과 제외 회원 조건이 비교에 나온다 |
 | `CHALKAK_IMAGE_ANONYMOUSACCESS` | `false` | `chalkak.image.anonymous-access`. local 프로필의 익명 자격증명으로는 presigned URL을 만들 수 없다("Only SigV4 signers are supported") |
 
 **Slack은 가짜 서버로 돌릴 수 없다.** 원본의 `SlackNotificationProperties`가 `https://hooks.slack.com/services/…`
@@ -227,6 +230,7 @@ content_type = "image/png"
 ```
 
 - 이미지 처리 콜백(`/internal/v1/**`) 단계는 `callback = {}`로 HMAC 헤더(`X-Chalkak-Callback-Timestamp`, `-Signature`)를 붙인다. 서명 대상은 `타임스탬프\nPOST\n경로\nsha256hex(빈 본문)\nlocal`이고 비밀키는 `oracle.env`의 `IMAGE_PROCESSOR_CALLBACK_SECRET`이다. `timestamp_offset`, `sign_path`, `secret`, `audience`, `signature`, `omit_timestamp`, `omit_signature`로 잘못된 요청을 만든다.
+- 응답을 보낸 뒤 비동기로 외부 호출을 이어 가는 단계(사용자 지표 집계)는 `await_fakes = { service = "cloudwatch_logs", count = N }`로 가짜 서버 기록이 누적 N개가 될 때까지 기다린다. 앱마다 걸리는 시간이 달라(JVM은 첫 호출이 느리다) 다음 단계의 "진행 중" 거절과 겹치지 않게 맞춘다. `[fakes.logs]`는 `status`(기본 `Complete`)와 `rows.<지표>.<필드> = "값"`을 지정한다.
 - 응답 지정과 s3 키의 `${변수}`는 단계마다 현재 변수 값으로 채운다. 그래서 앞 단계에서 `capture`한 `uploadId`로 키를 지정할 수 있다.
 - 비교에서 **빼는 것**: JWKS 조회(앱의 공개키 캐시 상태로 횟수가 달라진다), 요청 헤더(Content-Type만 남긴다), S3의 호스트·경로 방식(`버킷/키`만 남긴다).
 - Apple 요청 본문은 폼 필드로 풀어 이름순으로 비교하고, `client_secret`(ES256 JWT)은 헤더·클레임으로 풀어 비교한다. **서명 검증은 하지 않는다**(허용 목록에 `p256`이 없다).

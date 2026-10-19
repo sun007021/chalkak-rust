@@ -14,6 +14,15 @@
 //! | (새로 추가) `rssBytes` | `/proc/self/status`의 `VmRSS` |
 //! | (새로 추가) `openFds` | `/proc/self/fd` 항목 수 |
 //!
+//! ## GC 관측 로그(#695)를 대신하는 것
+//!
+//! 원본은 JVM 옵션 `-Xlog:gc`로 GC 로그 파일을 남기고(`memwatch.sh`, CloudWatch 에이전트 설정은 배포 산출물),
+//! 위 `gcTimeMsTotal`·`heapUsedBytes`로 메모리 압박을 본다. 이것은 JVM 런타임 기능이라 Rust 프로세스에 옮길 대상이 없다
+//! (GC가 없고 할당기는 즉시 반환한다). 같은 질문("메모리가 새는가, 연결이 쌓이는가")에는 이 로그가 답한다:
+//! `rssBytes`(프로세스 상주 메모리), `threads`, `openFds`, `hikariActive`·`hikariPending`을 1분마다 남기므로
+//! 시간에 따른 RSS 증가와 풀 대기를 같은 로그 그룹에서 본다. 배포 설정(에이전트·`memwatch.sh`)은 이 저장소에 배포
+//! 디렉터리가 없어 옮기지 않았다.
+//!
 //! Prometheus 같은 레지스트리를 거치지 않고 프로세스와 풀에서 직접 읽는다(원본과 같은 이유: 레지스트리 필터 설정
 //! 하나로 이 로그의 값이 사라지지 않게). `/proc`이 없는 플랫폼에서는 프로세스 값이 모두 빠진다.
 

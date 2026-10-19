@@ -13,6 +13,7 @@ use std::sync::Arc;
 
 use chalkak_app::admin::AdminConfig;
 use chalkak_app::admin::bootstrap::AdminAccount;
+use chalkak_app::analytics::{self, UserMetricsAggregationRunner};
 use chalkak_app::jobs::{self, AppleRevocation, Job, JobDeps, Jobs};
 use chalkak_app::notification::slack::{
     NotificationMessageFactory, PostModerationPendingNotifier,
@@ -133,6 +134,34 @@ pub fn build_handler(
     clock: Arc<dyn Clock>,
     logger: Arc<Logger>,
 ) -> Arc<dyn Handler> {
+    let analytics = build_analytics(settings, &pool, &clock, &logger)
+        .expect("사용자 지표 집계기를 만들 수 없습니다");
+    build_handler_with(settings, pool, clock, logger, analytics)
+}
+
+/// 사용자 지표 집계 러너. 스케줄러와 관리자 API가 같은 러너를 써야 하므로 한 번만 만들어 나눠 쓴다.
+fn build_analytics(
+    settings: &Settings,
+    pool: &Pool,
+    clock: &Arc<dyn Clock>,
+    logger: &Arc<Logger>,
+) -> Result<Arc<UserMetricsAggregationRunner>, String> {
+    analytics::build_runner(
+        &settings.analytics,
+        pool.clone(),
+        Arc::clone(clock),
+        Arc::clone(logger),
+    )
+}
+
+/// [`build_handler`]에 집계 러너를 직접 넘긴다.
+pub fn build_handler_with(
+    settings: &Settings,
+    pool: Pool,
+    clock: Arc<dyn Clock>,
+    logger: Arc<Logger>,
+    analytics: Arc<UserMetricsAggregationRunner>,
+) -> Arc<dyn Handler> {
     let object_store = post_s3::S3ObjectStore::new(
         &settings.post.image,
         settings.post.s3_endpoint_url.as_deref(),
@@ -150,6 +179,7 @@ pub fn build_handler(
             Arc::new(object_store),
             moderation_pending_listener(settings, Arc::clone(&logger)),
         ),
+        analytics,
     };
     let router = register_routes(Routes::new(Arc::clone(&logger)), &ctx).into_router();
     Arc::new(build_chain(
@@ -170,8 +200,22 @@ pub fn run(settings: &Settings, shutdown: ShutdownSignal) -> Result<(), Box<dyn 
     migrate(settings, &pool, &logger)?;
     ensure_admin_account(&pool, settings)?;
 
-    let jobs = start_jobs(settings, &pool, &clock, &logger, &shutdown)?;
-    let handler = build_handler(settings, pool.clone(), clock, Arc::clone(&logger));
+    let analytics = build_analytics(settings, &pool, &clock, &logger)?;
+    let jobs = start_jobs(
+        settings,
+        &pool,
+        &clock,
+        &logger,
+        &shutdown,
+        Arc::clone(&analytics),
+    )?;
+    let handler = build_handler_with(
+        settings,
+        pool.clone(),
+        clock,
+        Arc::clone(&logger),
+        analytics,
+    );
     let server = Server::bind(
         ("0.0.0.0", settings.port),
         settings.workers,
@@ -200,6 +244,7 @@ fn start_jobs(
     clock: &Arc<dyn Clock>,
     logger: &Arc<Logger>,
     shutdown: &ShutdownSignal,
+    analytics: Arc<UserMetricsAggregationRunner>,
 ) -> Result<Jobs, Box<dyn Error>> {
     let wants_apple = settings
         .jobs
@@ -228,6 +273,7 @@ fn start_jobs(
         logger: Arc::clone(logger),
         apple,
         publisher,
+        analytics: Some(analytics),
     };
     Ok(jobs::start(&deps, &settings.jobs, shutdown)?)
 }

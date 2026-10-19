@@ -538,11 +538,17 @@ fn deps(p: &Pending) -> JobDeps {
             cipher: p.cipher.clone(),
             client: p.apple.clone(),
         }),
+        analytics: None,
     }
 }
 
 fn all_enabled() -> JobsSettings {
-    JobsSettings::from_env(&Env::from_pairs(Vec::<(String, String)>::new()), false).unwrap()
+    JobsSettings::from_env(
+        &Env::from_pairs(Vec::<(String, String)>::new()),
+        false,
+        false,
+    )
+    .unwrap()
 }
 
 /// 시계가 KST 04:30/04:40/04:50/매시 정각에 닿으면 각 정리가 돈다.

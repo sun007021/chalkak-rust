@@ -12,7 +12,7 @@
 
 use std::fmt;
 
-/// 원본 `ErrorCode` enum 9개. 직렬화 이름이 곧 변형 이름이다(`"BUSINESS_ERROR"` 등).
+/// 원본 `ErrorCode` enum 10개. 직렬화 이름이 곧 변형 이름이다(`"BUSINESS_ERROR"` 등).
 #[allow(non_camel_case_types)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, serde::Serialize)]
 pub enum ErrorCode {
@@ -27,10 +27,12 @@ pub enum ErrorCode {
     REAUTHENTICATION_REQUIRED,
     FORBIDDEN,
     INTERNAL_ERROR,
+    /// 이미 도는 집계가 끝난 뒤 다시 요청하면 되므로 입력을 고쳐야 하는 `BUSINESS_ERROR`와 재시도 방식이 다르다.
+    USER_METRICS_AGGREGATION_IN_PROGRESS,
 }
 
 impl ErrorCode {
-    pub const ALL: [Self; 9] = [
+    pub const ALL: [Self; 10] = [
         Self::BUSINESS_ERROR,
         Self::SIGNATURE_REGISTRATION_REQUIRED,
         Self::SIGNATURE_REUPLOAD_REQUIRED,
@@ -40,6 +42,7 @@ impl ErrorCode {
         Self::REAUTHENTICATION_REQUIRED,
         Self::FORBIDDEN,
         Self::INTERNAL_ERROR,
+        Self::USER_METRICS_AGGREGATION_IN_PROGRESS,
     ];
 
     /// 원본 `ErrorCode.name()`.
@@ -54,6 +57,7 @@ impl ErrorCode {
             Self::REAUTHENTICATION_REQUIRED => "REAUTHENTICATION_REQUIRED",
             Self::FORBIDDEN => "FORBIDDEN",
             Self::INTERNAL_ERROR => "INTERNAL_ERROR",
+            Self::USER_METRICS_AGGREGATION_IN_PROGRESS => "USER_METRICS_AGGREGATION_IN_PROGRESS",
         }
     }
 }
@@ -211,7 +215,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn 원본_enum_9개가_그대로_있다() {
+    fn 원본_enum_10개가_그대로_있다() {
         let names: Vec<&str> = ErrorCode::ALL.iter().map(|c| c.as_str()).collect();
         assert_eq!(
             names,
@@ -225,6 +229,7 @@ mod tests {
                 "REAUTHENTICATION_REQUIRED",
                 "FORBIDDEN",
                 "INTERNAL_ERROR",
+                "USER_METRICS_AGGREGATION_IN_PROGRESS",
             ]
         );
     }
