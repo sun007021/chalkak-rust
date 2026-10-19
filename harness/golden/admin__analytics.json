@@ -1,0 +1,1014 @@
+{
+  "db": {
+    "admins": [
+      "{\"created_at\":\"<t-3542400s db +09:00>\",\"id\":\"$uuid?\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"updated_at\":\"<t-3542400s db +09:00>\",\"username\":\"operator\"}"
+    ]
+  },
+  "fakes": [
+    {
+      "body": {
+        "endTime": 1791730799,
+        "logGroupName": "/chalkak/test/application",
+        "queryString": "filter type = \"access\" and ispresent(userId)\n| filter userId not in [\"$uuid16\"]\n| stats count_distinct(userId) as visitors",
+        "startTime": 1791644400
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "StartQuery",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    },
+    {
+      "body": {
+        "queryId": "fake-query-1"
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "GetQueryResults",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    },
+    {
+      "body": {
+        "endTime": 1791730799,
+        "logGroupName": "/chalkak/test/application",
+        "queryString": "filter type = \"access\" and method = \"GET\" and route = \"/api/v1/topics\" and status = 200 and ispresent(userId)\n| filter userId not in [\"$uuid16\"]\n| stats count_distinct(userId) as topicViewers",
+        "startTime": 1791644400
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "StartQuery",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    },
+    {
+      "body": {
+        "queryId": "fake-query-2"
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "GetQueryResults",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    },
+    {
+      "body": {
+        "endTime": 1791730799,
+        "logGroupName": "/chalkak/test/application",
+        "queryString": "filter type = \"access\"\n| stats count(*) as requests, avg(durationMs) as latencyAvg, pct(durationMs, 95) as latencyP95",
+        "startTime": 1791644400
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "StartQuery",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    },
+    {
+      "body": {
+        "queryId": "fake-query-3"
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "GetQueryResults",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    },
+    {
+      "body": {
+        "endTime": 1791730799,
+        "logGroupName": "/chalkak/test/application",
+        "queryString": "filter type = \"access\" and status >= 500\n| stats count(*) as server5xx",
+        "startTime": 1791644400
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "StartQuery",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    },
+    {
+      "body": {
+        "queryId": "fake-query-4"
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "GetQueryResults",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    },
+    {
+      "body": {
+        "endTime": 1791730799,
+        "logGroupName": "/chalkak/test/application",
+        "queryString": "filter type = \"access\" and method = \"POST\" and route = \"/api/v1/posts\" and status = 201\n| filter userId not in [\"$uuid16\"]\n| stats count(*) as postCreations",
+        "startTime": 1791644400
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "StartQuery",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    },
+    {
+      "body": {
+        "queryId": "fake-query-5"
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "GetQueryResults",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    },
+    {
+      "body": {
+        "endTime": 1791644399,
+        "logGroupName": "/chalkak/test/application",
+        "queryString": "filter type = \"access\" and ispresent(userId)\n| filter userId not in [\"$uuid16\"]\n| stats count_distinct(userId) as visitors",
+        "startTime": 1791558000
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "StartQuery",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    },
+    {
+      "body": {
+        "queryId": "fake-query-6"
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "GetQueryResults",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    },
+    {
+      "body": {
+        "endTime": 1791557999,
+        "logGroupName": "/chalkak/test/application",
+        "queryString": "filter type = \"access\" and ispresent(userId)\n| filter userId not in [\"$uuid16\"]\n| stats count_distinct(userId) as visitors",
+        "startTime": 1791471600
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "StartQuery",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    },
+    {
+      "body": {
+        "queryId": "fake-query-7"
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "GetQueryResults",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    },
+    {
+      "body": {
+        "endTime": 1791557999,
+        "logGroupName": "/chalkak/test/application",
+        "queryString": "filter type = \"access\" and method = \"GET\" and route = \"/api/v1/topics\" and status = 200 and ispresent(userId)\n| filter userId not in [\"$uuid16\"]\n| stats count_distinct(userId) as topicViewers",
+        "startTime": 1791471600
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "StartQuery",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    },
+    {
+      "body": {
+        "queryId": "fake-query-8"
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "GetQueryResults",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    },
+    {
+      "body": {
+        "endTime": 1791557999,
+        "logGroupName": "/chalkak/test/application",
+        "queryString": "filter type = \"access\"\n| stats count(*) as requests, avg(durationMs) as latencyAvg, pct(durationMs, 95) as latencyP95",
+        "startTime": 1791471600
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "StartQuery",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    },
+    {
+      "body": {
+        "queryId": "fake-query-9"
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "GetQueryResults",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    },
+    {
+      "body": {
+        "endTime": 1791557999,
+        "logGroupName": "/chalkak/test/application",
+        "queryString": "filter type = \"access\" and status >= 500\n| stats count(*) as server5xx",
+        "startTime": 1791471600
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "StartQuery",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    },
+    {
+      "body": {
+        "queryId": "fake-query-10"
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "GetQueryResults",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    },
+    {
+      "body": {
+        "endTime": 1791557999,
+        "logGroupName": "/chalkak/test/application",
+        "queryString": "filter type = \"access\" and method = \"POST\" and route = \"/api/v1/posts\" and status = 201\n| filter userId not in [\"$uuid16\"]\n| stats count(*) as postCreations",
+        "startTime": 1791471600
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "StartQuery",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    },
+    {
+      "body": {
+        "queryId": "fake-query-11"
+      },
+      "contentType": "application/x-amz-json-1.1",
+      "detail": "GetQueryResults",
+      "method": "POST",
+      "service": "cloudwatch_logs"
+    }
+  ],
+  "steps": [
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "www-authenticate",
+          "Bearer"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "토큰 없이 요청"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be null"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid2"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "날짜 누락"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be null"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid3"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "날짜가 null"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid4"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "날짜 형식 오류"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid5"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "빈 본문"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "아직 끝나지 않은 날짜는 집계할 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid6"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "오늘 날짜는 끝나지 않은 날"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "아직 끝나지 않은 날짜는 집계할 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid7"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "미래 날짜"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid8"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 202,
+      "step": "어제 집계 시작"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid9"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 202,
+      "step": "보존 기간이 지난 날짜는 쿼리 없이 끝난다"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid10"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 202,
+      "step": "관측 시작일 이전 날짜는 쿼리 없이 끝난다"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid11"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 202,
+      "step": "쿼리 실패는 응답에 나타나지 않는다"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid12"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 202,
+      "step": "실패한 뒤에도 다시 시작할 수 있다"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid13"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 202,
+      "step": "보존 경계 날짜(10-05 00:00 KST는 경계 10-05 09:00 이전이라 제외)"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "지원하지 않는 요청 방식이거나 형식입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid14"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 405,
+      "step": "GET은 허용되지 않는다"
+    },
+    {
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "접근 권한이 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid15"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 403,
+      "step": "회원 토큰은 거절된다"
+    }
+  ]
+}

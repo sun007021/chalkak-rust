@@ -1,0 +1,153 @@
+name = "관리자 사용자 지표 수동 집계"
+tags = ["admin-api", "analytics"]
+# 2026-10-12 09:00 KST. 오늘(10-12)은 아직 끝나지 않은 날이고, 보존 기간 7일의 경계는 10-05 09:00 KST다.
+clock = "2026-10-12T09:00:00+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO admins (id, username, password, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000000a1', 'operator', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-01T00:00:00Z', '2026-09-01T00:00:00Z');
+"""]
+
+[fakes.logs]
+[fakes.logs.rows.visitors]
+visitors = "7"
+[fakes.logs.rows.topicViewers]
+topicViewers = "6"
+[fakes.logs.rows.requests]
+requests = "1200"
+latencyAvg = "12.6"
+latencyP95 = "80.4"
+[fakes.logs.rows.server5xx]
+server5xx = "3"
+[fakes.logs.rows.postCreations]
+postCreations = "9"
+
+[[step]]
+name = "토큰 없이 요청"
+method = "POST"
+path = "/api/v1/admin/analytics/aggregations"
+headers = { "Content-Type" = "application/json" }
+body = '''{"metricDate":"2026-10-11"}'''
+
+[[step]]
+name = "날짜 누락"
+method = "POST"
+path = "/api/v1/admin/analytics/aggregations"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{}'''
+
+[[step]]
+name = "날짜가 null"
+method = "POST"
+path = "/api/v1/admin/analytics/aggregations"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"metricDate":null}'''
+
+[[step]]
+name = "날짜 형식 오류"
+method = "POST"
+path = "/api/v1/admin/analytics/aggregations"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"metricDate":"2026/10/11"}'''
+
+[[step]]
+name = "빈 본문"
+method = "POST"
+path = "/api/v1/admin/analytics/aggregations"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+
+[[step]]
+name = "오늘 날짜는 끝나지 않은 날"
+method = "POST"
+path = "/api/v1/admin/analytics/aggregations"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"metricDate":"2026-10-12"}'''
+
+[[step]]
+name = "미래 날짜"
+method = "POST"
+path = "/api/v1/admin/analytics/aggregations"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"metricDate":"2030-01-01"}'''
+
+[[step]]
+name = "어제 집계 시작"
+method = "POST"
+path = "/api/v1/admin/analytics/aggregations"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"metricDate":"2026-10-11"}'''
+advance_seconds = 2
+await_fakes = { service = "cloudwatch_logs", count = 10 }
+
+[[step]]
+name = "보존 기간이 지난 날짜는 쿼리 없이 끝난다"
+method = "POST"
+path = "/api/v1/admin/analytics/aggregations"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"metricDate":"2026-10-04"}'''
+advance_seconds = 2
+
+[[step]]
+name = "관측 시작일 이전 날짜는 쿼리 없이 끝난다"
+method = "POST"
+path = "/api/v1/admin/analytics/aggregations"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"metricDate":"2026-10-01"}'''
+advance_seconds = 2
+
+[[step]]
+name = "쿼리 실패는 응답에 나타나지 않는다"
+method = "POST"
+path = "/api/v1/admin/analytics/aggregations"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"metricDate":"2026-10-10"}'''
+advance_seconds = 2
+await_fakes = { service = "cloudwatch_logs", count = 12 }
+[step.fakes.logs]
+status = "Failed"
+
+[[step]]
+name = "실패한 뒤에도 다시 시작할 수 있다"
+method = "POST"
+path = "/api/v1/admin/analytics/aggregations"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"metricDate":"2026-10-09"}'''
+advance_seconds = 2
+await_fakes = { service = "cloudwatch_logs", count = 22 }
+[step.fakes.logs]
+status = "Complete"
+
+[[step]]
+name = "보존 경계 날짜(10-05 00:00 KST는 경계 10-05 09:00 이전이라 제외)"
+method = "POST"
+path = "/api/v1/admin/analytics/aggregations"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"metricDate":"2026-10-05"}'''
+advance_seconds = 2
+
+[[step]]
+name = "GET은 허용되지 않는다"
+method = "GET"
+path = "/api/v1/admin/analytics/aggregations"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "회원 토큰은 거절된다"
+method = "POST"
+path = "/api/v1/admin/analytics/aggregations"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"metricDate":"2026-10-11"}'''

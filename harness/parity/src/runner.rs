@@ -221,6 +221,10 @@ fn run_once(target: &Target, scenario: &Scenario, trace: bool) -> Result<(Value,
             "body": body,
         }));
 
+        if let (Some(wait), Some(url)) = (&step.await_fakes, fakes_url) {
+            await_fakes(url, wait).map_err(|e| format!("[{}] {}: {e}", target.name, step.name))?;
+        }
+
         app_offset += step.advance_seconds.unwrap_or(0);
     }
 
@@ -251,6 +255,28 @@ fn run_once(target: &Target, scenario: &Scenario, trace: bool) -> Result<(Value,
 
 /// 서버가 요청의 `Host`로 만들어 응답에 싣는 자기 주소(OpenAPI `servers`, `Location` 등)는 레인마다 포트가 달라
 /// 비교를 깨뜨린다. 본문과 헤더 값의 대상 주소를 `http://<base>`로 바꾼다. UTF-8이 아닌 본문(이미지 등)은 건드리지 않는다.
+/// 가짜 서버 기록이 `wait.count`개에 이를 때까지 기다린다. 이른 뒤에도 앱이 일을 마무리(잠금 해제 등)할 틈을 둔다.
+fn await_fakes(url: &str, wait: &crate::scenario::AwaitFakes) -> Result<(), String> {
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(30);
+    loop {
+        let seen = fakes::records(url)?
+            .iter()
+            .filter(|r| r["service"].as_str() == Some(wait.service.as_str()))
+            .count();
+        if seen >= wait.count {
+            std::thread::sleep(std::time::Duration::from_millis(500));
+            return Ok(());
+        }
+        if std::time::Instant::now() >= deadline {
+            return Err(format!(
+                "가짜 서버 {} 호출이 {}개에 이르지 않았습니다(현재 {seen}개)",
+                wait.service, wait.count
+            ));
+        }
+        std::thread::sleep(std::time::Duration::from_millis(100));
+    }
+}
+
 fn mask_base_url(res: &mut http::Response, base_url: &str) {
     const MASK: &str = "http://<base>";
     for (_, value) in &mut res.headers {
