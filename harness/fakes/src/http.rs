@@ -32,6 +32,8 @@ pub struct Response {
     pub body: Vec<u8>,
     /// HEAD 응답처럼 본문 없이 길이만 알릴 때 쓴다.
     pub content_length: Option<usize>,
+    /// 응답을 보내기 전에 기다릴 시간(ms). 호출한 쪽의 시간 제한 시험용이다. 서버 상태 잠금을 놓은 뒤에 기다린다.
+    pub delay_ms: u64,
 }
 
 impl Response {
@@ -41,6 +43,7 @@ impl Response {
             headers: vec![("Content-Type".into(), content_type.into())],
             body: body.into(),
             content_length: None,
+            delay_ms: 0,
         }
     }
 
