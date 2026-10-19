@@ -1,0 +1,352 @@
+name = "푸시 기기: 등록·갱신·토큰 이전·재로그인 필요·로그아웃·재사용 감지·탈퇴 정리"
+tags = ["notification", "push-device", "auth"]
+clock = "2026-10-12T09:00:00+09:00"
+db_opaque = ["token_hash"]
+
+# 근거: PushDeviceController, PushDeviceService, LoginSessionService, PushDevice, FcmToken,
+# UserRefreshTokenService(revokeSession/revokeOwner -> 기기 삭제), PushDeviceServiceTest/AccessTest/LogoutTest/
+# RefreshRevocationTest/WithdrawalTest.
+# 기기는 로그인(session_id) 하나에 한 행이고 같은 FCM 토큰은 한 행에만 붙는다. 토큰이 다른 로그인으로 옮겨 가면 이전 행은 삭제된다.
+# 리프레시 토큰은 SQL로 심는다(원문 push-rt-N, 저장값은 SHA-256 16진수). 액세스 토큰은 하네스가 session_id 클레임과 함께 발급한다.
+
+[setup]
+sql = ["""INSERT INTO users (id, email, signature_original_storage_key, deleted_at) VALUES
+  ('01990000-0000-7000-8000-000000000001', 'user1@test.chalkak', 'chalkak/signatures/user1/original.png', NULL),
+  ('01990000-0000-7000-8000-000000000002', 'user2@test.chalkak', 'chalkak/signatures/user2/original.png', NULL),
+  ('01990000-0000-7000-8000-000000000003', 'gone@test.chalkak', 'chalkak/signatures/user3/original.png', '2026-10-01T00:00:00+09:00');
+INSERT INTO user_refresh_tokens (user_id, session_id, token_hash, expires_at, absolute_expires_at, revoked_at, created_at) VALUES
+  ('01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000005a1', 'e143ac959b771779cfd9b1c628d5619d2e9a878028fbd92976cbea5f6013242a', '2026-11-11T00:00:00+09:00', '2027-01-10T00:00:00+09:00', NULL, '2026-10-12T08:00:00+09:00'),
+  ('01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000005a2', '1d47375182470dcf4750331f6b4ec73b2c0d9500b04780c969f0cd64b35b2c12', '2026-11-11T00:00:00+09:00', '2027-01-10T00:00:00+09:00', NULL, '2026-10-12T08:00:00+09:00'),
+  ('01990000-0000-7000-8000-000000000002', '01990000-0000-7000-8000-0000000005a3', 'b0eacdbfd1e8e3eac9af37062bb4f4350afaa8118e8146cd59700c2ac1d1b252', '2026-11-11T00:00:00+09:00', '2027-01-10T00:00:00+09:00', NULL, '2026-10-12T08:00:00+09:00'),
+  ('01990000-0000-7000-8000-000000000003', '01990000-0000-7000-8000-0000000005a4', '15c1e2ff872d748d605b78072276abaff3e58a184d4b2fb6df3276bce52689a9', '2026-11-11T00:00:00+09:00', '2027-01-10T00:00:00+09:00', NULL, '2026-10-12T08:00:00+09:00'),
+  ('01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000005a5', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', '2026-11-11T00:00:00+09:00', '2027-01-10T00:00:00+09:00', '2026-10-12T08:30:00+09:00', '2026-10-12T08:00:00+09:00'),
+  ('01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000005a6', 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', '2026-10-12T08:59:00+09:00', '2027-01-10T00:00:00+09:00', NULL, '2026-09-01T08:00:00+09:00')
+"""]
+
+[[step]]
+name = "첫 등록"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a1" }
+body = '{"fcmToken":"tok-a"}'
+advance_seconds = 60
+
+[[step]]
+name = "같은 토큰으로 다시 등록(갱신 시각만 바뀐다)"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a1" }
+body = '{"fcmToken":"tok-a"}'
+advance_seconds = 60
+
+[[step]]
+name = "같은 로그인에서 토큰 교체(행 유지)"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a1" }
+body = '{"fcmToken":"tok-b"}'
+advance_seconds = 60
+
+[[step]]
+name = "같은 회원의 다른 로그인이 같은 토큰을 가져간다"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a2" }
+body = '{"fcmToken":"tok-b"}'
+advance_seconds = 60
+
+[[step]]
+name = "다른 회원의 로그인이 같은 토큰을 가져간다"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000002", session = "01990000-0000-7000-8000-0000000005a3" }
+body = '{"fcmToken":"tok-b"}'
+advance_seconds = 60
+
+[[step]]
+name = "이전 로그인이 같은 토큰을 되찾는다(새 행)"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a1" }
+body = '{"fcmToken":"tok-b"}'
+advance_seconds = 60
+
+[[step]]
+name = "앞뒤 공백이 있는 토큰은 그대로 저장한다"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a2" }
+body = '{"fcmToken":"  spaced token  "}'
+advance_seconds = 60
+
+[[step]]
+name = "긴 토큰"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a2" }
+body = '{"fcmToken":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}'
+advance_seconds = 60
+
+[[step]]
+name = "숫자 토큰은 문자열로 읽는다"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000002", session = "01990000-0000-7000-8000-0000000005a3" }
+body = '{"fcmToken":123}'
+advance_seconds = 60
+
+[[step]]
+name = "불리언 토큰은 문자열로 읽는다"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000002", session = "01990000-0000-7000-8000-0000000005a3" }
+body = '{"fcmToken":true}'
+advance_seconds = 60
+
+[[step]]
+name = "로그인 ID 없는 토큰은 재로그인 필요"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '{"fcmToken":"legacy"}'
+
+[[step]]
+name = "다른 회원의 로그인으로는 등록할 수 없다"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000002", session = "01990000-0000-7000-8000-0000000005a1" }
+body = '{"fcmToken":"stolen"}'
+
+[[step]]
+name = "없는 로그인으로는 등록할 수 없다"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000009ff" }
+body = '{"fcmToken":"ghost"}'
+
+[[step]]
+name = "폐기된 로그인으로는 등록할 수 없다"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a5" }
+body = '{"fcmToken":"revoked"}'
+
+[[step]]
+name = "만료된 로그인으로는 등록할 수 없다"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a6" }
+body = '{"fcmToken":"expired"}'
+
+[[step]]
+name = "session_id 클레임이 UUID가 아니면 이전 토큰처럼 본다"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "not-a-uuid" }
+body = '{"fcmToken":"bad-session"}'
+
+[[step]]
+name = "session_id 클레임이 대문자 UUID면 같은 로그인이다"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005A1" }
+body = '{"fcmToken":"upper-session"}'
+advance_seconds = 60
+
+[[step]]
+name = "탈퇴 회원은 401"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000003", session = "01990000-0000-7000-8000-0000000005a4" }
+body = '{"fcmToken":"gone"}'
+
+[[step]]
+name = "없는 회원은 401"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-0000000000ff", session = "01990000-0000-7000-8000-0000000005a1" }
+body = '{"fcmToken":"nobody"}'
+
+[[step]]
+name = "토큰 필드가 없으면 400"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a1" }
+body = '{}'
+
+[[step]]
+name = "토큰이 null이면 400"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a1" }
+body = '{"fcmToken":null}'
+
+[[step]]
+name = "토큰이 빈 문자열이면 400"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a1" }
+body = '{"fcmToken":""}'
+
+[[step]]
+name = "토큰이 공백뿐이면 400"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a1" }
+body = '{"fcmToken":"   "}'
+
+[[step]]
+name = "토큰이 탭과 개행뿐이면 400"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a1" }
+body = '{"fcmToken":"\t\n"}'
+
+[[step]]
+name = "토큰이 유니코드 공백뿐이면 400"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a1" }
+body = '{"fcmToken":"\u2003"}'
+
+[[step]]
+name = "토큰이 배열이면 400"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a1" }
+body = '{"fcmToken":["a"]}'
+
+[[step]]
+name = "토큰이 객체이면 400"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a1" }
+body = '{"fcmToken":{}}'
+
+[[step]]
+name = "본문 없음은 400"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a1" }
+
+[[step]]
+name = "깨진 JSON은 400"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a1" }
+body = '{'
+
+[[step]]
+name = "JSON이 아닌 Content-Type은 415"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a1" }
+headers = { "Content-Type" = "text/plain" }
+body = '{"fcmToken":"x"}'
+
+[[step]]
+name = "본문 오류가 인증 오류보다 먼저(탈퇴 회원 + 빈 토큰)"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000003", session = "01990000-0000-7000-8000-0000000005a4" }
+body = '{"fcmToken":""}'
+
+[[step]]
+name = "토큰 없이 등록은 401"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+body = '{"fcmToken":"anon"}'
+
+[[step]]
+name = "관리자 토큰은 403"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+body = '{"fcmToken":"admin"}'
+
+[[step]]
+name = "허용하지 않은 메서드"
+method = "POST"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a1" }
+body = '{"fcmToken":"x"}'
+
+[[step]]
+name = "로그아웃(다른 로그인의 기기는 유지)"
+method = "POST"
+path = "/api/v1/auth/logout"
+body = '{"refreshToken":"push-rt-3"}'
+
+[[step]]
+name = "로그아웃된 로그인으로 다시 등록할 수 없다"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000002", session = "01990000-0000-7000-8000-0000000005a3" }
+body = '{"fcmToken":"after-logout"}'
+advance_seconds = 60
+
+[[step]]
+name = "이미 폐기된 토큰으로 다시 로그아웃해도 204"
+method = "POST"
+path = "/api/v1/auth/logout"
+body = '{"refreshToken":"push-rt-3"}'
+
+[[step]]
+name = "모르는 토큰으로 로그아웃해도 204"
+method = "POST"
+path = "/api/v1/auth/logout"
+body = '{"refreshToken":"unknown"}'
+
+[[step]]
+name = "리프레시 토큰 회전(기기 유지)"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":"push-rt-1"}'
+opaque = ["accessToken", "refreshToken"]
+advance_seconds = 60
+
+[[step]]
+name = "회전된 로그인으로도 등록할 수 있다"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a1" }
+body = '{"fcmToken":"tok-c"}'
+advance_seconds = 60
+
+[[step]]
+name = "회전된 토큰 재사용은 401이고 기기도 삭제된다"
+method = "POST"
+path = "/api/v1/auth/refresh"
+body = '{"refreshToken":"push-rt-1"}'
+advance_seconds = 60
+
+[[step]]
+name = "재사용으로 폐기된 로그인은 등록할 수 없다"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a1" }
+body = '{"fcmToken":"tok-d"}'
+advance_seconds = 60
+
+[[step]]
+name = "다른 로그인에 새로 등록"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a2" }
+body = '{"fcmToken":"tok-e"}'
+advance_seconds = 60
+
+[[step]]
+name = "탈퇴(모든 로그인의 기기 삭제)"
+method = "DELETE"
+path = "/api/v1/users/me"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a2" }
+advance_seconds = 60
+
+[[step]]
+name = "탈퇴한 회원은 등록할 수 없다"
+method = "PUT"
+path = "/api/v1/push-devices/current"
+auth = { user = "01990000-0000-7000-8000-000000000001", session = "01990000-0000-7000-8000-0000000005a2" }
+body = '{"fcmToken":"tok-f"}'
+advance_seconds = 60

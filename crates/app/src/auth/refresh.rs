@@ -22,6 +22,7 @@ use super::domain::{
 use super::repository::{NewRefreshToken, RefreshTokenRepository};
 use super::tokens::{AccessTokenIssuer, generate_refresh_token, hash_refresh_token};
 use crate::common::{transact, transact_unless};
+use crate::notification::push_device::PushDeviceRepository;
 use crate::web::ApiError;
 
 /// `TokenRefreshResult`.
@@ -125,11 +126,13 @@ impl UserRefreshTokenService {
         })
     }
 
-    /// 한 기기의 로그아웃. 모르는 토큰이나 이미 폐기된 토큰에도 오류를 내지 않는다(`logout`).
+    /// 한 기기의 로그아웃. 모르는 토큰이나 이미 폐기된 토큰에도 오류를 내지 않는다(`logout`). 폐기된 토큰이어도 그 로그인에
+    /// 남은 푸시 기기는 지운다.
     pub fn logout(&self, presented_token: &str) -> Result<(), ApiError> {
         transact(&self.pool, |tx| {
             let token = self.lock_lineage_and_read(tx, &hash_refresh_token(presented_token))?;
-            if let Some(token) = token.filter(|t| !t.is_revoked()) {
+            // 이미 폐기된 토큰이어도 계보 폐기와 기기 해제를 다시 한다(남아 있는 기기 행을 지우려는 것).
+            if let Some(token) = token {
                 self.revoke_session(tx, token.session_id, self.clock.now())?;
             }
             Ok(())
@@ -148,8 +151,7 @@ impl UserRefreshTokenService {
         self.repository
             .revoke_all_by_user_id(db, user_id, self.clock.now())?;
         // 로그인이 모두 끝났으므로 푸시 기기 연결도 지운다(`revokeOwner`의 `deleteByUserId`).
-        self.repository
-            .delete_push_devices_by_user_id(db, user_id)?;
+        PushDeviceRepository.delete_by_user_id(db, user_id)?;
         Ok(())
     }
 
@@ -161,8 +163,7 @@ impl UserRefreshTokenService {
         revoked_at: Timestamp,
     ) -> Result<(), ApiError> {
         self.repository.revoke_session(db, session_id, revoked_at)?;
-        self.repository
-            .delete_push_devices_by_session_id(db, session_id)?;
+        PushDeviceRepository.delete_by_session_id(db, session_id)?;
         Ok(())
     }
 

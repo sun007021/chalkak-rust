@@ -1,0 +1,1797 @@
+{
+  "db": {
+    "user_refresh_tokens": [
+      "{\"absolute_expires_at\":\"<t+7743600s db +09:00>\",\"created_at\":\"<t+720s db +09:00>\",\"expires_at\":\"<t+2592720s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t+840s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid?\"}",
+      "{\"absolute_expires_at\":\"<t+7743600s db +09:00>\",\"created_at\":\"<t-3546000s db +09:00>\",\"expires_at\":\"<t-60s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t+1020s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid?\"}",
+      "{\"absolute_expires_at\":\"<t+7743600s db +09:00>\",\"created_at\":\"<t-3600s db +09:00>\",\"expires_at\":\"<t+2559600s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t+1020s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid?\"}",
+      "{\"absolute_expires_at\":\"<t+7743600s db +09:00>\",\"created_at\":\"<t-3600s db +09:00>\",\"expires_at\":\"<t+2559600s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t+660s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid?\"}",
+      "{\"absolute_expires_at\":\"<t+7743600s db +09:00>\",\"created_at\":\"<t-3600s db +09:00>\",\"expires_at\":\"<t+2559600s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t+840s db +09:00>\",\"rotated_at\":\"<t+720s db +09:00>\",\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid?\"}",
+      "{\"absolute_expires_at\":\"<t+7743600s db +09:00>\",\"created_at\":\"<t-3600s db +09:00>\",\"expires_at\":\"<t+2559600s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t-1800s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid?\"}",
+      "{\"absolute_expires_at\":\"<t+7743600s db +09:00>\",\"created_at\":\"<t-3600s db +09:00>\",\"expires_at\":\"<t+2559600s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":null,\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid?\"}"
+    ],
+    "users": [
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t+1020s db +09:00>\",\"email\":\"withdrawn+$uuid?@chalkak.invalid\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"withdrawn/$uuid?\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+1020s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t-982800s db +09:00>\",\"email\":\"gone@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/user3/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"user2@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/user2/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}"
+    ]
+  },
+  "steps": [
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "첫 등록"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid2"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "같은 토큰으로 다시 등록(갱신 시각만 바뀐다)"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid3"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "같은 로그인에서 토큰 교체(행 유지)"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid4"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "같은 회원의 다른 로그인이 같은 토큰을 가져간다"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid5"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "다른 회원의 로그인이 같은 토큰을 가져간다"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid6"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "이전 로그인이 같은 토큰을 되찾는다(새 행)"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid7"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "앞뒤 공백이 있는 토큰은 그대로 저장한다"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid8"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "긴 토큰"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid9"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "숫자 토큰은 문자열로 읽는다"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid10"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "불리언 토큰은 문자열로 읽는다"
+    },
+    {
+      "body": {
+        "errorCode": "REAUTHENTICATION_REQUIRED",
+        "message": "다시 로그인해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid11"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "로그인 ID 없는 토큰은 재로그인 필요"
+    },
+    {
+      "body": {
+        "errorCode": "REAUTHENTICATION_REQUIRED",
+        "message": "다시 로그인해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid12"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "다른 회원의 로그인으로는 등록할 수 없다"
+    },
+    {
+      "body": {
+        "errorCode": "REAUTHENTICATION_REQUIRED",
+        "message": "다시 로그인해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid13"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "없는 로그인으로는 등록할 수 없다"
+    },
+    {
+      "body": {
+        "errorCode": "REAUTHENTICATION_REQUIRED",
+        "message": "다시 로그인해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid14"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "폐기된 로그인으로는 등록할 수 없다"
+    },
+    {
+      "body": {
+        "errorCode": "REAUTHENTICATION_REQUIRED",
+        "message": "다시 로그인해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid15"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "만료된 로그인으로는 등록할 수 없다"
+    },
+    {
+      "body": {
+        "errorCode": "REAUTHENTICATION_REQUIRED",
+        "message": "다시 로그인해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid16"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "session_id 클레임이 UUID가 아니면 이전 토큰처럼 본다"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid17"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "session_id 클레임이 대문자 UUID면 같은 로그인이다"
+    },
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid18"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "탈퇴 회원은 401"
+    },
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid19"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "없는 회원은 401"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "FCM 토큰이 필요합니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid20"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "토큰 필드가 없으면 400"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "FCM 토큰이 필요합니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid21"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "토큰이 null이면 400"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "FCM 토큰이 필요합니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid22"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "토큰이 빈 문자열이면 400"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "FCM 토큰이 필요합니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid23"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "토큰이 공백뿐이면 400"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "FCM 토큰이 필요합니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid24"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "토큰이 탭과 개행뿐이면 400"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "FCM 토큰이 필요합니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid25"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "토큰이 유니코드 공백뿐이면 400"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid26"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "토큰이 배열이면 400"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid27"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "토큰이 객체이면 400"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid28"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "본문 없음은 400"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid29"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "깨진 JSON은 400"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "지원하지 않는 요청 방식이거나 형식입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid30"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 415,
+      "step": "JSON이 아닌 Content-Type은 415"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "FCM 토큰이 필요합니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid31"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "본문 오류가 인증 오류보다 먼저(탈퇴 회원 + 빈 토큰)"
+    },
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "www-authenticate",
+          "Bearer"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid32"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "토큰 없이 등록은 401"
+    },
+    {
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "접근 권한이 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid33"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 403,
+      "step": "관리자 토큰은 403"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "지원하지 않는 요청 방식이거나 형식입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid34"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 405,
+      "step": "허용하지 않은 메서드"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid35"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "로그아웃(다른 로그인의 기기는 유지)"
+    },
+    {
+      "body": {
+        "errorCode": "REAUTHENTICATION_REQUIRED",
+        "message": "다시 로그인해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid36"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "로그아웃된 로그인으로 다시 등록할 수 없다"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid37"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "이미 폐기된 토큰으로 다시 로그아웃해도 204"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid38"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "모르는 토큰으로 로그아웃해도 204"
+    },
+    {
+      "body": {
+        "accessToken": "<opaque len=425>",
+        "expiresIn": 900,
+        "refreshToken": "<opaque len=43>",
+        "refreshTokenExpiresIn": 2592000
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid39"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "리프레시 토큰 회전(기기 유지)"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid40"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "회전된 로그인으로도 등록할 수 있다"
+    },
+    {
+      "body": {
+        "errorCode": "REAUTHENTICATION_REQUIRED",
+        "message": "다시 로그인해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid41"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "회전된 토큰 재사용은 401이고 기기도 삭제된다"
+    },
+    {
+      "body": {
+        "errorCode": "REAUTHENTICATION_REQUIRED",
+        "message": "다시 로그인해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid42"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "재사용으로 폐기된 로그인은 등록할 수 없다"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid43"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "다른 로그인에 새로 등록"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid44"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "탈퇴(모든 로그인의 기기 삭제)"
+    },
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid45"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "탈퇴한 회원은 등록할 수 없다"
+    }
+  ]
+}

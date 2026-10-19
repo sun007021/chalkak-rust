@@ -18,6 +18,7 @@ use chalkak_core::log::{Logger, fields};
 use chalkak_http::{Handler, Middleware, Request, Response};
 use chalkak_jwt::{ClaimError, Claims, Validator, hs256_decode};
 use serde_json::Value;
+use uuid::Uuid;
 
 use super::boot;
 
@@ -36,7 +37,8 @@ pub struct BearerAuth {
 #[derive(Debug, PartialEq)]
 enum Outcome {
     Anonymous,
-    Authenticated(Principal),
+    /// 주체와 로그인 식별자(`session_id` 클레임, 없거나 형식이 틀리면 `None`).
+    Authenticated(Principal, Option<Uuid>),
     /// 401. 값은 로그의 `exception`(원본 예외 클래스 이름).
     Unauthorized(&'static str),
     /// `aud` 누락으로 원본이 NPE를 내는 경우.
@@ -79,10 +81,13 @@ impl BearerAuth {
         let Some(subject) = claims.subject() else {
             return Outcome::Unauthorized("InvalidBearerTokenException");
         };
-        Outcome::Authenticated(Principal {
-            subject: subject.to_owned(),
-            authorities: authorities(&claims),
-        })
+        Outcome::Authenticated(
+            Principal {
+                subject: subject.to_owned(),
+                authorities: authorities(&claims),
+            },
+            security::session_id_from_claim(claims.get_str("session_id")),
+        )
     }
 }
 
@@ -90,8 +95,8 @@ impl Middleware for BearerAuth {
     fn handle(&self, req: Request, next: &dyn Handler) -> Response {
         match self.authenticate(&req) {
             Outcome::Anonymous => next.handle(req),
-            Outcome::Authenticated(principal) => {
-                let _guard = security::enter(principal);
+            Outcome::Authenticated(principal, session_id) => {
+                let _guard = security::enter_with_session(principal, session_id);
                 next.handle(req)
             }
             Outcome::Unauthorized(exception) => unauthorized(&self.logger, exception),
@@ -310,11 +315,33 @@ mod tests {
     #[test]
     fn 유효한_토큰은_주체와_권한을_만든다() {
         let t = token_with(payload(json!({})));
-        let Outcome::Authenticated(p) = outcome(Some(&format!("Bearer {t}"))) else {
+        let Outcome::Authenticated(p, session_id) = outcome(Some(&format!("Bearer {t}"))) else {
             panic!("인증되어야 한다");
         };
         assert_eq!(p.subject, "01990000-0000-7000-8000-000000000001");
         assert_eq!(p.authorities, ["SCOPE_USER"]);
+        assert_eq!(session_id, None);
+    }
+
+    // AuthenticatedUsers#findSessionId: 문자열이고 표준형 UUID인 session_id만 로그인 식별자가 된다.
+    #[test]
+    fn 로그인_식별자는_표준형_uuid_클레임만_읽는다() {
+        let session = |claim: serde_json::Value| {
+            let t = token_with(payload(json!({"session_id": claim})));
+            match outcome(Some(&format!("Bearer {t}"))) {
+                Outcome::Authenticated(_, session_id) => session_id,
+                other => panic!("인증되어야 한다: {other:?}"),
+            }
+        };
+        let id = "0198f6c1-62ba-7d30-8b12-0f733b6572f2";
+        assert_eq!(session(json!(id)), Some(id.parse().unwrap()));
+        assert_eq!(session(json!(id.to_uppercase())), Some(id.parse().unwrap()));
+        // 표준형이 아닌 값(하이픈 생략·짧은 형식), 문자열이 아닌 값은 없는 것으로 본다.
+        assert_eq!(session(json!(id.replace('-', ""))), None);
+        assert_eq!(session(json!("1-2-3-4-5")), None);
+        assert_eq!(session(json!("not-a-uuid")), None);
+        assert_eq!(session(json!(1)), None);
+        assert_eq!(session(json!(null)), None);
     }
 
     #[test]
@@ -349,7 +376,7 @@ mod tests {
         ));
         assert!(matches!(
             outcome(Some(&format!("Bearer {t}"))),
-            Outcome::Authenticated(_)
+            Outcome::Authenticated(..)
         ));
     }
 

@@ -18,13 +18,14 @@ pub fn access_token(
     iat: i64,
     exp: i64,
     jti: &str,
+    session_id: Option<&str>,
 ) -> Result<String, String> {
     let header = r#"{"typ":"JWT","alg":"HS256"}"#;
     let scope = match scope {
         Scope::User => "USER",
         Scope::Admin => "ADMIN",
     };
-    let payload = serde_json::json!({
+    let mut payload = serde_json::json!({
         "iss": "chalkak-backend",
         "aud": ["chalkak-access"],
         "sub": subject,
@@ -34,6 +35,10 @@ pub fn access_token(
         "purpose": "ACCESS",
         "scope": scope,
     });
+    // 로그인 세션 식별자. 없으면 로그인 ID 도입 전의 이전 토큰이다.
+    if let Some(session_id) = session_id {
+        payload["session_id"] = session_id.into();
+    }
     let signing_input = format!(
         "{}.{}",
         base64url_encode(header.as_bytes()),
@@ -78,8 +83,21 @@ mod tests {
     }
 
     #[test]
+    fn 로그인_세션_식별자는_지정했을_때만_싣는다() {
+        let payload = |t: &str| -> serde_json::Value {
+            let part = t.split('.').nth(1).unwrap();
+            let bytes = crate::normalize::base64url_decode(part).unwrap();
+            serde_json::from_slice(&bytes).unwrap()
+        };
+        let with = access_token("00ff", "s", Scope::User, 1, 2, "j", Some("sid")).unwrap();
+        assert_eq!(payload(&with)["session_id"], "sid");
+        let without = access_token("00ff", "s", Scope::User, 1, 2, "j", None).unwrap();
+        assert!(payload(&without).get("session_id").is_none());
+    }
+
+    #[test]
     fn 토큰은_세_부분이다() {
-        let t = access_token("00ff", "s", Scope::User, 1, 2, "j").unwrap();
+        let t = access_token("00ff", "s", Scope::User, 1, 2, "j", None).unwrap();
         assert_eq!(t.split('.').count(), 3);
     }
 }

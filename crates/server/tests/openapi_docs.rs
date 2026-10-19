@@ -453,6 +453,140 @@ fn user_api_docs_exposes_notification_inbox_contract() {
 }
 
 // ---------------------------------------------------------------------------------------------
+// NotificationSettingsOpenApiTest, PushDeviceOpenApiTest
+// ---------------------------------------------------------------------------------------------
+
+fn schema_ref<'a>(doc: &'a Value, path: &[&str]) -> Option<&'a str> {
+    let mut full = path.to_vec();
+    full.push("$ref");
+    at(doc, &full).and_then(Value::as_str)
+}
+
+// NotificationSettingsOpenApiTest#userApiDocs_exposesSettingsQueryContract
+#[test]
+fn user_api_docs_exposes_settings_query_contract() {
+    let doc = user_api();
+    let op = ["paths", "/api/v1/notification-settings", "get"];
+    let sub =
+        |rest: &[&str]| -> Vec<String> { op.iter().chain(rest).map(|s| (*s).to_owned()).collect() };
+    let get = |rest: &[&str]| {
+        let owned = sub(rest);
+        let refs: Vec<&str> = owned.iter().map(String::as_str).collect();
+        at(&doc, &refs).cloned()
+    };
+    assert!(get(&["security"]).is_some_and(|s| s[0].get("accessToken").is_some()));
+    assert!(get(&["parameters"]).is_none());
+    assert!(get(&["requestBody"]).is_none());
+    assert_eq!(get(&["responses"]).unwrap().as_object().unwrap().len(), 3);
+    let ok = get(&["responses", "200", "content", "*/*", "schema"]).unwrap();
+    assert_eq!(
+        ok["$ref"],
+        "#/components/schemas/NotificationSettingsResponse"
+    );
+    let unauthorized = get(&["responses", "401", "content", "application/json", "schema"]).unwrap();
+    assert_eq!(unauthorized["$ref"], "#/components/schemas/ErrorResponse");
+    assert!(get(&["responses", "403"]).is_some());
+    let props = at(
+        &doc,
+        &[
+            "components",
+            "schemas",
+            "NotificationSettingsResponse",
+            "properties",
+        ],
+    )
+    .unwrap();
+    assert_eq!(props.as_object().unwrap().len(), 2);
+    assert_eq!(props["topicPushEnabled"]["type"], "boolean");
+    assert_eq!(props["moderationPushEnabled"]["type"], "boolean");
+}
+
+// NotificationSettingsOpenApiTest#userApiDocs_exposesSettingsUpdateContract
+#[test]
+fn user_api_docs_exposes_settings_update_contract() {
+    let doc = user_api();
+    let patch = at(&doc, &["paths", "/api/v1/notification-settings", "patch"]).unwrap();
+    assert!(patch["security"][0].get("accessToken").is_some());
+    assert!(patch.get("parameters").is_none());
+    assert_eq!(patch["requestBody"]["required"], true);
+    assert_eq!(
+        patch["requestBody"]["content"]["application/json"]["schema"]["$ref"],
+        "#/components/schemas/NotificationSettingsUpdateRequest"
+    );
+    assert_eq!(patch["responses"].as_object().unwrap().len(), 4);
+    assert!(patch["responses"]["204"].get("content").is_none());
+    assert_eq!(
+        patch["responses"]["400"]["content"]["application/json"]["schema"]["$ref"],
+        "#/components/schemas/ErrorResponse"
+    );
+    assert!(patch["responses"].get("401").is_some());
+    assert!(patch["responses"].get("403").is_some());
+    let request = at(
+        &doc,
+        &["components", "schemas", "NotificationSettingsUpdateRequest"],
+    )
+    .unwrap();
+    assert!(request.get("required").is_none());
+    assert_eq!(request["properties"].as_object().unwrap().len(), 2);
+    for name in ["topicPushEnabled", "moderationPushEnabled"] {
+        let mut types: Vec<&str> = request["properties"][name]["type"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter_map(Value::as_str)
+            .collect();
+        types.sort_unstable();
+        assert_eq!(types, ["boolean", "null"], "{name}");
+    }
+    assert_eq!(
+        schema_ref(
+            &doc,
+            &[
+                "paths",
+                "/api/v1/notification-settings",
+                "patch",
+                "requestBody",
+                "content",
+                "application/json",
+                "schema"
+            ]
+        ),
+        Some("#/components/schemas/NotificationSettingsUpdateRequest")
+    );
+}
+
+// PushDeviceOpenApiTest#userApiDocs_exposesCurrentDeviceContract
+#[test]
+fn user_api_docs_exposes_current_device_contract() {
+    let doc = user_api();
+    let put = at(&doc, &["paths", "/api/v1/push-devices/current", "put"]).unwrap();
+    assert!(put["security"][0].get("accessToken").is_some());
+    assert!(put.get("parameters").is_none());
+    assert_eq!(put["requestBody"]["required"], true);
+    assert_eq!(
+        put["requestBody"]["content"]["application/json"]["schema"]["$ref"],
+        "#/components/schemas/PushDeviceRegistrationRequest"
+    );
+    let request = at(
+        &doc,
+        &["components", "schemas", "PushDeviceRegistrationRequest"],
+    )
+    .unwrap();
+    assert_eq!(request["required"][0], "fcmToken");
+    assert_eq!(request["properties"]["fcmToken"]["type"], "string");
+    assert!(request["properties"].get("sessionId").is_none());
+    assert!(request["properties"].get("userId").is_none());
+    assert_eq!(put["responses"].as_object().unwrap().len(), 4);
+    assert!(put["responses"]["204"].get("content").is_none());
+    assert!(put["responses"].get("400").is_some());
+    assert_eq!(
+        put["responses"]["401"]["content"]["application/json"]["schema"]["$ref"],
+        "#/components/schemas/ErrorResponse"
+    );
+    assert!(put["responses"].get("403").is_some());
+}
+
+// ---------------------------------------------------------------------------------------------
 // PostOpenApiTest
 // ---------------------------------------------------------------------------------------------
 

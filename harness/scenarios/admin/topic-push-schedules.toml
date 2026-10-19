@@ -1,0 +1,473 @@
+name = "관리자 주제 푸시 시간표: 목록, 등록, 수정, 삭제"
+tags = ["admin-api", "topic-push-schedule"]
+clock = "2026-10-12T09:00:00+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO admins (id, username, password, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000000a1', 'operator', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-01T00:00:00Z', '2026-09-01T00:00:00Z');
+INSERT INTO topic_push_schedules (id, send_time, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-000000000901', '07:30:00', '2026-10-01T00:00:00Z', '2026-10-01T00:00:00Z'),
+  ('01990000-0000-7000-8000-000000000902', '21:00:00', '2026-10-02T00:00:00Z', '2026-10-02T00:00:00Z');
+"""]
+
+[[step]]
+name = "목록 비어 있음"
+method = "GET"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "등록 거절 본문 없음"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "등록 거절 빈 객체"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{}'''
+
+[[step]]
+name = "등록 거절 null"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":null}'''
+
+[[step]]
+name = "등록 거절 24시"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"24:00:00"}'''
+
+[[step]]
+name = "등록 거절 60초"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"23:59:60"}'''
+
+[[step]]
+name = "등록 거절 문자"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"invalid"}'''
+
+[[step]]
+name = "등록 거절 숫자"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":9}'''
+
+[[step]]
+name = "등록 거절 불리언"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":true}'''
+
+[[step]]
+name = "등록 거절 객체"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":{}}'''
+
+[[step]]
+name = "등록 거절 빈 문자열"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":""}'''
+
+[[step]]
+name = "등록 거절 공백 문자열"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"  "}'''
+
+[[step]]
+name = "등록 거절 배열 한 칸"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":[9]}'''
+
+[[step]]
+name = "등록 거절 배열 다섯 칸"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":[9,0,0,0,0]}'''
+
+[[step]]
+name = "등록 거절 배열 범위 밖"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":[25,0]}'''
+
+[[step]]
+name = "등록 거절 배열 문자"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":["9","0"]}'''
+
+[[step]]
+name = "등록 거절 초 있음"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"09:00:01"}'''
+
+[[step]]
+name = "등록 거절 소수 초"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"09:00:00.5"}'''
+
+[[step]]
+name = "등록 거절 나노 1"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"09:00:00.000000001"}'''
+
+[[step]]
+name = "등록 거절 배열 초"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":[9,0,1]}'''
+
+[[step]]
+name = "등록 거절 시만"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"09"}'''
+
+[[step]]
+name = "등록 거절 한 자리 시"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"9:00"}'''
+
+[[step]]
+name = "등록 거절 깨진 JSON"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":'''
+
+[[step]]
+name = "등록 성공 09:00:00"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"09:00:00"}'''
+capture = { schedA = "scheduleId" }
+advance_seconds = 2
+
+[[step]]
+name = "등록 중복"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"09:00:00"}'''
+
+[[step]]
+name = "등록 중복 분 단위 표기"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"09:00"}'''
+
+[[step]]
+name = "등록 성공 분 단위 표기"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"18:30"}'''
+capture = { schedB = "scheduleId" }
+advance_seconds = 2
+
+[[step]]
+name = "등록 성공 배열"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":[0,0]}'''
+capture = { schedC = "scheduleId" }
+advance_seconds = 2
+
+[[step]]
+name = "등록 성공 배열 세 칸"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":[23,59,0]}'''
+advance_seconds = 2
+
+[[step]]
+name = "등록 성공 공백 포함"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":" 12:00:00 "}'''
+advance_seconds = 2
+
+[[step]]
+name = "등록 성공 소수 0"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"13:00:00.000"}'''
+advance_seconds = 2
+
+[[step]]
+name = "등록 성공 날짜시각"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"2026-10-12T14:00:00"}'''
+advance_seconds = 2
+
+[[step]]
+name = "등록 성공 UTC 날짜시각"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"2026-10-12T06:00:00Z"}'''
+advance_seconds = 2
+
+[[step]]
+name = "등록 성공 오프셋 날짜시각"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"2026-10-12T07:00:00+09:00"}'''
+
+[[step]]
+name = "등록 성공 24 배열 거절"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":[24,0]}'''
+
+[[step]]
+name = "목록"
+method = "GET"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "수정 거절 빈 객체"
+method = "PUT"
+path = "/api/v1/admin/topic-push-schedules/${schedA}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{}'''
+
+[[step]]
+name = "수정 거절 null"
+method = "PUT"
+path = "/api/v1/admin/topic-push-schedules/${schedA}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":null}'''
+
+[[step]]
+name = "수정 거절 초 있음"
+method = "PUT"
+path = "/api/v1/admin/topic-push-schedules/${schedA}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"10:00:01"}'''
+
+[[step]]
+name = "수정 거절 중복"
+method = "PUT"
+path = "/api/v1/admin/topic-push-schedules/${schedA}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"18:30:00"}'''
+
+[[step]]
+name = "수정 성공"
+method = "PUT"
+path = "/api/v1/admin/topic-push-schedules/${schedA}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"10:15:00"}'''
+advance_seconds = 2
+
+[[step]]
+name = "수정 같은 시각"
+method = "PUT"
+path = "/api/v1/admin/topic-push-schedules/${schedA}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"10:15:00"}'''
+
+[[step]]
+name = "수정 같은 시각 다른 표기"
+method = "PUT"
+path = "/api/v1/admin/topic-push-schedules/${schedA}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"10:15"}'''
+
+[[step]]
+name = "수정 없는 설정"
+method = "PUT"
+path = "/api/v1/admin/topic-push-schedules/01990000-0000-7000-8000-000000000999"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"10:00:00"}'''
+
+[[step]]
+name = "수정 없는 설정 잘못된 시각"
+method = "PUT"
+path = "/api/v1/admin/topic-push-schedules/01990000-0000-7000-8000-000000000999"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"10:00:01"}'''
+
+[[step]]
+name = "수정 없는 설정 null"
+method = "PUT"
+path = "/api/v1/admin/topic-push-schedules/01990000-0000-7000-8000-000000000999"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":null}'''
+
+[[step]]
+name = "수정 잘못된 id"
+method = "PUT"
+path = "/api/v1/admin/topic-push-schedules/invalid"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"10:00:00"}'''
+
+[[step]]
+name = "수정 1-1-1-1-1 id"
+method = "PUT"
+path = "/api/v1/admin/topic-push-schedules/1-1-1-1-1"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"10:00:00"}'''
+
+[[step]]
+name = "삭제 잘못된 id"
+method = "DELETE"
+path = "/api/v1/admin/topic-push-schedules/invalid"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "삭제 없는 설정"
+method = "DELETE"
+path = "/api/v1/admin/topic-push-schedules/01990000-0000-7000-8000-000000000999"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "삭제 성공"
+method = "DELETE"
+path = "/api/v1/admin/topic-push-schedules/${schedB}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+advance_seconds = 2
+
+[[step]]
+name = "삭제 다시"
+method = "DELETE"
+path = "/api/v1/admin/topic-push-schedules/${schedB}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "삭제한 시각 다시 등록"
+method = "POST"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"sendTime":"18:30:00"}'''
+advance_seconds = 2
+
+[[step]]
+name = "삭제 시드 설정"
+method = "DELETE"
+path = "/api/v1/admin/topic-push-schedules/01990000-0000-7000-8000-000000000901"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+advance_seconds = 2
+
+[[step]]
+name = "목록 최종"
+method = "GET"
+path = "/api/v1/admin/topic-push-schedules"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "감사 로그 시간표 등록"
+method = "GET"
+path = "/api/v1/admin/audit-logs?action=TOPIC_PUSH_SCHEDULE_CREATED&sort=occurredAtAsc&pageSize=100"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "감사 로그 시간표 수정"
+method = "GET"
+path = "/api/v1/admin/audit-logs?action=TOPIC_PUSH_SCHEDULE_UPDATED&sort=occurredAtAsc"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "감사 로그 시간표 삭제"
+method = "GET"
+path = "/api/v1/admin/audit-logs?action=TOPIC_PUSH_SCHEDULE_DELETED&sort=occurredAtAsc"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "감사 로그 대상 시간표"
+method = "GET"
+path = "/api/v1/admin/audit-logs?targetType=TOPIC_PUSH_SCHEDULE&sort=occurredAtAsc&pageSize=100"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }

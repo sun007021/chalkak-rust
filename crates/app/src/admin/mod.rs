@@ -1,6 +1,6 @@
 //! 관리자 도메인(원본 `admin` 패키지).
 //!
-//! 하위 구성: `analytics`(사용자 지표 수동 집계), `auth`(로그인·토큰), `audit`(감사 로그), `user`·`post`·`topic`·`feedback`(관리 API),
+//! 하위 구성: `analytics`(사용자 지표 수동 집계), `auth`(로그인·토큰), `audit`(감사 로그), `user`·`post`·`topic`·`feedback`·`notice`·`topic_push_schedule`(관리 API),
 //! `bootstrap`(시작 시 계정 보장).
 
 pub mod analytics;
@@ -16,11 +16,17 @@ mod endpoint_tests;
 pub mod feedback;
 #[cfg(test)]
 mod lock_db_tests;
+pub mod notice;
+#[cfg(test)]
+mod notice_tests;
 pub mod post;
+#[cfg(test)]
+mod push_schedule_tests;
 pub mod support;
 #[cfg(test)]
 mod testing;
 pub mod topic;
+pub mod topic_push_schedule;
 pub mod user;
 
 pub use config::AdminConfig;
@@ -50,5 +56,7 @@ pub fn register_with(routes: Routes, deps: &support::AdminDeps) -> Routes {
     let routes = user::api::register(routes, &deps);
     let routes = post::api::register(routes, &deps);
     let routes = topic::register(routes, &deps);
+    let routes = notice::register(routes, &deps);
+    let routes = topic_push_schedule::register(routes, &deps);
     feedback::register(routes, &deps)
 }

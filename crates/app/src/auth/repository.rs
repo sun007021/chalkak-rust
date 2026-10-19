@@ -248,25 +248,22 @@ impl RefreshTokenRepository {
         )?)
     }
 
-    /// 로그인(계보) 하나에 연결된 푸시 기기를 지운다(`PushDeviceRepository.deleteBySessionId`).
-    pub fn delete_push_devices_by_session_id(
+    /// `existsUsableBySessionIdAndUserId`: 로그인(계보)에 회전·폐기되지 않았고 비활동·절대 만료 전인 토큰이 있는가.
+    pub fn exists_usable_by_session_id_and_user_id(
         &self,
         db: &mut impl Db,
         session_id: Uuid,
-    ) -> Result<u64, DbError> {
-        Ok(db.execute(
-            "DELETE FROM push_devices WHERE session_id = $1",
-            &[&session_id],
-        )?)
-    }
-
-    /// 한 회원의 푸시 기기를 모두 지운다(`PushDeviceRepository.deleteByUserId`).
-    pub fn delete_push_devices_by_user_id(
-        &self,
-        db: &mut impl Db,
         user_id: Uuid,
-    ) -> Result<u64, DbError> {
-        Ok(db.execute("DELETE FROM push_devices WHERE user_id = $1", &[&user_id])?)
+        now: Timestamp,
+    ) -> Result<bool, DbError> {
+        Ok(db
+            .query_one(
+                "SELECT EXISTS (SELECT 1 FROM user_refresh_tokens \
+                 WHERE session_id = $1 AND user_id = $2 AND rotated_at IS NULL AND revoked_at IS NULL \
+                 AND expires_at > $3 AND absolute_expires_at > $3)",
+                &[&session_id, &user_id, &now],
+            )?
+            .try_get(0)?)
     }
 
     /// 한 회원의 모든 기기 세션을 폐기한다.
