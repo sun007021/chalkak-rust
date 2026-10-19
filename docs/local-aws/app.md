@@ -256,7 +256,7 @@ docker compose exec rust env | grep -E "OIDC_CLIENT_ID|OIDC_APP_KEY|JWKSETURI"  
 | 5 | 좋아요 | 카운트 증가 | `PUT /posts/{id}/likes` |
 | 6 | 관리자 웹(또는 curl)에서 승인 | 알림 행 생성 | `trace.sh <알림ID>` |
 | 7 | 알림함 | POST_APPROVED 1건, 미읽음 → 읽음 | notifications |
-| 8 | (가짜 FCM에 발송 기록) | L4(Rust 푸시 경로) 이후에 확인 | |
+| 8 | (푸시) 승인 알림이 기기로 감 | Relay가 SQS에 발행 → Worker가 가짜 FCM에 `messages:send` 1건 → 큐 메시지 삭제 | `curl -s http://127.0.0.1:19000/__admin/requests`에서 `service: fcm_send`의 `message.token`이 앱이 `PUT /push-devices/current`로 올린 토큰과 같다. 예시는 `scripts/worker_e2e.py` |
 
 관리자 승인을 앱 없이 하는 curl:
 ```bash
@@ -266,6 +266,24 @@ curl -s --cacert $CA -X PUT -H "Authorization: Bearer $TOKEN" -H 'Content-Type: 
 ```
 
 `trace.sh`는 UUID 하나(업로드·알림·회원)를 받아 DB 행, SQS 큐 깊이·속성, S3 객체, 같은 시각의 backend·esm-poller·lambda-image 로그를 한 번에 보여 준다. `smoke.sh`는 끝에 그 세 ID로 부르는 명령을 출력한다.
+
+### 기기에서 푸시 알림 표시와 탭 재현하기
+가짜 FCM은 발송 요청을 기록만 하고 기기로 전달하지 않는다. 알림 표시와 탭 뒤 화면 이동은 기기에 같은 내용을 직접 넣어 확인한다. 넣을 값은 가짜 FCM 기록의 `message.notification`·`message.data`를 그대로 쓴다(2026-10-19 앱 E2E 2차 검증에서 Rust가 보낸 본문이 원본 `FcmDevicePushSender`와 필드 단위로 같음을 확인했다).
+
+- **Android** (root·실제 FCM 불필요). 앱을 한 번 실행해 두고 force-stop하지 않은 상태에서:
+  ```bash
+  adb shell am broadcast -a com.google.android.c2dm.intent.RECEIVE -p <패키지> \
+    --es gcm.notification.title "<제목>" --es gcm.notification.body "<본문>" \
+    --es <data 키> "<값>"   # data 키마다 반복(예: type, sourceId)
+  ```
+- **iOS 시뮬레이터**: `aps.alert`와 data 키를 **최상위**에 둔 JSON을 넣는다.
+  ```bash
+  cat > /tmp/push.json <<'JSON'
+  {"aps": {"alert": {"title": "<제목>", "body": "<본문>"}}, "type": "<값>", "sourceId": "<값>"}
+  JSON
+  xcrun simctl push booted <번들 ID> /tmp/push.json
+  ```
+- 주제·공지 푸시는 Rust 프로필에서 켜져 있다(`NOTIFICATION_TOPIC_PUSH_ENABLED`, `NOTIFICATION_NOTICE_DISTRIBUTION_ENABLED`, `compose.yaml`). Java 프로필은 원본 기본값대로 꺼져 있다.
 
 ## 7. 가짜 모드 스모크(`scripts/smoke.sh`)가 하는 일
 
