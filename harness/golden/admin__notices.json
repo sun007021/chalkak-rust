@@ -1,0 +1,5047 @@
+{
+  "db": {
+    "admin_audit_logs": [
+      "{\"action\":\"NOTICE_CREATED\",\"actor_admin_id\":\"$uuid96\",\"after_state\":{\"bodySha256\":\"06db896f1d0ace00fe49534e596595ef50836b2f9df43857444f10a1a8a1eb73\",\"scheduledAt\":\"<t-240s db Z>\",\"title\":\"경계\"},\"before_state\":{},\"id\":\"$uuid97\",\"occurred_at\":\"<t+0s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid57\",\"target_id\":\"$uuid58\",\"target_type\":\"NOTICE\"}",
+      "{\"action\":\"NOTICE_CREATED\",\"actor_admin_id\":\"$uuid96\",\"after_state\":{\"bodySha256\":\"2b1eaa96ca668bb67d2b1b832b7874aa21a39b86a8f94fdbbaa4cec1159d4202\",\"scheduledAt\":\"<t+691200s db Z>\",\"title\":\"가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가\"},\"before_state\":{},\"id\":\"$uuid100\",\"occurred_at\":\"<t+5s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid63\",\"target_id\":\"$uuid64\",\"target_type\":\"NOTICE\"}",
+      "{\"action\":\"NOTICE_CREATED\",\"actor_admin_id\":\"$uuid96\",\"after_state\":{\"bodySha256\":\"3e23e8160039594a33894f6564e1b1348bbd7a0088d42c4acb73eeaed59c009d\",\"scheduledAt\":\"<t+691200s db Z>\",\"title\":\"1\"},\"before_state\":{},\"id\":\"$uuid95\",\"occurred_at\":\"<t+0s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid50\",\"target_id\":\"$uuid51\",\"target_type\":\"NOTICE\"}",
+      "{\"action\":\"NOTICE_CREATED\",\"actor_admin_id\":\"$uuid96\",\"after_state\":{\"bodySha256\":\"7bf6b3d9dfe51ae2c216b950cc484b2c6edaf7475f0e54ff3ca37a855b48ff57\",\"scheduledAt\":\"<t+691200s db Z>\",\"title\":\"😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀\"},\"before_state\":{},\"id\":\"$uuid101\",\"occurred_at\":\"<t+5s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid65\",\"target_id\":\"$uuid66\",\"target_type\":\"NOTICE\"}",
+      "{\"action\":\"NOTICE_CREATED\",\"actor_admin_id\":\"$uuid96\",\"after_state\":{\"bodySha256\":\"9118bb57091cfe7374e011b9979c8fc88e72d4074c0959b45eda164f3bc77857\",\"scheduledAt\":\"<t+691200s db Z>\",\"title\":\"오프셋 예약\"},\"before_state\":{},\"id\":\"$uuid98\",\"occurred_at\":\"<t+0s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid59\",\"target_id\":\"$uuid60\",\"target_type\":\"NOTICE\"}",
+      "{\"action\":\"NOTICE_CREATED\",\"actor_admin_id\":\"$uuid96\",\"after_state\":{\"bodySha256\":\"9118bb57091cfe7374e011b9979c8fc88e72d4074c0959b45eda164f3bc77857\",\"scheduledAt\":\"<t+723600s db Z>\",\"title\":\"소수 초\"},\"before_state\":{},\"id\":\"$uuid99\",\"occurred_at\":\"<t+5s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid61\",\"target_id\":\"$uuid62\",\"target_type\":\"NOTICE\"}",
+      "{\"action\":\"NOTICE_DELETED\",\"actor_admin_id\":\"$uuid96\",\"after_state\":{\"bodySha256\":\"04a26bb7f1c4f8515b4a82c6635d23d256a36cf08507baef17b5c1e97fd555b8\",\"deletedAt\":\"<t+20s db Z>\",\"scheduledAt\":\"<t-86400s db Z>\",\"title\":\"배포된 공지\"},\"before_state\":{\"bodySha256\":\"04a26bb7f1c4f8515b4a82c6635d23d256a36cf08507baef17b5c1e97fd555b8\",\"deletedAt\":null,\"scheduledAt\":\"<t-86400s db Z>\",\"title\":\"배포된 공지\"},\"id\":\"$uuid107\",\"occurred_at\":\"<t+20s db +09:00>\",\"reason\":\"배포 후 숨김\",\"request_id\":\"$uuid88\",\"target_id\":\"$uuid4\",\"target_type\":\"NOTICE\"}",
+      "{\"action\":\"NOTICE_DELETED\",\"actor_admin_id\":\"$uuid96\",\"after_state\":{\"bodySha256\":\"06db896f1d0ace00fe49534e596595ef50836b2f9df43857444f10a1a8a1eb73\",\"deletedAt\":\"<t+15s db Z>\",\"scheduledAt\":\"<t-240s db Z>\",\"title\":\"경계\"},\"before_state\":{\"bodySha256\":\"06db896f1d0ace00fe49534e596595ef50836b2f9df43857444f10a1a8a1eb73\",\"deletedAt\":null,\"scheduledAt\":\"<t-240s db Z>\",\"title\":\"경계\"},\"id\":\"$uuid105\",\"occurred_at\":\"<t+15s db +09:00>\",\"reason\":\"잘못 등록\",\"request_id\":\"$uuid85\",\"target_id\":\"$uuid58\",\"target_type\":\"NOTICE\"}",
+      "{\"action\":\"NOTICE_DELETED\",\"actor_admin_id\":\"$uuid96\",\"after_state\":{\"bodySha256\":\"9118bb57091cfe7374e011b9979c8fc88e72d4074c0959b45eda164f3bc77857\",\"deletedAt\":\"<t+15s db Z>\",\"scheduledAt\":\"<t+723600s db Z>\",\"title\":\"소수 초\"},\"before_state\":{\"bodySha256\":\"9118bb57091cfe7374e011b9979c8fc88e72d4074c0959b45eda164f3bc77857\",\"deletedAt\":null,\"scheduledAt\":\"<t+723600s db Z>\",\"title\":\"소수 초\"},\"id\":\"$uuid106\",\"occurred_at\":\"<t+15s db +09:00>\",\"reason\":\"가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가\",\"request_id\":\"$uuid87\",\"target_id\":\"$uuid62\",\"target_type\":\"NOTICE\"}",
+      "{\"action\":\"NOTICE_UPDATED\",\"actor_admin_id\":\"$uuid96\",\"after_state\":{\"bodySha256\":\"6c7188c633baa17f384527728a492451d71aac532e187aa283800840893c1a0d\",\"scheduledAt\":\"<t+777600s db Z>\",\"title\":\"수정된 제목\"},\"before_state\":{\"bodySha256\":\"9118bb57091cfe7374e011b9979c8fc88e72d4074c0959b45eda164f3bc77857\",\"scheduledAt\":\"<t+691200s db Z>\",\"title\":\"오프셋 예약\"},\"id\":\"$uuid103\",\"occurred_at\":\"<t+10s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid71\",\"target_id\":\"$uuid60\",\"target_type\":\"NOTICE\"}"
+    ],
+    "admins": [
+      "{\"created_at\":\"<t-3542400s db +09:00>\",\"id\":\"$uuid96\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"updated_at\":\"<t-3542400s db +09:00>\",\"username\":\"operator\"}"
+    ],
+    "notices": [
+      "{\"body\":\"b\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"distributed_at\":null,\"id\":\"$uuid51\",\"scheduled_at\":\"<t+691200s db +09:00>\",\"title\":\"1\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"body\":\"곧 배포합니다.\",\"created_at\":\"<t-169200s db +09:00>\",\"deleted_at\":null,\"distributed_at\":null,\"id\":\"$uuid3\",\"scheduled_at\":\"<t+691200s db +09:00>\",\"title\":\"예약된 공지\",\"updated_at\":\"<t-169200s db +09:00>\"}",
+      "{\"body\":\"나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나\",\"created_at\":\"<t+5s db +09:00>\",\"deleted_at\":null,\"distributed_at\":null,\"id\":\"$uuid64\",\"scheduled_at\":\"<t+691200s db +09:00>\",\"title\":\"가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가\",\"updated_at\":\"<t+5s db +09:00>\"}",
+      "{\"body\":\"본문 1\",\"created_at\":\"<t-863940s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-946800s db +09:00>\",\"id\":\"$uuid28\",\"scheduled_at\":\"<t-946800s db +09:00>\",\"title\":\"공지 1\",\"updated_at\":\"<t-863940s db +09:00>\"}",
+      "{\"body\":\"본문 10\",\"created_at\":\"<t-863400s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-914400s db +09:00>\",\"id\":\"$uuid17\",\"scheduled_at\":\"<t-914400s db +09:00>\",\"title\":\"공지 10\",\"updated_at\":\"<t-863400s db +09:00>\"}",
+      "{\"body\":\"본문 11\",\"created_at\":\"<t-863340s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-910800s db +09:00>\",\"id\":\"$uuid16\",\"scheduled_at\":\"<t-910800s db +09:00>\",\"title\":\"공지 11\",\"updated_at\":\"<t-863340s db +09:00>\"}",
+      "{\"body\":\"본문 12\",\"created_at\":\"<t-863280s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-907200s db +09:00>\",\"id\":\"$uuid15\",\"scheduled_at\":\"<t-907200s db +09:00>\",\"title\":\"공지 12\",\"updated_at\":\"<t-863280s db +09:00>\"}",
+      "{\"body\":\"본문 13\",\"created_at\":\"<t-863220s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-903600s db +09:00>\",\"id\":\"$uuid14\",\"scheduled_at\":\"<t-903600s db +09:00>\",\"title\":\"공지 13\",\"updated_at\":\"<t-863220s db +09:00>\"}",
+      "{\"body\":\"본문 14\",\"created_at\":\"<t-863160s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-900000s db +09:00>\",\"id\":\"$uuid13\",\"scheduled_at\":\"<t-900000s db +09:00>\",\"title\":\"공지 14\",\"updated_at\":\"<t-863160s db +09:00>\"}",
+      "{\"body\":\"본문 15\",\"created_at\":\"<t-863100s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-896400s db +09:00>\",\"id\":\"$uuid12\",\"scheduled_at\":\"<t-896400s db +09:00>\",\"title\":\"공지 15\",\"updated_at\":\"<t-863100s db +09:00>\"}",
+      "{\"body\":\"본문 16\",\"created_at\":\"<t-863040s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-892800s db +09:00>\",\"id\":\"$uuid11\",\"scheduled_at\":\"<t-892800s db +09:00>\",\"title\":\"공지 16\",\"updated_at\":\"<t-863040s db +09:00>\"}",
+      "{\"body\":\"본문 17\",\"created_at\":\"<t-862980s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-889200s db +09:00>\",\"id\":\"$uuid10\",\"scheduled_at\":\"<t-889200s db +09:00>\",\"title\":\"공지 17\",\"updated_at\":\"<t-862980s db +09:00>\"}",
+      "{\"body\":\"본문 18\",\"created_at\":\"<t-862920s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-885600s db +09:00>\",\"id\":\"$uuid9\",\"scheduled_at\":\"<t-885600s db +09:00>\",\"title\":\"공지 18\",\"updated_at\":\"<t-862920s db +09:00>\"}",
+      "{\"body\":\"본문 19\",\"created_at\":\"<t-862860s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-882000s db +09:00>\",\"id\":\"$uuid8\",\"scheduled_at\":\"<t-882000s db +09:00>\",\"title\":\"공지 19\",\"updated_at\":\"<t-862860s db +09:00>\"}",
+      "{\"body\":\"본문 2\",\"created_at\":\"<t-863880s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-943200s db +09:00>\",\"id\":\"$uuid27\",\"scheduled_at\":\"<t-943200s db +09:00>\",\"title\":\"공지 2\",\"updated_at\":\"<t-863880s db +09:00>\"}",
+      "{\"body\":\"본문 20\",\"created_at\":\"<t-862800s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-878400s db +09:00>\",\"id\":\"$uuid7\",\"scheduled_at\":\"<t-878400s db +09:00>\",\"title\":\"공지 20\",\"updated_at\":\"<t-862800s db +09:00>\"}",
+      "{\"body\":\"본문 21\",\"created_at\":\"<t-862740s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-874800s db +09:00>\",\"id\":\"$uuid6\",\"scheduled_at\":\"<t-874800s db +09:00>\",\"title\":\"공지 21\",\"updated_at\":\"<t-862740s db +09:00>\"}",
+      "{\"body\":\"본문 22\",\"created_at\":\"<t-862680s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-871200s db +09:00>\",\"id\":\"$uuid5\",\"scheduled_at\":\"<t-871200s db +09:00>\",\"title\":\"공지 22\",\"updated_at\":\"<t-862680s db +09:00>\"}",
+      "{\"body\":\"본문 3\",\"created_at\":\"<t-863820s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-939600s db +09:00>\",\"id\":\"$uuid26\",\"scheduled_at\":\"<t-939600s db +09:00>\",\"title\":\"공지 3\",\"updated_at\":\"<t-863820s db +09:00>\"}",
+      "{\"body\":\"본문 4\",\"created_at\":\"<t-863760s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-936000s db +09:00>\",\"id\":\"$uuid25\",\"scheduled_at\":\"<t-936000s db +09:00>\",\"title\":\"공지 4\",\"updated_at\":\"<t-863760s db +09:00>\"}",
+      "{\"body\":\"본문 5\",\"created_at\":\"<t-863700s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-932400s db +09:00>\",\"id\":\"$uuid24\",\"scheduled_at\":\"<t-932400s db +09:00>\",\"title\":\"공지 5\",\"updated_at\":\"<t-863700s db +09:00>\"}",
+      "{\"body\":\"본문 6\",\"created_at\":\"<t-863640s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-928800s db +09:00>\",\"id\":\"$uuid21\",\"scheduled_at\":\"<t-928800s db +09:00>\",\"title\":\"공지 6\",\"updated_at\":\"<t-863640s db +09:00>\"}",
+      "{\"body\":\"본문 7\",\"created_at\":\"<t-863580s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-925200s db +09:00>\",\"id\":\"$uuid20\",\"scheduled_at\":\"<t-925200s db +09:00>\",\"title\":\"공지 7\",\"updated_at\":\"<t-863580s db +09:00>\"}",
+      "{\"body\":\"본문 8\",\"created_at\":\"<t-863520s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-921600s db +09:00>\",\"id\":\"$uuid19\",\"scheduled_at\":\"<t-921600s db +09:00>\",\"title\":\"공지 8\",\"updated_at\":\"<t-863520s db +09:00>\"}",
+      "{\"body\":\"본문 9\",\"created_at\":\"<t-863460s db +09:00>\",\"deleted_at\":null,\"distributed_at\":\"<t-918000s db +09:00>\",\"id\":\"$uuid18\",\"scheduled_at\":\"<t-918000s db +09:00>\",\"title\":\"공지 9\",\"updated_at\":\"<t-863460s db +09:00>\"}",
+      "{\"body\":\"본문\",\"created_at\":\"<t+5s db +09:00>\",\"deleted_at\":\"<t+15s db +09:00>\",\"distributed_at\":null,\"id\":\"$uuid62\",\"scheduled_at\":\"<t+723600s db +09:00>\",\"title\":\"소수 초\",\"updated_at\":\"<t+15s db +09:00>\"}",
+      "{\"body\":\"본문\\r\\n둘째 줄\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t+15s db +09:00>\",\"distributed_at\":null,\"id\":\"$uuid58\",\"scheduled_at\":\"<t-240s db +09:00>\",\"title\":\"경계\",\"updated_at\":\"<t+15s db +09:00>\"}",
+      "{\"body\":\"삭제했습니다.\",\"created_at\":\"<t-165600s db +09:00>\",\"deleted_at\":\"<t-43200s db +09:00>\",\"distributed_at\":null,\"id\":\"$uuid2\",\"scheduled_at\":\"<t+259200s db +09:00>\",\"title\":\"삭제된 공지\",\"updated_at\":\"<t-43200s db +09:00>\"}",
+      "{\"body\":\"수정된 본문\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"distributed_at\":null,\"id\":\"$uuid60\",\"scheduled_at\":\"<t+777600s db +09:00>\",\"title\":\"수정된 제목\",\"updated_at\":\"<t+10s db +09:00>\"}",
+      "{\"body\":\"이미 배포했습니다.\",\"created_at\":\"<t-172800s db +09:00>\",\"deleted_at\":\"<t+20s db +09:00>\",\"distributed_at\":\"<t-86340s db +09:00>\",\"id\":\"$uuid4\",\"scheduled_at\":\"<t-86400s db +09:00>\",\"title\":\"배포된 공지\",\"updated_at\":\"<t+20s db +09:00>\"}",
+      "{\"body\":\"😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀\",\"created_at\":\"<t+5s db +09:00>\",\"deleted_at\":null,\"distributed_at\":null,\"id\":\"$uuid66\",\"scheduled_at\":\"<t+691200s db +09:00>\",\"title\":\"😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀\",\"updated_at\":\"<t+5s db +09:00>\"}"
+    ]
+  },
+  "steps": [
+    {
+      "body": {
+        "currentPage": 1,
+        "hasNext": true,
+        "notices": [
+          {
+            "body": "삭제했습니다.",
+            "createdAt": "<t-165600s iso Z>",
+            "deletedAt": "<t-43200s iso Z>",
+            "distributedAt": null,
+            "noticeId": "$uuid2",
+            "scheduledAt": "<t+259200s iso Z>",
+            "status": "SCHEDULED",
+            "title": "삭제된 공지",
+            "updatedAt": "<t-43200s iso Z>"
+          },
+          {
+            "body": "곧 배포합니다.",
+            "createdAt": "<t-169200s iso Z>",
+            "deletedAt": null,
+            "distributedAt": null,
+            "noticeId": "$uuid3",
+            "scheduledAt": "<t+691200s iso Z>",
+            "status": "SCHEDULED",
+            "title": "예약된 공지",
+            "updatedAt": "<t-169200s iso Z>"
+          },
+          {
+            "body": "이미 배포했습니다.",
+            "createdAt": "<t-172800s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-86340s iso Z>",
+            "noticeId": "$uuid4",
+            "scheduledAt": "<t-86400s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "배포된 공지",
+            "updatedAt": "<t-86340s iso Z>"
+          },
+          {
+            "body": "본문 22",
+            "createdAt": "<t-862680s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-871200s iso Z>",
+            "noticeId": "$uuid5",
+            "scheduledAt": "<t-871200s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 22",
+            "updatedAt": "<t-862680s iso Z>"
+          },
+          {
+            "body": "본문 21",
+            "createdAt": "<t-862740s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-874800s iso Z>",
+            "noticeId": "$uuid6",
+            "scheduledAt": "<t-874800s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 21",
+            "updatedAt": "<t-862740s iso Z>"
+          },
+          {
+            "body": "본문 20",
+            "createdAt": "<t-862800s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-878400s iso Z>",
+            "noticeId": "$uuid7",
+            "scheduledAt": "<t-878400s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 20",
+            "updatedAt": "<t-862800s iso Z>"
+          },
+          {
+            "body": "본문 19",
+            "createdAt": "<t-862860s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-882000s iso Z>",
+            "noticeId": "$uuid8",
+            "scheduledAt": "<t-882000s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 19",
+            "updatedAt": "<t-862860s iso Z>"
+          },
+          {
+            "body": "본문 18",
+            "createdAt": "<t-862920s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-885600s iso Z>",
+            "noticeId": "$uuid9",
+            "scheduledAt": "<t-885600s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 18",
+            "updatedAt": "<t-862920s iso Z>"
+          },
+          {
+            "body": "본문 17",
+            "createdAt": "<t-862980s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-889200s iso Z>",
+            "noticeId": "$uuid10",
+            "scheduledAt": "<t-889200s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 17",
+            "updatedAt": "<t-862980s iso Z>"
+          },
+          {
+            "body": "본문 16",
+            "createdAt": "<t-863040s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-892800s iso Z>",
+            "noticeId": "$uuid11",
+            "scheduledAt": "<t-892800s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 16",
+            "updatedAt": "<t-863040s iso Z>"
+          },
+          {
+            "body": "본문 15",
+            "createdAt": "<t-863100s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-896400s iso Z>",
+            "noticeId": "$uuid12",
+            "scheduledAt": "<t-896400s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 15",
+            "updatedAt": "<t-863100s iso Z>"
+          },
+          {
+            "body": "본문 14",
+            "createdAt": "<t-863160s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-900000s iso Z>",
+            "noticeId": "$uuid13",
+            "scheduledAt": "<t-900000s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 14",
+            "updatedAt": "<t-863160s iso Z>"
+          },
+          {
+            "body": "본문 13",
+            "createdAt": "<t-863220s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-903600s iso Z>",
+            "noticeId": "$uuid14",
+            "scheduledAt": "<t-903600s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 13",
+            "updatedAt": "<t-863220s iso Z>"
+          },
+          {
+            "body": "본문 12",
+            "createdAt": "<t-863280s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-907200s iso Z>",
+            "noticeId": "$uuid15",
+            "scheduledAt": "<t-907200s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 12",
+            "updatedAt": "<t-863280s iso Z>"
+          },
+          {
+            "body": "본문 11",
+            "createdAt": "<t-863340s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-910800s iso Z>",
+            "noticeId": "$uuid16",
+            "scheduledAt": "<t-910800s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 11",
+            "updatedAt": "<t-863340s iso Z>"
+          },
+          {
+            "body": "본문 10",
+            "createdAt": "<t-863400s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-914400s iso Z>",
+            "noticeId": "$uuid17",
+            "scheduledAt": "<t-914400s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 10",
+            "updatedAt": "<t-863400s iso Z>"
+          },
+          {
+            "body": "본문 9",
+            "createdAt": "<t-863460s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-918000s iso Z>",
+            "noticeId": "$uuid18",
+            "scheduledAt": "<t-918000s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 9",
+            "updatedAt": "<t-863460s iso Z>"
+          },
+          {
+            "body": "본문 8",
+            "createdAt": "<t-863520s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-921600s iso Z>",
+            "noticeId": "$uuid19",
+            "scheduledAt": "<t-921600s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 8",
+            "updatedAt": "<t-863520s iso Z>"
+          },
+          {
+            "body": "본문 7",
+            "createdAt": "<t-863580s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-925200s iso Z>",
+            "noticeId": "$uuid20",
+            "scheduledAt": "<t-925200s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 7",
+            "updatedAt": "<t-863580s iso Z>"
+          },
+          {
+            "body": "본문 6",
+            "createdAt": "<t-863640s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-928800s iso Z>",
+            "noticeId": "$uuid21",
+            "scheduledAt": "<t-928800s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 6",
+            "updatedAt": "<t-863640s iso Z>"
+          }
+        ],
+        "pageSize": 20
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "목록 기본"
+    },
+    {
+      "body": {
+        "currentPage": 2,
+        "hasNext": true,
+        "notices": [
+          {
+            "body": "본문 20",
+            "createdAt": "<t-862800s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-878400s iso Z>",
+            "noticeId": "$uuid7",
+            "scheduledAt": "<t-878400s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 20",
+            "updatedAt": "<t-862800s iso Z>"
+          },
+          {
+            "body": "본문 19",
+            "createdAt": "<t-862860s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-882000s iso Z>",
+            "noticeId": "$uuid8",
+            "scheduledAt": "<t-882000s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 19",
+            "updatedAt": "<t-862860s iso Z>"
+          },
+          {
+            "body": "본문 18",
+            "createdAt": "<t-862920s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-885600s iso Z>",
+            "noticeId": "$uuid9",
+            "scheduledAt": "<t-885600s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 18",
+            "updatedAt": "<t-862920s iso Z>"
+          },
+          {
+            "body": "본문 17",
+            "createdAt": "<t-862980s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-889200s iso Z>",
+            "noticeId": "$uuid10",
+            "scheduledAt": "<t-889200s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 17",
+            "updatedAt": "<t-862980s iso Z>"
+          },
+          {
+            "body": "본문 16",
+            "createdAt": "<t-863040s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-892800s iso Z>",
+            "noticeId": "$uuid11",
+            "scheduledAt": "<t-892800s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 16",
+            "updatedAt": "<t-863040s iso Z>"
+          }
+        ],
+        "pageSize": 5
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid22"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "목록 2쪽 크기 5"
+    },
+    {
+      "body": {
+        "currentPage": 5,
+        "hasNext": false,
+        "notices": [
+          {
+            "body": "본문 5",
+            "createdAt": "<t-863700s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-932400s iso Z>",
+            "noticeId": "$uuid24",
+            "scheduledAt": "<t-932400s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 5",
+            "updatedAt": "<t-863700s iso Z>"
+          },
+          {
+            "body": "본문 4",
+            "createdAt": "<t-863760s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-936000s iso Z>",
+            "noticeId": "$uuid25",
+            "scheduledAt": "<t-936000s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 4",
+            "updatedAt": "<t-863760s iso Z>"
+          },
+          {
+            "body": "본문 3",
+            "createdAt": "<t-863820s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-939600s iso Z>",
+            "noticeId": "$uuid26",
+            "scheduledAt": "<t-939600s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 3",
+            "updatedAt": "<t-863820s iso Z>"
+          },
+          {
+            "body": "본문 2",
+            "createdAt": "<t-863880s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-943200s iso Z>",
+            "noticeId": "$uuid27",
+            "scheduledAt": "<t-943200s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 2",
+            "updatedAt": "<t-863880s iso Z>"
+          },
+          {
+            "body": "본문 1",
+            "createdAt": "<t-863940s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-946800s iso Z>",
+            "noticeId": "$uuid28",
+            "scheduledAt": "<t-946800s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 1",
+            "updatedAt": "<t-863940s iso Z>"
+          }
+        ],
+        "pageSize": 5
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid23"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "목록 마지막 쪽"
+    },
+    {
+      "body": {
+        "currentPage": 9,
+        "hasNext": false,
+        "notices": [],
+        "pageSize": 5
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid29"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "목록 범위 밖"
+    },
+    {
+      "body": {
+        "currentPage": 1,
+        "hasNext": false,
+        "notices": [
+          {
+            "body": "삭제했습니다.",
+            "createdAt": "<t-165600s iso Z>",
+            "deletedAt": "<t-43200s iso Z>",
+            "distributedAt": null,
+            "noticeId": "$uuid2",
+            "scheduledAt": "<t+259200s iso Z>",
+            "status": "SCHEDULED",
+            "title": "삭제된 공지",
+            "updatedAt": "<t-43200s iso Z>"
+          },
+          {
+            "body": "곧 배포합니다.",
+            "createdAt": "<t-169200s iso Z>",
+            "deletedAt": null,
+            "distributedAt": null,
+            "noticeId": "$uuid3",
+            "scheduledAt": "<t+691200s iso Z>",
+            "status": "SCHEDULED",
+            "title": "예약된 공지",
+            "updatedAt": "<t-169200s iso Z>"
+          },
+          {
+            "body": "이미 배포했습니다.",
+            "createdAt": "<t-172800s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-86340s iso Z>",
+            "noticeId": "$uuid4",
+            "scheduledAt": "<t-86400s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "배포된 공지",
+            "updatedAt": "<t-86340s iso Z>"
+          },
+          {
+            "body": "본문 22",
+            "createdAt": "<t-862680s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-871200s iso Z>",
+            "noticeId": "$uuid5",
+            "scheduledAt": "<t-871200s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 22",
+            "updatedAt": "<t-862680s iso Z>"
+          },
+          {
+            "body": "본문 21",
+            "createdAt": "<t-862740s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-874800s iso Z>",
+            "noticeId": "$uuid6",
+            "scheduledAt": "<t-874800s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 21",
+            "updatedAt": "<t-862740s iso Z>"
+          },
+          {
+            "body": "본문 20",
+            "createdAt": "<t-862800s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-878400s iso Z>",
+            "noticeId": "$uuid7",
+            "scheduledAt": "<t-878400s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 20",
+            "updatedAt": "<t-862800s iso Z>"
+          },
+          {
+            "body": "본문 19",
+            "createdAt": "<t-862860s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-882000s iso Z>",
+            "noticeId": "$uuid8",
+            "scheduledAt": "<t-882000s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 19",
+            "updatedAt": "<t-862860s iso Z>"
+          },
+          {
+            "body": "본문 18",
+            "createdAt": "<t-862920s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-885600s iso Z>",
+            "noticeId": "$uuid9",
+            "scheduledAt": "<t-885600s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 18",
+            "updatedAt": "<t-862920s iso Z>"
+          },
+          {
+            "body": "본문 17",
+            "createdAt": "<t-862980s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-889200s iso Z>",
+            "noticeId": "$uuid10",
+            "scheduledAt": "<t-889200s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 17",
+            "updatedAt": "<t-862980s iso Z>"
+          },
+          {
+            "body": "본문 16",
+            "createdAt": "<t-863040s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-892800s iso Z>",
+            "noticeId": "$uuid11",
+            "scheduledAt": "<t-892800s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 16",
+            "updatedAt": "<t-863040s iso Z>"
+          },
+          {
+            "body": "본문 15",
+            "createdAt": "<t-863100s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-896400s iso Z>",
+            "noticeId": "$uuid12",
+            "scheduledAt": "<t-896400s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 15",
+            "updatedAt": "<t-863100s iso Z>"
+          },
+          {
+            "body": "본문 14",
+            "createdAt": "<t-863160s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-900000s iso Z>",
+            "noticeId": "$uuid13",
+            "scheduledAt": "<t-900000s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 14",
+            "updatedAt": "<t-863160s iso Z>"
+          },
+          {
+            "body": "본문 13",
+            "createdAt": "<t-863220s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-903600s iso Z>",
+            "noticeId": "$uuid14",
+            "scheduledAt": "<t-903600s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 13",
+            "updatedAt": "<t-863220s iso Z>"
+          },
+          {
+            "body": "본문 12",
+            "createdAt": "<t-863280s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-907200s iso Z>",
+            "noticeId": "$uuid15",
+            "scheduledAt": "<t-907200s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 12",
+            "updatedAt": "<t-863280s iso Z>"
+          },
+          {
+            "body": "본문 11",
+            "createdAt": "<t-863340s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-910800s iso Z>",
+            "noticeId": "$uuid16",
+            "scheduledAt": "<t-910800s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 11",
+            "updatedAt": "<t-863340s iso Z>"
+          },
+          {
+            "body": "본문 10",
+            "createdAt": "<t-863400s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-914400s iso Z>",
+            "noticeId": "$uuid17",
+            "scheduledAt": "<t-914400s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 10",
+            "updatedAt": "<t-863400s iso Z>"
+          },
+          {
+            "body": "본문 9",
+            "createdAt": "<t-863460s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-918000s iso Z>",
+            "noticeId": "$uuid18",
+            "scheduledAt": "<t-918000s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 9",
+            "updatedAt": "<t-863460s iso Z>"
+          },
+          {
+            "body": "본문 8",
+            "createdAt": "<t-863520s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-921600s iso Z>",
+            "noticeId": "$uuid19",
+            "scheduledAt": "<t-921600s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 8",
+            "updatedAt": "<t-863520s iso Z>"
+          },
+          {
+            "body": "본문 7",
+            "createdAt": "<t-863580s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-925200s iso Z>",
+            "noticeId": "$uuid20",
+            "scheduledAt": "<t-925200s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 7",
+            "updatedAt": "<t-863580s iso Z>"
+          },
+          {
+            "body": "본문 6",
+            "createdAt": "<t-863640s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-928800s iso Z>",
+            "noticeId": "$uuid21",
+            "scheduledAt": "<t-928800s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 6",
+            "updatedAt": "<t-863640s iso Z>"
+          },
+          {
+            "body": "본문 5",
+            "createdAt": "<t-863700s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-932400s iso Z>",
+            "noticeId": "$uuid24",
+            "scheduledAt": "<t-932400s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 5",
+            "updatedAt": "<t-863700s iso Z>"
+          },
+          {
+            "body": "본문 4",
+            "createdAt": "<t-863760s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-936000s iso Z>",
+            "noticeId": "$uuid25",
+            "scheduledAt": "<t-936000s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 4",
+            "updatedAt": "<t-863760s iso Z>"
+          },
+          {
+            "body": "본문 3",
+            "createdAt": "<t-863820s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-939600s iso Z>",
+            "noticeId": "$uuid26",
+            "scheduledAt": "<t-939600s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 3",
+            "updatedAt": "<t-863820s iso Z>"
+          },
+          {
+            "body": "본문 2",
+            "createdAt": "<t-863880s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-943200s iso Z>",
+            "noticeId": "$uuid27",
+            "scheduledAt": "<t-943200s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 2",
+            "updatedAt": "<t-863880s iso Z>"
+          },
+          {
+            "body": "본문 1",
+            "createdAt": "<t-863940s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-946800s iso Z>",
+            "noticeId": "$uuid28",
+            "scheduledAt": "<t-946800s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 1",
+            "updatedAt": "<t-863940s iso Z>"
+          }
+        ],
+        "pageSize": 100
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid30"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "목록 크기 100"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid31"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "목록 page 0"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid32"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "목록 pageSize 0"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 조건이 올바르지 않습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid33"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "목록 pageSize 101"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid34"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "목록 page 문자"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "page: 요청 값의 형식이 올바르지 않습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid35"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "목록 page 오버플로"
+    },
+    {
+      "body": {
+        "body": "이미 배포했습니다.",
+        "createdAt": "<t-172800s iso Z>",
+        "deletedAt": null,
+        "distributedAt": "<t-86340s iso Z>",
+        "noticeId": "$uuid4",
+        "scheduledAt": "<t-86400s iso Z>",
+        "status": "DISTRIBUTED",
+        "title": "배포된 공지",
+        "updatedAt": "<t-86340s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid36"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "상세 배포됨"
+    },
+    {
+      "body": {
+        "body": "곧 배포합니다.",
+        "createdAt": "<t-169200s iso Z>",
+        "deletedAt": null,
+        "distributedAt": null,
+        "noticeId": "$uuid3",
+        "scheduledAt": "<t+691200s iso Z>",
+        "status": "SCHEDULED",
+        "title": "예약된 공지",
+        "updatedAt": "<t-169200s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid37"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "상세 예약됨"
+    },
+    {
+      "body": {
+        "body": "삭제했습니다.",
+        "createdAt": "<t-165600s iso Z>",
+        "deletedAt": "<t-43200s iso Z>",
+        "distributedAt": null,
+        "noticeId": "$uuid2",
+        "scheduledAt": "<t+259200s iso Z>",
+        "status": "SCHEDULED",
+        "title": "삭제된 공지",
+        "updatedAt": "<t-43200s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid38"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "상세 삭제됨"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "공지를 찾을 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid39"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 404,
+      "step": "상세 없음"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "ID 형식이 올바르지 않습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid40"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "상세 잘못된 id"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid41"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 본문 없음"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be blank"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid42"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 제목 null"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be blank"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid43"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 제목 공백"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be blank"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid44"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 본문 null"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be blank"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid45"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 본문 공백"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be null"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid46"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 예약 없음"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be null"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid47"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 예약 null"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid48"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 예약 형식 오류"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "공지 예약 시각은 현재 시각보다 5분 넘게 과거일 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid49"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 예약 숫자"
+    },
+    {
+      "body": {
+        "body": "b",
+        "createdAt": "<t+0s iso Z>",
+        "deletedAt": null,
+        "distributedAt": null,
+        "noticeId": "$uuid51",
+        "scheduledAt": "<t+691200s iso Z>",
+        "status": "SCHEDULED",
+        "title": "1",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid50"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 201,
+      "step": "등록 거절 제목 숫자"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "공지 제목은 1자 이상 50자 이하여야 합니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid52"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 제목 51자"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "공지 본문은 1자 이상 500자 이하여야 합니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid53"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 본문 501자"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "공지 예약 시각은 현재 시각보다 5분 넘게 과거일 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid54"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 예약 6분 과거"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "민감한 정보는 관리자 감사 로그에 저장할 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid55"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 민감 문구 제목"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid56"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 깨진 JSON"
+    },
+    {
+      "body": {
+        "body": "본문\r\n둘째 줄",
+        "createdAt": "<t+0s iso Z>",
+        "deletedAt": null,
+        "distributedAt": null,
+        "noticeId": "$uuid58",
+        "scheduledAt": "<t-240s iso Z>",
+        "status": "SCHEDULED",
+        "title": "경계",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid57"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 201,
+      "step": "등록 성공 4분 과거"
+    },
+    {
+      "body": {
+        "body": "본문",
+        "createdAt": "<t+0s iso Z>",
+        "deletedAt": null,
+        "distributedAt": null,
+        "noticeId": "$uuid60",
+        "scheduledAt": "<t+691200s iso Z>",
+        "status": "SCHEDULED",
+        "title": "오프셋 예약",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid59"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 201,
+      "step": "등록 성공 오프셋"
+    },
+    {
+      "body": {
+        "body": "본문",
+        "createdAt": "<t+5s iso Z>",
+        "deletedAt": null,
+        "distributedAt": null,
+        "noticeId": "$uuid62",
+        "scheduledAt": "<t+723600s iso Z>",
+        "status": "SCHEDULED",
+        "title": "소수 초",
+        "updatedAt": "<t+5s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid61"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 201,
+      "step": "등록 성공 소수 초"
+    },
+    {
+      "body": {
+        "body": "나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나",
+        "createdAt": "<t+5s iso Z>",
+        "deletedAt": null,
+        "distributedAt": null,
+        "noticeId": "$uuid64",
+        "scheduledAt": "<t+691200s iso Z>",
+        "status": "SCHEDULED",
+        "title": "가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가",
+        "updatedAt": "<t+5s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid63"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 201,
+      "step": "등록 성공 50자 500자"
+    },
+    {
+      "body": {
+        "body": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "createdAt": "<t+5s iso Z>",
+        "deletedAt": null,
+        "distributedAt": null,
+        "noticeId": "$uuid66",
+        "scheduledAt": "<t+691200s iso Z>",
+        "status": "SCHEDULED",
+        "title": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "updatedAt": "<t+5s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid65"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 201,
+      "step": "등록 성공 이모지 제목"
+    },
+    {
+      "body": {
+        "body": "본문\r\n둘째 줄",
+        "createdAt": "<t+0s iso Z>",
+        "deletedAt": null,
+        "distributedAt": null,
+        "noticeId": "$uuid58",
+        "scheduledAt": "<t-240s iso Z>",
+        "status": "SCHEDULED",
+        "title": "경계",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid67"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "상세 방금 등록"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid68"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "수정 거절 본문 없음"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "공지 제목은 1자 이상 50자 이하여야 합니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid69"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "수정 거절 제목 길이"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "공지 예약 시각은 현재 시각보다 5분 넘게 과거일 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid70"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "수정 거절 과거"
+    },
+    {
+      "body": {
+        "body": "수정된 본문",
+        "createdAt": "<t+0s iso Z>",
+        "deletedAt": null,
+        "distributedAt": null,
+        "noticeId": "$uuid60",
+        "scheduledAt": "<t+777600s iso Z>",
+        "status": "SCHEDULED",
+        "title": "수정된 제목",
+        "updatedAt": "<t+10s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid71"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "수정 성공"
+    },
+    {
+      "body": {
+        "body": "수정된 본문",
+        "createdAt": "<t+0s iso Z>",
+        "deletedAt": null,
+        "distributedAt": null,
+        "noticeId": "$uuid60",
+        "scheduledAt": "<t+777600s iso Z>",
+        "status": "SCHEDULED",
+        "title": "수정된 제목",
+        "updatedAt": "<t+10s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid72"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "수정 같은 내용"
+    },
+    {
+      "body": {
+        "body": "수정된 본문",
+        "createdAt": "<t+0s iso Z>",
+        "deletedAt": null,
+        "distributedAt": null,
+        "noticeId": "$uuid60",
+        "scheduledAt": "<t+777600s iso Z>",
+        "status": "SCHEDULED",
+        "title": "수정된 제목",
+        "updatedAt": "<t+10s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid73"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "수정 같은 시각 다른 표기"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "배포된 공지는 수정할 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid74"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "수정 배포된 공지"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "삭제된 공지는 수정할 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid75"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "수정 삭제된 공지"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "공지를 찾을 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid76"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 404,
+      "step": "수정 없는 공지"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "ID 형식이 올바르지 않습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid77"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "수정 잘못된 id"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid78"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "삭제 거절 본문 없음"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be blank"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid79"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "삭제 거절 사유 없음"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be blank"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid80"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "삭제 거절 사유 null"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be blank"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid81"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "삭제 거절 사유 공백"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "size must be between 0 and 500"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid82"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "삭제 거절 사유 501자"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "ID 형식이 올바르지 않습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid83"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "삭제 거절 잘못된 id"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "공지를 찾을 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid84"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 404,
+      "step": "삭제 거절 없는 공지"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid85"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "삭제 성공 예약 공지"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid86"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "삭제 다시"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid87"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "삭제 성공 500자 사유"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid88"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "삭제 성공 배포된 공지"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid89"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "삭제 이미 삭제된 공지"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "삭제된 공지는 수정할 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid90"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "삭제된 공지 수정"
+    },
+    {
+      "body": {
+        "body": "본문\r\n둘째 줄",
+        "createdAt": "<t+0s iso Z>",
+        "deletedAt": "<t+15s iso Z>",
+        "distributedAt": null,
+        "noticeId": "$uuid58",
+        "scheduledAt": "<t-240s iso Z>",
+        "status": "SCHEDULED",
+        "title": "경계",
+        "updatedAt": "<t+15s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid91"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "상세 삭제 후"
+    },
+    {
+      "body": {
+        "body": "이미 배포했습니다.",
+        "createdAt": "<t-172800s iso Z>",
+        "deletedAt": "<t+20s iso Z>",
+        "distributedAt": "<t-86340s iso Z>",
+        "noticeId": "$uuid4",
+        "scheduledAt": "<t-86400s iso Z>",
+        "status": "DISTRIBUTED",
+        "title": "배포된 공지",
+        "updatedAt": "<t+20s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid92"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "상세 배포 후 삭제"
+    },
+    {
+      "body": {
+        "currentPage": 1,
+        "hasNext": false,
+        "notices": [
+          {
+            "body": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+            "createdAt": "<t+5s iso Z>",
+            "deletedAt": null,
+            "distributedAt": null,
+            "noticeId": "$uuid66",
+            "scheduledAt": "<t+691200s iso Z>",
+            "status": "SCHEDULED",
+            "title": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+            "updatedAt": "<t+5s iso Z>"
+          },
+          {
+            "body": "나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나",
+            "createdAt": "<t+5s iso Z>",
+            "deletedAt": null,
+            "distributedAt": null,
+            "noticeId": "$uuid64",
+            "scheduledAt": "<t+691200s iso Z>",
+            "status": "SCHEDULED",
+            "title": "가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가",
+            "updatedAt": "<t+5s iso Z>"
+          },
+          {
+            "body": "본문",
+            "createdAt": "<t+5s iso Z>",
+            "deletedAt": "<t+15s iso Z>",
+            "distributedAt": null,
+            "noticeId": "$uuid62",
+            "scheduledAt": "<t+723600s iso Z>",
+            "status": "SCHEDULED",
+            "title": "소수 초",
+            "updatedAt": "<t+15s iso Z>"
+          },
+          {
+            "body": "수정된 본문",
+            "createdAt": "<t+0s iso Z>",
+            "deletedAt": null,
+            "distributedAt": null,
+            "noticeId": "$uuid60",
+            "scheduledAt": "<t+777600s iso Z>",
+            "status": "SCHEDULED",
+            "title": "수정된 제목",
+            "updatedAt": "<t+10s iso Z>"
+          },
+          {
+            "body": "본문\r\n둘째 줄",
+            "createdAt": "<t+0s iso Z>",
+            "deletedAt": "<t+15s iso Z>",
+            "distributedAt": null,
+            "noticeId": "$uuid58",
+            "scheduledAt": "<t-240s iso Z>",
+            "status": "SCHEDULED",
+            "title": "경계",
+            "updatedAt": "<t+15s iso Z>"
+          },
+          {
+            "body": "b",
+            "createdAt": "<t+0s iso Z>",
+            "deletedAt": null,
+            "distributedAt": null,
+            "noticeId": "$uuid51",
+            "scheduledAt": "<t+691200s iso Z>",
+            "status": "SCHEDULED",
+            "title": "1",
+            "updatedAt": "<t+0s iso Z>"
+          },
+          {
+            "body": "삭제했습니다.",
+            "createdAt": "<t-165600s iso Z>",
+            "deletedAt": "<t-43200s iso Z>",
+            "distributedAt": null,
+            "noticeId": "$uuid2",
+            "scheduledAt": "<t+259200s iso Z>",
+            "status": "SCHEDULED",
+            "title": "삭제된 공지",
+            "updatedAt": "<t-43200s iso Z>"
+          },
+          {
+            "body": "곧 배포합니다.",
+            "createdAt": "<t-169200s iso Z>",
+            "deletedAt": null,
+            "distributedAt": null,
+            "noticeId": "$uuid3",
+            "scheduledAt": "<t+691200s iso Z>",
+            "status": "SCHEDULED",
+            "title": "예약된 공지",
+            "updatedAt": "<t-169200s iso Z>"
+          },
+          {
+            "body": "이미 배포했습니다.",
+            "createdAt": "<t-172800s iso Z>",
+            "deletedAt": "<t+20s iso Z>",
+            "distributedAt": "<t-86340s iso Z>",
+            "noticeId": "$uuid4",
+            "scheduledAt": "<t-86400s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "배포된 공지",
+            "updatedAt": "<t+20s iso Z>"
+          },
+          {
+            "body": "본문 22",
+            "createdAt": "<t-862680s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-871200s iso Z>",
+            "noticeId": "$uuid5",
+            "scheduledAt": "<t-871200s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 22",
+            "updatedAt": "<t-862680s iso Z>"
+          },
+          {
+            "body": "본문 21",
+            "createdAt": "<t-862740s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-874800s iso Z>",
+            "noticeId": "$uuid6",
+            "scheduledAt": "<t-874800s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 21",
+            "updatedAt": "<t-862740s iso Z>"
+          },
+          {
+            "body": "본문 20",
+            "createdAt": "<t-862800s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-878400s iso Z>",
+            "noticeId": "$uuid7",
+            "scheduledAt": "<t-878400s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 20",
+            "updatedAt": "<t-862800s iso Z>"
+          },
+          {
+            "body": "본문 19",
+            "createdAt": "<t-862860s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-882000s iso Z>",
+            "noticeId": "$uuid8",
+            "scheduledAt": "<t-882000s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 19",
+            "updatedAt": "<t-862860s iso Z>"
+          },
+          {
+            "body": "본문 18",
+            "createdAt": "<t-862920s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-885600s iso Z>",
+            "noticeId": "$uuid9",
+            "scheduledAt": "<t-885600s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 18",
+            "updatedAt": "<t-862920s iso Z>"
+          },
+          {
+            "body": "본문 17",
+            "createdAt": "<t-862980s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-889200s iso Z>",
+            "noticeId": "$uuid10",
+            "scheduledAt": "<t-889200s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 17",
+            "updatedAt": "<t-862980s iso Z>"
+          },
+          {
+            "body": "본문 16",
+            "createdAt": "<t-863040s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-892800s iso Z>",
+            "noticeId": "$uuid11",
+            "scheduledAt": "<t-892800s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 16",
+            "updatedAt": "<t-863040s iso Z>"
+          },
+          {
+            "body": "본문 15",
+            "createdAt": "<t-863100s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-896400s iso Z>",
+            "noticeId": "$uuid12",
+            "scheduledAt": "<t-896400s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 15",
+            "updatedAt": "<t-863100s iso Z>"
+          },
+          {
+            "body": "본문 14",
+            "createdAt": "<t-863160s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-900000s iso Z>",
+            "noticeId": "$uuid13",
+            "scheduledAt": "<t-900000s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 14",
+            "updatedAt": "<t-863160s iso Z>"
+          },
+          {
+            "body": "본문 13",
+            "createdAt": "<t-863220s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-903600s iso Z>",
+            "noticeId": "$uuid14",
+            "scheduledAt": "<t-903600s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 13",
+            "updatedAt": "<t-863220s iso Z>"
+          },
+          {
+            "body": "본문 12",
+            "createdAt": "<t-863280s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-907200s iso Z>",
+            "noticeId": "$uuid15",
+            "scheduledAt": "<t-907200s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 12",
+            "updatedAt": "<t-863280s iso Z>"
+          },
+          {
+            "body": "본문 11",
+            "createdAt": "<t-863340s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-910800s iso Z>",
+            "noticeId": "$uuid16",
+            "scheduledAt": "<t-910800s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 11",
+            "updatedAt": "<t-863340s iso Z>"
+          },
+          {
+            "body": "본문 10",
+            "createdAt": "<t-863400s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-914400s iso Z>",
+            "noticeId": "$uuid17",
+            "scheduledAt": "<t-914400s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 10",
+            "updatedAt": "<t-863400s iso Z>"
+          },
+          {
+            "body": "본문 9",
+            "createdAt": "<t-863460s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-918000s iso Z>",
+            "noticeId": "$uuid18",
+            "scheduledAt": "<t-918000s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 9",
+            "updatedAt": "<t-863460s iso Z>"
+          },
+          {
+            "body": "본문 8",
+            "createdAt": "<t-863520s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-921600s iso Z>",
+            "noticeId": "$uuid19",
+            "scheduledAt": "<t-921600s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 8",
+            "updatedAt": "<t-863520s iso Z>"
+          },
+          {
+            "body": "본문 7",
+            "createdAt": "<t-863580s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-925200s iso Z>",
+            "noticeId": "$uuid20",
+            "scheduledAt": "<t-925200s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 7",
+            "updatedAt": "<t-863580s iso Z>"
+          },
+          {
+            "body": "본문 6",
+            "createdAt": "<t-863640s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-928800s iso Z>",
+            "noticeId": "$uuid21",
+            "scheduledAt": "<t-928800s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 6",
+            "updatedAt": "<t-863640s iso Z>"
+          },
+          {
+            "body": "본문 5",
+            "createdAt": "<t-863700s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-932400s iso Z>",
+            "noticeId": "$uuid24",
+            "scheduledAt": "<t-932400s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 5",
+            "updatedAt": "<t-863700s iso Z>"
+          },
+          {
+            "body": "본문 4",
+            "createdAt": "<t-863760s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-936000s iso Z>",
+            "noticeId": "$uuid25",
+            "scheduledAt": "<t-936000s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 4",
+            "updatedAt": "<t-863760s iso Z>"
+          },
+          {
+            "body": "본문 3",
+            "createdAt": "<t-863820s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-939600s iso Z>",
+            "noticeId": "$uuid26",
+            "scheduledAt": "<t-939600s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 3",
+            "updatedAt": "<t-863820s iso Z>"
+          },
+          {
+            "body": "본문 2",
+            "createdAt": "<t-863880s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-943200s iso Z>",
+            "noticeId": "$uuid27",
+            "scheduledAt": "<t-943200s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 2",
+            "updatedAt": "<t-863880s iso Z>"
+          },
+          {
+            "body": "본문 1",
+            "createdAt": "<t-863940s iso Z>",
+            "deletedAt": null,
+            "distributedAt": "<t-946800s iso Z>",
+            "noticeId": "$uuid28",
+            "scheduledAt": "<t-946800s iso Z>",
+            "status": "DISTRIBUTED",
+            "title": "공지 1",
+            "updatedAt": "<t-863940s iso Z>"
+          }
+        ],
+        "pageSize": 100
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid93"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "목록 최종"
+    },
+    {
+      "body": {
+        "auditLogs": [
+          {
+            "action": "NOTICE_CREATED",
+            "actorAdminId": "$uuid96",
+            "actorUsername": "operator",
+            "afterState": {
+              "bodySha256": "3e23e8160039594a33894f6564e1b1348bbd7a0088d42c4acb73eeaed59c009d",
+              "scheduledAt": "<t+691200s iso Z>",
+              "title": "1"
+            },
+            "auditLogId": "$uuid95",
+            "beforeState": {},
+            "occurredAt": "<t+0s iso Z>",
+            "reason": null,
+            "requestId": "$uuid50",
+            "targetId": "$uuid51",
+            "targetType": "NOTICE"
+          },
+          {
+            "action": "NOTICE_CREATED",
+            "actorAdminId": "$uuid96",
+            "actorUsername": "operator",
+            "afterState": {
+              "bodySha256": "06db896f1d0ace00fe49534e596595ef50836b2f9df43857444f10a1a8a1eb73",
+              "scheduledAt": "<t-240s iso Z>",
+              "title": "경계"
+            },
+            "auditLogId": "$uuid97",
+            "beforeState": {},
+            "occurredAt": "<t+0s iso Z>",
+            "reason": null,
+            "requestId": "$uuid57",
+            "targetId": "$uuid58",
+            "targetType": "NOTICE"
+          },
+          {
+            "action": "NOTICE_CREATED",
+            "actorAdminId": "$uuid96",
+            "actorUsername": "operator",
+            "afterState": {
+              "bodySha256": "9118bb57091cfe7374e011b9979c8fc88e72d4074c0959b45eda164f3bc77857",
+              "scheduledAt": "<t+691200s iso Z>",
+              "title": "오프셋 예약"
+            },
+            "auditLogId": "$uuid98",
+            "beforeState": {},
+            "occurredAt": "<t+0s iso Z>",
+            "reason": null,
+            "requestId": "$uuid59",
+            "targetId": "$uuid60",
+            "targetType": "NOTICE"
+          },
+          {
+            "action": "NOTICE_CREATED",
+            "actorAdminId": "$uuid96",
+            "actorUsername": "operator",
+            "afterState": {
+              "bodySha256": "9118bb57091cfe7374e011b9979c8fc88e72d4074c0959b45eda164f3bc77857",
+              "scheduledAt": "<t+723600s iso Z>",
+              "title": "소수 초"
+            },
+            "auditLogId": "$uuid99",
+            "beforeState": {},
+            "occurredAt": "<t+5s iso Z>",
+            "reason": null,
+            "requestId": "$uuid61",
+            "targetId": "$uuid62",
+            "targetType": "NOTICE"
+          },
+          {
+            "action": "NOTICE_CREATED",
+            "actorAdminId": "$uuid96",
+            "actorUsername": "operator",
+            "afterState": {
+              "bodySha256": "2b1eaa96ca668bb67d2b1b832b7874aa21a39b86a8f94fdbbaa4cec1159d4202",
+              "scheduledAt": "<t+691200s iso Z>",
+              "title": "가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가"
+            },
+            "auditLogId": "$uuid100",
+            "beforeState": {},
+            "occurredAt": "<t+5s iso Z>",
+            "reason": null,
+            "requestId": "$uuid63",
+            "targetId": "$uuid64",
+            "targetType": "NOTICE"
+          },
+          {
+            "action": "NOTICE_CREATED",
+            "actorAdminId": "$uuid96",
+            "actorUsername": "operator",
+            "afterState": {
+              "bodySha256": "7bf6b3d9dfe51ae2c216b950cc484b2c6edaf7475f0e54ff3ca37a855b48ff57",
+              "scheduledAt": "<t+691200s iso Z>",
+              "title": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+            },
+            "auditLogId": "$uuid101",
+            "beforeState": {},
+            "occurredAt": "<t+5s iso Z>",
+            "reason": null,
+            "requestId": "$uuid65",
+            "targetId": "$uuid66",
+            "targetType": "NOTICE"
+          }
+        ],
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 100
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid94"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "감사 로그 공지 등록"
+    },
+    {
+      "body": {
+        "auditLogs": [
+          {
+            "action": "NOTICE_UPDATED",
+            "actorAdminId": "$uuid96",
+            "actorUsername": "operator",
+            "afterState": {
+              "bodySha256": "6c7188c633baa17f384527728a492451d71aac532e187aa283800840893c1a0d",
+              "scheduledAt": "<t+777600s iso Z>",
+              "title": "수정된 제목"
+            },
+            "auditLogId": "$uuid103",
+            "beforeState": {
+              "bodySha256": "9118bb57091cfe7374e011b9979c8fc88e72d4074c0959b45eda164f3bc77857",
+              "scheduledAt": "<t+691200s iso Z>",
+              "title": "오프셋 예약"
+            },
+            "occurredAt": "<t+10s iso Z>",
+            "reason": null,
+            "requestId": "$uuid71",
+            "targetId": "$uuid60",
+            "targetType": "NOTICE"
+          }
+        ],
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid102"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "감사 로그 공지 수정"
+    },
+    {
+      "body": {
+        "auditLogs": [
+          {
+            "action": "NOTICE_DELETED",
+            "actorAdminId": "$uuid96",
+            "actorUsername": "operator",
+            "afterState": {
+              "bodySha256": "06db896f1d0ace00fe49534e596595ef50836b2f9df43857444f10a1a8a1eb73",
+              "deletedAt": "<t+15s iso Z>",
+              "scheduledAt": "<t-240s iso Z>",
+              "title": "경계"
+            },
+            "auditLogId": "$uuid105",
+            "beforeState": {
+              "bodySha256": "06db896f1d0ace00fe49534e596595ef50836b2f9df43857444f10a1a8a1eb73",
+              "deletedAt": null,
+              "scheduledAt": "<t-240s iso Z>",
+              "title": "경계"
+            },
+            "occurredAt": "<t+15s iso Z>",
+            "reason": "잘못 등록",
+            "requestId": "$uuid85",
+            "targetId": "$uuid58",
+            "targetType": "NOTICE"
+          },
+          {
+            "action": "NOTICE_DELETED",
+            "actorAdminId": "$uuid96",
+            "actorUsername": "operator",
+            "afterState": {
+              "bodySha256": "9118bb57091cfe7374e011b9979c8fc88e72d4074c0959b45eda164f3bc77857",
+              "deletedAt": "<t+15s iso Z>",
+              "scheduledAt": "<t+723600s iso Z>",
+              "title": "소수 초"
+            },
+            "auditLogId": "$uuid106",
+            "beforeState": {
+              "bodySha256": "9118bb57091cfe7374e011b9979c8fc88e72d4074c0959b45eda164f3bc77857",
+              "deletedAt": null,
+              "scheduledAt": "<t+723600s iso Z>",
+              "title": "소수 초"
+            },
+            "occurredAt": "<t+15s iso Z>",
+            "reason": "가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가",
+            "requestId": "$uuid87",
+            "targetId": "$uuid62",
+            "targetType": "NOTICE"
+          },
+          {
+            "action": "NOTICE_DELETED",
+            "actorAdminId": "$uuid96",
+            "actorUsername": "operator",
+            "afterState": {
+              "bodySha256": "04a26bb7f1c4f8515b4a82c6635d23d256a36cf08507baef17b5c1e97fd555b8",
+              "deletedAt": "<t+20s iso Z>",
+              "scheduledAt": "<t-86400s iso Z>",
+              "title": "배포된 공지"
+            },
+            "auditLogId": "$uuid107",
+            "beforeState": {
+              "bodySha256": "04a26bb7f1c4f8515b4a82c6635d23d256a36cf08507baef17b5c1e97fd555b8",
+              "deletedAt": null,
+              "scheduledAt": "<t-86400s iso Z>",
+              "title": "배포된 공지"
+            },
+            "occurredAt": "<t+20s iso Z>",
+            "reason": "배포 후 숨김",
+            "requestId": "$uuid88",
+            "targetId": "$uuid4",
+            "targetType": "NOTICE"
+          }
+        ],
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid104"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "감사 로그 공지 삭제"
+    },
+    {
+      "body": {
+        "auditLogs": [
+          {
+            "action": "NOTICE_CREATED",
+            "actorAdminId": "$uuid96",
+            "actorUsername": "operator",
+            "afterState": {
+              "bodySha256": "3e23e8160039594a33894f6564e1b1348bbd7a0088d42c4acb73eeaed59c009d",
+              "scheduledAt": "<t+691200s iso Z>",
+              "title": "1"
+            },
+            "auditLogId": "$uuid95",
+            "beforeState": {},
+            "occurredAt": "<t+0s iso Z>",
+            "reason": null,
+            "requestId": "$uuid50",
+            "targetId": "$uuid51",
+            "targetType": "NOTICE"
+          },
+          {
+            "action": "NOTICE_CREATED",
+            "actorAdminId": "$uuid96",
+            "actorUsername": "operator",
+            "afterState": {
+              "bodySha256": "06db896f1d0ace00fe49534e596595ef50836b2f9df43857444f10a1a8a1eb73",
+              "scheduledAt": "<t-240s iso Z>",
+              "title": "경계"
+            },
+            "auditLogId": "$uuid97",
+            "beforeState": {},
+            "occurredAt": "<t+0s iso Z>",
+            "reason": null,
+            "requestId": "$uuid57",
+            "targetId": "$uuid58",
+            "targetType": "NOTICE"
+          },
+          {
+            "action": "NOTICE_CREATED",
+            "actorAdminId": "$uuid96",
+            "actorUsername": "operator",
+            "afterState": {
+              "bodySha256": "9118bb57091cfe7374e011b9979c8fc88e72d4074c0959b45eda164f3bc77857",
+              "scheduledAt": "<t+691200s iso Z>",
+              "title": "오프셋 예약"
+            },
+            "auditLogId": "$uuid98",
+            "beforeState": {},
+            "occurredAt": "<t+0s iso Z>",
+            "reason": null,
+            "requestId": "$uuid59",
+            "targetId": "$uuid60",
+            "targetType": "NOTICE"
+          },
+          {
+            "action": "NOTICE_CREATED",
+            "actorAdminId": "$uuid96",
+            "actorUsername": "operator",
+            "afterState": {
+              "bodySha256": "9118bb57091cfe7374e011b9979c8fc88e72d4074c0959b45eda164f3bc77857",
+              "scheduledAt": "<t+723600s iso Z>",
+              "title": "소수 초"
+            },
+            "auditLogId": "$uuid99",
+            "beforeState": {},
+            "occurredAt": "<t+5s iso Z>",
+            "reason": null,
+            "requestId": "$uuid61",
+            "targetId": "$uuid62",
+            "targetType": "NOTICE"
+          },
+          {
+            "action": "NOTICE_CREATED",
+            "actorAdminId": "$uuid96",
+            "actorUsername": "operator",
+            "afterState": {
+              "bodySha256": "2b1eaa96ca668bb67d2b1b832b7874aa21a39b86a8f94fdbbaa4cec1159d4202",
+              "scheduledAt": "<t+691200s iso Z>",
+              "title": "가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가"
+            },
+            "auditLogId": "$uuid100",
+            "beforeState": {},
+            "occurredAt": "<t+5s iso Z>",
+            "reason": null,
+            "requestId": "$uuid63",
+            "targetId": "$uuid64",
+            "targetType": "NOTICE"
+          },
+          {
+            "action": "NOTICE_CREATED",
+            "actorAdminId": "$uuid96",
+            "actorUsername": "operator",
+            "afterState": {
+              "bodySha256": "7bf6b3d9dfe51ae2c216b950cc484b2c6edaf7475f0e54ff3ca37a855b48ff57",
+              "scheduledAt": "<t+691200s iso Z>",
+              "title": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+            },
+            "auditLogId": "$uuid101",
+            "beforeState": {},
+            "occurredAt": "<t+5s iso Z>",
+            "reason": null,
+            "requestId": "$uuid65",
+            "targetId": "$uuid66",
+            "targetType": "NOTICE"
+          },
+          {
+            "action": "NOTICE_UPDATED",
+            "actorAdminId": "$uuid96",
+            "actorUsername": "operator",
+            "afterState": {
+              "bodySha256": "6c7188c633baa17f384527728a492451d71aac532e187aa283800840893c1a0d",
+              "scheduledAt": "<t+777600s iso Z>",
+              "title": "수정된 제목"
+            },
+            "auditLogId": "$uuid103",
+            "beforeState": {
+              "bodySha256": "9118bb57091cfe7374e011b9979c8fc88e72d4074c0959b45eda164f3bc77857",
+              "scheduledAt": "<t+691200s iso Z>",
+              "title": "오프셋 예약"
+            },
+            "occurredAt": "<t+10s iso Z>",
+            "reason": null,
+            "requestId": "$uuid71",
+            "targetId": "$uuid60",
+            "targetType": "NOTICE"
+          },
+          {
+            "action": "NOTICE_DELETED",
+            "actorAdminId": "$uuid96",
+            "actorUsername": "operator",
+            "afterState": {
+              "bodySha256": "06db896f1d0ace00fe49534e596595ef50836b2f9df43857444f10a1a8a1eb73",
+              "deletedAt": "<t+15s iso Z>",
+              "scheduledAt": "<t-240s iso Z>",
+              "title": "경계"
+            },
+            "auditLogId": "$uuid105",
+            "beforeState": {
+              "bodySha256": "06db896f1d0ace00fe49534e596595ef50836b2f9df43857444f10a1a8a1eb73",
+              "deletedAt": null,
+              "scheduledAt": "<t-240s iso Z>",
+              "title": "경계"
+            },
+            "occurredAt": "<t+15s iso Z>",
+            "reason": "잘못 등록",
+            "requestId": "$uuid85",
+            "targetId": "$uuid58",
+            "targetType": "NOTICE"
+          },
+          {
+            "action": "NOTICE_DELETED",
+            "actorAdminId": "$uuid96",
+            "actorUsername": "operator",
+            "afterState": {
+              "bodySha256": "9118bb57091cfe7374e011b9979c8fc88e72d4074c0959b45eda164f3bc77857",
+              "deletedAt": "<t+15s iso Z>",
+              "scheduledAt": "<t+723600s iso Z>",
+              "title": "소수 초"
+            },
+            "auditLogId": "$uuid106",
+            "beforeState": {
+              "bodySha256": "9118bb57091cfe7374e011b9979c8fc88e72d4074c0959b45eda164f3bc77857",
+              "deletedAt": null,
+              "scheduledAt": "<t+723600s iso Z>",
+              "title": "소수 초"
+            },
+            "occurredAt": "<t+15s iso Z>",
+            "reason": "가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가",
+            "requestId": "$uuid87",
+            "targetId": "$uuid62",
+            "targetType": "NOTICE"
+          },
+          {
+            "action": "NOTICE_DELETED",
+            "actorAdminId": "$uuid96",
+            "actorUsername": "operator",
+            "afterState": {
+              "bodySha256": "04a26bb7f1c4f8515b4a82c6635d23d256a36cf08507baef17b5c1e97fd555b8",
+              "deletedAt": "<t+20s iso Z>",
+              "scheduledAt": "<t-86400s iso Z>",
+              "title": "배포된 공지"
+            },
+            "auditLogId": "$uuid107",
+            "beforeState": {
+              "bodySha256": "04a26bb7f1c4f8515b4a82c6635d23d256a36cf08507baef17b5c1e97fd555b8",
+              "deletedAt": null,
+              "scheduledAt": "<t-86400s iso Z>",
+              "title": "배포된 공지"
+            },
+            "occurredAt": "<t+20s iso Z>",
+            "reason": "배포 후 숨김",
+            "requestId": "$uuid88",
+            "targetId": "$uuid4",
+            "targetType": "NOTICE"
+          }
+        ],
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 100
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid108"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "감사 로그 대상 NOTICE"
+    }
+  ]
+}
