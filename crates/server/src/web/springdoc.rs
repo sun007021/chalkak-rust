@@ -27,7 +27,7 @@ use chalkak_app::web::{ApiError, marker};
 use chalkak_core::log::Logger;
 use chalkak_http::{Handler, Method, Middleware, Request, Response};
 
-const API_DOCS: &str = include_str!("../../assets/springdoc/api-docs.json");
+pub(super) const API_DOCS: &str = include_str!("../../assets/springdoc/api-docs.json");
 const API_DOCS_YAML: &str = include_str!("../../assets/springdoc/api-docs.yaml");
 const SWAGGER_CONFIG: &str = include_str!("../../assets/springdoc/swagger-config.json");
 const GROUPS: [(&str, &str); 3] = [

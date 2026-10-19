@@ -15,10 +15,14 @@ tags:
   description: 내 알림함 API
 - name: Internal Signature Processing
   description: 사인 이미지 처리 내부 콜백 API
+- name: Admin Analytics
+  description: 관리자 사용자 지표 API
 - name: Users
   description: 사용자 API
 - name: Admin Users
   description: 관리자 사용자 조회 API
+- name: Admin Topic Push Schedules
+  description: 관리자 주제 푸시 발송 시각 설정
 - name: Admin Audit Logs
   description: 읽기 전용 관리자 감사 로그 API
 - name: Auth
@@ -33,8 +37,14 @@ tags:
   description: 관리자 피드백 조회 API
 - name: Feedbacks
   description: 사용자 피드백 API
+- name: Admin Notices
+  description: 관리자 공지 관리
 - name: Admin Posts
   description: 관리자 게시물 검수 조회 API
+- name: NotificationSettings
+  description: 내 푸시 수신 설정 API
+- name: PushDevices
+  description: 현재 로그인 기기의 푸시 등록 API
 - name: Posts
   description: 게시물 API
 paths:
@@ -104,6 +114,44 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: 업로드 이미지를 찾을 수 없음
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      security:
+      - accessToken: []
+  /api/v1/push-devices/current:
+    put:
+      tags:
+      - PushDevices
+      summary: 현재 로그인 기기 등록·갱신
+      description: 회원과 로그인 ID는 액세스 토큰에서 식별합니다. 같은 로그인에서 반복 등록해도 최초 등록 시각을 유지합니다. 다른
+        로그인이 같은 FCM 토큰을 사용 중이면 이전 연결을 비활성화합니다.
+      operationId: registerCurrentDevice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PushDeviceRegistrationRequest"
+        required: true
+      responses:
+        "204":
+          description: 등록·갱신 성공
+        "400":
+          description: FCM 토큰 누락 또는 잘못된 요청 본문
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "UNAUTHORIZED: 유효하지 않은 인증 또는 탈퇴 회원. REAUTHENTICATION_REQUIRED:\
+            \ 로그인 ID가 없거나 유효한 로그인이 아니므로 다시 로그인 필요"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: 회원 액세스 토큰이 아닌 인증 정보
           content:
             application/json:
               schema:
@@ -462,6 +510,89 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/admin/topic-push-schedules/{scheduleId}:
+    put:
+      tags:
+      - Admin Topic Push Schedules
+      summary: 주제 푸시 설정 수정
+      description: 기존 설정의 KST 발송 시각을 변경합니다. 다른 설정과 같은 시각으로 변경할 수 없으며 기존 설정과 동일한 시각의
+        요청은 허용합니다. 변경 이후 도래하는 시각부터 적용하고 지난 시각은 소급 실행하지 않습니다. 이 요청 자체는 푸시를 발송하지 않습니다.
+      operationId: updateSchedule
+      parameters:
+      - name: scheduleId
+        in: path
+        description: 주제 푸시 설정 ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TopicPushScheduleRequest"
+        required: true
+      responses:
+        "200":
+          description: 수정 성공
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TopicPushScheduleResponse"
+        "400":
+          description: "잘못된 ID, 필수 값 누락, 잘못된 시각 또는 중복 시각"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: 관리자 API 접근 불가
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: 설정 없음
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags:
+      - Admin Topic Push Schedules
+      summary: 주제 푸시 설정 삭제
+      description: 발송 시각 설정을 삭제합니다. 해당 설정의 향후 정시 발송을 중단하며 이미 SQS에 발행한 작업은 취소하지 않습니다.
+        요청 본문은 없습니다.
+      operationId: deleteSchedule
+      parameters:
+      - name: scheduleId
+        in: path
+        description: 주제 푸시 설정 ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: 삭제 성공
+        "400":
+          description: 잘못된 ID
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: 관리자 API 접근 불가
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: 설정 없음
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /api/v1/admin/posts/{postId}/moderation:
     put:
       tags:
@@ -507,6 +638,136 @@ paths:
           description: 게시물을 찾을 수 없음
           content:
             application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/admin/notices/{noticeId}:
+    get:
+      tags:
+      - Admin Notices
+      summary: 공지 상세 조회
+      description: 공지 한 건을 조회합니다.
+      operationId: getNotice
+      parameters:
+      - name: noticeId
+        in: path
+        description: 공지 ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AdminNoticeResponse"
+        "400":
+          description: 잘못된 ID
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: 관리자 API 접근 불가
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: 공지 없음
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      tags:
+      - Admin Notices
+      summary: 공지 수정
+      description: "배포 전 공지의 제목·본문·예약 시각을 수정합니다. 검증 기준은 등록과 같습니다. 배포된 공지는 수정할 수 없으\
+        며, 같은 내용으로 수정하면 변경 없이 현재 공지를 반환합니다."
+      operationId: updateNotice
+      parameters:
+      - name: noticeId
+        in: path
+        description: 공지 ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminNoticeRequest"
+        required: true
+      responses:
+        "200":
+          description: 수정 성공
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AdminNoticeResponse"
+        "400":
+          description: "잘못된 ID, 필수 값 누락, 제목·본문 길이 초과, 5분 넘게 과거인 예약 시각, 감사 로그에 저장할\
+            \ 수 없는 민감 정보 포함 또는 배포된 공지"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: 관리자 API 접근 불가
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: 공지 없음
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags:
+      - Admin Notices
+      summary: 공지 삭제
+      description: "사유와 함께 공지를 삭제합니다. 배포 전 공지는 발송이 취소되고, 배포된 공지는 회원 알림함에서 숨기며 아직 보\
+        내지 않은 푸시도 보내지 않습니다. 이미 기기에 표시된 푸시는 회수하지 않습니다. 이미 삭제한 공지를 다시 삭제하면 최초 결과를 유지\
+        합니다."
+      operationId: deleteNotice
+      parameters:
+      - name: noticeId
+        in: path
+        description: 공지 ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminNoticeDeletionRequest"
+        required: true
+      responses:
+        "204":
+          description: 삭제 성공
+        "400":
+          description: "잘못된 ID, 사유 누락·공백 또는 500자 초과"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: 관리자 API 접근 불가
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: 공지 없음
+          content:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
   /internal/v1/signature-processing/{uploadId}/upload-urls:
@@ -1189,8 +1450,9 @@ paths:
       tags:
       - Auth
       summary: 로그아웃
-      description: "리프레시 토큰이 가리키는 기기 세션 하나만 끊는다. 알 수 없거나 이미 폐기된 토큰에도 204를 반환한다. 실패\
-        를 알리면 토큰의 존재 여부가 새어 나가고, 재시도한 클라이언트가 로그아웃하지 못하고 막히기 때문이다"
+      description: "리프레시 토큰이 가리키는 기기 세션 하나만 끊는다. 해당 로그인에 연결된 푸시 기기를 비활성화하고 FCM 토큰을\
+        \ 제거한다. 다른 로그인 기기는 유지한다. 알 수 없거나 이미 폐기된 토큰에도 204를 반환한다. 실패를 알리면 토큰의 존재 여부가\
+        \ 새어 나가고, 재시도한 클라이언트가 로그아웃하지 못하고 막히기 때문이다"
       operationId: logout
       requestBody:
         content:
@@ -1328,6 +1590,139 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/admin/topic-push-schedules:
+    get:
+      tags:
+      - Admin Topic Push Schedules
+      summary: 주제 푸시 설정 목록 조회
+      description: 등록된 설정 전체를 KST 발송 시각 오름차순으로 조회합니다. 설정이 없으면 빈 목록을 반환합니다.
+      operationId: getSchedules
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TopicPushScheduleListResponse"
+        "403":
+          description: 관리자 API 접근 불가
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags:
+      - Admin Topic Push Schedules
+      summary: 주제 푸시 설정 생성
+      description: "KST 발송 시각 하나를 등록합니다. 같은 시각은 중복 등록할 수 없습니다. 등록된 설정은 등록 이후 도래하는\
+        \ 시각부터 적용하고, 지난 시각은 소급 실행하지 않습니다. 이 요청 자체는 푸시를 발송하지 않습니다."
+      operationId: createSchedule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TopicPushScheduleRequest"
+        required: true
+      responses:
+        "201":
+          description: 등록 성공
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TopicPushScheduleResponse"
+        "400":
+          description: "필수 값 누락, 잘못된 시각 또는 중복 시각"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: 관리자 API 접근 불가
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/admin/notices:
+    get:
+      tags:
+      - Admin Notices
+      summary: 공지 목록 조회
+      description: 등록한 공지를 등록 최신순으로 페이지 단위로 조회합니다. 공지가 없으면 빈 목록을 반환합니다.
+      operationId: getNotices
+      parameters:
+      - name: page
+        in: query
+        description: 페이지 번호
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 1
+          description: 페이지 번호
+          minimum: 1
+      - name: pageSize
+        in: query
+        description: 페이지당 공지 수
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 20
+          description: 페이지당 공지 수
+          maximum: 100
+          minimum: 1
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AdminNoticeListResponse"
+        "400":
+          description: 잘못된 페이지 조건
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: 관리자 API 접근 불가
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags:
+      - Admin Notices
+      summary: 공지 등록
+      description: 공지를 예약 시각과 함께 등록합니다. 즉시 발송은 현재 시각을 예약 시각으로 전달합니다. 이 요청 자체는 푸시를
+        발송하지 않습니다.
+      operationId: createNotice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminNoticeRequest"
+        required: true
+      responses:
+        "201":
+          description: 등록 성공
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AdminNoticeResponse"
+        "400":
+          description: "필수 값 누락, 제목·본문 길이 초과, 5분 넘게 과거인 예약 시각 또는 감사 로그에 저장할 수 없는 민\
+            감 정보 포함"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: 관리자 API 접근 불가
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /api/v1/admin/auth/refresh:
     post:
       tags:
@@ -1418,12 +1813,40 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/admin/analytics/aggregations:
+    post:
+      tags:
+      - Admin Analytics
+      summary: 사용자 지표 수동 집계
+      description: 집계 로그를 다시 남기는 요청이다. 과거 그래프의 값은 바뀌지 않는다.
+      operationId: startUserMetricsAggregation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminUserMetricsAggregationRequest"
+        required: true
+      responses:
+        "202":
+          description: 백그라운드 집계 시작
+        "400":
+          description: "날짜 누락·형식 오류, 오늘 이후 날짜 또는 이미 진행 중인 집계(errorCode USER_METRICS_AGGREGATION_IN_PROGRESS)"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: 관리자 API 접근 불가
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /api/v1/notifications/{notificationId}/read:
     patch:
       tags:
       - Notifications
       summary: 내 알림 읽음 처리
-      description: 삭제된 게시물의 알림은 처리할 수 없습니다. 반복 호출해도 처음 읽은 시각을 유지합니다.
+      description: 30일이 지난 알림과 삭제된 게시물의 알림은 처리할 수 없습니다. 반복 호출해도 처음 읽은 시각을 유지합니다.
       operationId: markRead
       parameters:
       - name: notificationId
@@ -1461,13 +1884,78 @@ paths:
       tags:
       - Notifications
       summary: 내 알림 모두 읽음 처리
-      description: 알림함에 표시되는 미읽음 알림만 처리합니다.
+      description: 30일이 지나지 않았고 알림함에 표시되는 미읽음 알림만 처리합니다.
       operationId: markAllRead
       responses:
         "204":
           description: 읽음 처리 성공
         "401":
           description: 유효하지 않은 인증 정보
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      security:
+      - accessToken: []
+  /api/v1/notification-settings:
+    get:
+      tags:
+      - NotificationSettings
+      summary: 내 푸시 수신 설정 조회
+      description: 회원 계정에 저장된 주제·승인·반려 푸시 수신 설정을 조회합니다. 최초 설정은 두 항목 모두 true이며 회원의
+        모든 기기에 공통으로 적용됩니다. 운영체제의 알림 권한을 나타내지는 않습니다.
+      operationId: getSettings
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NotificationSettingsResponse"
+        "401":
+          description: "UNAUTHORIZED: 유효하지 않은 인증 정보 또는 탈퇴 회원"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: 회원 액세스 토큰이 아닌 인증 정보
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      security:
+      - accessToken: []
+    patch:
+      tags:
+      - NotificationSettings
+      summary: 내 푸시 수신 설정 수정
+      description: "값을 전달한 설정만 변경합니다. 생략 또는 null인 항목은 기존 값을 유지하며, 변경할 설정이 하나 이상 필요\
+        합니다. 같은 회원의 모든 기기에 공통으로 적용하며 알림함에는 영향을 주지 않습니다. 정지 회원도 수정할 수 있습니다."
+      operationId: updateSettings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationSettingsUpdateRequest"
+        required: true
+      responses:
+        "204":
+          description: 수정 성공
+        "400":
+          description: "BUSINESS_ERROR: 변경할 설정이 없거나 잘못된 요청 형식"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "UNAUTHORIZED: 유효하지 않은 인증 정보 또는 탈퇴 회원"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: 회원 액세스 토큰이 아닌 인증 정보
           content:
             application/json:
               schema:
@@ -1687,7 +2175,7 @@ paths:
       tags:
       - Notifications
       summary: 내 알림 목록 조회
-      description: 게시물이 삭제된 알림은 제외합니다.
+      description: 사건 발생 시각부터 30일이 지난 알림과 게시물이 삭제된 알림은 제외합니다. 정확한 30일 경계 시각에는 표시합니다.
       operationId: getNotifications
       parameters:
       - name: page
@@ -1741,8 +2229,8 @@ paths:
       tags:
       - Notifications
       summary: 내 알림 상세 조회
-      description: 반려 알림에는 원본 사진과 반려 사유를 포함합니다. 삭제된 게시물의 알림은 조회할 수 없습니다. 조회만으로 읽음
-        처리하지 않습니다.
+      description: 반려 알림에는 원본 사진과 반려 사유를 포함합니다. 30일이 지난 알림과 삭제된 게시물의 알림은 조회할 수 없습니다.
+        조회만으로 읽음 처리하지 않습니다.
       operationId: getNotification
       parameters:
       - name: notificationId
@@ -1784,7 +2272,7 @@ paths:
       tags:
       - Notifications
       summary: 내 미읽음 알림 여부 조회
-      description: 알림함에 표시되는 알림을 기준으로 판단합니다.
+      description: 30일이 지나지 않았고 알림함에 표시되는 알림을 기준으로 판단합니다.
       operationId: getUnreadStatus
       responses:
         "200":
@@ -2248,6 +2736,12 @@ paths:
           - TOPIC_CREATED
           - TOPIC_UPDATED
           - TOPIC_DELETED
+          - TOPIC_PUSH_SCHEDULE_CREATED
+          - TOPIC_PUSH_SCHEDULE_UPDATED
+          - TOPIC_PUSH_SCHEDULE_DELETED
+          - NOTICE_CREATED
+          - NOTICE_UPDATED
+          - NOTICE_DELETED
       - name: targetType
         in: query
         description: 작업 대상 유형
@@ -2259,6 +2753,8 @@ paths:
           - POST
           - USER
           - TOPIC
+          - TOPIC_PUSH_SCHEDULE
+          - NOTICE
       - name: targetId
         in: query
         description: 작업 대상 ID
@@ -2343,6 +2839,8 @@ paths:
       tags:
       - Users
       summary: 회원 탈퇴
+      description: 회원 탈퇴와 함께 모든 로그인 RT를 폐기하고 연결된 푸시 기기를 비활성화하며 FCM 토큰을 제거합니다. 별도 기기
+        해제 요청은 필요하지 않습니다.
       operationId: withdraw
       responses:
         "204":
@@ -2379,6 +2877,14 @@ components:
       properties:
         signatureOriginalImageUrl:
           type: string
+    PushDeviceRegistrationRequest:
+      type: object
+      properties:
+        fcmToken:
+          type: string
+          minLength: 1
+      required:
+      - fcmToken
     PostUpdateRequest:
       type: object
       properties:
@@ -2486,6 +2992,33 @@ components:
         rejected:
           type: integer
           format: int64
+    TopicPushScheduleRequest:
+      type: object
+      properties:
+        sendTime:
+          type: string
+          format: time
+          description: KST 기준 발송 시각. 날짜·시간대 없이 HH:mm:ss 형식으로 전달하며 초는 00이어야 합니다.
+          example: 09:00:00
+      required:
+      - sendTime
+    TopicPushScheduleResponse:
+      type: object
+      properties:
+        scheduleId:
+          type: string
+          format: uuid
+        sendTime:
+          type: string
+          format: time
+          description: KST 기준 발송 시각
+          example: 09:00:00
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
     AdminPostModerationRequest:
       type: object
       properties:
@@ -2526,6 +3059,67 @@ components:
           type:
           - string
           - "null"
+    AdminNoticeRequest:
+      type: object
+      description: 관리자 공지 등록 요청
+      properties:
+        title:
+          type: string
+          description: 공지 제목. 앞뒤 공백을 제거한 뒤 1~50자
+          example: 서비스 점검 안내
+          minLength: 1
+        body:
+          type: string
+          description: 공지 본문. 앞뒤 공백을 제거한 뒤 1~500자
+          example: 10월 20일 02:00부터 04:00까지 서비스 점검이 진행됩니다.
+          minLength: 1
+        scheduledAt:
+          type: string
+          format: date-time
+          description: "발송 예약 시각. 즉시 발송은 현재 시각을 전달하며, 현재보다 5분 넘게 과거인 시각은 거절합니다."
+          example: 2026-10-19T09:00:00Z
+      required:
+      - body
+      - scheduledAt
+      - title
+    AdminNoticeResponse:
+      type: object
+      properties:
+        noticeId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        body:
+          type: string
+        scheduledAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          description: 회원 알림함 배포 상태. 예약 시각이 지나 알림함에 배포되면 DISTRIBUTED
+          enum:
+          - SCHEDULED
+          - DISTRIBUTED
+        distributedAt:
+          type:
+          - string
+          - "null"
+          format: date-time
+          description: 회원 알림함에 배포한 시각. 배포 전이면 null
+        deletedAt:
+          type:
+          - string
+          - "null"
+          format: date-time
+          description: "공지를 삭제한 시각. 삭제하지 않았으면 null. 배포 전 삭제는 발송 취소, 배포 후 삭제는 회원 알림\
+            함에서 숨김"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
     SignatureProcessingUploadUrlsResponse:
       type: object
       properties:
@@ -2942,6 +3536,30 @@ components:
           format: int64
           description: 발급 시점부터의 리프레시 토큰 유효 시간(초)
           example: 2592000
+    AdminUserMetricsAggregationRequest:
+      type: object
+      description: 사용자 지표 수동 집계 요청
+      properties:
+        metricDate:
+          type: string
+          format: date
+          description: 집계할 KST 날짜. 오늘 이후는 집계할 수 없다
+          example: 2026-10-12
+      required:
+      - metricDate
+    NotificationSettingsUpdateRequest:
+      type: object
+      properties:
+        topicPushEnabled:
+          type:
+          - boolean
+          - "null"
+          description: 주제 푸시 수신 여부. 생략 또는 null이면 기존 값을 유지합니다.
+        moderationPushEnabled:
+          type:
+          - boolean
+          - "null"
+          description: 승인·반려 푸시 수신 여부. 생략 또는 null이면 기존 값을 유지합니다.
     AdminUserStatusUpdateRequest:
       type: object
       description: 관리자 사용자 상태 변경 요청
@@ -3194,6 +3812,23 @@ components:
           enum:
           - POST_APPROVED
           - POST_REJECTED
+          - TOPIC
+          - NOTICE
+        sourceType:
+          type:
+          - string
+          - "null"
+          description: 관련 대상 종류. 현재 승인·반려는 POST이며 대상이 없으면 null
+          enum:
+          - POST
+          - TOPIC
+          - NOTICE
+        sourceId:
+          type:
+          - string
+          - "null"
+          format: uuid
+          description: 관련 대상 ID. 승인 알림은 이 게시물 ID로 이동하며 알림 ID와 구분
         title:
           type: string
         body:
@@ -3220,6 +3855,8 @@ components:
           enum:
           - POST_APPROVED
           - POST_REJECTED
+          - TOPIC
+          - NOTICE
         title:
           type: string
         body:
@@ -3239,6 +3876,15 @@ components:
       properties:
         hasUnread:
           type: boolean
+    NotificationSettingsResponse:
+      type: object
+      properties:
+        topicPushEnabled:
+          type: boolean
+          description: 주제 푸시 수신 여부
+        moderationPushEnabled:
+          type: boolean
+          description: 게시물 승인·반려 결과 푸시 수신 여부
     AdminUserListItem:
       type: object
       properties:
@@ -3377,6 +4023,13 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/AdminTopicDetailResponse"
+    TopicPushScheduleListResponse:
+      type: object
+      properties:
+        schedules:
+          type: array
+          items:
+            $ref: "#/components/schemas/TopicPushScheduleResponse"
     AdminPostListAuthor:
       type: object
       properties:
@@ -3635,6 +4288,22 @@ components:
           - string
           - "null"
           format: date-time
+    AdminNoticeListResponse:
+      type: object
+      description: 관리자 공지 목록. 등록 최신순으로 정렬합니다.
+      properties:
+        currentPage:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        hasNext:
+          type: boolean
+        notices:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminNoticeResponse"
     AdminFeedbackListAuthor:
       type: object
       properties:
@@ -3728,12 +4397,20 @@ components:
           - TOPIC_CREATED
           - TOPIC_UPDATED
           - TOPIC_DELETED
+          - TOPIC_PUSH_SCHEDULE_CREATED
+          - TOPIC_PUSH_SCHEDULE_UPDATED
+          - TOPIC_PUSH_SCHEDULE_DELETED
+          - NOTICE_CREATED
+          - NOTICE_UPDATED
+          - NOTICE_DELETED
         targetType:
           type: string
           enum:
           - POST
           - USER
           - TOPIC
+          - TOPIC_PUSH_SCHEDULE
+          - NOTICE
         targetId:
           type: string
           format: uuid
@@ -3774,6 +4451,18 @@ components:
           example: 운영 정책 위반
           maxLength: 500
           minLength: 1
+      required:
+      - reason
+    AdminNoticeDeletionRequest:
+      type: object
+      description: 관리자 공지 삭제 요청
+      properties:
+        reason:
+          type: string
+          description: 삭제 사유
+          example: 점검 일정 취소
+          maxLength: 500
+          minLength: 0
       required:
       - reason
   securitySchemes:

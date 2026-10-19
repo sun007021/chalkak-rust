@@ -34,4 +34,4 @@ pub const CARRY_ALLOW: &str = "x-chalkak-error-allow";
 pub const CARRY_ACCEPT: &str = "x-chalkak-error-accept";
 
 /// 요청 본문 타입이 맞지 않을 때(415) 원본이 `Accept`에 싣는 목록.
-pub const SUPPORTED_BODY_TYPES: &str = "application/json, application/yaml, application/*+json";
+pub const SUPPORTED_BODY_TYPES: &str = "application/json, application/yaml, application/xml;charset=UTF-8, text/xml;charset=UTF-8, application/*+json, application/*+xml;charset=UTF-8";

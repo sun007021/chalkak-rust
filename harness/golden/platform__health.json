@@ -1,8 +1,14 @@
 {
+  "db": {},
   "steps": [
     {
-      "step": "health",
-      "status": 200,
+      "body": {
+        "groups": [
+          "liveness",
+          "readiness"
+        ],
+        "status": "UP"
+      },
       "headers": [
         [
           "cache-control",
@@ -37,17 +43,11 @@
           "0"
         ]
       ],
-      "body": {
-        "groups": [
-          "liveness",
-          "readiness"
-        ],
-        "status": "UP"
-      }
+      "status": 200,
+      "step": "health"
     },
     {
-      "step": "info",
-      "status": 200,
+      "body": {},
       "headers": [
         [
           "cache-control",
@@ -82,8 +82,8 @@
           "0"
         ]
       ],
-      "body": {}
+      "status": 200,
+      "step": "info"
     }
-  ],
-  "db": {}
+  ]
 }
