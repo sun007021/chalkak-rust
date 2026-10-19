@@ -8,6 +8,7 @@
 //! chalkak-loadgen stress --case <spike|storm|idle|slow|fairness|dbkill|outage|abort|all>[:크기] --base host:port --secret <hex> --db "<접속 문자열>" --label java [--container ID --db-container ID] --out stress-java.json
 //! chalkak-loadgen report --dir <결과 디렉터리> [--out report.md]
 //! chalkak-loadgen trend  --log soak.log [--skip 0.2 --pool 10]   # 장시간 시험 로그의 누수 추세
+//! chalkak-loadgen uploads --base 127.0.0.1:18080 --s3 127.0.0.1:4566 --secret <hex> --db "<접속 문자열>" [--rate 5 --duration 1m]   # local-aws 이미지 업로드 흐름
 //! ```
 
 mod args;
@@ -26,6 +27,7 @@ mod stress_load;
 mod sys;
 mod token;
 mod trend;
+mod uploads;
 
 use std::process::ExitCode;
 
@@ -56,6 +58,7 @@ fn main() -> ExitCode {
         "stress" => stress::command(&args),
         "report" => report::command(&args),
         "trend" => trend::command(&args),
+        "uploads" => uploads::command(&args),
         "help" | "--help" | "-h" => {
             println!("{USAGE}");
             return ExitCode::SUCCESS;
@@ -78,4 +81,5 @@ const USAGE: &str = "사용법: chalkak-loadgen <seed|run|sql|race|stress|report
   race    같은 자원에 동시 요청을 보내고 DB 불변식을 확인한다\n\
   stress  트래픽 급증·연결 폭주·유휴 연결·느린 클라이언트·DB 장애 등에서 서버·풀 안정성을 시험한다(누수 검사 포함)
   report  결과 디렉터리의 Java·Rust 결과를 비교해 게이트를 판정한다\n\
-  trend   장시간 시험 로그에서 메모리·FD·스레드·DB 연결의 누수 추세를 판정한다";
+  trend   장시간 시험 로그에서 메모리·FD·스레드·DB 연결의 누수 추세를 판정한다\n\
+  uploads local-aws 의 이미지 업로드 흐름(presign -> S3 PUT -> Lambda 콜백 대기)을 건다. 사용법은 local-aws/README.md";
