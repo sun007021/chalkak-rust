@@ -10,6 +10,8 @@
 pub mod api;
 pub mod cleanup;
 pub mod distribution;
+#[cfg(test)]
+mod distribution_tests;
 pub mod domain;
 pub mod notice;
 pub mod repository;

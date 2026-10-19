@@ -19,6 +19,8 @@ pub mod notice;
 #[cfg(test)]
 mod notice_tests;
 pub mod post;
+#[cfg(test)]
+mod push_schedule_tests;
 pub mod support;
 #[cfg(test)]
 mod testing;
