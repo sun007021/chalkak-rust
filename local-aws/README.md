@@ -22,11 +22,50 @@ scripts/prepare-lambda.sh            # 한 번: Lambda 의존성(boto3 1.43.78, 
 ( cd .. && cargo build --release -p chalkak-fakes -p chalkak-server )   # fakes 는 항상, rust 프로필이면 서버도
 docker compose --profile rust up -d  # 또는 --profile java (원본 JAR: ORACLE_JAR, 기본 /tmp/chalkak-lanes/oracle/app.jar)
 scripts/e2e-image.sh                 # 사인 PNG + 게시물 WebP 종단 확인
+scripts/smoke.sh                     # 앱 없이 6.5 스모크: 가입 -> 로그인 -> 게시물 -> 피드 -> 승인 -> 좋아요 -> 알림 -> cdn 이미지
+scripts/trace.sh <uploadId|notificationId|userId>   # DB 행·SQS·S3·서비스 로그를 한 화면에
 scripts/lambda-unit-tests.sh         # 원본 Lambda 단위 테스트(99개)를 lambda 컨테이너에서 실행
 ```
+앱(에뮬레이터·시뮬레이터·실기기) 연결은 [`docs/local-aws/app.md`](../docs/local-aws/app.md).
 
 백엔드 교체: `docker compose --profile rust down` 후 `--profile java up -d`. 둘 다 별칭 `backend`로 edge 뒤에 서고 같은 env 파일을 읽으므로 나머지는 그대로다.
 DB는 `pgdata` 볼륨에 남는다(`docker compose down -v`로 지운다).
+**Rust ↔ Java 를 바꿀 때는 `docker compose --profile rust --profile java down -v`로 DB 를 비운다.** Java(원본 HEAD)의 Flyway 가 Rust 가 아직 모르는
+스키마(예: `notifications` 가 `post_id` 대신 출처 컬럼을 쓴다)로 올려서, Java 가 한 번 올린 DB 에 Rust 를 붙이면 승인 시 알림 INSERT 가 500 으로 실패한다
+(L0 로 Rust 가 따라잡기 전까지의 차이). 반대로 Rust 가 만든 DB 에 Java 를 붙이는 것은 확인한 범위에서 된다(Rust → Java 순서로 smoke 통과).
+
+### 동시성 (ESM_CONCURRENCY)
+실제 Lambda 는 SQS 메시지가 몰리면 동시 실행이 늘지만 RIE 한 컨테이너는 한 번에 하나만 처리한다. 업로드 몰림(S2) 시험은 둘을 같이 늘린다.
+```bash
+ESM_CONCURRENCY=4 docker compose --profile rust up -d      # lambda-image 4개 + esm-poller 워커 4개 (기본 1 = 순차)
+docker compose logs esm-poller | head -1                    # "concurrency": 4, lambdaTargets 4개
+```
+`lambda-image` 는 `deploy.replicas: ${ESM_CONCURRENCY:-1}` 로 N 개가 뜨고(컨테이너마다 `mem_limit: 1024m`), poller 는 서비스 이름의 A 레코드를 모두 풀어
+워커 스레드마다 다른 컨테이너를 배정한다. 컨테이너가 모자라면(`fewer_lambda_containers` 로그) 있는 만큼만 나눠 쓴다. 이 머신(4코어)에서는 Lambda 처리가 CPU 를 쓰므로
+N 을 4 이상으로 올려도 선형으로 늘지 않는다(아래 부하 발생기 측정 참고).
+
+### 부하 발생기 업로드 흐름 (S2)
+`harness/loadgen` 의 `uploads` 명령이 presign → S3 PUT → 콜백 대기를 건다(가짜 모드 회원 토큰, 앱 불필요). loadgen 에 TLS 가 없어서 백엔드 디버그 포트(`--base`)와
+LocalStack 디버그 포트(`--s3`)로 직접 간다(서버가 서명한 `https://<버킷>.s3.<IP>.sslip.io/…` 를 path-style 로 바꿔 PUT). Lambda 의 콜백은 평소처럼 edge 를 거친다.
+```bash
+cargo build --release -p chalkak-loadgen
+target/release/chalkak-loadgen uploads --base 127.0.0.1:18080 --s3 127.0.0.1:4566 \
+  --secret fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210 \
+  --db "postgres://chalkak:local-aws-password@127.0.0.1:15440/chalkak" \
+  --rate 3 --duration 1m [--users 50 --conns 16 --timeout 7m --image 파일.webp --label rust-c4 --out up.json]
+```
+`--rate` 건/초를 `--duration` 동안 열린 루프로 시작하고, 끝난 뒤 `--timeout`(기본 7분 = `POST_IMAGE_PROCESSING_TIMEOUT`)까지 남은 업로드가 닫히길 기다린다.
+출력: presign·PUT·**콜백 대기**(PUT 완료 → `post_image_uploads` 가 `ISSUED` 를 벗어남)·전체 지연의 p50/p95/p99, 시작 지연(lag, 발생기 포화 지표), `stuck`(닫히지 않음).
+종료 코드 0 = 오류 없고 stuck 0 (S2 통과 기준 "모두 완료 또는 실패로 닫힘, 고아 0"의 완료 쪽). 회원은 `--users` 명을 시드와 같은 UUID 규칙으로 만들고 기존 데이터는 지우지 않는다.
+
+이 머신(공유 4코어)에서 1분·3건/초(180건)로 돌려 본 값(Java, 한 번씩):
+
+| ESM_CONCURRENCY | 완료 | 오류 | 콜백 대기 p50 / p99 | 끝난 시각 |
+| ---: | ---: | ---: | ---: | ---: |
+| 2 | 180/180 | 0 | 13.8초 / 29.9초 | 90초 |
+| 4 | 180/180 | 0 | 11.9초 / 16.1초 | 76초 |
+
+처리 용량(약 2건/초 안팎)이 도착률(3건/초)보다 낮아 큐가 쌓였다가 빠진다. 호스트가 다른 작업과 공유돼 절대값은 믿지 않는다(S2 본 시험은 전용 호스트에서).
 
 ## 서비스
 
@@ -54,6 +93,14 @@ DB는 `pgdata` 볼륨에 남는다(`docker compose down -v`로 지운다).
 원본 `local` 프로필은 `environment: local`이라 Lambda가 반려한다). 값은 시험용 더미다. `[로컬 전용]` 블록(`AWS_ENDPOINT_URL_*`, `AWS_EC2_METADATA_SERVICE_ENDPOINT`,
 `SSL_CERT_FILE`, `CHALKAK_AUTH_*`)만 빼면 #32의 실제 AWS에서 같은 파일을 쓸 수 있다. 푸시 관련 키(`NOTIFICATION_*`)는 이름만 두고 꺼 둔다(L4).
 `NOTIFICATION_SQS_QUEUE_URL`은 `https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-dev-push` 형식을 유지하고, 전송 주소만 `AWS_ENDPOINT_URL_SQS=http://aws:4566`로 돌린다.
+
+### 실계정 모드 (앱 시험)
+앱의 실제 Google·Kakao·Apple 로그인으로 시험하려면 백엔드가 진짜 JWKS 와 앱과 같은 클라이언트 값을 쓰게 한다. `compose.real-oidc.yaml` 오버레이가 백엔드 `env_file` 뒤에 `env/real-oidc.env`(예시: `env/real-oidc.env.example`)를 덧붙인다.
+```bash
+cp env/real-oidc.env.example env/real-oidc.env       # 앱 값으로 채운다. git 에 올라가지 않는다
+docker compose -f compose.yaml -f compose.real-oidc.yaml --profile rust up -d
+```
+가짜 모드(하네스·`smoke.sh`)로 돌아오려면 `-f compose.real-oidc.yaml` 없이 같은 명령. 값의 출처와 절차는 [`docs/local-aws/app.md`](../docs/local-aws/app.md) 5절.
 
 ## 결정 기록
 
