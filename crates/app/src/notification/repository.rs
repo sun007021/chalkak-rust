@@ -260,6 +260,25 @@ impl NotificationRepository {
         )?)
     }
 
+    /// `findForPushByIdAndUserId`: 푸시를 보내기 전에 알림을 다시 읽는다. 대상 게시물·공지가 삭제됐으면 없는 것으로 본다.
+    pub fn find_for_push_by_id_and_user_id(
+        &self,
+        db: &mut impl Db,
+        notification_id: Uuid,
+        user_id: Uuid,
+    ) -> Result<Option<Notification>, DbError> {
+        let sql = format!(
+            "SELECT {NOTIFICATION_COLUMNS} FROM notifications n \
+             LEFT JOIN posts p ON n.source_type = 'POST' AND p.id = n.source_id \
+             LEFT JOIN notices nt ON n.source_type = 'NOTICE' AND nt.id = n.source_id \
+             WHERE n.id = $1 AND n.user_id = $2 AND {VISIBLE_SOURCE}"
+        );
+        db.query_opt(&sql, &[&notification_id, &user_id])?
+            .as_ref()
+            .map(from_row)
+            .transpose()
+    }
+
     /// `getPublicationBacklog`. 호출 측이 제한 시간을 건 트랜잭션 안에서 부른다.
     pub fn get_publication_backlog(&self, db: &mut impl Db) -> Result<PublicationBacklog, DbError> {
         let row = db.query_one(

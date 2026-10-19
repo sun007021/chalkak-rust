@@ -109,7 +109,6 @@ impl ErrorCode {
             429 => ErrorCode::ResourceExhausted,
             500 => ErrorCode::Internal,
             503 => ErrorCode::Unavailable,
-            504 => ErrorCode::DeadlineExceeded,
             _ => ErrorCode::Unknown,
         }
     }

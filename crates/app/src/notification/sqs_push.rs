@@ -226,6 +226,8 @@ pub struct SqsPushSettings {
     pub relay_enabled: bool,
     /// `NOTIFICATION_TOPIC_PUSH_ENABLED`(기본 꺼짐)
     pub topic_push_enabled: bool,
+    /// `NOTIFICATION_WORKER_ENABLED`(기본 꺼짐). 켜면 이 서버가 큐에서 메시지를 받아 FCM으로 보낸다.
+    pub worker_enabled: bool,
     /// `NOTIFICATION_SQS_QUEUE_URL`
     pub queue_url: String,
     /// `AWS_REGION`
@@ -239,6 +241,7 @@ impl SqsPushSettings {
         let settings = SqsPushSettings {
             relay_enabled: env.bool_or("NOTIFICATION_RELAY_ENABLED", false)?,
             topic_push_enabled: env.bool_or("NOTIFICATION_TOPIC_PUSH_ENABLED", false)?,
+            worker_enabled: env.bool_or("NOTIFICATION_WORKER_ENABLED", false)?,
             queue_url: env.string_or("NOTIFICATION_SQS_QUEUE_URL", "").to_owned(),
             region: env.string_or("AWS_REGION", "ap-northeast-2").to_owned(),
             endpoint_url: ["AWS_ENDPOINT_URL_SQS", "AWS_ENDPOINT_URL"]
@@ -246,16 +249,14 @@ impl SqsPushSettings {
                 .find_map(|key| env.get(key).map(str::trim).filter(|v| !v.is_empty()))
                 .map(str::to_owned),
         };
-        // 발행을 켰는데 Standard 큐 URL이 아니면 기동 때 거절한다.
-        if (settings.relay_enabled || settings.topic_push_enabled)
-            && !is_standard_queue_url(&settings.queue_url)
-        {
+        // 발행이나 Worker를 켰는데 Standard 큐 URL이 아니면 기동 때 거절한다(Relay와 Worker가 같은 조건이다).
+        if settings.queue_required() && !is_standard_queue_url(&settings.queue_url) {
             return Err(ConfigError::Invalid {
                 key: "NOTIFICATION_SQS_QUEUE_URL".to_owned(),
                 reason: INVALID_QUEUE_URL.to_owned(),
             });
         }
-        if settings.publishing_enabled()
+        if settings.queue_required()
             && let Some(url) = &settings.endpoint_url
         {
             SqsEndpoint::custom(url).map_err(|e| ConfigError::Invalid {
@@ -266,18 +267,24 @@ impl SqsPushSettings {
         Ok(settings)
     }
 
-    /// 어느 쪽이든 발행이 켜져 있으면 SQS 클라이언트가 필요하다.
+    /// 어느 쪽이든 발행이 켜져 있으면 SQS 발행기가 필요하다.
     pub fn publishing_enabled(&self) -> bool {
         self.relay_enabled || self.topic_push_enabled
     }
+
+    /// 발행이나 수신 중 하나라도 켜져 있으면 올바른 큐 URL이 필요하다.
+    pub fn queue_required(&self) -> bool {
+        self.publishing_enabled() || self.worker_enabled
+    }
 }
 
-/// 설정에 맞는 SQS 발행기. 자격증명은 환경변수 -> IMDS 순서(`DefaultCredentialsProvider`)다. SQS 호출은 5초 안에 끝내고
-/// 재시도하지 않는다(`SqsPushConfiguration.notificationSqsClient`).
-pub fn build_publisher(
+/// 설정에 맞는 SQS 클라이언트. 자격증명은 환경변수 -> IMDS 순서(`DefaultCredentialsProvider`)다. `transport_timeout`은
+/// 연결·읽기 제한이고, 호출별 제한(`SqsClient::with_timeout`)은 쓰는 쪽이 정한다.
+pub fn build_sqs_client(
     settings: &SqsPushSettings,
     clock: Arc<dyn Clock>,
-) -> Result<Arc<dyn PushMessagePublisher>, String> {
+    transport_timeout: Duration,
+) -> Result<SqsClient, String> {
     let endpoint = match &settings.endpoint_url {
         Some(url) => SqsEndpoint::custom(url),
         None => SqsEndpoint::aws(&settings.region),
@@ -292,13 +299,21 @@ pub fn build_publisher(
         imds,
         Arc::clone(&now),
     ));
-    let client = SqsClient::new(
+    Ok(SqsClient::new(
         &settings.region,
         endpoint,
         credentials,
-        Arc::new(HttpSqsTransport::new(chalkak_aws::sqs::DEFAULT_TIMEOUT)?),
+        Arc::new(HttpSqsTransport::new(transport_timeout)?),
         now,
-    );
+    ))
+}
+
+/// 설정에 맞는 SQS 발행기. SQS 호출은 5초 안에 끝내고 재시도하지 않는다(`SqsPushConfiguration.notificationSqsClient`).
+pub fn build_publisher(
+    settings: &SqsPushSettings,
+    clock: Arc<dyn Clock>,
+) -> Result<Arc<dyn PushMessagePublisher>, String> {
+    let client = build_sqs_client(settings, clock, chalkak_aws::sqs::DEFAULT_TIMEOUT)?;
     Ok(Arc::new(SqsPushMessagePublisher::new(
         client,
         &settings.queue_url,

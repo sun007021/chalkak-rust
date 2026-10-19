@@ -642,7 +642,7 @@ fn 오류_본문이_없으면_http_상태로_코드를_정한다() {
         (429, "RESOURCE_EXHAUSTED", false),
         (500, "INTERNAL", true),
         (502, "UNKNOWN", true),
-        (504, "DEADLINE_EXCEEDED", true),
+        (504, "UNKNOWN", true),
     ] {
         let fixture = fixture(move |_, _| Ok(response(status, &[], "")));
         let result = fixture.sender.send(&request()).unwrap();
