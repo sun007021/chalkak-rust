@@ -403,7 +403,15 @@ fn authorization(
     let jti = format!("00000000-0000-4000-8000-{:012x}", now);
     Ok(format!(
         "Bearer {}",
-        token::access_token(&target.access_token_secret, &subject, scope, now, exp, &jti)?
+        token::access_token(
+            &target.access_token_secret,
+            &subject,
+            scope,
+            now,
+            exp,
+            &jti,
+            auth.session.as_deref().map(|s| subst(s, vars)).as_deref(),
+        )?
     ))
 }
 

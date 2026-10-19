@@ -526,10 +526,33 @@ impl World {
     /// 컨트롤러 계층 테스트용 라우터. 인증 필터 없이 핸들러만 실제 서비스와 DB에 붙인다(`@WebMvcTest` +
     /// `addFilters = false`에 해당). 주체는 `security::enter`로 올린다.
     pub fn router(&self) -> Router {
-        use chalkak_app::AppContext;
         use chalkak_app::auth::UsableUserPolicy;
-        use chalkak_app::config::{AppSettings, TEST_ENV};
         use chalkak_app::wiring::Components;
+
+        let (ctx, logger) = self.app_context();
+        let components = Components {
+            policy: UsableUserPolicy::new(self.pool.clone()),
+            login: self.login.clone(),
+            signup: self.signup.clone(),
+            refresh: self.refresh.clone(),
+            users: self.users.clone(),
+            withdrawal: self.withdrawal.clone(),
+            callback_auth: self.callback_auth(),
+        };
+        let routes = Routes::new(logger);
+        let routes = chalkak_app::auth::api::register(routes, &ctx, &components);
+        chalkak_app::user::api::register(routes, &ctx, &components).into_router()
+    }
+
+    /// 알림 수신 설정·푸시 기기 컨트롤러만 붙인 라우터(인증 필터 없음).
+    pub fn push_router(&self) -> Router {
+        let (ctx, logger) = self.app_context();
+        chalkak_app::notification::push_api::register(Routes::new(logger), &ctx).into_router()
+    }
+
+    fn app_context(&self) -> (chalkak_app::AppContext, Arc<chalkak_core::log::Logger>) {
+        use chalkak_app::AppContext;
+        use chalkak_app::config::{AppSettings, TEST_ENV};
         use chalkak_core::Env;
         use chalkak_core::log::{Level, Logger};
 
@@ -564,18 +587,7 @@ impl World {
                 Arc::new(chalkak_app::post::NoopPostModerationPendingListener),
             ),
         };
-        let components = Components {
-            policy: UsableUserPolicy::new(self.pool.clone()),
-            login: self.login.clone(),
-            signup: self.signup.clone(),
-            refresh: self.refresh.clone(),
-            users: self.users.clone(),
-            withdrawal: self.withdrawal.clone(),
-            callback_auth: self.callback_auth(),
-        };
-        let routes = Routes::new(logger);
-        let routes = chalkak_app::auth::api::register(routes, &ctx, &components);
-        chalkak_app::user::api::register(routes, &ctx, &components).into_router()
+        (ctx, logger)
     }
 
     pub fn callback_auth(&self) -> chalkak_app::post::ProcessingCallbackAuthenticator {
