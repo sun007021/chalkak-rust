@@ -5,13 +5,17 @@
 //!   트랜잭션 안에서 호출한다.
 //! - 관리자 Slack 알림(검수 대기): [`slack`].
 //! - 보관 기간이 지난 알림 정리 쿼리: [`cleanup`]. 스케줄은 주기 작업 이슈에서 건다.
+//! - 공지([`notice`])와 예약 시각이 된 공지의 알림함 배포([`distribution`]), 주제 푸시 발송 시간표([`topic_push_schedule`]).
 
 pub mod api;
 pub mod cleanup;
+pub mod distribution;
 pub mod domain;
+pub mod notice;
 pub mod repository;
 pub mod service;
 pub mod slack;
+pub mod topic_push_schedule;
 
 use std::fmt;
 
