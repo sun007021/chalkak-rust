@@ -13,6 +13,7 @@
 //! method = "GET"
 //! path = "/api/v1/topics?date=2026-10-12"
 //! auth = { user = "11111111-1111-7111-8111-111111111111" }   # 하네스가 액세스 토큰을 발급
+//! # auth = { user = "...", session = "..." }                    # 로그인 세션 식별자(session_id 클레임)를 싣는다
 //! headers = { "Accept-Language" = "ko" }
 //! body = '''{"title": "x"}'''
 //! capture = { topicId = "id" }        # 응답 본문 경로 → 변수, 이후 ${topicId}로 사용
@@ -218,6 +219,8 @@ pub struct Auth {
     pub admin: Option<String>,
     /// 원시 Authorization 헤더 값. 위조·형식 오류 토큰 시나리오용.
     pub raw: Option<String>,
+    /// 회원 액세스 토큰에 싣는 로그인 세션 식별자(`session_id` 클레임). 생략하면 이전 토큰처럼 싣지 않는다.
+    pub session: Option<String>,
     /// 만료 시각을 현재 기준으로 이 초만큼 옮긴다(음수면 이미 만료).
     pub expires_in: Option<i64>,
 }
