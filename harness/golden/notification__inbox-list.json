@@ -1,8 +1,90 @@
 {
+  "db": {
+    "admin_audit_logs": [
+      "{\"action\":\"POST_APPROVED\",\"actor_admin_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"before_state\":{\"status\":\"PENDING\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-165600s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid?\",\"target_id\":\"$uuid15\",\"target_type\":\"POST\"}",
+      "{\"action\":\"POST_APPROVED\",\"actor_admin_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"before_state\":{\"status\":\"PENDING\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-169200s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid?\",\"target_id\":\"$uuid7\",\"target_type\":\"POST\"}",
+      "{\"action\":\"POST_APPROVED\",\"actor_admin_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"before_state\":{\"status\":\"PENDING\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-259200s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid?\",\"target_id\":\"$uuid?\",\"target_type\":\"POST\"}",
+      "{\"action\":\"POST_APPROVED\",\"actor_admin_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"before_state\":{\"status\":\"PENDING\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-41105s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid?\",\"target_id\":\"$uuid3\",\"target_type\":\"POST\"}",
+      "{\"action\":\"POST_REJECTED\",\"actor_admin_id\":\"$uuid?\",\"after_state\":{\"status\":\"REJECTED\"},\"before_state\":{\"status\":\"PENDING\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-41105s db +09:00>\",\"reason\":\"사진 품질\",\"request_id\":\"$uuid?\",\"target_id\":\"$uuid5\",\"target_type\":\"POST\"}"
+    ],
+    "admins": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"id\":\"$uuid?\",\"password\":\"hash-not-used\",\"updated_at\":\"<t+0s db +09:00>\",\"username\":\"operator\"}"
+    ],
+    "notifications": [
+      "{\"body\":\"내 사진이 피드에 공개되었습니다.\",\"created_at\":\"<t-165600s db +09:00>\",\"event_key\":\"$uuid?\",\"id\":\"$uuid14\",\"next_attempt_at\":null,\"payload\":null,\"read_at\":null,\"source_id\":\"$uuid15\",\"source_type\":\"POST\",\"sqs_publish_status\":\"NOT_REQUIRED\",\"sqs_published_at\":null,\"title\":\"게시물이 승인되었습니다.\",\"type\":\"POST_APPROVED\",\"user_id\":\"$uuid?\"}",
+      "{\"body\":\"내 사진이 피드에 공개되었습니다.\",\"created_at\":\"<t-169200s db +09:00>\",\"event_key\":\"$uuid?\",\"id\":\"$uuid6\",\"next_attempt_at\":null,\"payload\":null,\"read_at\":\"<t-154800s db +09:00>\",\"source_id\":\"$uuid7\",\"source_type\":\"POST\",\"sqs_publish_status\":\"NOT_REQUIRED\",\"sqs_published_at\":null,\"title\":\"게시물이 승인되었습니다.\",\"type\":\"POST_APPROVED\",\"user_id\":\"$uuid?\"}",
+      "{\"body\":\"내 사진이 피드에 공개되었습니다.\",\"created_at\":\"<t-259200s db +09:00>\",\"event_key\":\"$uuid?\",\"id\":\"$uuid?\",\"next_attempt_at\":null,\"payload\":null,\"read_at\":null,\"source_id\":\"$uuid?\",\"source_type\":\"POST\",\"sqs_publish_status\":\"NOT_REQUIRED\",\"sqs_published_at\":null,\"title\":\"게시물이 승인되었습니다.\",\"type\":\"POST_APPROVED\",\"user_id\":\"$uuid?\"}",
+      "{\"body\":\"내 사진이 피드에 공개되었습니다.\",\"created_at\":\"<t-41105s db +09:00>\",\"event_key\":\"$uuid?\",\"id\":\"$uuid2\",\"next_attempt_at\":null,\"payload\":null,\"read_at\":null,\"source_id\":\"$uuid3\",\"source_type\":\"POST\",\"sqs_publish_status\":\"NOT_REQUIRED\",\"sqs_published_at\":null,\"title\":\"게시물이 승인되었습니다.\",\"type\":\"POST_APPROVED\",\"user_id\":\"$uuid?\"}",
+      "{\"body\":\"반려 사유를 확인해 주세요.\",\"created_at\":\"<t-41105s db +09:00>\",\"event_key\":\"$uuid?\",\"id\":\"$uuid4\",\"next_attempt_at\":null,\"payload\":{\"rejectionReason\":\"사진 품질\"},\"read_at\":null,\"source_id\":\"$uuid5\",\"source_type\":\"POST\",\"sqs_publish_status\":\"NOT_REQUIRED\",\"sqs_published_at\":null,\"title\":\"게시물이 반려되었습니다.\",\"type\":\"POST_REJECTED\",\"user_id\":\"$uuid?\"}"
+    ],
+    "photos": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/p1/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p1/thumbnail.webp\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/p2/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p2/thumbnail.webp\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/p3/original.webp\",\"thumbnail_storage_key\":null,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/p4/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p4/thumbnail.webp\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/한글 공백/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/한글 공백/thumbnail.webp\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ],
+    "posts": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t-637200s db +09:00>\",\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"지움\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid15\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"남의것\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid3\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"셋째\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid5\",\"moderated_at\":null,\"moderation_status\":\"REJECTED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"둘째\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid7\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"첫 사진\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}"
+    ],
+    "topics": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t-637200s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-723600s db +09:00>\",\"title\":\"주제4\",\"topic_date\":\"2026-10-04\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t-723600s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-810000s db +09:00>\",\"title\":\"주제3\",\"topic_date\":\"2026-10-03\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t-810000s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-896400s db +09:00>\",\"title\":\"주제2\",\"topic_date\":\"2026-10-02\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t-896400s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-982800s db +09:00>\",\"title\":\"주제1\",\"topic_date\":\"2026-10-01\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ],
+    "users": [
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t-982800s db +09:00>\",\"email\":\"gone@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/user3/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"user1@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/user1/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"user2@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/user2/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}"
+    ]
+  },
   "steps": [
     {
-      "step": "기본 목록(최신순, 삭제된 게시물·남의 알림 제외)",
-      "status": 200,
+      "body": {
+        "currentPage": 1,
+        "hasNext": false,
+        "notifications": [
+          {
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "createdAt": "<t-41105s iso Z>",
+            "id": "$uuid2",
+            "readAt": null,
+            "sourceId": "$uuid3",
+            "sourceType": "POST",
+            "thumbnailImageUrl": null,
+            "title": "게시물이 승인되었습니다.",
+            "type": "POST_APPROVED"
+          },
+          {
+            "body": "반려 사유를 확인해 주세요.",
+            "createdAt": "<t-41105s iso Z>",
+            "id": "$uuid4",
+            "readAt": null,
+            "sourceId": "$uuid5",
+            "sourceType": "POST",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
+            "title": "게시물이 반려되었습니다.",
+            "type": "POST_REJECTED"
+          },
+          {
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "createdAt": "<t-169200s iso Z>",
+            "id": "$uuid6",
+            "readAt": "<t-154800s iso Z>",
+            "sourceId": "$uuid7",
+            "sourceType": "POST",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
+            "title": "게시물이 승인되었습니다.",
+            "type": "POST_APPROVED"
+          }
+        ],
+        "pageSize": 20
+      },
       "headers": [
         [
           "cache-control",
@@ -37,206 +119,28 @@
           "0"
         ]
       ],
-      "body": {
-        "currentPage": 1,
-        "pageSize": 20,
-        "hasNext": false,
-        "notifications": [
-          {
-            "id": "$uuid2",
-            "type": "POST_APPROVED",
-            "title": "게시물이 승인되었습니다.",
-            "body": "내 사진이 피드에 공개되었습니다.",
-            "thumbnailImageUrl": null,
-            "readAt": null,
-            "createdAt": "<t-41105s iso Z>"
-          },
-          {
-            "id": "$uuid3",
-            "type": "POST_REJECTED",
-            "title": "게시물이 반려되었습니다.",
-            "body": "반려 사유를 확인해 주세요.",
-            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
-            "readAt": null,
-            "createdAt": "<t-41105s iso Z>"
-          },
-          {
-            "id": "$uuid4",
-            "type": "POST_APPROVED",
-            "title": "게시물이 승인되었습니다.",
-            "body": "내 사진이 피드에 공개되었습니다.",
-            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
-            "readAt": "<t-154800s iso Z>",
-            "createdAt": "<t-169200s iso Z>"
-          }
-        ]
-      }
+      "status": 200,
+      "step": "기본 목록(최신순, 삭제된 게시물·남의 알림 제외)"
     },
     {
-      "step": "페이지 크기 1, 1쪽",
-      "status": 200,
-      "headers": [
-        [
-          "cache-control",
-          "no-cache, no-store, max-age=0, must-revalidate"
-        ],
-        [
-          "content-type",
-          "application/json"
-        ],
-        [
-          "expires",
-          "0"
-        ],
-        [
-          "pragma",
-          "no-cache"
-        ],
-        [
-          "x-content-type-options",
-          "nosniff"
-        ],
-        [
-          "x-frame-options",
-          "DENY"
-        ],
-        [
-          "x-request-id",
-          "$uuid5"
-        ],
-        [
-          "x-xss-protection",
-          "0"
-        ]
-      ],
       "body": {
         "currentPage": 1,
-        "pageSize": 1,
         "hasNext": true,
         "notifications": [
           {
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "createdAt": "<t-41105s iso Z>",
             "id": "$uuid2",
-            "type": "POST_APPROVED",
-            "title": "게시물이 승인되었습니다.",
-            "body": "내 사진이 피드에 공개되었습니다.",
+            "readAt": null,
+            "sourceId": "$uuid3",
+            "sourceType": "POST",
             "thumbnailImageUrl": null,
-            "readAt": null,
-            "createdAt": "<t-41105s iso Z>"
-          }
-        ]
-      }
-    },
-    {
-      "step": "페이지 크기 1, 2쪽",
-      "status": 200,
-      "headers": [
-        [
-          "cache-control",
-          "no-cache, no-store, max-age=0, must-revalidate"
-        ],
-        [
-          "content-type",
-          "application/json"
-        ],
-        [
-          "expires",
-          "0"
-        ],
-        [
-          "pragma",
-          "no-cache"
-        ],
-        [
-          "x-content-type-options",
-          "nosniff"
-        ],
-        [
-          "x-frame-options",
-          "DENY"
-        ],
-        [
-          "x-request-id",
-          "$uuid6"
-        ],
-        [
-          "x-xss-protection",
-          "0"
-        ]
-      ],
-      "body": {
-        "currentPage": 2,
-        "pageSize": 1,
-        "hasNext": true,
-        "notifications": [
-          {
-            "id": "$uuid3",
-            "type": "POST_REJECTED",
-            "title": "게시물이 반려되었습니다.",
-            "body": "반려 사유를 확인해 주세요.",
-            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
-            "readAt": null,
-            "createdAt": "<t-41105s iso Z>"
-          }
-        ]
-      }
-    },
-    {
-      "step": "페이지 크기 1, 3쪽",
-      "status": 200,
-      "headers": [
-        [
-          "cache-control",
-          "no-cache, no-store, max-age=0, must-revalidate"
-        ],
-        [
-          "content-type",
-          "application/json"
-        ],
-        [
-          "expires",
-          "0"
-        ],
-        [
-          "pragma",
-          "no-cache"
-        ],
-        [
-          "x-content-type-options",
-          "nosniff"
-        ],
-        [
-          "x-frame-options",
-          "DENY"
-        ],
-        [
-          "x-request-id",
-          "$uuid7"
-        ],
-        [
-          "x-xss-protection",
-          "0"
-        ]
-      ],
-      "body": {
-        "currentPage": 3,
-        "pageSize": 1,
-        "hasNext": false,
-        "notifications": [
-          {
-            "id": "$uuid4",
-            "type": "POST_APPROVED",
             "title": "게시물이 승인되었습니다.",
-            "body": "내 사진이 피드에 공개되었습니다.",
-            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
-            "readAt": "<t-154800s iso Z>",
-            "createdAt": "<t-169200s iso Z>"
+            "type": "POST_APPROVED"
           }
-        ]
-      }
-    },
-    {
-      "step": "페이지 크기 1, 4쪽",
-      "status": 200,
+        ],
+        "pageSize": 1
+      },
       "headers": [
         [
           "cache-control",
@@ -271,16 +175,28 @@
           "0"
         ]
       ],
-      "body": {
-        "currentPage": 4,
-        "pageSize": 1,
-        "hasNext": false,
-        "notifications": []
-      }
+      "status": 200,
+      "step": "페이지 크기 1, 1쪽"
     },
     {
-      "step": "페이지 크기 2, 2쪽",
-      "status": 200,
+      "body": {
+        "currentPage": 2,
+        "hasNext": true,
+        "notifications": [
+          {
+            "body": "반려 사유를 확인해 주세요.",
+            "createdAt": "<t-41105s iso Z>",
+            "id": "$uuid4",
+            "readAt": null,
+            "sourceId": "$uuid5",
+            "sourceType": "POST",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p2/thumbnail.webp",
+            "title": "게시물이 반려되었습니다.",
+            "type": "POST_REJECTED"
+          }
+        ],
+        "pageSize": 1
+      },
       "headers": [
         [
           "cache-control",
@@ -315,26 +231,28 @@
           "0"
         ]
       ],
+      "status": 200,
+      "step": "페이지 크기 1, 2쪽"
+    },
+    {
       "body": {
-        "currentPage": 2,
-        "pageSize": 2,
+        "currentPage": 3,
         "hasNext": false,
         "notifications": [
           {
-            "id": "$uuid4",
-            "type": "POST_APPROVED",
-            "title": "게시물이 승인되었습니다.",
             "body": "내 사진이 피드에 공개되었습니다.",
-            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
+            "createdAt": "<t-169200s iso Z>",
+            "id": "$uuid6",
             "readAt": "<t-154800s iso Z>",
-            "createdAt": "<t-169200s iso Z>"
+            "sourceId": "$uuid7",
+            "sourceType": "POST",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
+            "title": "게시물이 승인되었습니다.",
+            "type": "POST_APPROVED"
           }
-        ]
-      }
-    },
-    {
-      "step": "다른 회원의 목록",
-      "status": 200,
+        ],
+        "pageSize": 1
+      },
       "headers": [
         [
           "cache-control",
@@ -369,26 +287,72 @@
           "0"
         ]
       ],
+      "status": 200,
+      "step": "페이지 크기 1, 3쪽"
+    },
+    {
       "body": {
-        "currentPage": 1,
-        "pageSize": 20,
+        "currentPage": 4,
+        "hasNext": false,
+        "notifications": [],
+        "pageSize": 1
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid11"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "페이지 크기 1, 4쪽"
+    },
+    {
+      "body": {
+        "currentPage": 2,
         "hasNext": false,
         "notifications": [
           {
-            "id": "$uuid11",
-            "type": "POST_APPROVED",
-            "title": "게시물이 승인되었습니다.",
             "body": "내 사진이 피드에 공개되었습니다.",
-            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/%ED%95%9C%EA%B8%80%20%EA%B3%B5%EB%B0%B1/thumbnail.webp",
-            "readAt": null,
-            "createdAt": "<t-165600s iso Z>"
+            "createdAt": "<t-169200s iso Z>",
+            "id": "$uuid6",
+            "readAt": "<t-154800s iso Z>",
+            "sourceId": "$uuid7",
+            "sourceType": "POST",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
+            "title": "게시물이 승인되었습니다.",
+            "type": "POST_APPROVED"
           }
-        ]
-      }
-    },
-    {
-      "step": "탈퇴한 회원은 401",
-      "status": 401,
+        ],
+        "pageSize": 2
+      },
       "headers": [
         [
           "cache-control",
@@ -423,14 +387,28 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      }
+      "status": 200,
+      "step": "페이지 크기 2, 2쪽"
     },
     {
-      "step": "없는 회원은 401",
-      "status": 401,
+      "body": {
+        "currentPage": 1,
+        "hasNext": false,
+        "notifications": [
+          {
+            "body": "내 사진이 피드에 공개되었습니다.",
+            "createdAt": "<t-165600s iso Z>",
+            "id": "$uuid14",
+            "readAt": null,
+            "sourceId": "$uuid15",
+            "sourceType": "POST",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/%ED%95%9C%EA%B8%80%20%EA%B3%B5%EB%B0%B1/thumbnail.webp",
+            "title": "게시물이 승인되었습니다.",
+            "type": "POST_APPROVED"
+          }
+        ],
+        "pageSize": 20
+      },
       "headers": [
         [
           "cache-control",
@@ -465,14 +443,98 @@
           "0"
         ]
       ],
+      "status": 200,
+      "step": "다른 회원의 목록"
+    },
+    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 인증 정보입니다."
-      }
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid16"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "탈퇴한 회원은 401"
     },
     {
-      "step": "토큰 없이 401",
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid17"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
       "status": 401,
+      "step": "없는 회원은 401"
+    },
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -504,21 +566,21 @@
         ],
         [
           "x-request-id",
-          "$uuid14"
+          "$uuid18"
         ],
         [
           "x-xss-protection",
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      }
+      "status": 401,
+      "step": "토큰 없이 401"
     },
     {
-      "step": "관리자 토큰은 403",
-      "status": 403,
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "접근 권한이 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -546,61 +608,15 @@
         ],
         [
           "x-request-id",
-          "$uuid15"
+          "$uuid19"
         ],
         [
           "x-xss-protection",
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "FORBIDDEN",
-        "message": "접근 권한이 없습니다."
-      }
+      "status": 403,
+      "step": "관리자 토큰은 403"
     }
-  ],
-  "db": {
-    "admin_audit_logs": [
-      "{\"id\":\"$uuid?\",\"action\":\"POST_APPROVED\",\"reason\":null,\"target_id\":\"$uuid?\",\"request_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"occurred_at\":\"<t-165600s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"status\":\"PENDING\"},\"actor_admin_id\":\"$uuid?\"}",
-      "{\"id\":\"$uuid?\",\"action\":\"POST_APPROVED\",\"reason\":null,\"target_id\":\"$uuid?\",\"request_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"occurred_at\":\"<t-169200s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"status\":\"PENDING\"},\"actor_admin_id\":\"$uuid?\"}",
-      "{\"id\":\"$uuid?\",\"action\":\"POST_APPROVED\",\"reason\":null,\"target_id\":\"$uuid?\",\"request_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"occurred_at\":\"<t-259200s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"status\":\"PENDING\"},\"actor_admin_id\":\"$uuid?\"}",
-      "{\"id\":\"$uuid?\",\"action\":\"POST_APPROVED\",\"reason\":null,\"target_id\":\"$uuid?\",\"request_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"occurred_at\":\"<t-41105s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"status\":\"PENDING\"},\"actor_admin_id\":\"$uuid?\"}",
-      "{\"id\":\"$uuid?\",\"action\":\"POST_REJECTED\",\"reason\":\"사진 품질\",\"target_id\":\"$uuid?\",\"request_id\":\"$uuid?\",\"after_state\":{\"status\":\"REJECTED\"},\"occurred_at\":\"<t-41105s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"status\":\"PENDING\"},\"actor_admin_id\":\"$uuid?\"}"
-    ],
-    "admins": [
-      "{\"id\":\"$uuid?\",\"password\":\"hash-not-used\",\"username\":\"operator\",\"created_at\":\"<t+0s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\"}"
-    ],
-    "notifications": [
-      "{\"id\":\"$uuid11\",\"body\":\"내 사진이 피드에 공개되었습니다.\",\"type\":\"POST_APPROVED\",\"title\":\"게시물이 승인되었습니다.\",\"post_id\":\"$uuid?\",\"read_at\":null,\"user_id\":\"$uuid?\",\"event_key\":\"$uuid?\",\"created_at\":\"<t-165600s db +09:00>\",\"rejection_reason\":null}",
-      "{\"id\":\"$uuid2\",\"body\":\"내 사진이 피드에 공개되었습니다.\",\"type\":\"POST_APPROVED\",\"title\":\"게시물이 승인되었습니다.\",\"post_id\":\"$uuid?\",\"read_at\":null,\"user_id\":\"$uuid?\",\"event_key\":\"$uuid?\",\"created_at\":\"<t-41105s db +09:00>\",\"rejection_reason\":null}",
-      "{\"id\":\"$uuid3\",\"body\":\"반려 사유를 확인해 주세요.\",\"type\":\"POST_REJECTED\",\"title\":\"게시물이 반려되었습니다.\",\"post_id\":\"$uuid?\",\"read_at\":null,\"user_id\":\"$uuid?\",\"event_key\":\"$uuid?\",\"created_at\":\"<t-41105s db +09:00>\",\"rejection_reason\":\"사진 품질\"}",
-      "{\"id\":\"$uuid4\",\"body\":\"내 사진이 피드에 공개되었습니다.\",\"type\":\"POST_APPROVED\",\"title\":\"게시물이 승인되었습니다.\",\"post_id\":\"$uuid?\",\"read_at\":\"<t-154800s db +09:00>\",\"user_id\":\"$uuid?\",\"event_key\":\"$uuid?\",\"created_at\":\"<t-169200s db +09:00>\",\"rejection_reason\":null}",
-      "{\"id\":\"$uuid?\",\"body\":\"내 사진이 피드에 공개되었습니다.\",\"type\":\"POST_APPROVED\",\"title\":\"게시물이 승인되었습니다.\",\"post_id\":\"$uuid?\",\"read_at\":null,\"user_id\":\"$uuid?\",\"event_key\":\"$uuid?\",\"created_at\":\"<t-259200s db +09:00>\",\"rejection_reason\":null}"
-    ],
-    "photos": [
-      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p1/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p1/thumbnail.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p2/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p2/thumbnail.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p3/original.webp\",\"thumbnail_storage_key\":null}",
-      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p4/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p4/thumbnail.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/한글 공백/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/한글 공백/thumbnail.webp\"}"
-    ],
-    "posts": [
-      "{\"id\":\"$uuid?\",\"title\":\"남의것\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid?\",\"title\":\"둘째\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"REJECTED\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid?\",\"title\":\"셋째\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid?\",\"title\":\"지움\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t-637200s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid?\",\"title\":\"첫 사진\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}"
-    ],
-    "topics": [
-      "{\"id\":\"$uuid?\",\"title\":\"주제1\",\"ends_at\":\"<t-896400s db +09:00>\",\"starts_at\":\"<t-982800s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-01\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"title\":\"주제2\",\"ends_at\":\"<t-810000s db +09:00>\",\"starts_at\":\"<t-896400s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-02\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"title\":\"주제3\",\"ends_at\":\"<t-723600s db +09:00>\",\"starts_at\":\"<t-810000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-03\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"title\":\"주제4\",\"ends_at\":\"<t-637200s db +09:00>\",\"starts_at\":\"<t-723600s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-04\",\"updated_at\":\"<t+0s db +09:00>\"}"
-    ],
-    "users": [
-      "{\"id\":\"$uuid?\",\"email\":\"gone@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t-982800s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/user3/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}",
-      "{\"id\":\"$uuid?\",\"email\":\"user1@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/user1/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}",
-      "{\"id\":\"$uuid?\",\"email\":\"user2@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/user2/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}"
-    ]
-  }
+  ]
 }

@@ -1,8 +1,63 @@
 {
+  "db": {
+    "photos": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"byteSize\":183423,\"capturedAt\":\"<t-3600s db +09:00>\",\"height\":3024,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"},\"width\":4032},\"original_storage_key\":\"chalkak/posts/local/original/p1.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p1.webp\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"byteSize\":183423,\"capturedAt\":\"<t-3600s db +09:00>\",\"height\":3024,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"},\"width\":4032},\"original_storage_key\":\"chalkak/posts/local/original/p10.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p10.webp\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"byteSize\":183423,\"capturedAt\":\"<t-3600s db +09:00>\",\"height\":3024,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"},\"width\":4032},\"original_storage_key\":\"chalkak/posts/local/original/p11.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p11.webp\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"byteSize\":183423,\"capturedAt\":\"<t-3600s db +09:00>\",\"height\":3024,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"},\"width\":4032},\"original_storage_key\":\"chalkak/posts/local/original/p12.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p12.webp\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"byteSize\":183423,\"capturedAt\":\"<t-3600s db +09:00>\",\"height\":3024,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"},\"width\":4032},\"original_storage_key\":\"chalkak/posts/local/original/p2.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p2.webp\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"byteSize\":183423,\"capturedAt\":\"<t-3600s db +09:00>\",\"height\":3024,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"},\"width\":4032},\"original_storage_key\":\"chalkak/posts/local/original/p3.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p3.webp\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"byteSize\":183423,\"capturedAt\":\"<t-3600s db +09:00>\",\"height\":3024,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"},\"width\":4032},\"original_storage_key\":\"chalkak/posts/local/original/p4.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p4.webp\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"byteSize\":183423,\"capturedAt\":\"<t-3600s db +09:00>\",\"height\":3024,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"},\"width\":4032},\"original_storage_key\":\"chalkak/posts/local/original/p5.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p5.webp\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"byteSize\":183423,\"capturedAt\":\"<t-3600s db +09:00>\",\"height\":3024,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"},\"width\":4032},\"original_storage_key\":\"chalkak/posts/local/original/p6.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p6.webp\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"byteSize\":183423,\"capturedAt\":\"<t-3600s db +09:00>\",\"height\":3024,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"},\"width\":4032},\"original_storage_key\":\"chalkak/posts/local/original/p7.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p7.webp\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"byteSize\":183423,\"capturedAt\":\"<t-3600s db +09:00>\",\"height\":3024,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"},\"width\":4032},\"original_storage_key\":\"chalkak/posts/local/original/p8.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p8.webp\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"byteSize\":183423,\"capturedAt\":\"<t-3600s db +09:00>\",\"height\":3024,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"},\"width\":4032},\"original_storage_key\":\"chalkak/posts/local/original/p9.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p9.webp\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ],
+    "post_likes": [
+      "{\"created_at\":\"<t-60s db +09:00>\",\"id\":\"$uuid?\",\"post_id\":\"$uuid17\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-60s db +09:00>\",\"id\":\"$uuid?\",\"post_id\":\"$uuid23\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-60s db +09:00>\",\"id\":\"$uuid?\",\"post_id\":\"$uuid3\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-60s db +09:00>\",\"id\":\"$uuid?\",\"post_id\":\"$uuid3\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-60s db +09:00>\",\"id\":\"$uuid?\",\"post_id\":\"$uuid3\",\"user_id\":\"$uuid?\"}"
+    ],
+    "posts": [
+      "{\"created_at\":\"<t-1033200s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid19\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"지난달\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t-1033200s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-1200s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid5\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"대기\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t-1200s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-169200s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid16\",\"moderated_at\":\"<t-169200s db +09:00>\",\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"그제\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t-169200s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-1800s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid33\",\"moderated_at\":\"<t-1800s db +09:00>\",\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"차단\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t-1800s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-2400s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid11\",\"moderated_at\":\"<t-2400s db +09:00>\",\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"셋\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t-2400s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-240s db +09:00>\",\"deleted_at\":\"<t-240s db +09:00>\",\"id\":\"$uuid?\",\"moderated_at\":\"<t-240s db +09:00>\",\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"삭제\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t-240s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-3000s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid23\",\"moderated_at\":\"<t-3000s db +09:00>\",\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":null,\"topic_id\":\"$uuid?\",\"updated_at\":\"<t-3000s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-300s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid8\",\"moderated_at\":null,\"moderation_status\":\"VALIDATING\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"검증\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t-300s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-3600s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid3\",\"moderated_at\":\"<t-3600s db +09:00>\",\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"하나\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t-3600s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-600s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":\"<t-600s db +09:00>\",\"moderation_status\":\"REJECTED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"반려\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t-600s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-79200s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid22\",\"moderated_at\":\"<t-79200s db +09:00>\",\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"어제2\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t-79200s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-82800s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid17\",\"moderated_at\":\"<t-82800s db +09:00>\",\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"어제\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t-82800s db +09:00>\",\"user_id\":\"$uuid?\"}"
+    ],
+    "topics": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t+54000s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-32400s db +09:00>\",\"title\":\"오늘\",\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t-118800s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-205200s db +09:00>\",\"title\":\"그제\",\"topic_date\":\"2026-10-10\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t-32400s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-118800s db +09:00>\",\"title\":\"어제\",\"topic_date\":\"2026-10-11\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t-982800s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-1069200s db +09:00>\",\"title\":\"지난달\",\"topic_date\":\"2026-09-30\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ],
+    "users": [
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"u1@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u1/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u1/thumbnail.png\",\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"u2@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u2/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u2/thumbnail.png\",\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"u3@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u3/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u3/thumbnail.png\",\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"u4@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u4/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u4/thumbnail.png\",\"status\":\"BANNED\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"u5@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u5/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u5/thumbnail.png\",\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"u6@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u6/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u6/thumbnail.png\",\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"u7@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u7/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u7/thumbnail.png\",\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"u8@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u8/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u8/thumbnail.png\",\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}"
+    ]
+  },
   "steps": [
     {
-      "step": "오늘 상태: 인증 없음",
-      "status": 401,
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -41,14 +96,16 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      }
+      "status": 401,
+      "step": "오늘 상태: 인증 없음"
     },
     {
-      "step": "오늘 상태: 승인",
-      "status": 200,
+      "body": {
+        "isPosted": true,
+        "moderationStatus": "APPROVED",
+        "postId": "$uuid3",
+        "topicDate": "2026-10-12"
+      },
       "headers": [
         [
           "cache-control",
@@ -83,16 +140,16 @@
           "0"
         ]
       ],
-      "body": {
-        "topicDate": "2026-10-12",
-        "isPosted": true,
-        "postId": "$uuid3",
-        "moderationStatus": "APPROVED"
-      }
+      "status": 200,
+      "step": "오늘 상태: 승인"
     },
     {
-      "step": "오늘 상태: 검수 대기",
-      "status": 200,
+      "body": {
+        "isPosted": true,
+        "moderationStatus": "PENDING",
+        "postId": "$uuid5",
+        "topicDate": "2026-10-12"
+      },
       "headers": [
         [
           "cache-control",
@@ -127,16 +184,16 @@
           "0"
         ]
       ],
-      "body": {
-        "topicDate": "2026-10-12",
-        "isPosted": true,
-        "postId": "$uuid5",
-        "moderationStatus": "PENDING"
-      }
+      "status": 200,
+      "step": "오늘 상태: 검수 대기"
     },
     {
-      "step": "오늘 상태: 반려",
-      "status": 200,
+      "body": {
+        "isPosted": false,
+        "moderationStatus": null,
+        "postId": null,
+        "topicDate": "2026-10-12"
+      },
       "headers": [
         [
           "cache-control",
@@ -171,16 +228,16 @@
           "0"
         ]
       ],
-      "body": {
-        "topicDate": "2026-10-12",
-        "isPosted": false,
-        "postId": null,
-        "moderationStatus": null
-      }
+      "status": 200,
+      "step": "오늘 상태: 반려"
     },
     {
-      "step": "오늘 상태: 검증 중",
-      "status": 200,
+      "body": {
+        "isPosted": true,
+        "moderationStatus": "VALIDATING",
+        "postId": "$uuid8",
+        "topicDate": "2026-10-12"
+      },
       "headers": [
         [
           "cache-control",
@@ -215,16 +272,16 @@
           "0"
         ]
       ],
-      "body": {
-        "topicDate": "2026-10-12",
-        "isPosted": true,
-        "postId": "$uuid8",
-        "moderationStatus": "VALIDATING"
-      }
+      "status": 200,
+      "step": "오늘 상태: 검증 중"
     },
     {
-      "step": "오늘 상태: 삭제",
-      "status": 200,
+      "body": {
+        "isPosted": false,
+        "moderationStatus": null,
+        "postId": null,
+        "topicDate": "2026-10-12"
+      },
       "headers": [
         [
           "cache-control",
@@ -259,16 +316,16 @@
           "0"
         ]
       ],
-      "body": {
-        "topicDate": "2026-10-12",
-        "isPosted": false,
-        "postId": null,
-        "moderationStatus": null
-      }
+      "status": 200,
+      "step": "오늘 상태: 삭제"
     },
     {
-      "step": "오늘 상태: 승인(다른)",
-      "status": 200,
+      "body": {
+        "isPosted": true,
+        "moderationStatus": "APPROVED",
+        "postId": "$uuid11",
+        "topicDate": "2026-10-12"
+      },
       "headers": [
         [
           "cache-control",
@@ -303,16 +360,14 @@
           "0"
         ]
       ],
-      "body": {
-        "topicDate": "2026-10-12",
-        "isPosted": true,
-        "postId": "$uuid11",
-        "moderationStatus": "APPROVED"
-      }
+      "status": 200,
+      "step": "오늘 상태: 승인(다른)"
     },
     {
-      "step": "오늘 상태: 차단된 회원",
-      "status": 403,
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "차단된 회원입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -347,14 +402,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "FORBIDDEN",
-        "message": "차단된 회원입니다."
-      }
+      "status": 403,
+      "step": "오늘 상태: 차단된 회원"
     },
     {
-      "step": "오늘 상태: 없는 회원",
-      "status": 401,
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -389,14 +444,14 @@
           "0"
         ]
       ],
+      "status": 401,
+      "step": "오늘 상태: 없는 회원"
+    },
+    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 인증 정보입니다."
-      }
-    },
-    {
-      "step": "캘린더: 인증 없음",
-      "status": 401,
+      },
       "headers": [
         [
           "cache-control",
@@ -435,14 +490,34 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      }
+      "status": 401,
+      "step": "캘린더: 인증 없음"
     },
     {
-      "step": "캘린더: 10월",
-      "status": 200,
+      "body": {
+        "month": 10,
+        "posts": [
+          {
+            "postId": "$uuid16",
+            "status": "APPROVED",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/local/thumbnail/p11.webp",
+            "topicDate": "2026-10-10"
+          },
+          {
+            "postId": "$uuid17",
+            "status": "APPROVED",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/local/thumbnail/p9.webp",
+            "topicDate": "2026-10-11"
+          },
+          {
+            "postId": "$uuid3",
+            "status": "APPROVED",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/local/thumbnail/p1.webp",
+            "topicDate": "2026-10-12"
+          }
+        ],
+        "year": 2026
+      },
       "headers": [
         [
           "cache-control",
@@ -477,34 +552,22 @@
           "0"
         ]
       ],
-      "body": {
-        "year": 2026,
-        "month": 10,
-        "posts": [
-          {
-            "topicDate": "2026-10-10",
-            "postId": "$uuid16",
-            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/local/thumbnail/p11.webp",
-            "status": "APPROVED"
-          },
-          {
-            "topicDate": "2026-10-11",
-            "postId": "$uuid17",
-            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/local/thumbnail/p9.webp",
-            "status": "APPROVED"
-          },
-          {
-            "topicDate": "2026-10-12",
-            "postId": "$uuid3",
-            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/local/thumbnail/p1.webp",
-            "status": "APPROVED"
-          }
-        ]
-      }
+      "status": 200,
+      "step": "캘린더: 10월"
     },
     {
-      "step": "캘린더: 9월",
-      "status": 200,
+      "body": {
+        "month": 9,
+        "posts": [
+          {
+            "postId": "$uuid19",
+            "status": "PENDING",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/local/thumbnail/p12.webp",
+            "topicDate": "2026-09-30"
+          }
+        ],
+        "year": 2026
+      },
       "headers": [
         [
           "cache-control",
@@ -539,22 +602,15 @@
           "0"
         ]
       ],
-      "body": {
-        "year": 2026,
-        "month": 9,
-        "posts": [
-          {
-            "topicDate": "2026-09-30",
-            "postId": "$uuid19",
-            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/local/thumbnail/p12.webp",
-            "status": "PENDING"
-          }
-        ]
-      }
+      "status": 200,
+      "step": "캘린더: 9월"
     },
     {
-      "step": "캘린더: 게시물 없는 달",
-      "status": 200,
+      "body": {
+        "month": 1,
+        "posts": [],
+        "year": 2026
+      },
       "headers": [
         [
           "cache-control",
@@ -589,15 +645,28 @@
           "0"
         ]
       ],
-      "body": {
-        "year": 2026,
-        "month": 1,
-        "posts": []
-      }
+      "status": 200,
+      "step": "캘린더: 게시물 없는 달"
     },
     {
-      "step": "캘린더: 다른 회원",
-      "status": 200,
+      "body": {
+        "month": 10,
+        "posts": [
+          {
+            "postId": "$uuid22",
+            "status": "APPROVED",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/local/thumbnail/p10.webp",
+            "topicDate": "2026-10-11"
+          },
+          {
+            "postId": "$uuid23",
+            "status": "APPROVED",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/local/thumbnail/p2.webp",
+            "topicDate": "2026-10-12"
+          }
+        ],
+        "year": 2026
+      },
       "headers": [
         [
           "cache-control",
@@ -632,28 +701,14 @@
           "0"
         ]
       ],
-      "body": {
-        "year": 2026,
-        "month": 10,
-        "posts": [
-          {
-            "topicDate": "2026-10-11",
-            "postId": "$uuid22",
-            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/local/thumbnail/p10.webp",
-            "status": "APPROVED"
-          },
-          {
-            "topicDate": "2026-10-12",
-            "postId": "$uuid23",
-            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/local/thumbnail/p2.webp",
-            "status": "APPROVED"
-          }
-        ]
-      }
+      "status": 200,
+      "step": "캘린더: 다른 회원"
     },
     {
-      "step": "캘린더: 월 0",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 연월이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -688,14 +743,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "캘린더: 월 0"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "조회 연월이 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "캘린더: 월 13",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -730,14 +785,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "캘린더: 월 13"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "조회 연월이 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "캘린더: 연도 0",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -772,14 +827,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "캘린더: 연도 0"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "조회 연월이 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "캘린더: 연도 누락",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -814,14 +869,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "캘린더: 연도 누락"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "조회 연월이 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "캘린더: 월 누락",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -856,14 +911,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "조회 연월이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "캘린더: 월 누락"
     },
     {
-      "step": "캘린더: 숫자 아님",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "year: 요청 값의 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -898,14 +953,15 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "year: 요청 값의 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "캘린더: 숫자 아님"
     },
     {
-      "step": "캘린더: 큰 연도",
-      "status": 200,
+      "body": {
+        "month": 12,
+        "posts": [],
+        "year": 9999
+      },
       "headers": [
         [
           "cache-control",
@@ -940,15 +996,14 @@
           "0"
         ]
       ],
-      "body": {
-        "year": 9999,
-        "month": 12,
-        "posts": []
-      }
+      "status": 200,
+      "step": "캘린더: 큰 연도"
     },
     {
-      "step": "캘린더: 범위 밖 연도",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "조회 연월이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -983,14 +1038,22 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "조회 연월이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "캘린더: 범위 밖 연도"
     },
     {
-      "step": "캘린더: 차단된 회원",
-      "status": 200,
+      "body": {
+        "month": 10,
+        "posts": [
+          {
+            "postId": "$uuid33",
+            "status": "APPROVED",
+            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/local/thumbnail/p4.webp",
+            "topicDate": "2026-10-12"
+          }
+        ],
+        "year": 2026
+      },
       "headers": [
         [
           "cache-control",
@@ -1025,22 +1088,14 @@
           "0"
         ]
       ],
-      "body": {
-        "year": 2026,
-        "month": 10,
-        "posts": [
-          {
-            "topicDate": "2026-10-12",
-            "postId": "$uuid33",
-            "thumbnailImageUrl": "https://cdn.test.chalkak/posts/local/thumbnail/p4.webp",
-            "status": "APPROVED"
-          }
-        ]
-      }
+      "status": 200,
+      "step": "캘린더: 차단된 회원"
     },
     {
-      "step": "캘린더 월 목록: 인증 없음",
-      "status": 401,
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1079,14 +1134,22 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      }
+      "status": 401,
+      "step": "캘린더 월 목록: 인증 없음"
     },
     {
-      "step": "캘린더 월 목록",
-      "status": 200,
+      "body": {
+        "months": [
+          {
+            "month": 10,
+            "year": 2026
+          },
+          {
+            "month": 9,
+            "year": 2026
+          }
+        ]
+      },
       "headers": [
         [
           "cache-control",
@@ -1121,22 +1184,18 @@
           "0"
         ]
       ],
+      "status": 200,
+      "step": "캘린더 월 목록"
+    },
+    {
       "body": {
         "months": [
           {
-            "year": 2026,
-            "month": 10
-          },
-          {
-            "year": 2026,
-            "month": 9
+            "month": 10,
+            "year": 2026
           }
         ]
-      }
-    },
-    {
-      "step": "캘린더 월 목록: 게시물 없는 회원",
-      "status": 200,
+      },
       "headers": [
         [
           "cache-control",
@@ -1171,18 +1230,18 @@
           "0"
         ]
       ],
+      "status": 200,
+      "step": "캘린더 월 목록: 게시물 없는 회원"
+    },
+    {
       "body": {
         "months": [
           {
-            "year": 2026,
-            "month": 10
+            "month": 10,
+            "year": 2026
           }
         ]
-      }
-    },
-    {
-      "step": "캘린더 월 목록: 차단된 회원",
-      "status": 200,
+      },
       "headers": [
         [
           "cache-control",
@@ -1217,67 +1276,8 @@
           "0"
         ]
       ],
-      "body": {
-        "months": [
-          {
-            "year": 2026,
-            "month": 10
-          }
-        ]
-      }
+      "status": 200,
+      "step": "캘린더 월 목록: 차단된 회원"
     }
-  ],
-  "db": {
-    "photos": [
-      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p1.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p1.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p10.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p10.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p11.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p11.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p12.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p12.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p2.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p2.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p3.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p3.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p4.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p4.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p5.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p5.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p6.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p6.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p7.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p7.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p8.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p8.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":4032,\"height\":3024,\"byteSize\":183423,\"location\":{\"latitude\":37.5665,\"longitude\":126.978},\"capturedAt\":\"<t-3600s db +09:00>\",\"metaAttributes\":{\"iso\":100,\"make\":\"Apple\"}},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/p9.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/p9.webp\"}"
-    ],
-    "post_likes": [
-      "{\"id\":\"$uuid?\",\"post_id\":\"$uuid17\",\"user_id\":\"$uuid?\",\"created_at\":\"<t-60s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"post_id\":\"$uuid23\",\"user_id\":\"$uuid?\",\"created_at\":\"<t-60s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"post_id\":\"$uuid3\",\"user_id\":\"$uuid?\",\"created_at\":\"<t-60s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"post_id\":\"$uuid3\",\"user_id\":\"$uuid?\",\"created_at\":\"<t-60s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"post_id\":\"$uuid3\",\"user_id\":\"$uuid?\",\"created_at\":\"<t-60s db +09:00>\"}"
-    ],
-    "posts": [
-      "{\"id\":\"$uuid11\",\"title\":\"셋\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-2400s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-2400s db +09:00>\",\"moderated_at\":\"<t-2400s db +09:00>\",\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid16\",\"title\":\"그제\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-169200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-169200s db +09:00>\",\"moderated_at\":\"<t-169200s db +09:00>\",\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid17\",\"title\":\"어제\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-82800s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-82800s db +09:00>\",\"moderated_at\":\"<t-82800s db +09:00>\",\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid19\",\"title\":\"지난달\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-1033200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-1033200s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid22\",\"title\":\"어제2\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-79200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-79200s db +09:00>\",\"moderated_at\":\"<t-79200s db +09:00>\",\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid23\",\"title\":null,\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-3000s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-3000s db +09:00>\",\"moderated_at\":\"<t-3000s db +09:00>\",\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid3\",\"title\":\"하나\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-3600s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-3600s db +09:00>\",\"moderated_at\":\"<t-3600s db +09:00>\",\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid33\",\"title\":\"차단\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-1800s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-1800s db +09:00>\",\"moderated_at\":\"<t-1800s db +09:00>\",\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid5\",\"title\":\"대기\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-1200s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-1200s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid8\",\"title\":\"검증\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-300s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-300s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"VALIDATING\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid?\",\"title\":\"반려\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-600s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-600s db +09:00>\",\"moderated_at\":\"<t-600s db +09:00>\",\"moderation_status\":\"REJECTED\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid?\",\"title\":\"삭제\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-240s db +09:00>\",\"deleted_at\":\"<t-240s db +09:00>\",\"updated_at\":\"<t-240s db +09:00>\",\"moderated_at\":\"<t-240s db +09:00>\",\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}"
-    ],
-    "topics": [
-      "{\"id\":\"$uuid?\",\"title\":\"그제\",\"ends_at\":\"<t-118800s db +09:00>\",\"starts_at\":\"<t-205200s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-10\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"title\":\"어제\",\"ends_at\":\"<t-32400s db +09:00>\",\"starts_at\":\"<t-118800s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-11\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"title\":\"오늘\",\"ends_at\":\"<t+54000s db +09:00>\",\"starts_at\":\"<t-32400s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"title\":\"지난달\",\"ends_at\":\"<t-982800s db +09:00>\",\"starts_at\":\"<t-1069200s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-09-30\",\"updated_at\":\"<t+0s db +09:00>\"}"
-    ],
-    "users": [
-      "{\"id\":\"$uuid?\",\"email\":\"u1@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u1/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u1/thumbnail.png\"}",
-      "{\"id\":\"$uuid?\",\"email\":\"u2@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u2/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u2/thumbnail.png\"}",
-      "{\"id\":\"$uuid?\",\"email\":\"u3@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u3/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u3/thumbnail.png\"}",
-      "{\"id\":\"$uuid?\",\"email\":\"u4@test.chalkak\",\"status\":\"BANNED\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u4/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u4/thumbnail.png\"}",
-      "{\"id\":\"$uuid?\",\"email\":\"u5@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u5/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u5/thumbnail.png\"}",
-      "{\"id\":\"$uuid?\",\"email\":\"u6@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u6/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u6/thumbnail.png\"}",
-      "{\"id\":\"$uuid?\",\"email\":\"u7@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u7/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u7/thumbnail.png\"}",
-      "{\"id\":\"$uuid?\",\"email\":\"u8@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u8/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u8/thumbnail.png\"}"
-    ]
-  }
+  ]
 }
