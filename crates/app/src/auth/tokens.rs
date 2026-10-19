@@ -62,17 +62,28 @@ impl AccessTokenIssuer {
         }
     }
 
-    /// 회원 scope(`USER`) 액세스 토큰.
+    /// 회원 scope(`USER`) 액세스 토큰. 로그인 세션을 알 수 없는 발급(`issue(subject, scope)`)이다.
     pub fn issue(&self, user_id: Uuid) -> IssuedAccessToken {
-        self.issue_with_scope(&user_id.to_string(), "USER")
+        self.issue_with_scope(&user_id.to_string(), "USER", None)
     }
 
-    pub fn issue_with_scope(&self, subject: &str, scope: &str) -> IssuedAccessToken {
+    /// 회원 scope(`USER`) 액세스 토큰에 로그인 세션 식별자(`session_id`)를 실어 낸다(`issueForSession`).
+    pub fn issue_for_session(&self, user_id: Uuid, session_id: Uuid) -> IssuedAccessToken {
+        self.issue_with_scope(&user_id.to_string(), "USER", Some(session_id))
+    }
+
+    pub fn issue_with_scope(
+        &self,
+        subject: &str,
+        scope: &str,
+        session_id: Option<Uuid>,
+    ) -> IssuedAccessToken {
         let issued_at = self.clock.now();
         let expires_at = issued_at
             .saturating_add(to_signed(self.expiration))
             .unwrap_or(issued_at);
         let jti = Uuid::new_v4().to_string();
+        let session_id = session_id.map(|id| id.to_string());
         let claims = AccessTokenClaims {
             issuer: TOKEN_ISSUER,
             audience: &self.audience,
@@ -81,6 +92,7 @@ impl AccessTokenIssuer {
             expires_at: expires_at.as_second(),
             jti: &jti,
             scope,
+            session_id: session_id.as_deref(),
         };
         let value = hs256_encode(&access_token_header(), &claims.to_value(), &self.key);
         IssuedAccessToken {
@@ -422,10 +434,44 @@ mod tests {
         assert_eq!(claims.get_str("scope"), Some("USER"));
     }
 
+    // JwtAccessTokenProviderTest#issueForSession: 회원 토큰에만 로그인 ID(session_id)를 싣는다.
+    #[test]
+    fn issue_for_session_adds_the_session_id_claim_after_the_issuer() {
+        let user = Uuid::new_v4();
+        let session = Uuid::new_v4();
+        let issued = access_issuer(ACCESS_NOW).issue_for_session(user, session);
+        assert!(access_token_accepted(&issued.value, ACCESS_NOW));
+        let claims = hs256_decode(&issued.value, &secret()).unwrap();
+        assert_eq!(
+            claims.get_str("session_id"),
+            Some(session.to_string().as_str())
+        );
+        assert_eq!(claims.get_str("scope"), Some("USER"));
+        let keys: Vec<&str> = claims.as_map().keys().map(String::as_str).collect();
+        assert_eq!(
+            keys,
+            [
+                "sub",
+                "aud",
+                "purpose",
+                "scope",
+                "iss",
+                "session_id",
+                "exp",
+                "iat",
+                "jti"
+            ]
+        );
+        // 로그인 ID를 모르는 발급에는 클레임 자체가 없다.
+        let plain = access_issuer(ACCESS_NOW).issue(user);
+        let plain_claims = hs256_decode(&plain.value, &secret()).unwrap();
+        assert_eq!(plain_claims.get_str("session_id"), None);
+    }
+
     #[test]
     fn issue_admin_scope_issues_admin_access_token() {
         let admin = Uuid::new_v4();
-        let issued = access_issuer(ACCESS_NOW).issue_with_scope(&admin.to_string(), "ADMIN");
+        let issued = access_issuer(ACCESS_NOW).issue_with_scope(&admin.to_string(), "ADMIN", None);
         let claims = hs256_decode(&issued.value, &secret()).unwrap();
         assert_eq!(claims.subject(), Some(admin.to_string().as_str()));
         assert_eq!(claims.get_str("scope"), Some("ADMIN"));

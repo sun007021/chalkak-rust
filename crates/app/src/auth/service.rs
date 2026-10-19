@@ -256,10 +256,13 @@ impl ExistingSocialAccountLoginProcessor {
             if user.is_deleted() {
                 return Ok(None);
             }
+            let refresh_token = self.refresh_tokens.issue(tx, user.id)?;
             Ok(Some(SocialLoginSuccess {
                 user_id: user.id,
-                access_token: self.access_tokens.issue(user.id),
-                refresh_token: self.refresh_tokens.issue(tx, user.id)?,
+                access_token: self
+                    .access_tokens
+                    .issue_for_session(user.id, refresh_token.session_id),
+                refresh_token,
             }))
         })
     }
@@ -526,10 +529,13 @@ impl SocialSignupService {
         db: &mut impl Db,
         user_id: Uuid,
     ) -> Result<SocialSignupResult, ApiError> {
+        let refresh_token = self.refresh_tokens.issue(db, user_id)?;
         Ok(SocialSignupResult {
             user_id,
-            access_token: self.access_tokens.issue(user_id),
-            refresh_token: self.refresh_tokens.issue(db, user_id)?,
+            access_token: self
+                .access_tokens
+                .issue_for_session(user_id, refresh_token.session_id),
+            refresh_token,
         })
     }
 

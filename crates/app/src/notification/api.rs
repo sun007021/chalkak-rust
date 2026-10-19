@@ -7,7 +7,7 @@ use chalkak_http::{Method, Request, Response};
 use serde::Serialize;
 use uuid::Uuid;
 
-use super::domain::NotificationType;
+use super::domain::{NotificationSourceType, NotificationType};
 use super::service::{
     NotificationDetailResult, NotificationInboxService, NotificationListResult,
     NotificationSummaryResult,
@@ -44,6 +44,8 @@ struct NotificationSummaryResponse {
     id: String,
     #[serde(rename = "type")]
     kind: &'static str,
+    source_type: Option<&'static str>,
+    source_id: Option<String>,
     title: String,
     body: String,
     thumbnail_image_url: Option<String>,
@@ -94,6 +96,8 @@ impl From<NotificationSummaryResult> for NotificationSummaryResponse {
         NotificationSummaryResponse {
             id: s.id.to_string(),
             kind: type_name(s.kind),
+            source_type: s.source_type.map(NotificationSourceType::as_str),
+            source_id: s.source_id.map(|id| id.to_string()),
             title: s.title,
             body: s.body,
             thumbnail_image_url: s.thumbnail_image_url,
@@ -466,6 +470,8 @@ mod tests {
         let summary = NotificationSummaryResponse {
             id: "i".to_owned(),
             kind: "POST_APPROVED",
+            source_type: Some("POST"),
+            source_id: Some("s".to_owned()),
             title: "t".to_owned(),
             body: "b".to_owned(),
             thumbnail_image_url: None,
@@ -474,7 +480,7 @@ mod tests {
         };
         assert_eq!(
             crate::web::json::to_json(&summary),
-            r#"{"id":"i","type":"POST_APPROVED","title":"t","body":"b","thumbnailImageUrl":null,"readAt":null,"createdAt":"2026-09-29T09:00:00Z"}"#
+            r#"{"id":"i","type":"POST_APPROVED","sourceType":"POST","sourceId":"s","title":"t","body":"b","thumbnailImageUrl":null,"readAt":null,"createdAt":"2026-09-29T09:00:00Z"}"#
         );
         let detail = NotificationDetailResponse {
             id: "i".to_owned(),

@@ -9,10 +9,29 @@ use jiff::Timestamp;
 use postgres::Row;
 use uuid::Uuid;
 
-use super::domain::{Notification, NotificationType};
+use super::domain::{Notification, NotificationSourceType, NotificationType, PublishStatus};
 
-const NOTIFICATION_COLUMNS: &str = "n.id, n.user_id, n.post_id, n.event_key, n.type, n.title, n.body, \
-     n.rejection_reason, n.read_at, n.created_at";
+const NOTIFICATION_COLUMNS: &str = "n.id, n.user_id, n.source_type, n.source_id, n.event_key, n.type, \
+     n.title, n.body, n.payload ->> 'rejectionReason' AS rejection_reason, n.read_at, n.created_at, \
+     n.sqs_publish_status, n.next_attempt_at, n.sqs_published_at";
+
+/// 알림함에 보이는 알림의 조건(`findSummariesByUserId` 등의 JPQL). 대상이 게시물이면 삭제되지 않은 게시물이어야 하고, 공지면
+/// 삭제되지 않은 공지여야 한다. 대상이 없거나 주제면 항상 보인다. `p`는 게시물, `nt`는 공지를 `source_id`로 잇는다.
+const VISIBLE_SOURCE: &str = "(n.source_type IS NULL OR n.source_type <> 'POST' \
+     OR (p.id IS NOT NULL AND p.deleted_at IS NULL)) \
+     AND (n.source_type IS NULL OR n.source_type <> 'NOTICE' \
+     OR (nt.id IS NOT NULL AND nt.deleted_at IS NULL))";
+
+/// 위 조건이 쓰는 조인.
+const SOURCE_JOINS: &str = "LEFT JOIN posts p ON n.source_type = 'POST' AND p.id = n.source_id \
+     LEFT JOIN photos photo ON photo.id = p.photo_id \
+     LEFT JOIN notices nt ON n.source_type = 'NOTICE' AND nt.id = n.source_id";
+
+/// `markRead`/`markAllRead`가 같은 조건을 EXISTS로 거는 문장 조각(UPDATE는 조인을 쓰지 않는다).
+const VISIBLE_SOURCE_EXISTS: &str = "(n.source_type IS NULL OR n.source_type <> 'POST' \
+     OR EXISTS (SELECT 1 FROM posts p WHERE p.id = n.source_id AND p.deleted_at IS NULL)) \
+     AND (n.source_type IS NULL OR n.source_type <> 'NOTICE' \
+     OR EXISTS (SELECT 1 FROM notices nt WHERE nt.id = n.source_id AND nt.deleted_at IS NULL))";
 
 /// 목록의 한 줄: 알림과 사진 썸네일의 스토리지 키(`NotificationSummary`).
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -25,7 +44,8 @@ pub struct NotificationSummary {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct NotificationDetail {
     pub notification: Notification,
-    pub original_storage_key: String,
+    /// 게시물 알림이 아니면 사진이 없다.
+    pub original_storage_key: Option<String>,
 }
 
 /// 목록 한 쪽(`NotificationSlice`).
@@ -40,12 +60,20 @@ pub struct NotificationRepository;
 
 fn from_row(row: &Row) -> Result<Notification, DbError> {
     let kind: String = row.try_get("type")?;
+    let source_type: Option<String> = row.try_get("source_type")?;
+    let publish_status: String = row.try_get("sqs_publish_status")?;
     Ok(Notification {
         id: Some(row.try_get("id")?),
         user_id: row.try_get("user_id")?,
-        post_id: row.try_get("post_id")?,
+        source_type: source_type
+            .map(|t| {
+                NotificationSourceType::parse(&t)
+                    .ok_or_else(|| DbError::Config(format!("알 수 없는 알림 대상 종류: {t}")))
+            })
+            .transpose()?,
+        source_id: row.try_get("source_id")?,
         event_key: row.try_get("event_key")?,
-        // `ck_notifications_type` 제약이 두 값만 허용한다.
+        // 종류는 열거형 이름이라 알 수 없는 값은 원본도 읽다가 실패한다.
         kind: NotificationType::parse(&kind)
             .ok_or_else(|| DbError::Config(format!("알 수 없는 알림 종류: {kind}")))?,
         title: row.try_get("title")?,
@@ -53,26 +81,40 @@ fn from_row(row: &Row) -> Result<Notification, DbError> {
         rejection_reason: row.try_get("rejection_reason")?,
         read_at: row.try_get("read_at")?,
         created_at: row.try_get("created_at")?,
+        publish_status: PublishStatus::parse(&publish_status)
+            .ok_or_else(|| DbError::Config(format!("알 수 없는 발행 상태: {publish_status}")))?,
+        next_attempt_at: row.try_get("next_attempt_at")?,
+        published_at: row.try_get("sqs_published_at")?,
     })
 }
 
 impl NotificationRepository {
     /// `save`: INSERT 하고 DB가 만든 `id`를 채운다.
     pub fn save(&self, db: &mut impl Db, notification: &mut Notification) -> Result<(), DbError> {
+        // 반려 사유는 `NotificationPayload` 레코드(`{"rejectionReason": ...}`)로 저장한다.
+        let payload = notification
+            .rejection_reason
+            .as_ref()
+            .map(|reason| serde_json::json!({ "rejectionReason": reason }).to_string());
         let row = db.query_one(
             "INSERT INTO notifications \
-             (user_id, post_id, event_key, type, title, body, rejection_reason, read_at, created_at) \
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id",
+             (user_id, source_type, source_id, event_key, type, title, body, payload, read_at, \
+              created_at, sqs_publish_status, next_attempt_at, sqs_published_at) \
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8::text::jsonb, $9, $10, $11, $12, $13) RETURNING id",
             &[
                 &notification.user_id,
-                &notification.post_id,
+                &notification.source_type.map(NotificationSourceType::as_str),
+                &notification.source_id,
                 &notification.event_key,
                 &notification.kind.as_str(),
                 &notification.title,
                 &notification.body,
-                &notification.rejection_reason,
+                &payload,
                 &notification.read_at,
                 &notification.created_at,
+                &notification.publish_status.as_str(),
+                &notification.next_attempt_at,
+                &notification.published_at,
             ],
         )?;
         notification.id = Some(row.try_get("id")?);
@@ -80,24 +122,23 @@ impl NotificationRepository {
     }
 
     /// `findByUserId`: 최신순(`created_at DESC, id DESC`)으로 `offset`부터 `page_size`건. 한 건을 더 읽어 다음 쪽 여부를 안다
-    /// (Spring Data `Slice`).
+    /// (Spring Data `Slice`). `created_from` 이전에 생긴 알림은 보이지 않는다.
     pub fn find_by_user_id(
         &self,
         db: &mut impl Db,
         user_id: Uuid,
         offset: i64,
         page_size: i64,
+        created_from: Timestamp,
     ) -> Result<NotificationSlice, DbError> {
         let sql = format!(
             "SELECT {NOTIFICATION_COLUMNS}, photo.thumbnail_storage_key \
-             FROM notifications n \
-             JOIN posts p ON p.id = n.post_id \
-             JOIN photos photo ON photo.id = p.photo_id \
-             WHERE n.user_id = $1 AND p.deleted_at IS NULL \
+             FROM notifications n {SOURCE_JOINS} \
+             WHERE n.user_id = $1 AND n.created_at >= $4 AND {VISIBLE_SOURCE} \
              ORDER BY n.created_at DESC, n.id DESC \
              LIMIT $2 OFFSET $3"
         );
-        let rows = db.query(&sql, &[&user_id, &(page_size + 1), &offset])?;
+        let rows = db.query(&sql, &[&user_id, &(page_size + 1), &offset, &created_from])?;
         let has_next = rows.len() as i64 > page_size;
         let notifications = rows
             .iter()
@@ -121,15 +162,14 @@ impl NotificationRepository {
         db: &mut impl Db,
         notification_id: Uuid,
         user_id: Uuid,
+        created_from: Timestamp,
     ) -> Result<Option<NotificationDetail>, DbError> {
         let sql = format!(
             "SELECT {NOTIFICATION_COLUMNS}, photo.original_storage_key \
-             FROM notifications n \
-             JOIN posts p ON p.id = n.post_id \
-             JOIN photos photo ON photo.id = p.photo_id \
-             WHERE n.id = $1 AND n.user_id = $2 AND p.deleted_at IS NULL"
+             FROM notifications n {SOURCE_JOINS} \
+             WHERE n.id = $1 AND n.user_id = $2 AND n.created_at >= $3 AND {VISIBLE_SOURCE}"
         );
-        db.query_opt(&sql, &[&notification_id, &user_id])?
+        db.query_opt(&sql, &[&notification_id, &user_id, &created_from])?
             .as_ref()
             .map(|row| {
                 Ok(NotificationDetail {
@@ -140,18 +180,18 @@ impl NotificationRepository {
             .transpose()
     }
 
-    /// `existsUnreadByUserId`
+    /// `existsVisibleUnreadByUserId`
     pub fn exists_unread_by_user_id(
         &self,
         db: &mut impl Db,
         user_id: Uuid,
+        created_from: Timestamp,
     ) -> Result<bool, DbError> {
-        let row = db.query_one(
-            "SELECT EXISTS (SELECT 1 FROM notifications n \
-             JOIN posts p ON p.id = n.post_id \
-             WHERE n.user_id = $1 AND n.read_at IS NULL AND p.deleted_at IS NULL)",
-            &[&user_id],
-        )?;
+        let sql = format!(
+            "SELECT EXISTS (SELECT 1 FROM notifications n {SOURCE_JOINS} \
+             WHERE n.user_id = $1 AND n.read_at IS NULL AND n.created_at >= $2 AND {VISIBLE_SOURCE})"
+        );
+        let row = db.query_one(&sql, &[&user_id, &created_from])?;
         Ok(row.try_get(0)?)
     }
 
@@ -162,13 +202,13 @@ impl NotificationRepository {
         notification_id: Uuid,
         user_id: Uuid,
         read_at: Timestamp,
+        created_from: Timestamp,
     ) -> Result<u64, DbError> {
-        Ok(db.execute(
+        let sql = format!(
             "UPDATE notifications n SET read_at = coalesce(n.read_at, $3) \
-             WHERE n.id = $1 AND n.user_id = $2 \
-             AND EXISTS (SELECT 1 FROM posts p WHERE p.id = n.post_id AND p.deleted_at IS NULL)",
-            &[&notification_id, &user_id, &read_at],
-        )?)
+             WHERE n.id = $1 AND n.user_id = $2 AND n.created_at >= $4 AND {VISIBLE_SOURCE_EXISTS}"
+        );
+        Ok(db.execute(&sql, &[&notification_id, &user_id, &read_at, &created_from])?)
     }
 
     /// `markAllRead`
@@ -177,13 +217,14 @@ impl NotificationRepository {
         db: &mut impl Db,
         user_id: Uuid,
         read_at: Timestamp,
+        created_from: Timestamp,
     ) -> Result<u64, DbError> {
-        Ok(db.execute(
+        let sql = format!(
             "UPDATE notifications n SET read_at = $2 \
-             WHERE n.user_id = $1 AND n.read_at IS NULL \
-             AND EXISTS (SELECT 1 FROM posts p WHERE p.id = n.post_id AND p.deleted_at IS NULL)",
-            &[&user_id, &read_at],
-        )?)
+             WHERE n.user_id = $1 AND n.read_at IS NULL AND n.created_at >= $3 \
+             AND {VISIBLE_SOURCE_EXISTS}"
+        );
+        Ok(db.execute(&sql, &[&user_id, &read_at, &created_from])?)
     }
 
     /// `deleteExpiredForActiveUsers`: 탈퇴하지 않은 회원의 알림 중 `created_before`보다 먼저 만들어진 것.

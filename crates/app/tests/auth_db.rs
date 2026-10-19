@@ -871,6 +871,100 @@ fn revoke_all_multiple_devices_revokes_every_lineage() {
     assert_eq!(f.token_row(&second).revoked_at, Some(now()));
 }
 
+/// 로그인(계보)에 연결된 푸시 기기를 만든다. 토큰 해시는 세션마다 달라야 한다.
+fn insert_push_device(f: &Fixture, user: &User, session_id: Uuid) {
+    f.db.client()
+        .execute(
+            "INSERT INTO push_devices (user_id, session_id, fcm_token, fcm_token_hash, registered_at, updated_at) \
+             VALUES ($1, $2, $3, $4, now(), now())",
+            &[
+                &user.id,
+                &session_id,
+                &format!("token-{session_id}"),
+                &format!("{0}{0}", session_id.simple()),
+            ],
+        )
+        .unwrap();
+}
+
+fn push_device_count(f: &Fixture) -> i64 {
+    f.db.client()
+        .query_one("SELECT count(*) FROM push_devices", &[])
+        .unwrap()
+        .get(0)
+}
+
+// UserRefreshTokenService#issueAccessToken: 재발급한 액세스 토큰은 소비한 토큰의 로그인 ID를 session_id로 싣는다.
+#[test]
+fn refresh_access_token_carries_the_session_id_of_the_lineage() {
+    let Some(f) = fixture() else { return };
+    let user = save_user(&f.db);
+    let issued = f.issue(&user);
+    let session_id = f.token_row(&issued).session_id;
+
+    let result = f.service.refresh(&issued).unwrap();
+
+    let claims = chalkak_jwt::hs256_decode(&result.access_token.value, &[7; 32]).unwrap();
+    assert_eq!(
+        claims.get_str("session_id"),
+        Some(session_id.hyphenated().to_string().as_str())
+    );
+    assert_eq!(claims.get_str("scope"), Some("USER"));
+}
+
+// UserRefreshTokenService#revokeSession: 로그아웃하면 그 로그인의 푸시 기기만 지운다.
+#[test]
+fn logout_deletes_only_the_push_device_of_that_session() {
+    let Some(f) = fixture() else { return };
+    let user = save_user(&f.db);
+    let logged_out = f.issue(&user);
+    let other = f.issue(&user);
+    insert_push_device(&f, &user, f.token_row(&logged_out).session_id);
+    insert_push_device(&f, &user, f.token_row(&other).session_id);
+
+    f.service.logout(&logged_out).unwrap();
+
+    assert_eq!(push_device_count(&f), 1);
+    let left: Uuid =
+        f.db.client()
+            .query_one("SELECT session_id FROM push_devices", &[])
+            .unwrap()
+            .get(0);
+    assert_eq!(left, f.token_row(&other).session_id);
+}
+
+// UserRefreshTokenService#revokeOwner: 전체 폐기(탈퇴)는 회원의 푸시 기기를 모두 지운다.
+#[test]
+fn revoke_all_deletes_every_push_device_of_the_user() {
+    let Some(f) = fixture() else { return };
+    let user = save_user(&f.db);
+    let other_user = save_user(&f.db);
+    let first = f.issue(&user);
+    let second = f.issue(&user);
+    let others = f.issue(&other_user);
+    insert_push_device(&f, &user, f.token_row(&first).session_id);
+    insert_push_device(&f, &user, f.token_row(&second).session_id);
+    insert_push_device(&f, &other_user, f.token_row(&others).session_id);
+
+    f.service.revoke_all(&mut f.db.client(), user.id).unwrap();
+
+    assert_eq!(push_device_count(&f), 1);
+}
+
+// 재사용이 탐지되면 계보를 폐기하면서 그 로그인의 푸시 기기도 지운다.
+#[test]
+fn reuse_detection_deletes_the_push_device_of_the_lineage() {
+    let Some(f) = fixture() else { return };
+    let user = save_user(&f.db);
+    let issued = f.issue(&user);
+    insert_push_device(&f, &user, f.token_row(&issued).session_id);
+    f.service.refresh(&issued).unwrap();
+
+    f.assert_reauthentication_required(&issued);
+
+    assert_eq!(push_device_count(&f), 0);
+}
+
 // ---------------------------------------------------------------------------------------------
 // UserRefreshTokenConcurrencyTest
 // ---------------------------------------------------------------------------------------------

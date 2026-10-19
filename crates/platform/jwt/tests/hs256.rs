@@ -228,6 +228,7 @@ fn 원본_액세스_토큰과_바이트가_같다_jwt_access_token_provider() {
             expires_at: now + access["expiration_secs"].as_i64().unwrap(),
             jti: s(&t["jti"]),
             scope: s(&t["scope"]),
+            session_id: None,
         };
         let issued = hs256_encode(&access_token_header(), &claims.to_value(), &key);
         assert_eq!(issued, s(&t["token"]), "scope {}", s(&t["scope"]));
