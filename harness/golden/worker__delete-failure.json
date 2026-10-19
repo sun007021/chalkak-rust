@@ -1,0 +1,77 @@
+{
+  "db": {
+    "users": [
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"user1@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/user1/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}"
+    ]
+  },
+  "fakes": [
+    {
+      "body": {
+        "MaxNumberOfMessages": 1,
+        "MessageSystemAttributeNames": [
+          "ApproximateReceiveCount"
+        ],
+        "QueueUrl": "https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-test-push",
+        "VisibilityTimeout": 60,
+        "WaitTimeSeconds": 20
+      },
+      "contentType": "application/x-amz-json-1.0",
+      "detail": "ReceiveMessage",
+      "method": "POST",
+      "service": "sqs"
+    },
+    {
+      "body": {
+        "QueueUrl": "https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-test-push",
+        "ReceiptHandle": "fake-receipt-1"
+      },
+      "contentType": "application/x-amz-json-1.0",
+      "detail": "DeleteMessage",
+      "method": "POST",
+      "service": "sqs"
+    }
+  ],
+  "steps": [
+    {
+      "body": {
+        "hasUnread": false
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "잘못된 본문 하나를 받아 처리하고 삭제를 시도할 때까지 기다린다"
+    }
+  ]
+}

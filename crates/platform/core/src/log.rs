@@ -31,7 +31,7 @@ use jiff::tz::TimeZone;
 use serde_json::Value;
 
 use crate::clock::Clock;
-use crate::request_id;
+use crate::{mdc, request_id};
 
 /// 원본 `LogFields`의 키 이름과 값.
 pub mod fields {
@@ -115,6 +115,8 @@ pub struct LogEvent {
     pub message: String,
     /// MDC `requestId`.
     pub request_id: Option<String>,
+    /// `requestId` 밖의 MDC 항목(넣은 순서). `requestId` 다음에 최상위 키로 싣는다.
+    pub mdc: Vec<(String, String)>,
     /// key-value 쌍(추가한 순서).
     pub fields: Vec<(String, Value)>,
     pub stack_trace: Option<String>,
@@ -153,6 +155,16 @@ pub fn format_event(event: &LogEvent, tz: &TimeZone) -> String {
         write_string(&mut out, id);
     }
     let mut seen: Vec<&str> = Vec::new();
+    for (key, value) in &event.mdc {
+        if RESERVED.contains(&key.as_str()) || seen.contains(&key.as_str()) {
+            continue;
+        }
+        seen.push(key);
+        out.push(',');
+        write_string(&mut out, key);
+        out.push(':');
+        write_string(&mut out, value);
+    }
     for (key, value) in &event.fields {
         if RESERVED.contains(&key.as_str()) || seen.contains(&key.as_str()) {
             continue;
@@ -394,6 +406,7 @@ impl EventBuilder<'_> {
                 .map_or_else(|| format!("{:?}", thread.id()), str::to_owned),
             message: message.to_owned(),
             request_id: request_id::current(),
+            mdc: mdc::snapshot(),
             fields: self.fields,
             stack_trace: self.stack_trace,
         };
@@ -419,6 +432,7 @@ mod tests {
             thread: "main".into(),
             message: message.into(),
             request_id: None,
+            mdc: vec![],
             fields: vec![],
             stack_trace: None,
         }
@@ -444,6 +458,49 @@ mod tests {
             format_event(&e, &TimeZone::UTC),
             r#"{"@timestamp":"2026-10-12T16:38:58.198201888Z","@version":"1","message":"access","logger_name":"chalkak.access","thread_name":"main","level":"INFO","level_value":20000,"requestId":"0b9d6f0e-2a4b-4a5e-9f3a-1c2d3e4f5a6b","type":"access","method":"GET","route":"/api/v1/posts/{postId}","status":200,"durationMs":12,"userId":"u-1"}"#
         );
+    }
+
+    // SqsPushService: MDC sqsMessageId·receiveCount는 requestId 다음, key-value 앞의 최상위 키다.
+    #[test]
+    fn mdc_항목은_requestid_다음_key_value_앞에_온다() {
+        let mut e = event("푸시 발송 결과");
+        e.request_id = Some("req-1".into());
+        e.mdc = vec![
+            ("sqsMessageId".into(), "sqs-id".into()),
+            ("receiveCount".into(), "2".into()),
+        ];
+        e.fields = vec![("stage".into(), json!("fcm_result"))];
+        assert_eq!(
+            format_event(&e, &TimeZone::UTC),
+            r#"{"@timestamp":"2026-10-12T16:38:58.198201888Z","@version":"1","message":"푸시 발송 결과","logger_name":"chalkak.access","thread_name":"main","level":"INFO","level_value":20000,"requestId":"req-1","sqsMessageId":"sqs-id","receiveCount":"2","stage":"fcm_result"}"#
+        );
+    }
+
+    #[test]
+    fn 로거는_현재_스레드의_mdc를_싣는다() {
+        let sink = std::sync::Arc::new(Mutex::new(Vec::new()));
+        struct Shared(std::sync::Arc<Mutex<Vec<u8>>>);
+        impl Write for Shared {
+            fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+                self.0.lock().unwrap().extend_from_slice(buf);
+                Ok(buf.len())
+            }
+            fn flush(&mut self) -> std::io::Result<()> {
+                Ok(())
+            }
+        }
+        let clock = Arc::new(FixedClock::new(ts("2026-10-12T16:38:58Z")));
+        let logger = Logger::new(Box::new(Shared(sink.clone())), Level::Info, clock)
+            .with_time_zone(TimeZone::UTC);
+        {
+            let _mdc = mdc::enter(&[("sqsMessageId", Some("sqs-id"))]);
+            logger.info("x").log("안");
+        }
+        logger.info("x").log("밖");
+        let text = String::from_utf8(sink.lock().unwrap().clone()).unwrap();
+        let lines: Vec<&str> = text.lines().collect();
+        assert!(lines[0].contains(r#""sqsMessageId":"sqs-id""#));
+        assert!(!lines[1].contains("sqsMessageId"));
     }
 
     // RuntimeSnapshotLogger: 요청 밖이라 requestId가 없고 한글 메시지

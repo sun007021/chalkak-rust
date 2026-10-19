@@ -10,22 +10,15 @@
 //! `body`, `headers`(객체), `delay_ms`(응답 전 대기)를 줄 수 있다. 맞는 규칙이 없으면 정상 응답이다.
 
 use crate::http::{Request, Response};
+use crate::rules::{self, Rule};
 use chalkak_aws::sqs::md5_hex;
-use serde_json::{Map, Value, json};
+use serde_json::{Value, json};
 use std::time::{Duration, Instant};
 
 const JSON_1_0: &str = "application/x-amz-json-1.0";
 
-#[derive(Debug, Clone)]
-pub struct Rule {
-    op: Option<String>,
-    contains: Option<String>,
-    status: u16,
-    content_type: String,
-    body: String,
-    headers: Vec<(String, String)>,
-    delay_ms: u64,
-}
+/// 롱 폴링을 흉내 내며 기다리는 최대 시간. 앱은 20초를 요청하지만 시나리오 사이 초기화가 오래 막히지 않게 줄인다.
+pub const LONG_POLL_CAP: Duration = Duration::from_secs(1);
 
 #[derive(Debug, Clone)]
 struct Stored {
@@ -43,6 +36,8 @@ pub struct Sqs {
     messages: Vec<Stored>,
     next_id: u64,
     next_receipt: u64,
+    /// 마지막 `ReceiveMessage`가 빈 목록을 돌려줬는지(규칙 응답은 해당하지 않는다).
+    last_receive_empty: bool,
 }
 
 impl Sqs {
@@ -57,19 +52,9 @@ impl Sqs {
     }
 
     pub fn handle(&mut self, op: &str, req: &Request) -> Response {
+        self.last_receive_empty = false;
         let body = String::from_utf8_lossy(&req.body).into_owned();
-        if let Some(rule) = self
-            .rules
-            .iter()
-            .find(|r| {
-                r.op.as_deref().is_none_or(|o| o == op)
-                    && r.contains.as_deref().is_none_or(|c| body.contains(c))
-            })
-            .cloned()
-        {
-            let mut res = Response::new(rule.status, &rule.content_type, rule.body);
-            res.headers.extend(rule.headers);
-            res.delay_ms = rule.delay_ms;
+        if let Some(res) = rules::respond(&self.rules, op, &body) {
             return res;
         }
         let input: Value = serde_json::from_str(&body).unwrap_or(Value::Null);
@@ -135,7 +120,34 @@ impl Sqs {
                 "Attributes": { "ApproximateReceiveCount": m.receive_count.to_string() },
             }));
         }
+        self.last_receive_empty = out.is_empty();
         ok(&json!({ "Messages": out }))
+    }
+
+    /// 마지막 `ReceiveMessage`가 빈 목록이었는지. 비어 있으면 호출한 쪽이 `long_poll_wait`만큼 메시지를 기다린다.
+    pub fn last_receive_empty(&self) -> bool {
+        self.last_receive_empty
+    }
+
+    /// 롱 폴링으로 기다릴 시간: 요청의 `WaitTimeSeconds`를 `LONG_POLL_CAP`으로 줄인 값.
+    pub fn long_poll_wait(req: &Request) -> Duration {
+        let wait = serde_json::from_slice::<Value>(&req.body)
+            .ok()
+            .and_then(|v| v.get("WaitTimeSeconds").and_then(Value::as_u64))
+            .unwrap_or(0);
+        Duration::from_secs(wait).min(LONG_POLL_CAP)
+    }
+
+    /// 시나리오가 큐에 미리 넣어 두는 메시지(`SendMessage`처럼 저장하지만 기록·규칙은 거치지 않는다).
+    pub fn seed(&mut self, body: &str) {
+        self.next_id += 1;
+        self.messages.push(Stored {
+            id: format!("fake-message-{}", self.next_id),
+            body: body.to_owned(),
+            receive_count: 0,
+            visible_at: Instant::now(),
+            receipt: None,
+        });
     }
 
     fn delete(&mut self, input: &Value) -> Response {
@@ -182,11 +194,7 @@ impl Sqs {
 
     /// `sqs` 지정을 읽어 규칙으로 바꾼다. 형식이 틀리면 설명을 돌려준다.
     pub fn parse_rules(value: &Value) -> Result<Vec<Rule>, String> {
-        let list = value.as_array().ok_or("sqs는 규칙 배열이어야 합니다")?;
-        list.iter()
-            .enumerate()
-            .map(|(i, v)| parse_rule(i, v))
-            .collect()
+        rules::parse_rules("sqs", JSON_1_0, value)
     }
 
     pub fn set_rules(&mut self, rules: Vec<Rule>) {
@@ -204,45 +212,6 @@ fn error(status: u16, kind: &str, message: &str) -> Response {
         JSON_1_0,
         json!({ "__type": kind, "message": message }).to_string(),
     )
-}
-
-fn parse_rule(i: usize, v: &Value) -> Result<Rule, String> {
-    let name = format!("sqs[{i}]");
-    let obj = v
-        .as_object()
-        .ok_or_else(|| format!("{name}은 객체여야 합니다"))?;
-    let status = obj
-        .get("status")
-        .and_then(Value::as_u64)
-        .filter(|s| (100..600).contains(s))
-        .ok_or_else(|| format!("{name}.status가 필요합니다"))?;
-    let text = |key: &str| obj.get(key).and_then(Value::as_str).map(str::to_owned);
-    let headers = match obj.get("headers") {
-        None => Vec::new(),
-        Some(h) => headers_of(&name, h)?,
-    };
-    Ok(Rule {
-        op: text("op"),
-        contains: text("contains"),
-        status: status as u16,
-        content_type: text("content_type").unwrap_or_else(|| JSON_1_0.to_owned()),
-        body: text("body").unwrap_or_default(),
-        headers,
-        delay_ms: obj.get("delay_ms").and_then(Value::as_u64).unwrap_or(0),
-    })
-}
-
-fn headers_of(name: &str, h: &Value) -> Result<Vec<(String, String)>, String> {
-    let map: &Map<String, Value> = h
-        .as_object()
-        .ok_or_else(|| format!("{name}.headers는 객체여야 합니다"))?;
-    map.iter()
-        .map(|(k, v)| {
-            v.as_str()
-                .map(|s| (k.clone(), s.to_owned()))
-                .ok_or_else(|| format!("{name}.headers.{k}는 문자열이어야 합니다"))
-        })
-        .collect()
 }
 
 #[cfg(test)]

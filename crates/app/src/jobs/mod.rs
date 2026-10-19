@@ -10,6 +10,7 @@
 //! | 공지 알림함 배포 | 매분 0초 | `chalkak.notification.notice.distribution-enabled`(기본 꺼짐) |
 //! | 알림 SQS 발행(Relay) | 앞 실행이 끝난 뒤 1초(시작 즉시 한 번) | `chalkak.notification.sqs.relay-enabled`(기본 꺼짐) |
 //! | 주제 푸시 발행 | 매분 0초 | `chalkak.notification.sqs.topic-push-enabled`(기본 꺼짐) |
+//! | 푸시 Worker 폴링(2개) | 앞 실행이 끝난 뒤 1ms(시작 즉시 한 번) | `chalkak.notification.fcm.worker-enabled`(기본 꺼짐) |
 //! | 알림 발행 대기 모니터 | 60초마다(시작 즉시 한 번) | dev·prod 프로필에서만(끄는 키 없음) |
 //! | 런타임 상태 로그 | 60초마다(시작 즉시 한 번) | `chalkak.monitoring.runtime-log.enabled` |
 //!
@@ -43,6 +44,7 @@ use crate::auth::apple::AppleTokenClient;
 use crate::auth::tokens::AppleCipher;
 use crate::notification;
 use crate::notification::publication_monitor::NotificationPublicationMonitor;
+use crate::notification::push_worker_config::{FcmSettings, PushWorker};
 use crate::notification::relay::NotificationRelayService;
 use crate::notification::sqs_push::{PushMessagePublisher, SqsPushSettings};
 use crate::notification::topic_push::TopicPushService;
@@ -62,6 +64,10 @@ const TOPIC_SCHEDULER_LOGGER: &str =
 /// Relay가 앞 실행을 마친 뒤 다음 실행까지 쉬는 시간(`@Scheduled(fixedDelay = 1000)`).
 pub const RELAY_DELAY: Duration = Duration::from_secs(1);
 
+/// Worker 폴링이 앞 실행을 마친 뒤 다음 실행까지 쉬는 시간(`@Scheduled(fixedDelay = 1)`, 밀리초). 수신 자체가 롱 폴링이라
+/// 빈 큐에서도 바쁘게 돌지 않는다.
+pub const WORKER_POLL_DELAY: Duration = Duration::from_millis(1);
+
 /// 런타임 상태 로그 주기(`@Scheduled(fixedRate = 60_000)`).
 pub const RUNTIME_LOG_PERIOD: Duration = Duration::from_secs(60);
 
@@ -76,6 +82,9 @@ pub enum Job {
     NoticeDistribution,
     NotificationRelay,
     TopicPush,
+    /// 푸시 Worker 폴링. 원본은 같은 `SqsPollingScheduler` 빈 둘을 등록해 두 스레드가 동시에 수신한다.
+    NotificationWorkerFirst,
+    NotificationWorkerSecond,
     PublicationMonitor,
     RuntimeSnapshot,
 }
@@ -92,7 +101,7 @@ pub enum Schedule {
 }
 
 impl Job {
-    pub const ALL: [Job; 10] = [
+    pub const ALL: [Job; 12] = [
         Job::RefreshTokenCleanup,
         Job::ConsumedSignupTokenCleanup,
         Job::NotificationCleanup,
@@ -101,6 +110,8 @@ impl Job {
         Job::NoticeDistribution,
         Job::NotificationRelay,
         Job::TopicPush,
+        Job::NotificationWorkerFirst,
+        Job::NotificationWorkerSecond,
         Job::PublicationMonitor,
         Job::RuntimeSnapshot,
     ];
@@ -116,6 +127,7 @@ impl Job {
             Job::NoticeDistribution => "distributeNotices",
             Job::NotificationRelay => "publishPendingNotifications",
             Job::TopicPush => "publishDueTopics",
+            Job::NotificationWorkerFirst | Job::NotificationWorkerSecond => "poll",
             Job::PublicationMonitor => "logBacklog",
             Job::RuntimeSnapshot => "logSnapshot",
         }
@@ -131,6 +143,9 @@ impl Job {
             Job::NoticeDistribution => Schedule::Cron("0 * * * * *"),
             Job::NotificationRelay => Schedule::FixedDelay(RELAY_DELAY),
             Job::TopicPush => Schedule::Cron("0 * * * * *"),
+            Job::NotificationWorkerFirst | Job::NotificationWorkerSecond => {
+                Schedule::FixedDelay(WORKER_POLL_DELAY)
+            }
             Job::PublicationMonitor => Schedule::FixedRate(RUNTIME_LOG_PERIOD),
             Job::RuntimeSnapshot => Schedule::FixedRate(RUNTIME_LOG_PERIOD),
         }
@@ -163,6 +178,8 @@ pub struct JobsSettings {
     pub notice_distribution: bool,
     /// SQS 발행 설정(Relay·주제 푸시 켜기, 큐 URL, 리전). 둘 중 하나라도 켜면 큐 URL을 검증한다.
     pub sqs: SqsPushSettings,
+    /// 푸시 Worker의 Firebase 설정(`sqs.worker_enabled`가 켜져 있을 때만 뜻이 있다).
+    pub fcm: FcmSettings,
     /// `NotificationPublicationMonitor`는 dev·prod 프로필에서만 존재한다(`@Profile({"dev", "prod"})`).
     pub publication_monitor: bool,
     pub runtime_log: bool,
@@ -177,6 +194,8 @@ impl JobsSettings {
         deployed: bool,
         aggregation_default: bool,
     ) -> Result<Self, ConfigError> {
+        let sqs = SqsPushSettings::from_env(env)?;
+        let fcm = FcmSettings::from_env(env, sqs.worker_enabled)?;
         Ok(JobsSettings {
             scheduling_enabled: env.bool_or("CHALKAK_SCHEDULING_ENABLED", true)?,
             refresh_token_cleanup: env
@@ -191,7 +210,8 @@ impl JobsSettings {
             user_metrics_aggregation: env
                 .bool_or("CHALKAK_ANALYTICS_AGGREGATION_ENABLED", aggregation_default)?,
             notice_distribution: env.bool_or("NOTIFICATION_NOTICE_DISTRIBUTION_ENABLED", false)?,
-            sqs: SqsPushSettings::from_env(env)?,
+            sqs,
+            fcm,
             publication_monitor: deployed,
             runtime_log: env.bool_or("CHALKAK_MONITORING_RUNTIMELOG_ENABLED", deployed)?,
         })
@@ -208,6 +228,7 @@ impl JobsSettings {
             Job::NoticeDistribution => self.notice_distribution,
             Job::NotificationRelay => self.sqs.relay_enabled,
             Job::TopicPush => self.sqs.topic_push_enabled,
+            Job::NotificationWorkerFirst | Job::NotificationWorkerSecond => self.sqs.worker_enabled,
             Job::PublicationMonitor => self.publication_monitor,
             Job::RuntimeSnapshot => self.runtime_log,
         }
@@ -244,6 +265,8 @@ pub struct JobDeps {
     pub publisher: Option<Arc<dyn PushMessagePublisher>>,
     /// 사용자 지표 집계가 켜져 있으면 필요하다. 관리자 수동 집계와 같은 러너여야 한다.
     pub analytics: Option<Arc<UserMetricsAggregationRunner>>,
+    /// 푸시 Worker가 켜져 있으면 필요하다. 두 폴링 작업이 같은 서비스를 쓴다.
+    pub worker: Option<Arc<PushWorker>>,
 }
 
 /// 돌고 있는 주기 작업들.
@@ -282,8 +305,13 @@ pub fn start(
     let planned = settings.planned();
     let mut scheduler = Scheduler::new(shutdown.clone(), Arc::clone(&deps.clock))
         .with_logger(Arc::clone(&deps.logger));
+    // 본문을 모두 만든 뒤에 스레드를 시작한다. 하나라도 만들 수 없으면(필요한 객체가 없는 경우) 어떤 작업도 돌지 않는다.
+    let mut bodies = Vec::with_capacity(planned.len());
     for job in &planned {
-        register(&mut scheduler, *job, deps, shutdown)?;
+        bodies.push((*job, body(*job, deps, shutdown)?));
+    }
+    for (job, body) in bodies {
+        register(&mut scheduler, job, body)?;
     }
     Ok(Jobs {
         scheduler,
@@ -294,10 +322,8 @@ pub fn start(
 fn register(
     scheduler: &mut Scheduler,
     job: Job,
-    deps: &JobDeps,
-    shutdown: &ShutdownSignal,
+    body: Box<dyn FnMut() + Send>,
 ) -> Result<(), String> {
-    let body = body(job, deps, shutdown)?;
     let name = job.name();
     let result = match job.schedule() {
         Schedule::Cron(_) => {
@@ -406,6 +432,14 @@ fn body(
                         .log("주제 푸시 설정 조회 실패");
                 }
             })
+        }
+        Job::NotificationWorkerFirst | Job::NotificationWorkerSecond => {
+            let worker = deps
+                .worker
+                .clone()
+                .ok_or_else(|| "푸시 Worker 폴링에는 Worker가 필요합니다".to_owned())?;
+            // `SqsPollingScheduler.poll`: 수신 오류는 서비스가 로그를 남기고 1초 쉬므로 여기서는 부르기만 한다.
+            Box::new(move || worker.service.poll())
         }
         Job::PublicationMonitor => {
             let monitor = NotificationPublicationMonitor::new(pool, clock, logger);

@@ -15,6 +15,7 @@ use chalkak_app::admin::AdminConfig;
 use chalkak_app::admin::bootstrap::AdminAccount;
 use chalkak_app::analytics::{self, UserMetricsAggregationRunner};
 use chalkak_app::jobs::{self, AppleRevocation, Job, JobDeps, Jobs};
+use chalkak_app::notification::push_worker_config::build_push_worker;
 use chalkak_app::notification::slack::{
     NotificationMessageFactory, PostModerationPendingNotifier,
     SlackIncomingWebhookNotificationSender,
@@ -267,6 +268,19 @@ fn start_jobs(
     } else {
         None
     };
+    // Worker는 스케줄링이 꺼져 있어도 설정과 서비스 계정 파일을 확인한다(원본은 Firebase 앱 빈을 항상 만든다).
+    let worker = if settings.jobs.sqs.worker_enabled {
+        Some(Arc::new(build_push_worker(
+            &settings.jobs.sqs,
+            &settings.jobs.fcm,
+            pool,
+            clock,
+            logger,
+            shutdown,
+        )?))
+    } else {
+        None
+    };
     let deps = JobDeps {
         pool: pool.clone(),
         clock: Arc::clone(clock),
@@ -274,6 +288,7 @@ fn start_jobs(
         apple,
         publisher,
         analytics: Some(analytics),
+        worker,
     };
     Ok(jobs::start(&deps, &settings.jobs, shutdown)?)
 }

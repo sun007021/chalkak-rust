@@ -176,6 +176,49 @@ impl PushDeviceRepository {
         )?)
     }
 
+    /// `findIdsByUserId`: 회원의 기기 식별자를 식별자 순으로.
+    pub fn find_ids_by_user_id(
+        &self,
+        db: &mut impl Db,
+        user_id: Uuid,
+    ) -> Result<Vec<Uuid>, DbError> {
+        db.query(
+            "SELECT id FROM push_devices WHERE user_id = $1 ORDER BY id",
+            &[&user_id],
+        )?
+        .iter()
+        .map(|row| row.try_get(0).map_err(DbError::from))
+        .collect()
+    }
+
+    /// `findByIdAndUserId`
+    pub fn find_by_id_and_user_id(
+        &self,
+        db: &mut impl Db,
+        id: Uuid,
+        user_id: Uuid,
+    ) -> Result<Option<PushDevice>, DbError> {
+        db.query_opt(
+            &format!("SELECT {COLUMNS} FROM push_devices WHERE id = $1 AND user_id = $2"),
+            &[&id, &user_id],
+        )?
+        .map(|row| device_from_row(&row))
+        .transpose()
+    }
+
+    /// `deleteByIdAndTokenHash`: 그 사이 토큰이 바뀐 기기는 지우지 않도록 해시까지 맞을 때만 지운다.
+    pub fn delete_by_id_and_token_hash(
+        &self,
+        db: &mut impl Db,
+        id: Uuid,
+        token_hash: &str,
+    ) -> Result<u64, DbError> {
+        Ok(db.execute(
+            "DELETE FROM push_devices WHERE id = $1 AND fcm_token_hash = $2",
+            &[&id, &token_hash],
+        )?)
+    }
+
     /// `save`(새 기기). 식별자는 DB 기본값이 만든다.
     pub fn insert(&self, db: &mut impl Db, device: &PushDevice) -> Result<Uuid, DbError> {
         let row = db.query_one(
@@ -254,6 +297,28 @@ pub fn get_usable_user(
         return Err(reauthentication_required());
     }
     Ok(user)
+}
+
+/// `LoginSessionService.findUsableUser`: 회원이 있고 탈퇴하지 않았으며 그 로그인에 쓸 수 있는 토큰이 있을 때만 회원을 돌려준다.
+/// [`get_usable_user`]와 달리 이유를 구별하지 않고 없음으로 돌려준다.
+pub fn find_usable_user(
+    db: &mut impl Db,
+    user_id: Uuid,
+    session_id: Uuid,
+    now: Timestamp,
+) -> Result<Option<User>, DbError> {
+    let Some(user) = UserRepository.find_by_id(db, user_id)? else {
+        return Ok(None);
+    };
+    if user.is_deleted() {
+        return Ok(None);
+    }
+    if !RefreshTokenRepository
+        .exists_usable_by_session_id_and_user_id(db, session_id, user_id, now)?
+    {
+        return Ok(None);
+    }
+    Ok(Some(user))
 }
 
 /// `PushDeviceService`.

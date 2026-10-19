@@ -117,7 +117,10 @@ fn run_once(target: &Target, scenario: &Scenario, trace: bool) -> Result<(Value,
     // 외부 연동: 가짜 서버를 비우고, ID Token을 서명해 변수로 만든다. 응답 지정은 단계마다 현재 변수로 다시 채워 보낸다.
     let uses_fakes = scenario.fakes.is_some()
         || !scenario.id_tokens.is_empty()
-        || scenario.steps.iter().any(|s| s.fakes.is_some());
+        || scenario
+            .steps
+            .iter()
+            .any(|s| s.fakes.is_some() || !s.sqs_seed.is_empty());
     let fakes_url = target.fakes_url.as_deref();
     if uses_fakes && fakes_url.is_none() {
         return Err(format!(
@@ -144,6 +147,10 @@ fn run_once(target: &Target, scenario: &Scenario, trace: bool) -> Result<(Value,
         }
         if let (true, Some(url)) = (uses_fakes, fakes_url) {
             fakes::configure(url, &fakes_spec, &|s| subst(s, &vars))?;
+        }
+        if let (false, Some(url)) = (step.sqs_seed.is_empty(), fakes_url) {
+            let bodies: Vec<String> = step.sqs_seed.iter().map(|b| subst(b, &vars)).collect();
+            fakes::seed_sqs(url, &bodies)?;
         }
         if let Some(sql) = &step.wait_until_sql {
             wait_until(&mut db, &subst(sql, &vars), target, &step.name)?;

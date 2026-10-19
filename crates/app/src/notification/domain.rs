@@ -30,6 +30,11 @@ pub fn is_push_expired_at(expires_at: Timestamp, now: Timestamp) -> bool {
     now >= expires_at
 }
 
+/// `PushDeadlinePolicy.isValidLifetime`: 사건 시각에서 기한까지가 정확히 30분이다.
+pub fn is_valid_push_lifetime(occurred_at: Timestamp, expires_at: Timestamp) -> bool {
+    expires_at.duration_since(occurred_at) == PUSH_LIFETIME
+}
+
 /// 알림 종류. DB 문자열이자 JSON 값(Java enum 이름).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum NotificationType {
@@ -48,6 +53,28 @@ impl NotificationType {
             NotificationType::PostRejected => "POST_REJECTED",
             NotificationType::Topic => "TOPIC",
             NotificationType::Notice => "NOTICE",
+        }
+    }
+
+    /// `isSourceOf`: 이 종류의 알림이 가리키는 대상 종류.
+    pub const fn source_type(self) -> NotificationSourceType {
+        match self {
+            NotificationType::PostApproved | NotificationType::PostRejected => {
+                NotificationSourceType::Post
+            }
+            NotificationType::Topic => NotificationSourceType::Topic,
+            NotificationType::Notice => NotificationSourceType::Notice,
+        }
+    }
+
+    /// `isPushEnabledFor`: 회원의 수신 설정이 이 종류의 푸시를 허용하는가. 공지는 전용 설정 없이 항상 보낸다.
+    pub fn is_push_enabled_for(self, user: &crate::user::domain::User) -> bool {
+        match self {
+            NotificationType::PostApproved | NotificationType::PostRejected => {
+                user.moderation_push_enabled
+            }
+            NotificationType::Topic => user.topic_push_enabled,
+            NotificationType::Notice => true,
         }
     }
 

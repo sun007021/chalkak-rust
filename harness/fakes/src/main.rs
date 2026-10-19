@@ -1,18 +1,19 @@
 //! 하네스용 가짜 외부 서버. 한 프로세스, 한 포트에서 OIDC JWKS, Apple 토큰 교환·철회, Slack Webhook,
-//! S3 HeadObject, SQS(JSON 프로토콜)를 흉내 내고 받은 요청을 모두 기록한다. 러너가 관리 경로(`/__admin/*`)로 응답을 지정하고
+//! S3 HeadObject, SQS(JSON 프로토콜), FCM HTTP v1 발송, Google OAuth 토큰 교환을 흉내 내고 받은 요청을 모두 기록한다. 러너가 관리 경로(`/__admin/*`)로 응답을 지정하고
 //! 기록을 가져간다. 경로 표는 `routes.rs` 상단 주석 참고.
 //!
 //! 환경변수: `FAKES_ADDR`(기본 `0.0.0.0:9000`), `FAKES_S3_BUCKET`(기본 `test-bucket`).
 
 mod http;
 mod routes;
+mod rules;
 mod sqs;
 
 use std::io::{BufRead, BufReader, Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::sync::{Arc, Mutex};
 use std::thread;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 fn main() {
     let addr = std::env::var("FAKES_ADDR").unwrap_or_else(|_| "0.0.0.0:9000".into());
@@ -50,10 +51,13 @@ fn serve(stream: TcpStream, state: &Mutex<routes::Fakes>) {
                 return;
             }
         };
-        let res = match state.lock() {
+        let mut res = match state.lock() {
             Ok(mut s) => s.handle(&req),
             Err(_) => return,
         };
+        if res.long_poll_ms > 0 {
+            res = wait_for_message(state, &req, res);
+        }
         if res.delay_ms > 0 {
             thread::sleep(Duration::from_millis(res.delay_ms));
         }
@@ -61,6 +65,23 @@ fn serve(stream: TcpStream, state: &Mutex<routes::Fakes>) {
             return;
         }
     }
+}
+
+/// 롱 폴링: 메시지가 들어오거나 대기 시간이 끝날 때까지 상태 잠금 없이 기다린다. 메시지가 오면 그 응답을 돌려준다.
+fn wait_for_message(
+    state: &Mutex<routes::Fakes>,
+    req: &http::Request,
+    empty: http::Response,
+) -> http::Response {
+    let deadline = Instant::now() + Duration::from_millis(empty.long_poll_ms);
+    while Instant::now() < deadline {
+        thread::sleep(Duration::from_millis(25));
+        let Ok(mut s) = state.lock() else { break };
+        if let Some(res) = s.poll_receive(req) {
+            return res;
+        }
+    }
+    empty
 }
 
 /// 읽기는 버퍼 리더로, 쓰기는 같은 소켓으로 보내는 한 쌍.

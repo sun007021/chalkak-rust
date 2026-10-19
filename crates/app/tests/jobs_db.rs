@@ -539,6 +539,7 @@ fn deps(p: &Pending) -> JobDeps {
             client: p.apple.clone(),
         }),
         analytics: None,
+        worker: None,
     }
 }
 

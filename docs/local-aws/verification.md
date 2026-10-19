@@ -50,4 +50,20 @@ Rust: `feat/44-local-aws`의 `target/release/chalkak-server`(origin/main 기준 
 | 로그 | `docker compose logs rust` | `stage=relay`(요청·수락)와 `relay_transaction_committed`가 `notification-sqs-setup.md`의 필드로 남음 |
 
 큐 URL은 `https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-dev-push` 형식 그대로이고 전송 주소만 `AWS_ENDPOINT_URL_SQS=http://aws:4566`로 돌렸다.
-이 확인은 큐에 들어가는 데까지다. 큐를 읽어 FCM으로 보내는 Worker(`SqsPushService`)는 #43 범위다.
+이 확인은 큐에 들어가는 데까지다. 큐를 읽어 FCM으로 보내는 Worker는 아래 절에서 확인했다.
+
+## 푸시 Worker 검증 결과 (2026-10-19, #43)
+
+같은 환경. Rust 프로필 전체(`docker compose --profile rust up -d`)를 띄웠다. `rust` 서비스는 `NOTIFICATION_WORKER_ENABLED=true`와 `fakes`를 가리키는
+`NOTIFICATION_FCM_ENDPOINT_URL`을 받고, 서비스 계정 JSON(`harness/keys/fcm-service-account.json`, `token_uri = http://fakes:9000/oauth2/token`)을
+`/secrets/fcm-service-account.json`으로 마운트한다. 진짜 FCM에는 나가지 않는다. Java 프로필은 FCM 주소를 바꿀 방법이 없어(Admin SDK가 호스트를 고정한다) Worker를 끈 채 둔다.
+
+| 확인 | 방법 | 결과 |
+| --- | --- | --- |
+| 기동 | `docker compose logs rust` | Worker가 시작되어 `scheduler-poll` 스레드로 폴링한다(`stage=worker_received` 등) |
+| 수신 → 처리 → 삭제 | `scripts/worker_e2e.py`: 가입·로그인 → `PUT /api/v1/push-devices/current` → 게시물 작성 → 관리자 승인 | Relay 발행(`stage=relay`) → Worker 수신(`worker_received`, `receiveCount=1`) → 가짜 OAuth `POST /oauth2/token` 1건 → 가짜 FCM `POST /v1/projects/local-aws/messages:send` 1건(`Bearer fake-access-token`, `message.token`·`data.sourceId` 일치, android `ttl`·apns `apns-expiration` 포함) → `fcm_result` → `worker_summary` → `worker_message_deleted`. 큐의 보이는·숨은 메시지 0건 |
+| 기기가 없는 사용자 | `scripts/smoke.sh` | 통과(11초). 알림은 NO_DEVICES로 처리되어 지워지고 FCM은 호출되지 않는다 |
+| 재시도 | 수동 확인 없음 | 일시 실패·재전달은 DB·단위 시험(`push_worker_db`, `sqs_worker_tests`)과 harness worker lane의 삭제 실패 시나리오가 맡는다 |
+
+실행 순서: `fetch-tools.sh` → `prepare-lambda.sh` → `cargo build --release -p chalkak-fakes -p chalkak-server` → `docker compose --profile rust up -d` → `python3 -I scripts/worker_e2e.py`.
+확인 뒤 `docker compose --profile rust down -v`로 정리했다.

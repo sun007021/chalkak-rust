@@ -5,10 +5,10 @@
 #   harness/scripts/lane.sh up rust [개수]    # 이 작업 트리의 target/release 바이너리로 Rust lane을 띄운다(기본 1개)
 #   harness/scripts/lane.sh up java [개수]    # 원본 JAR로 Java oracle lane을 띄운다. 작업 트리와 무관하게 모두가 함께 쓴다
 #   harness/scripts/lane.sh restart rust      # 이 작업 트리의 Rust lane 앱만 다시 띄운다(cargo build 후)
-#   harness/scripts/lane.sh targets rust|java [--txlog|--relay]
+#   harness/scripts/lane.sh targets rust|java [--txlog|--relay|--worker]
 #                                             # 쓸 수 있는 lane의 대상 설정 경로를 쉼표로 잇는다(parity --target 값).
 #                                             # --txlog이면 TXLOG=1로 띄운 lane만(parity txshape용),
-#                                             # --relay이면 RELAY=1로 띄운 lane만. 둘 다 없으면 기본 lane만
+#                                             # --relay이면 RELAY=1, --worker이면 WORKER=1로 띄운 lane만. 아무것도 없으면 기본 lane만
 #   harness/scripts/lane.sh ls
 #   harness/scripts/lane.sh down rust|java|<lane 이름>|all
 #
@@ -24,6 +24,11 @@
 # RELAY=1 harness/scripts/lane.sh up rust|java [개수]: SQS Relay를 켠 lane(harness/env/oracle-relay.env를 더한다). 앱이 스스로
 #   도는 작업을 확인하는 시나리오(`lane = "relay"`)만 이 lane에서 돈다. target.toml에 flavor = "relay"가 들어가고 lane
 #   디렉터리에 relay 표시 파일이 생긴다. 기본 lane에는 영향이 없다(targets가 서로 섞지 않는다).
+#
+# WORKER=1 harness/scripts/lane.sh up rust|java [개수]: SQS Relay와 푸시 Worker를 함께 켠 lane(harness/env/oracle-worker.env를 더한다,
+#   서비스 계정 파일은 harness/keys/fcm-service-account.json). `lane = "worker"` 시나리오만 이 lane에서 돈다. target.toml에
+#   flavor = "worker"가 들어가고 lane 디렉터리에 worker 표시 파일이 생긴다. 원본의 FCM 주소(fcm.googleapis.com)는 바꿀 수 없어
+#   Java는 FCM을 부르지 않는 경로만 시나리오로 확인한다(harness/README.md의 worker lane).
 #
 # 포트: lane 번호 N마다 20000+N*10 (앱), +1 (DB), +2 (가짜 서버). 번호는 잠금 아래에서 비어 있는 가장 작은 수로 정한다.
 #
@@ -50,11 +55,20 @@ lane_env() { # <이름> <번호> <종류>
   export LANE_FAKES_BIN="${LANE_FAKES_BIN:-$ROOT/target/release/chalkak-fakes}"
   export LANE_RUST_BIN="$ROOT/target/release/chalkak-server"
   export LANE_JAVA_JAR="$ORACLE_JAR"
-  if is_relay "$name"; then export LANE_ENV_EXTRA="$ROOT/harness/env/oracle-relay.env"; else unset LANE_ENV_EXTRA; fi
+  if is_worker "$name"; then
+    export LANE_ENV_EXTRA="$ROOT/harness/env/oracle-worker.env"
+  elif is_relay "$name"; then
+    export LANE_ENV_EXTRA="$ROOT/harness/env/oracle-relay.env"
+  else
+    unset LANE_ENV_EXTRA
+  fi
 }
 
 # RELAY=1로 띄운 lane인가(lane 디렉터리의 표시 파일).
 is_relay() { [[ -f "$LANES_DIR/$1/relay" ]]; }
+
+# WORKER=1로 띄운 lane인가(Relay도 함께 켜져 있다).
+is_worker() { [[ -f "$LANES_DIR/$1/worker" ]]; }
 
 # TXLOG=1로 띄운 lane인가(lane 디렉터리의 표시 파일).
 is_txlog() { [[ -f "$LANES_DIR/$1/txlog" ]]; }
@@ -78,14 +92,16 @@ used_numbers() {
 }
 
 # lane 이름 목록(종류별). Rust는 이 작업 트리 것만.
-# 둘째 인자: --txlog(문장 로그 lane만) | --relay(Relay lane만) | --all(종류의 모든 lane) | 없음(기본 lane만).
-lanes_of() { # <종류> [--txlog|--relay|--all]
+# 둘째 인자: --txlog(문장 로그 lane만) | --relay(Relay lane만) | --worker(Worker lane만) | --all(종류의 모든 lane) | 없음(기본 lane만).
+lanes_of() { # <종류> [--txlog|--relay|--worker|--all]
   local kind=$1 only=${2:-}
   for d in "$LANES_DIR"/"$kind"-*/; do
     [[ -f "$d/target.toml" ]] || continue
     [[ $only == --txlog && ! -f "$d/txlog" ]] && continue
     [[ $only == --relay && ! -f "$d/relay" ]] && continue
-    [[ $only != --relay && $only != --all && -f "$d/relay" ]] && continue
+    [[ $only == --worker && ! -f "$d/worker" ]] && continue
+    # Worker lane은 Relay도 켜져 있지만 relay 표시 파일은 따로 만들지 않는다(종류가 하나씩이다).
+    [[ $only != --relay && $only != --worker && $only != --all && ( -f "$d/relay" || -f "$d/worker" ) ]] && continue
     if [[ $kind == rust && "$(cat "$d/owner" 2>/dev/null)" != "$ROOT" ]]; then continue; fi
     basename "$d"
   done
@@ -105,7 +121,9 @@ fakes_url = "http://127.0.0.1:$((base + 2))"
 lock_file = "$LANES_DIR/$name/lock"
 clock_settle_ms = $settle
 EOF
-  if is_relay "$name"; then
+  if is_worker "$name"; then
+    echo 'flavor = "worker"' >> "$LANES_DIR/$name/target.toml"
+  elif is_relay "$name"; then
     echo 'flavor = "relay"' >> "$LANES_DIR/$name/target.toml"
   fi
   if is_txlog "$name"; then
@@ -152,6 +170,7 @@ cmd_up() { # <종류> [개수]
       touch "$LANES_DIR/$name/txlog"
     fi
     [[ "${RELAY:-}" == 1 ]] && touch "$LANES_DIR/$name/relay"
+    [[ "${WORKER:-}" == 1 ]] && touch "$LANES_DIR/$name/worker"
     names+=("$name")
   done
   flock -u 9
@@ -200,6 +219,7 @@ cmd_ls() {
     if [[ -f "$d/target.toml" ]]; then state=ready; else state=starting; fi
     [[ -f "$d/txlog" ]] && state="$state+txlog"
     [[ -f "$d/relay" ]] && state="$state+relay"
+    [[ -f "$d/worker" ]] && state="$state+worker"
     if [[ -f "$d/lock" ]] && ! flock -n "$d/lock" true 2>/dev/null; then state=busy; fi
     printf "%-10s %-6s %-40s %s\n" "$name" "$((20000 + n * 10))" "$owner" "$state"
   done

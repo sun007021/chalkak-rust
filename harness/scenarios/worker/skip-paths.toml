@@ -1,0 +1,109 @@
+name = "푸시 Worker: 큐에서 받은 메시지 중 보내지 않는 경로는 모두 처리하고 지운다"
+tags = ["worker", "notification"]
+lane = "worker"
+clock = "2026-10-12T09:00:00+09:00"
+
+# 근거: SqsPushService(poll/process), PushWorkerService, PushMessage, SqsPushServiceTest, PushWorkerServiceTest.
+# 보내지 않는 경로는 모두 메시지를 지운다(ReceiveMessage 한 번 + DeleteMessage 한 번 = 가짜 SQS 기록 두 건). 단계마다 메시지 하나를 넣고 기록이 늘 때까지 기다린다.
+# FCM 전송은 Java Admin SDK가 호스트를 바꾸지 못해(https://fcm.googleapis.com 고정) 이 lane에서 Java로 녹화할 수 없다. 전송 경로는 Rust 단위·DB 테스트가 맡는다.
+
+[setup]
+sql = ["""INSERT INTO admins (id, username, password) VALUES ('01990000-0000-7000-8000-000000000161', 'operator', 'hash-not-used');
+INSERT INTO users (id, email, signature_original_storage_key, deleted_at) VALUES
+  ('01990000-0000-7000-8000-000000000001', 'user1@test.chalkak', 'chalkak/signatures/user1/original.png', NULL),
+  ('01990000-0000-7000-8000-000000000002', 'user2@test.chalkak', 'chalkak/signatures/user2/original.png', NULL),
+  ('01990000-0000-7000-8000-000000000003', 'user3@test.chalkak', 'chalkak/signatures/user3/original.png', '2026-10-11T12:00:00Z');
+INSERT INTO topics (id, title, topic_date, starts_at, ends_at) VALUES
+  ('01990000-0000-7000-8000-000000000241', '주제1', '2026-10-01', '2026-10-01T00:00:00+09:00', '2026-10-01T23:59:59+09:00');
+INSERT INTO photos (id, original_storage_key, thumbnail_storage_key) VALUES
+  ('01990000-0000-7000-8000-000000000177', 'chalkak/posts/p1/original.webp', 'chalkak/posts/p1/thumbnail.webp'),
+  ('01990000-0000-7000-8000-000000000178', 'chalkak/posts/p2/original.webp', 'chalkak/posts/p2/thumbnail.webp'),
+  ('01990000-0000-7000-8000-000000000179', 'chalkak/posts/p3/original.webp', 'chalkak/posts/p3/thumbnail.webp');
+INSERT INTO posts (id, user_id, topic_id, photo_id, title, moderation_status) VALUES
+  ('01990000-0000-7000-8000-000000000193', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-000000000241', '01990000-0000-7000-8000-000000000177', '사진1', 'APPROVED'),
+  ('01990000-0000-7000-8000-000000000194', '01990000-0000-7000-8000-000000000002', '01990000-0000-7000-8000-000000000241', '01990000-0000-7000-8000-000000000178', '사진2', 'APPROVED'),
+  ('01990000-0000-7000-8000-000000000195', '01990000-0000-7000-8000-000000000003', '01990000-0000-7000-8000-000000000241', '01990000-0000-7000-8000-000000000179', '사진3', 'APPROVED');
+INSERT INTO admin_audit_logs (id, actor_admin_id, action, target_type, target_id, reason, before_state, after_state, occurred_at, request_id) VALUES
+  ('01990000-0000-7000-8000-000000000209', '01990000-0000-7000-8000-000000000161', 'POST_APPROVED', 'POST', '01990000-0000-7000-8000-000000000193', NULL, '{"status":"PENDING"}', '{"status":"APPROVED"}', '2026-10-11T23:55:00Z', '01990000-0000-7000-8000-000000000225'),
+  ('01990000-0000-7000-8000-000000000210', '01990000-0000-7000-8000-000000000161', 'POST_APPROVED', 'POST', '01990000-0000-7000-8000-000000000194', NULL, '{"status":"PENDING"}', '{"status":"APPROVED"}', '2026-10-11T23:55:00Z', '01990000-0000-7000-8000-000000000225'),
+  ('01990000-0000-7000-8000-000000000211', '01990000-0000-7000-8000-000000000161', 'POST_APPROVED', 'POST', '01990000-0000-7000-8000-000000000195', NULL, '{"status":"PENDING"}', '{"status":"APPROVED"}', '2026-10-11T23:55:00Z', '01990000-0000-7000-8000-000000000225');
+INSERT INTO notifications (id, user_id, source_type, source_id, event_key, type, title, body, payload, sqs_publish_status, next_attempt_at, created_at, read_at) VALUES
+  ('01990000-0000-7000-8000-000000000257', '01990000-0000-7000-8000-000000000001', 'POST', '01990000-0000-7000-8000-000000000193', '01990000-0000-7000-8000-000000000209', 'POST_APPROVED', '게시물이 승인되었습니다.', '내 사진이 피드에 공개되었습니다.', NULL, 'NOT_REQUIRED', NULL, '2026-10-11T23:55:00Z', NULL),
+  ('01990000-0000-7000-8000-000000000258', '01990000-0000-7000-8000-000000000002', 'POST', '01990000-0000-7000-8000-000000000194', '01990000-0000-7000-8000-000000000210', 'POST_APPROVED', '게시물이 승인되었습니다.', '내 사진이 피드에 공개되었습니다.', NULL, 'NOT_REQUIRED', NULL, '2026-10-11T23:55:00Z', '2026-10-11T23:56:00Z'),
+  ('01990000-0000-7000-8000-000000000259', '01990000-0000-7000-8000-000000000003', 'POST', '01990000-0000-7000-8000-000000000195', '01990000-0000-7000-8000-000000000211', 'POST_APPROVED', '게시물이 승인되었습니다.', '내 사진이 피드에 공개되었습니다.', NULL, 'NOT_REQUIRED', NULL, '2026-10-11T23:55:00Z', NULL);
+INSERT INTO push_devices (user_id, session_id, fcm_token, fcm_token_hash, registered_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-000000000002', '01990000-0000-7000-8000-000000001442', 'token-user2', '2222222222222222222222222222222222222222222222222222222222222222', '2026-10-11T23:00:00Z', '2026-10-11T23:00:00Z'),
+  ('01990000-0000-7000-8000-000000000003', '01990000-0000-7000-8000-000000001443', 'token-user3', '3333333333333333333333333333333333333333333333333333333333333333', '2026-10-11T23:00:00Z', '2026-10-11T23:00:00Z');
+"""]
+
+[[step]]
+name = "JSON이 아닌 본문은 버린다(INVALID_MESSAGE)"
+method = "GET"
+path = "/api/v1/notifications/unread-status"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+sqs_seed = ['''invalid''']
+await_fakes = { service = "sqs", count = 2 }
+
+[[step]]
+name = "JSON null 본문은 버린다"
+method = "GET"
+path = "/api/v1/notifications/unread-status"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+sqs_seed = ['''null''']
+await_fakes = { service = "sqs", count = 4 }
+
+[[step]]
+name = "배열 본문은 버린다"
+method = "GET"
+path = "/api/v1/notifications/unread-status"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+sqs_seed = ['''[]''']
+await_fakes = { service = "sqs", count = 6 }
+
+[[step]]
+name = "유효 시간이 지난 메시지는 버린다"
+method = "GET"
+path = "/api/v1/notifications/unread-status"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+sqs_seed = ['''{"eventId":"01990000-0000-7000-8000-000000000209","notificationId":"01990000-0000-7000-8000-000000000257","userId":"01990000-0000-7000-8000-000000000001","sourceId":"01990000-0000-7000-8000-000000000193","type":"POST_APPROVED","sourceType":"POST","occurredAt":"2026-10-11T22:00:00Z","expiresAt":"2026-10-11T22:30:00Z"}''']
+await_fakes = { service = "sqs", count = 8 }
+
+[[step]]
+name = "type과 sourceType이 맞지 않으면 버린다"
+method = "GET"
+path = "/api/v1/notifications/unread-status"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+sqs_seed = ['''{"eventId":"01990000-0000-7000-8000-000000000209","notificationId":"01990000-0000-7000-8000-000000000257","userId":"01990000-0000-7000-8000-000000000001","sourceId":"01990000-0000-7000-8000-000000000193","type":"POST_APPROVED","sourceType":"TOPIC","occurredAt":"2026-10-11T23:55:00Z","expiresAt":"2026-10-12T00:25:00Z"}''']
+await_fakes = { service = "sqs", count = 10 }
+
+[[step]]
+name = "존재하지 않는 알림은 버린다"
+method = "GET"
+path = "/api/v1/notifications/unread-status"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+sqs_seed = ['''{"eventId":"01990000-0000-7000-8000-000000000209","notificationId":"01990000-0000-7000-8000-000000000511","userId":"01990000-0000-7000-8000-000000000001","sourceId":"01990000-0000-7000-8000-000000000193","type":"POST_APPROVED","sourceType":"POST","occurredAt":"2026-10-11T23:55:00Z","expiresAt":"2026-10-12T00:25:00Z"}''']
+await_fakes = { service = "sqs", count = 12 }
+
+[[step]]
+name = "기기가 없는 사용자는 보낼 곳이 없어 버린다(NO_DEVICES)"
+method = "GET"
+path = "/api/v1/notifications/unread-status"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+sqs_seed = ['''{"eventId":"01990000-0000-7000-8000-000000000209","notificationId":"01990000-0000-7000-8000-000000000257","userId":"01990000-0000-7000-8000-000000000001","sourceId":"01990000-0000-7000-8000-000000000193","type":"POST_APPROVED","sourceType":"POST","occurredAt":"2026-10-11T23:55:00Z","expiresAt":"2026-10-12T00:25:00Z"}''']
+await_fakes = { service = "sqs", count = 14 }
+
+[[step]]
+name = "이미 읽은 알림은 보내지 않는다"
+method = "GET"
+path = "/api/v1/notifications/unread-status"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+sqs_seed = ['''{"eventId":"01990000-0000-7000-8000-000000000210","notificationId":"01990000-0000-7000-8000-000000000258","userId":"01990000-0000-7000-8000-000000000002","sourceId":"01990000-0000-7000-8000-000000000194","type":"POST_APPROVED","sourceType":"POST","occurredAt":"2026-10-11T23:55:00Z","expiresAt":"2026-10-12T00:25:00Z"}''']
+await_fakes = { service = "sqs", count = 16 }
+
+[[step]]
+name = "탈퇴한 사용자의 알림은 보내지 않는다"
+method = "GET"
+path = "/api/v1/notifications/unread-status"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+sqs_seed = ['''{"eventId":"01990000-0000-7000-8000-000000000211","notificationId":"01990000-0000-7000-8000-000000000259","userId":"01990000-0000-7000-8000-000000000003","sourceId":"01990000-0000-7000-8000-000000000195","type":"POST_APPROVED","sourceType":"POST","occurredAt":"2026-10-11T23:55:00Z","expiresAt":"2026-10-12T00:25:00Z"}''']
+await_fakes = { service = "sqs", count = 18 }

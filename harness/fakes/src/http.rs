@@ -34,6 +34,8 @@ pub struct Response {
     pub content_length: Option<usize>,
     /// 응답을 보내기 전에 기다릴 시간(ms). 호출한 쪽의 시간 제한 시험용이다. 서버 상태 잠금을 놓은 뒤에 기다린다.
     pub delay_ms: u64,
+    /// 롱 폴링처럼 메시지가 올 때까지 기다릴 시간(ms). 0이면 기다리지 않는다. 서버 상태 잠금을 놓고 기다린다.
+    pub long_poll_ms: u64,
 }
 
 impl Response {
@@ -44,6 +46,7 @@ impl Response {
             body: body.into(),
             content_length: None,
             delay_ms: 0,
+            long_poll_ms: 0,
         }
     }
 

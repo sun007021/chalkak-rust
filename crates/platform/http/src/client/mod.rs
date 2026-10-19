@@ -277,7 +277,7 @@ impl HttpClient {
         let deadline = Instant::now() + self.connect_timeout;
         let addrs = (url.host.as_str(), url.port)
             .to_socket_addrs()
-            .map_err(ClientError::Connect)?;
+            .map_err(ClientError::Resolve)?;
         let mut last: Option<ClientError> = None;
         for addr in addrs {
             let remaining = deadline.saturating_duration_since(Instant::now());

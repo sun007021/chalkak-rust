@@ -1,0 +1,637 @@
+{
+  "db": {
+    "admin_audit_logs": [
+      "{\"action\":\"POST_APPROVED\",\"actor_admin_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"before_state\":{\"status\":\"PENDING\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-300s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid?\",\"target_id\":\"$uuid?\",\"target_type\":\"POST\"}",
+      "{\"action\":\"POST_APPROVED\",\"actor_admin_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"before_state\":{\"status\":\"PENDING\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-300s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid?\",\"target_id\":\"$uuid?\",\"target_type\":\"POST\"}",
+      "{\"action\":\"POST_APPROVED\",\"actor_admin_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"before_state\":{\"status\":\"PENDING\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-300s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid?\",\"target_id\":\"$uuid?\",\"target_type\":\"POST\"}"
+    ],
+    "admins": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"id\":\"$uuid?\",\"password\":\"hash-not-used\",\"updated_at\":\"<t+0s db +09:00>\",\"username\":\"operator\"}"
+    ],
+    "notifications": [
+      "{\"body\":\"내 사진이 피드에 공개되었습니다.\",\"created_at\":\"<t-300s db +09:00>\",\"event_key\":\"$uuid?\",\"id\":\"$uuid?\",\"next_attempt_at\":null,\"payload\":null,\"read_at\":\"<t-240s db +09:00>\",\"source_id\":\"$uuid?\",\"source_type\":\"POST\",\"sqs_publish_status\":\"NOT_REQUIRED\",\"sqs_published_at\":null,\"title\":\"게시물이 승인되었습니다.\",\"type\":\"POST_APPROVED\",\"user_id\":\"$uuid?\"}",
+      "{\"body\":\"내 사진이 피드에 공개되었습니다.\",\"created_at\":\"<t-300s db +09:00>\",\"event_key\":\"$uuid?\",\"id\":\"$uuid?\",\"next_attempt_at\":null,\"payload\":null,\"read_at\":null,\"source_id\":\"$uuid?\",\"source_type\":\"POST\",\"sqs_publish_status\":\"NOT_REQUIRED\",\"sqs_published_at\":null,\"title\":\"게시물이 승인되었습니다.\",\"type\":\"POST_APPROVED\",\"user_id\":\"$uuid?\"}",
+      "{\"body\":\"내 사진이 피드에 공개되었습니다.\",\"created_at\":\"<t-300s db +09:00>\",\"event_key\":\"$uuid?\",\"id\":\"$uuid?\",\"next_attempt_at\":null,\"payload\":null,\"read_at\":null,\"source_id\":\"$uuid?\",\"source_type\":\"POST\",\"sqs_publish_status\":\"NOT_REQUIRED\",\"sqs_published_at\":null,\"title\":\"게시물이 승인되었습니다.\",\"type\":\"POST_APPROVED\",\"user_id\":\"$uuid?\"}"
+    ],
+    "photos": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/p1/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p1/thumbnail.webp\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/p2/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p2/thumbnail.webp\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/p3/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p3/thumbnail.webp\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ],
+    "posts": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"사진1\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"사진2\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"사진3\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}"
+    ],
+    "push_devices": [
+      "{\"fcm_token\":\"token-user2\",\"fcm_token_hash\":\"2222222222222222222222222222222222222222222222222222222222222222\",\"id\":\"$uuid?\",\"registered_at\":\"<t-3600s db +09:00>\",\"session_id\":\"$uuid?\",\"updated_at\":\"<t-3600s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"fcm_token\":\"token-user3\",\"fcm_token_hash\":\"3333333333333333333333333333333333333333333333333333333333333333\",\"id\":\"$uuid?\",\"registered_at\":\"<t-3600s db +09:00>\",\"session_id\":\"$uuid?\",\"updated_at\":\"<t-3600s db +09:00>\",\"user_id\":\"$uuid?\"}"
+    ],
+    "topics": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t-896405s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-982800s db +09:00>\",\"title\":\"주제1\",\"topic_date\":\"2026-10-01\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ],
+    "users": [
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t-43200s db +09:00>\",\"email\":\"user3@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/user3/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"user1@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/user1/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"user2@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/user2/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}"
+    ]
+  },
+  "fakes": [
+    {
+      "body": {
+        "MaxNumberOfMessages": 1,
+        "MessageSystemAttributeNames": [
+          "ApproximateReceiveCount"
+        ],
+        "QueueUrl": "https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-test-push",
+        "VisibilityTimeout": 60,
+        "WaitTimeSeconds": 20
+      },
+      "contentType": "application/x-amz-json-1.0",
+      "detail": "ReceiveMessage",
+      "method": "POST",
+      "service": "sqs"
+    },
+    {
+      "body": {
+        "QueueUrl": "https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-test-push",
+        "ReceiptHandle": "fake-receipt-1"
+      },
+      "contentType": "application/x-amz-json-1.0",
+      "detail": "DeleteMessage",
+      "method": "POST",
+      "service": "sqs"
+    },
+    {
+      "body": {
+        "MaxNumberOfMessages": 1,
+        "MessageSystemAttributeNames": [
+          "ApproximateReceiveCount"
+        ],
+        "QueueUrl": "https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-test-push",
+        "VisibilityTimeout": 60,
+        "WaitTimeSeconds": 20
+      },
+      "contentType": "application/x-amz-json-1.0",
+      "detail": "ReceiveMessage",
+      "method": "POST",
+      "service": "sqs"
+    },
+    {
+      "body": {
+        "QueueUrl": "https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-test-push",
+        "ReceiptHandle": "fake-receipt-2"
+      },
+      "contentType": "application/x-amz-json-1.0",
+      "detail": "DeleteMessage",
+      "method": "POST",
+      "service": "sqs"
+    },
+    {
+      "body": {
+        "MaxNumberOfMessages": 1,
+        "MessageSystemAttributeNames": [
+          "ApproximateReceiveCount"
+        ],
+        "QueueUrl": "https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-test-push",
+        "VisibilityTimeout": 60,
+        "WaitTimeSeconds": 20
+      },
+      "contentType": "application/x-amz-json-1.0",
+      "detail": "ReceiveMessage",
+      "method": "POST",
+      "service": "sqs"
+    },
+    {
+      "body": {
+        "QueueUrl": "https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-test-push",
+        "ReceiptHandle": "fake-receipt-3"
+      },
+      "contentType": "application/x-amz-json-1.0",
+      "detail": "DeleteMessage",
+      "method": "POST",
+      "service": "sqs"
+    },
+    {
+      "body": {
+        "MaxNumberOfMessages": 1,
+        "MessageSystemAttributeNames": [
+          "ApproximateReceiveCount"
+        ],
+        "QueueUrl": "https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-test-push",
+        "VisibilityTimeout": 60,
+        "WaitTimeSeconds": 20
+      },
+      "contentType": "application/x-amz-json-1.0",
+      "detail": "ReceiveMessage",
+      "method": "POST",
+      "service": "sqs"
+    },
+    {
+      "body": {
+        "QueueUrl": "https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-test-push",
+        "ReceiptHandle": "fake-receipt-4"
+      },
+      "contentType": "application/x-amz-json-1.0",
+      "detail": "DeleteMessage",
+      "method": "POST",
+      "service": "sqs"
+    },
+    {
+      "body": {
+        "MaxNumberOfMessages": 1,
+        "MessageSystemAttributeNames": [
+          "ApproximateReceiveCount"
+        ],
+        "QueueUrl": "https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-test-push",
+        "VisibilityTimeout": 60,
+        "WaitTimeSeconds": 20
+      },
+      "contentType": "application/x-amz-json-1.0",
+      "detail": "ReceiveMessage",
+      "method": "POST",
+      "service": "sqs"
+    },
+    {
+      "body": {
+        "QueueUrl": "https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-test-push",
+        "ReceiptHandle": "fake-receipt-5"
+      },
+      "contentType": "application/x-amz-json-1.0",
+      "detail": "DeleteMessage",
+      "method": "POST",
+      "service": "sqs"
+    },
+    {
+      "body": {
+        "MaxNumberOfMessages": 1,
+        "MessageSystemAttributeNames": [
+          "ApproximateReceiveCount"
+        ],
+        "QueueUrl": "https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-test-push",
+        "VisibilityTimeout": 60,
+        "WaitTimeSeconds": 20
+      },
+      "contentType": "application/x-amz-json-1.0",
+      "detail": "ReceiveMessage",
+      "method": "POST",
+      "service": "sqs"
+    },
+    {
+      "body": {
+        "QueueUrl": "https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-test-push",
+        "ReceiptHandle": "fake-receipt-6"
+      },
+      "contentType": "application/x-amz-json-1.0",
+      "detail": "DeleteMessage",
+      "method": "POST",
+      "service": "sqs"
+    },
+    {
+      "body": {
+        "MaxNumberOfMessages": 1,
+        "MessageSystemAttributeNames": [
+          "ApproximateReceiveCount"
+        ],
+        "QueueUrl": "https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-test-push",
+        "VisibilityTimeout": 60,
+        "WaitTimeSeconds": 20
+      },
+      "contentType": "application/x-amz-json-1.0",
+      "detail": "ReceiveMessage",
+      "method": "POST",
+      "service": "sqs"
+    },
+    {
+      "body": {
+        "QueueUrl": "https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-test-push",
+        "ReceiptHandle": "fake-receipt-7"
+      },
+      "contentType": "application/x-amz-json-1.0",
+      "detail": "DeleteMessage",
+      "method": "POST",
+      "service": "sqs"
+    },
+    {
+      "body": {
+        "MaxNumberOfMessages": 1,
+        "MessageSystemAttributeNames": [
+          "ApproximateReceiveCount"
+        ],
+        "QueueUrl": "https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-test-push",
+        "VisibilityTimeout": 60,
+        "WaitTimeSeconds": 20
+      },
+      "contentType": "application/x-amz-json-1.0",
+      "detail": "ReceiveMessage",
+      "method": "POST",
+      "service": "sqs"
+    },
+    {
+      "body": {
+        "QueueUrl": "https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-test-push",
+        "ReceiptHandle": "fake-receipt-8"
+      },
+      "contentType": "application/x-amz-json-1.0",
+      "detail": "DeleteMessage",
+      "method": "POST",
+      "service": "sqs"
+    },
+    {
+      "body": {
+        "MaxNumberOfMessages": 1,
+        "MessageSystemAttributeNames": [
+          "ApproximateReceiveCount"
+        ],
+        "QueueUrl": "https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-test-push",
+        "VisibilityTimeout": 60,
+        "WaitTimeSeconds": 20
+      },
+      "contentType": "application/x-amz-json-1.0",
+      "detail": "ReceiveMessage",
+      "method": "POST",
+      "service": "sqs"
+    },
+    {
+      "body": {
+        "QueueUrl": "https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-test-push",
+        "ReceiptHandle": "fake-receipt-9"
+      },
+      "contentType": "application/x-amz-json-1.0",
+      "detail": "DeleteMessage",
+      "method": "POST",
+      "service": "sqs"
+    }
+  ],
+  "steps": [
+    {
+      "body": {
+        "hasUnread": true
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "JSON이 아닌 본문은 버린다(INVALID_MESSAGE)"
+    },
+    {
+      "body": {
+        "hasUnread": true
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid2"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "JSON null 본문은 버린다"
+    },
+    {
+      "body": {
+        "hasUnread": true
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid3"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "배열 본문은 버린다"
+    },
+    {
+      "body": {
+        "hasUnread": true
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid4"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "유효 시간이 지난 메시지는 버린다"
+    },
+    {
+      "body": {
+        "hasUnread": true
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid5"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "type과 sourceType이 맞지 않으면 버린다"
+    },
+    {
+      "body": {
+        "hasUnread": true
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid6"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "존재하지 않는 알림은 버린다"
+    },
+    {
+      "body": {
+        "hasUnread": true
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid7"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "기기가 없는 사용자는 보낼 곳이 없어 버린다(NO_DEVICES)"
+    },
+    {
+      "body": {
+        "hasUnread": true
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid8"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "이미 읽은 알림은 보내지 않는다"
+    },
+    {
+      "body": {
+        "hasUnread": true
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid9"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "탈퇴한 사용자의 알림은 보내지 않는다"
+    }
+  ]
+}

@@ -16,7 +16,9 @@ pub enum ClientError {
     ConnectTimeout,
     /// 읽기(또는 쓰기) 시간 초과.
     ReadTimeout,
-    /// 연결 거부·이름 해석 실패 등 연결 단계 오류.
+    /// 호스트 이름을 주소로 바꾸지 못했다(DNS 실패).
+    Resolve(io::Error),
+    /// 연결 거부 등 연결 단계 오류.
     Connect(io::Error),
     /// TLS 핸드셰이크·인증서 검증 실패.
     Tls(String),
@@ -36,6 +38,7 @@ impl fmt::Display for ClientError {
             Self::InvalidHeader(m) => write!(f, "잘못된 헤더: {m}"),
             Self::ConnectTimeout => write!(f, "연결 시간 초과"),
             Self::ReadTimeout => write!(f, "읽기 시간 초과"),
+            Self::Resolve(e) => write!(f, "이름 해석 실패: {e}"),
             Self::Connect(e) => write!(f, "연결 실패: {e}"),
             Self::Tls(m) => write!(f, "TLS 오류: {m}"),
             Self::Io(e) => write!(f, "입출력 오류: {e}"),
@@ -48,7 +51,7 @@ impl fmt::Display for ClientError {
 impl std::error::Error for ClientError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
-            Self::Connect(e) | Self::Io(e) => Some(e),
+            Self::Resolve(e) | Self::Connect(e) | Self::Io(e) => Some(e),
             _ => None,
         }
     }

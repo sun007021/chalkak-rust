@@ -288,3 +288,12 @@ fn 잘못된_url과_스킴() {
         ClientError::InvalidUrl(_)
     ));
 }
+
+// 이름 해석에 실패하면 연결 거부와 구별되는 오류다(FCM 발송이 UNAVAILABLE로 분류한다).
+#[test]
+fn 이름_해석_실패() {
+    let err = client()
+        .get("http://no-such-host.invalid:80/", &[])
+        .unwrap_err();
+    assert!(matches!(err, ClientError::Resolve(_)), "{err}");
+}
