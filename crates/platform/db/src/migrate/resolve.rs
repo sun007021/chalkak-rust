@@ -232,15 +232,15 @@ mod tests {
         ));
     }
 
-    /// 근거: 저장소 `migrations/`는 28개이며 Java가 적용한 순서(버전 오름차순)와 같아야 한다.
+    /// 근거: 저장소 `migrations/`는 45개이며 Java가 적용한 순서(버전 오름차순)와 같아야 한다.
     #[test]
     fn loads_repository_migrations_in_version_order() {
         let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../migrations");
         let all = load_dir(&dir).unwrap();
-        assert_eq!(all.len(), 28);
+        assert_eq!(all.len(), 45);
         assert!(all.windows(2).all(|w| w[0].version < w[1].version));
         assert_eq!(all[0].script, "V202608191752__create_initial_schema.sql");
-        assert_eq!(all[27].description, "create notifications");
+        assert_eq!(all[44].description, "allow notice delete audit");
     }
 
     #[test]
