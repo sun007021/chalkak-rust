@@ -488,6 +488,41 @@ mod tests {
         assert!(!overlapped.load(Ordering::SeqCst));
     }
 
+    // SqsPushConfigurationTest#configuration_publicationBlocked_keepsCommonSchedulerFreeAndClosesExecutor:
+    // 외부 호출에서 막힌 작업이 있어도 다른 작업은 제때 돌고, 종료 신호 뒤 막힘이 풀리면 모두 끝난다.
+    #[test]
+    fn 한_작업이_막혀도_다른_작업은_제때_돌고_막힘이_풀리면_모두_끝난다() {
+        let shutdown = ShutdownSignal::new();
+        let mut scheduler = Scheduler::new(shutdown.clone(), fixed_clock("2026-10-12T00:00:00Z"));
+        let release = Arc::new(AtomicBool::new(false));
+        let blocked_started = Arc::new(AtomicBool::new(false));
+        let (gate, started) = (Arc::clone(&release), Arc::clone(&blocked_started));
+        scheduler
+            .fixed_delay("relay", Duration::from_millis(5), move || {
+                started.store(true, Ordering::SeqCst);
+                while !gate.load(Ordering::SeqCst) {
+                    std::thread::sleep(Duration::from_millis(2));
+                }
+            })
+            .unwrap();
+        let ticks = Arc::new(AtomicUsize::new(0));
+        let counter = Arc::clone(&ticks);
+        scheduler
+            .fixed_rate("common", Duration::from_millis(5), move || {
+                counter.fetch_add(1, Ordering::SeqCst);
+            })
+            .unwrap();
+        wait_until("막힌 작업 시작", || {
+            blocked_started.load(Ordering::SeqCst)
+        });
+        wait_until("공용 작업이 계속 돈다", || {
+            ticks.load(Ordering::SeqCst) >= 3
+        });
+        shutdown.trigger();
+        release.store(true, Ordering::SeqCst);
+        scheduler.join();
+    }
+
     #[test]
     fn 작업이_패닉해도_일정은_계속된다() {
         let shutdown = ShutdownSignal::new();
