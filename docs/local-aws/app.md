@@ -62,6 +62,14 @@ emulator -avd chalkak-api33 -writable-system -no-snapshot       # -writable-syst
 
 API 레벨에 따라 CA를 넣는 방법이 다르다. 가능하면 **API 33 이하**로 만든다(파일을 `/system`에 직접 넣는다). API 34 이상은 CA가 APEX(`/apex/com.android.conscrypt/cacerts`)로 옮겨 가서 2-B 방법이 필요하다. 앱의 `minSdk = 26`(`build.gradle.kts:45`)이라 33에서도 돈다.
 
+### 실제로 안정적이었던 조합 (앱 E2E 검증, 2026-10-19)
+- 이미지는 **Google APIs API 33**(`google_apis`)을 쓰고 CA는 `/system`에 넣었다(2-A). Google Play 이미지는 `adb root`가 되지 않아 쓰지 못했다.
+- 호스트 IP가 바뀌면(Wi-Fi 이동 등) 에뮬레이터의 DNS가 꼬여 sslip.io 이름이 엉뚱한 IP로 풀렸다. 에뮬레이터만 쓸 때는 다음 조합이 안정적이었다.
+  - 스택을 `HOST_IP=127.0.0.1`로 띄운다(이름은 `api.127.0.0.1.sslip.io` 등).
+  - `adb reverse tcp:443 tcp:443`으로 에뮬레이터의 127.0.0.1:443을 호스트 443으로 넘긴다.
+  - 에뮬레이터 `/system/etc/hosts`에 쓰는 이름(`api.`, `cdn.`, `s3.`, `<버킷>.s3.` + `127.0.0.1.sslip.io`)을 `127.0.0.1`로 적어 외부 DNS에 기대지 않는다(`adb root && adb remount` 뒤 편집).
+  - 실기기와 함께 쓸 때는 이 조합을 쓸 수 없으니 위 "HOST_IP 고르기"대로 LAN IP 하나로 통일한다.
+
 ### 2-A. API 33 이하: /system 에 넣기
 ```bash
 HASH=$(openssl x509 -inform PEM -subject_hash_old -noout -in /tmp/chalkak-local-ca.crt | head -1)
@@ -146,6 +154,10 @@ xcrun simctl keychain booted add-root-cert /tmp/chalkak-local-ca.crt
 ```
 시뮬레이터마다 따로 넣는다(초기화하면 사라진다). 확인: 시뮬레이터 Safari에서 `https://api.<IP>.sslip.io/actuator/health`.
 빌드는 Xcode에서 시뮬레이터를 고르고 실행한다. 배포 타깃이 `IPHONEOS_DEPLOYMENT_TARGET = 26.5`(`project.pbxproj`)라 Xcode·시뮬레이터 런타임이 이 버전을 지원해야 한다.
+
+### 앱 버전 게이트와 Firebase 설정 (앱 E2E 검증, 2026-10-19)
+- **강제 업데이트 화면:** iOS `AppVersionGate`는 같은 번들 ID로 실제 App Store 버전을 조회한다. 로컬 빌드의 버전이 스토어보다 낮으면 강제 업데이트를 띄워 앱을 쓸 수 없다. 로컬에서는 게이트를 건너뛰는 로컬 전용 변경(커밋하지 않는다)이나 스토어에 없는 별도 번들 ID로 빌드한다.
+- **더미 `GoogleService-Info.plist`:** 팀 Firebase 파일이 없을 때 더미를 넣는다면 `API_KEY` 값이 **39자**여야 한다. 길이가 다르면 시작할 때 Firebase 초기화에서 크래시가 난다. 더미로는 실제 푸시를 받을 수 없다.
 
 ## 4. 실기기
 
@@ -269,6 +281,9 @@ curl -s --cacert $CA -X PUT -H "Authorization: Bearer $TOKEN" -H 'Content-Type: 
 | 로그인 401 `유효하지 않은 … ID Token` | 클라이언트 ID/앱키 불일치, 또는 가짜 모드 | 5절 표; `docker compose exec rust env | grep OIDC` |
 | 사인/사진 업로드가 PUT에서 실패 | 기기가 `<버킷>.s3.<IP>.sslip.io`를 못 풀거나 CA 미신뢰 | 휴대폰 DNS(sslip.io 필요), 같은 Wi-Fi; Safari로 `https://s3.<IP>.sslip.io/` |
 | 업로드 후 계속 VALIDATING/PROCESSING | Lambda·콜백 | `scripts/trace.sh <업로드ID>`의 esm-poller `message_deleted`/`message_kept`, lambda 로그 |
+| iOS가 시작하자마자 강제 업데이트 화면 | `AppVersionGate`가 같은 번들 ID의 App Store 버전과 비교 | 3절 "앱 버전 게이트": 게이트 우회 또는 별도 번들 ID |
+| iOS가 시작할 때 크래시 | 더미 `GoogleService-Info.plist`의 `API_KEY` 길이 | 39자로 맞춘다(3절) |
+| Android 에뮬레이터가 어느 순간 서버에 못 닿음 | 호스트 IP가 바뀌어 DNS가 꼬임 | 2절 "실제로 안정적이었던 조합": `HOST_IP=127.0.0.1`, `adb reverse tcp:443 tcp:443`, `/system/etc/hosts` |
 | 이미지가 안 보임 | cdn 이름/경로 | `curl --cacert … https://cdn.<IP>.sslip.io/posts/dev/original/<id>.webp` |
 
 ## 9. 부하 발생기에서 업로드 흐름과 동시성(S2)
