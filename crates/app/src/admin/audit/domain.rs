@@ -10,6 +10,7 @@ use serde_json::{Map, Value};
 use uuid::Uuid;
 
 use super::sensitive::contains_sensitive_value;
+use crate::notification::notice::Notice;
 use crate::web::binding::is_java_whitespace;
 use crate::web::json::format_instant;
 
@@ -83,6 +84,8 @@ pub enum AdminTargetType {
     Post,
     User,
     Topic,
+    TopicPushSchedule,
+    Notice,
 }
 
 impl AdminTargetType {
@@ -91,6 +94,8 @@ impl AdminTargetType {
             AdminTargetType::Post => "POST",
             AdminTargetType::User => "USER",
             AdminTargetType::Topic => "TOPIC",
+            AdminTargetType::TopicPushSchedule => "TOPIC_PUSH_SCHEDULE",
+            AdminTargetType::Notice => "NOTICE",
         }
     }
 
@@ -99,6 +104,8 @@ impl AdminTargetType {
             "POST" => AdminTargetType::Post,
             "USER" => AdminTargetType::User,
             "TOPIC" => AdminTargetType::Topic,
+            "TOPIC_PUSH_SCHEDULE" => AdminTargetType::TopicPushSchedule,
+            "NOTICE" => AdminTargetType::Notice,
             _ => return None,
         })
     }
@@ -114,10 +121,16 @@ pub enum AdminAction {
     TopicCreated,
     TopicUpdated,
     TopicDeleted,
+    TopicPushScheduleCreated,
+    TopicPushScheduleUpdated,
+    TopicPushScheduleDeleted,
+    NoticeCreated,
+    NoticeUpdated,
+    NoticeDeleted,
 }
 
 impl AdminAction {
-    pub const ALL: [AdminAction; 8] = [
+    pub const ALL: [AdminAction; 14] = [
         AdminAction::PostApproved,
         AdminAction::PostRejected,
         AdminAction::PostDeleted,
@@ -126,6 +139,12 @@ impl AdminAction {
         AdminAction::TopicCreated,
         AdminAction::TopicUpdated,
         AdminAction::TopicDeleted,
+        AdminAction::TopicPushScheduleCreated,
+        AdminAction::TopicPushScheduleUpdated,
+        AdminAction::TopicPushScheduleDeleted,
+        AdminAction::NoticeCreated,
+        AdminAction::NoticeUpdated,
+        AdminAction::NoticeDeleted,
     ];
 
     pub const fn as_str(self) -> &'static str {
@@ -138,6 +157,12 @@ impl AdminAction {
             AdminAction::TopicCreated => "TOPIC_CREATED",
             AdminAction::TopicUpdated => "TOPIC_UPDATED",
             AdminAction::TopicDeleted => "TOPIC_DELETED",
+            AdminAction::TopicPushScheduleCreated => "TOPIC_PUSH_SCHEDULE_CREATED",
+            AdminAction::TopicPushScheduleUpdated => "TOPIC_PUSH_SCHEDULE_UPDATED",
+            AdminAction::TopicPushScheduleDeleted => "TOPIC_PUSH_SCHEDULE_DELETED",
+            AdminAction::NoticeCreated => "NOTICE_CREATED",
+            AdminAction::NoticeUpdated => "NOTICE_UPDATED",
+            AdminAction::NoticeDeleted => "NOTICE_DELETED",
         }
     }
 
@@ -154,6 +179,12 @@ impl AdminAction {
             AdminAction::TopicCreated | AdminAction::TopicUpdated | AdminAction::TopicDeleted => {
                 AdminTargetType::Topic
             }
+            AdminAction::TopicPushScheduleCreated
+            | AdminAction::TopicPushScheduleUpdated
+            | AdminAction::TopicPushScheduleDeleted => AdminTargetType::TopicPushSchedule,
+            AdminAction::NoticeCreated
+            | AdminAction::NoticeUpdated
+            | AdminAction::NoticeDeleted => AdminTargetType::Notice,
         }
     }
 
@@ -165,6 +196,7 @@ impl AdminAction {
                 | AdminAction::UserBanned
                 | AdminAction::UserUnbanned
                 | AdminAction::TopicDeleted
+                | AdminAction::NoticeDeleted
         )
     }
 
@@ -193,6 +225,24 @@ impl AdminAction {
                     && before.values != after.values
             }
             AdminAction::TopicDeleted => is_topic_deleted(before, after),
+            AdminAction::TopicPushScheduleCreated => {
+                before.is_empty() && is_valid_push_schedule_state(after)
+            }
+            AdminAction::TopicPushScheduleUpdated => {
+                is_valid_push_schedule_state(before)
+                    && is_valid_push_schedule_state(after)
+                    && before.values != after.values
+            }
+            AdminAction::TopicPushScheduleDeleted => {
+                is_valid_push_schedule_state(before) && after.is_empty()
+            }
+            AdminAction::NoticeCreated => before.is_empty() && is_valid_notice_state(after),
+            AdminAction::NoticeUpdated => {
+                is_valid_notice_state(before)
+                    && is_valid_notice_state(after)
+                    && before.values != after.values
+            }
+            AdminAction::NoticeDeleted => is_notice_deleted(before, after),
         }
     }
 }
@@ -342,6 +392,9 @@ const USER_STATUS_FIELDS: [&str; 1] = ["status"];
 const TOPIC_STATE_FIELDS: [&str; 4] = ["title", "topicDate", "startsAt", "endsAt"];
 const DELETED_TOPIC_STATE_FIELDS: [&str; 5] =
     ["title", "topicDate", "startsAt", "endsAt", "deletedAt"];
+const PUSH_SCHEDULE_FIELDS: [&str; 1] = ["sendTime"];
+const NOTICE_STATE_FIELDS: [&str; 3] = ["title", "scheduledAt", "bodySha256"];
+const DELETED_NOTICE_STATE_FIELDS: [&str; 4] = ["title", "scheduledAt", "bodySha256", "deletedAt"];
 /// 게시물 `ModerationStatus`의 이름들.
 const MODERATION_STATUSES: [&str; 4] = ["VALIDATING", "PENDING", "APPROVED", "REJECTED"];
 
@@ -401,6 +454,60 @@ fn is_valid_topic_state(state: &AuditSnapshot, expected_fields: &[&str]) -> bool
         && is_valid_title(state.value("title"))
         && is_local_date(state.value("topicDate"))
         && matches!((starts_at, ends_at), (Some(s), Some(e)) if e > s)
+}
+
+/// `sendTime`은 `(?:[01][0-9]|2[0-3]):[0-5][0-9]:00` 모양의 문자열이다.
+fn is_valid_push_schedule_state(state: &AuditSnapshot) -> bool {
+    state.has_exactly_fields(&PUSH_SCHEDULE_FIELDS)
+        && state
+            .value("sendTime")
+            .and_then(Value::as_str)
+            .is_some_and(is_minute_time)
+}
+
+fn is_minute_time(text: &str) -> bool {
+    let b = text.as_bytes();
+    b.len() == 8
+        && matches!(
+            (b[0], b[1]),
+            (b'0' | b'1', b'0'..=b'9') | (b'2', b'0'..=b'3')
+        )
+        && b[2] == b':'
+        && matches!(b[3], b'0'..=b'5')
+        && b[4].is_ascii_digit()
+        && &b[5..] == b":00"
+}
+
+fn is_valid_notice_state(state: &AuditSnapshot) -> bool {
+    is_valid_notice_fields(state, &NOTICE_STATE_FIELDS)
+}
+
+fn is_valid_notice_fields(state: &AuditSnapshot, expected_fields: &[&str]) -> bool {
+    state.has_exactly_fields(expected_fields)
+        && state
+            .value("title")
+            .and_then(Value::as_str)
+            .is_some_and(Notice::is_valid_title)
+        && is_instant(state.value("scheduledAt"))
+        && state
+            .value("bodySha256")
+            .and_then(Value::as_str)
+            .is_some_and(is_sha256_hex)
+}
+
+/// `[0-9a-f]{64}`
+fn is_sha256_hex(text: &str) -> bool {
+    text.len() == 64 && text.bytes().all(|c| matches!(c, b'0'..=b'9' | b'a'..=b'f'))
+}
+
+fn is_notice_deleted(before: &AuditSnapshot, after: &AuditSnapshot) -> bool {
+    is_valid_notice_fields(before, &DELETED_NOTICE_STATE_FIELDS)
+        && is_valid_notice_fields(after, &DELETED_NOTICE_STATE_FIELDS)
+        && matches!(before.value("deletedAt"), Some(Value::Null))
+        && is_instant(after.value("deletedAt"))
+        && NOTICE_STATE_FIELDS
+            .iter()
+            .all(|field| before.value(field) == after.value(field))
 }
 
 fn is_valid_title(value: Option<&Value>) -> bool {
@@ -1012,7 +1119,8 @@ mod tests {
                 "POST_DELETED",
                 "USER_BANNED",
                 "USER_UNBANNED",
-                "TOPIC_DELETED"
+                "TOPIC_DELETED",
+                "NOTICE_DELETED"
             ]
         );
         for action in AdminAction::ALL {

@@ -1,0 +1,3686 @@
+{
+  "db": {
+    "admin_audit_logs": [
+      "{\"action\":\"TOPIC_PUSH_SCHEDULE_CREATED\",\"actor_admin_id\":\"$uuid68\",\"after_state\":{\"sendTime\":\"00:00:00\"},\"before_state\":{},\"id\":\"$uuid70\",\"occurred_at\":\"<t+5s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid32\",\"target_id\":\"$uuid33\",\"target_type\":\"TOPIC_PUSH_SCHEDULE\"}",
+      "{\"action\":\"TOPIC_PUSH_SCHEDULE_CREATED\",\"actor_admin_id\":\"$uuid68\",\"after_state\":{\"sendTime\":\"09:00:00\"},\"before_state\":{},\"id\":\"$uuid67\",\"occurred_at\":\"<t+0s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid26\",\"target_id\":\"$uuid27\",\"target_type\":\"TOPIC_PUSH_SCHEDULE\"}",
+      "{\"action\":\"TOPIC_PUSH_SCHEDULE_CREATED\",\"actor_admin_id\":\"$uuid68\",\"after_state\":{\"sendTime\":\"12:00:00\"},\"before_state\":{},\"id\":\"$uuid72\",\"occurred_at\":\"<t+5s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid36\",\"target_id\":\"$uuid37\",\"target_type\":\"TOPIC_PUSH_SCHEDULE\"}",
+      "{\"action\":\"TOPIC_PUSH_SCHEDULE_CREATED\",\"actor_admin_id\":\"$uuid68\",\"after_state\":{\"sendTime\":\"13:00:00\"},\"before_state\":{},\"id\":\"$uuid73\",\"occurred_at\":\"<t+10s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid38\",\"target_id\":\"$uuid39\",\"target_type\":\"TOPIC_PUSH_SCHEDULE\"}",
+      "{\"action\":\"TOPIC_PUSH_SCHEDULE_CREATED\",\"actor_admin_id\":\"$uuid68\",\"after_state\":{\"sendTime\":\"14:00:00\"},\"before_state\":{},\"id\":\"$uuid74\",\"occurred_at\":\"<t+10s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid40\",\"target_id\":\"$uuid41\",\"target_type\":\"TOPIC_PUSH_SCHEDULE\"}",
+      "{\"action\":\"TOPIC_PUSH_SCHEDULE_CREATED\",\"actor_admin_id\":\"$uuid68\",\"after_state\":{\"sendTime\":\"18:30:00\"},\"before_state\":{},\"id\":\"$uuid69\",\"occurred_at\":\"<t+0s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid30\",\"target_id\":\"$uuid31\",\"target_type\":\"TOPIC_PUSH_SCHEDULE\"}",
+      "{\"action\":\"TOPIC_PUSH_SCHEDULE_CREATED\",\"actor_admin_id\":\"$uuid68\",\"after_state\":{\"sendTime\":\"18:30:00\"},\"before_state\":{},\"id\":\"$uuid75\",\"occurred_at\":\"<t+20s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid62\",\"target_id\":\"$uuid63\",\"target_type\":\"TOPIC_PUSH_SCHEDULE\"}",
+      "{\"action\":\"TOPIC_PUSH_SCHEDULE_CREATED\",\"actor_admin_id\":\"$uuid68\",\"after_state\":{\"sendTime\":\"23:59:00\"},\"before_state\":{},\"id\":\"$uuid71\",\"occurred_at\":\"<t+5s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid34\",\"target_id\":\"$uuid35\",\"target_type\":\"TOPIC_PUSH_SCHEDULE\"}",
+      "{\"action\":\"TOPIC_PUSH_SCHEDULE_DELETED\",\"actor_admin_id\":\"$uuid68\",\"after_state\":{},\"before_state\":{\"sendTime\":\"07:30:00\"},\"id\":\"$uuid80\",\"occurred_at\":\"<t+20s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid64\",\"target_id\":\"$uuid2\",\"target_type\":\"TOPIC_PUSH_SCHEDULE\"}",
+      "{\"action\":\"TOPIC_PUSH_SCHEDULE_DELETED\",\"actor_admin_id\":\"$uuid68\",\"after_state\":{},\"before_state\":{\"sendTime\":\"18:30:00\"},\"id\":\"$uuid79\",\"occurred_at\":\"<t+15s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid60\",\"target_id\":\"$uuid31\",\"target_type\":\"TOPIC_PUSH_SCHEDULE\"}",
+      "{\"action\":\"TOPIC_PUSH_SCHEDULE_UPDATED\",\"actor_admin_id\":\"$uuid68\",\"after_state\":{\"sendTime\":\"10:15:00\"},\"before_state\":{\"sendTime\":\"09:00:00\"},\"id\":\"$uuid77\",\"occurred_at\":\"<t+15s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid50\",\"target_id\":\"$uuid27\",\"target_type\":\"TOPIC_PUSH_SCHEDULE\"}"
+    ],
+    "admins": [
+      "{\"created_at\":\"<t-3542400s db +09:00>\",\"id\":\"$uuid68\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"updated_at\":\"<t-3542400s db +09:00>\",\"username\":\"operator\"}"
+    ],
+    "topic_push_schedules": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"id\":\"$uuid27\",\"send_time\":\"10:15:00\",\"updated_at\":\"<t+15s db +09:00>\"}",
+      "{\"created_at\":\"<t+10s db +09:00>\",\"id\":\"$uuid39\",\"send_time\":\"13:00:00\",\"updated_at\":\"<t+10s db +09:00>\"}",
+      "{\"created_at\":\"<t+10s db +09:00>\",\"id\":\"$uuid41\",\"send_time\":\"14:00:00\",\"updated_at\":\"<t+10s db +09:00>\"}",
+      "{\"created_at\":\"<t+20s db +09:00>\",\"id\":\"$uuid63\",\"send_time\":\"18:30:00\",\"updated_at\":\"<t+20s db +09:00>\"}",
+      "{\"created_at\":\"<t+5s db +09:00>\",\"id\":\"$uuid33\",\"send_time\":\"00:00:00\",\"updated_at\":\"<t+5s db +09:00>\"}",
+      "{\"created_at\":\"<t+5s db +09:00>\",\"id\":\"$uuid35\",\"send_time\":\"23:59:00\",\"updated_at\":\"<t+5s db +09:00>\"}",
+      "{\"created_at\":\"<t+5s db +09:00>\",\"id\":\"$uuid37\",\"send_time\":\"12:00:00\",\"updated_at\":\"<t+5s db +09:00>\"}",
+      "{\"created_at\":\"<t-864000s db +09:00>\",\"id\":\"$uuid3\",\"send_time\":\"21:00:00\",\"updated_at\":\"<t-864000s db +09:00>\"}"
+    ]
+  },
+  "steps": [
+    {
+      "body": {
+        "schedules": [
+          {
+            "createdAt": "<t-950400s iso Z>",
+            "scheduleId": "$uuid2",
+            "sendTime": "07:30:00",
+            "updatedAt": "<t-950400s iso Z>"
+          },
+          {
+            "createdAt": "<t-864000s iso Z>",
+            "scheduleId": "$uuid3",
+            "sendTime": "21:00:00",
+            "updatedAt": "<t-864000s iso Z>"
+          }
+        ]
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "목록 비어 있음"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid4"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 본문 없음"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be null"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid5"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 빈 객체"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be null"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid6"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 null"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid7"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 24시"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid8"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 60초"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid9"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 문자"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid10"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 숫자"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid11"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 불리언"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid12"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 객체"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be null"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid13"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 빈 문자열"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be null"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid14"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 공백 문자열"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid15"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 배열 한 칸"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid16"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 배열 다섯 칸"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid17"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 배열 범위 밖"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid18"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 배열 문자"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제 푸시 발송 시각은 분 단위의 KST 시각이어야 합니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid19"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 초 있음"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제 푸시 발송 시각은 분 단위의 KST 시각이어야 합니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid20"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 소수 초"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제 푸시 발송 시각은 분 단위의 KST 시각이어야 합니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid21"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 나노 1"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제 푸시 발송 시각은 분 단위의 KST 시각이어야 합니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid22"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 배열 초"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid23"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 시만"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid24"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 한 자리 시"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid25"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 거절 깨진 JSON"
+    },
+    {
+      "body": {
+        "createdAt": "<t+0s iso Z>",
+        "scheduleId": "$uuid27",
+        "sendTime": "09:00:00",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid26"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 201,
+      "step": "등록 성공 09:00:00"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "해당 시각의 주제 푸시 설정이 이미 존재합니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid28"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 중복"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "해당 시각의 주제 푸시 설정이 이미 존재합니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid29"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 중복 분 단위 표기"
+    },
+    {
+      "body": {
+        "createdAt": "<t+0s iso Z>",
+        "scheduleId": "$uuid31",
+        "sendTime": "18:30:00",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid30"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 201,
+      "step": "등록 성공 분 단위 표기"
+    },
+    {
+      "body": {
+        "createdAt": "<t+5s iso Z>",
+        "scheduleId": "$uuid33",
+        "sendTime": "00:00:00",
+        "updatedAt": "<t+5s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid32"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 201,
+      "step": "등록 성공 배열"
+    },
+    {
+      "body": {
+        "createdAt": "<t+5s iso Z>",
+        "scheduleId": "$uuid35",
+        "sendTime": "23:59:00",
+        "updatedAt": "<t+5s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid34"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 201,
+      "step": "등록 성공 배열 세 칸"
+    },
+    {
+      "body": {
+        "createdAt": "<t+5s iso Z>",
+        "scheduleId": "$uuid37",
+        "sendTime": "12:00:00",
+        "updatedAt": "<t+5s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid36"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 201,
+      "step": "등록 성공 공백 포함"
+    },
+    {
+      "body": {
+        "createdAt": "<t+10s iso Z>",
+        "scheduleId": "$uuid39",
+        "sendTime": "13:00:00",
+        "updatedAt": "<t+10s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid38"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 201,
+      "step": "등록 성공 소수 0"
+    },
+    {
+      "body": {
+        "createdAt": "<t+10s iso Z>",
+        "scheduleId": "$uuid41",
+        "sendTime": "14:00:00",
+        "updatedAt": "<t+10s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid40"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 201,
+      "step": "등록 성공 날짜시각"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid42"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 성공 UTC 날짜시각"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid43"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 성공 오프셋 날짜시각"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid44"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "등록 성공 24 배열 거절"
+    },
+    {
+      "body": {
+        "schedules": [
+          {
+            "createdAt": "<t+5s iso Z>",
+            "scheduleId": "$uuid33",
+            "sendTime": "00:00:00",
+            "updatedAt": "<t+5s iso Z>"
+          },
+          {
+            "createdAt": "<t-950400s iso Z>",
+            "scheduleId": "$uuid2",
+            "sendTime": "07:30:00",
+            "updatedAt": "<t-950400s iso Z>"
+          },
+          {
+            "createdAt": "<t+0s iso Z>",
+            "scheduleId": "$uuid27",
+            "sendTime": "09:00:00",
+            "updatedAt": "<t+0s iso Z>"
+          },
+          {
+            "createdAt": "<t+5s iso Z>",
+            "scheduleId": "$uuid37",
+            "sendTime": "12:00:00",
+            "updatedAt": "<t+5s iso Z>"
+          },
+          {
+            "createdAt": "<t+10s iso Z>",
+            "scheduleId": "$uuid39",
+            "sendTime": "13:00:00",
+            "updatedAt": "<t+10s iso Z>"
+          },
+          {
+            "createdAt": "<t+10s iso Z>",
+            "scheduleId": "$uuid41",
+            "sendTime": "14:00:00",
+            "updatedAt": "<t+10s iso Z>"
+          },
+          {
+            "createdAt": "<t+0s iso Z>",
+            "scheduleId": "$uuid31",
+            "sendTime": "18:30:00",
+            "updatedAt": "<t+0s iso Z>"
+          },
+          {
+            "createdAt": "<t-864000s iso Z>",
+            "scheduleId": "$uuid3",
+            "sendTime": "21:00:00",
+            "updatedAt": "<t-864000s iso Z>"
+          },
+          {
+            "createdAt": "<t+5s iso Z>",
+            "scheduleId": "$uuid35",
+            "sendTime": "23:59:00",
+            "updatedAt": "<t+5s iso Z>"
+          }
+        ]
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid45"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "목록"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be null"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid46"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "수정 거절 빈 객체"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be null"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid47"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "수정 거절 null"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제 푸시 발송 시각은 분 단위의 KST 시각이어야 합니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid48"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "수정 거절 초 있음"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "해당 시각의 주제 푸시 설정이 이미 존재합니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid49"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "수정 거절 중복"
+    },
+    {
+      "body": {
+        "createdAt": "<t+0s iso Z>",
+        "scheduleId": "$uuid27",
+        "sendTime": "10:15:00",
+        "updatedAt": "<t+15s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid50"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "수정 성공"
+    },
+    {
+      "body": {
+        "createdAt": "<t+0s iso Z>",
+        "scheduleId": "$uuid27",
+        "sendTime": "10:15:00",
+        "updatedAt": "<t+15s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid51"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "수정 같은 시각"
+    },
+    {
+      "body": {
+        "createdAt": "<t+0s iso Z>",
+        "scheduleId": "$uuid27",
+        "sendTime": "10:15:00",
+        "updatedAt": "<t+15s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid52"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "수정 같은 시각 다른 표기"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제 푸시 설정을 찾을 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid53"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 404,
+      "step": "수정 없는 설정"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제 푸시 설정을 찾을 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid54"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 404,
+      "step": "수정 없는 설정 잘못된 시각"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be null"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid55"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "수정 없는 설정 null"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "ID 형식이 올바르지 않습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid56"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "수정 잘못된 id"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "ID 형식이 올바르지 않습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid57"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "수정 1-1-1-1-1 id"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "ID 형식이 올바르지 않습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid58"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "삭제 잘못된 id"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제 푸시 설정을 찾을 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid59"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 404,
+      "step": "삭제 없는 설정"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid60"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "삭제 성공"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제 푸시 설정을 찾을 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid61"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 404,
+      "step": "삭제 다시"
+    },
+    {
+      "body": {
+        "createdAt": "<t+20s iso Z>",
+        "scheduleId": "$uuid63",
+        "sendTime": "18:30:00",
+        "updatedAt": "<t+20s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid62"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 201,
+      "step": "삭제한 시각 다시 등록"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid64"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 204,
+      "step": "삭제 시드 설정"
+    },
+    {
+      "body": {
+        "schedules": [
+          {
+            "createdAt": "<t+5s iso Z>",
+            "scheduleId": "$uuid33",
+            "sendTime": "00:00:00",
+            "updatedAt": "<t+5s iso Z>"
+          },
+          {
+            "createdAt": "<t+0s iso Z>",
+            "scheduleId": "$uuid27",
+            "sendTime": "10:15:00",
+            "updatedAt": "<t+15s iso Z>"
+          },
+          {
+            "createdAt": "<t+5s iso Z>",
+            "scheduleId": "$uuid37",
+            "sendTime": "12:00:00",
+            "updatedAt": "<t+5s iso Z>"
+          },
+          {
+            "createdAt": "<t+10s iso Z>",
+            "scheduleId": "$uuid39",
+            "sendTime": "13:00:00",
+            "updatedAt": "<t+10s iso Z>"
+          },
+          {
+            "createdAt": "<t+10s iso Z>",
+            "scheduleId": "$uuid41",
+            "sendTime": "14:00:00",
+            "updatedAt": "<t+10s iso Z>"
+          },
+          {
+            "createdAt": "<t+20s iso Z>",
+            "scheduleId": "$uuid63",
+            "sendTime": "18:30:00",
+            "updatedAt": "<t+20s iso Z>"
+          },
+          {
+            "createdAt": "<t-864000s iso Z>",
+            "scheduleId": "$uuid3",
+            "sendTime": "21:00:00",
+            "updatedAt": "<t-864000s iso Z>"
+          },
+          {
+            "createdAt": "<t+5s iso Z>",
+            "scheduleId": "$uuid35",
+            "sendTime": "23:59:00",
+            "updatedAt": "<t+5s iso Z>"
+          }
+        ]
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid65"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "목록 최종"
+    },
+    {
+      "body": {
+        "auditLogs": [
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_CREATED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {
+              "sendTime": "09:00:00"
+            },
+            "auditLogId": "$uuid67",
+            "beforeState": {},
+            "occurredAt": "<t+0s iso Z>",
+            "reason": null,
+            "requestId": "$uuid26",
+            "targetId": "$uuid27",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          },
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_CREATED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {
+              "sendTime": "18:30:00"
+            },
+            "auditLogId": "$uuid69",
+            "beforeState": {},
+            "occurredAt": "<t+0s iso Z>",
+            "reason": null,
+            "requestId": "$uuid30",
+            "targetId": "$uuid31",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          },
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_CREATED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {
+              "sendTime": "00:00:00"
+            },
+            "auditLogId": "$uuid70",
+            "beforeState": {},
+            "occurredAt": "<t+5s iso Z>",
+            "reason": null,
+            "requestId": "$uuid32",
+            "targetId": "$uuid33",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          },
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_CREATED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {
+              "sendTime": "23:59:00"
+            },
+            "auditLogId": "$uuid71",
+            "beforeState": {},
+            "occurredAt": "<t+5s iso Z>",
+            "reason": null,
+            "requestId": "$uuid34",
+            "targetId": "$uuid35",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          },
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_CREATED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {
+              "sendTime": "12:00:00"
+            },
+            "auditLogId": "$uuid72",
+            "beforeState": {},
+            "occurredAt": "<t+5s iso Z>",
+            "reason": null,
+            "requestId": "$uuid36",
+            "targetId": "$uuid37",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          },
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_CREATED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {
+              "sendTime": "13:00:00"
+            },
+            "auditLogId": "$uuid73",
+            "beforeState": {},
+            "occurredAt": "<t+10s iso Z>",
+            "reason": null,
+            "requestId": "$uuid38",
+            "targetId": "$uuid39",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          },
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_CREATED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {
+              "sendTime": "14:00:00"
+            },
+            "auditLogId": "$uuid74",
+            "beforeState": {},
+            "occurredAt": "<t+10s iso Z>",
+            "reason": null,
+            "requestId": "$uuid40",
+            "targetId": "$uuid41",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          },
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_CREATED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {
+              "sendTime": "18:30:00"
+            },
+            "auditLogId": "$uuid75",
+            "beforeState": {},
+            "occurredAt": "<t+20s iso Z>",
+            "reason": null,
+            "requestId": "$uuid62",
+            "targetId": "$uuid63",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          }
+        ],
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 100
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid66"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "감사 로그 시간표 등록"
+    },
+    {
+      "body": {
+        "auditLogs": [
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_UPDATED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {
+              "sendTime": "10:15:00"
+            },
+            "auditLogId": "$uuid77",
+            "beforeState": {
+              "sendTime": "09:00:00"
+            },
+            "occurredAt": "<t+15s iso Z>",
+            "reason": null,
+            "requestId": "$uuid50",
+            "targetId": "$uuid27",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          }
+        ],
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid76"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "감사 로그 시간표 수정"
+    },
+    {
+      "body": {
+        "auditLogs": [
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_DELETED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {},
+            "auditLogId": "$uuid79",
+            "beforeState": {
+              "sendTime": "18:30:00"
+            },
+            "occurredAt": "<t+15s iso Z>",
+            "reason": null,
+            "requestId": "$uuid60",
+            "targetId": "$uuid31",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          },
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_DELETED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {},
+            "auditLogId": "$uuid80",
+            "beforeState": {
+              "sendTime": "07:30:00"
+            },
+            "occurredAt": "<t+20s iso Z>",
+            "reason": null,
+            "requestId": "$uuid64",
+            "targetId": "$uuid2",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          }
+        ],
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid78"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "감사 로그 시간표 삭제"
+    },
+    {
+      "body": {
+        "auditLogs": [
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_CREATED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {
+              "sendTime": "09:00:00"
+            },
+            "auditLogId": "$uuid67",
+            "beforeState": {},
+            "occurredAt": "<t+0s iso Z>",
+            "reason": null,
+            "requestId": "$uuid26",
+            "targetId": "$uuid27",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          },
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_CREATED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {
+              "sendTime": "18:30:00"
+            },
+            "auditLogId": "$uuid69",
+            "beforeState": {},
+            "occurredAt": "<t+0s iso Z>",
+            "reason": null,
+            "requestId": "$uuid30",
+            "targetId": "$uuid31",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          },
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_CREATED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {
+              "sendTime": "00:00:00"
+            },
+            "auditLogId": "$uuid70",
+            "beforeState": {},
+            "occurredAt": "<t+5s iso Z>",
+            "reason": null,
+            "requestId": "$uuid32",
+            "targetId": "$uuid33",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          },
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_CREATED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {
+              "sendTime": "23:59:00"
+            },
+            "auditLogId": "$uuid71",
+            "beforeState": {},
+            "occurredAt": "<t+5s iso Z>",
+            "reason": null,
+            "requestId": "$uuid34",
+            "targetId": "$uuid35",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          },
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_CREATED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {
+              "sendTime": "12:00:00"
+            },
+            "auditLogId": "$uuid72",
+            "beforeState": {},
+            "occurredAt": "<t+5s iso Z>",
+            "reason": null,
+            "requestId": "$uuid36",
+            "targetId": "$uuid37",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          },
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_CREATED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {
+              "sendTime": "13:00:00"
+            },
+            "auditLogId": "$uuid73",
+            "beforeState": {},
+            "occurredAt": "<t+10s iso Z>",
+            "reason": null,
+            "requestId": "$uuid38",
+            "targetId": "$uuid39",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          },
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_CREATED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {
+              "sendTime": "14:00:00"
+            },
+            "auditLogId": "$uuid74",
+            "beforeState": {},
+            "occurredAt": "<t+10s iso Z>",
+            "reason": null,
+            "requestId": "$uuid40",
+            "targetId": "$uuid41",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          },
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_UPDATED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {
+              "sendTime": "10:15:00"
+            },
+            "auditLogId": "$uuid77",
+            "beforeState": {
+              "sendTime": "09:00:00"
+            },
+            "occurredAt": "<t+15s iso Z>",
+            "reason": null,
+            "requestId": "$uuid50",
+            "targetId": "$uuid27",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          },
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_DELETED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {},
+            "auditLogId": "$uuid79",
+            "beforeState": {
+              "sendTime": "18:30:00"
+            },
+            "occurredAt": "<t+15s iso Z>",
+            "reason": null,
+            "requestId": "$uuid60",
+            "targetId": "$uuid31",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          },
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_CREATED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {
+              "sendTime": "18:30:00"
+            },
+            "auditLogId": "$uuid75",
+            "beforeState": {},
+            "occurredAt": "<t+20s iso Z>",
+            "reason": null,
+            "requestId": "$uuid62",
+            "targetId": "$uuid63",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          },
+          {
+            "action": "TOPIC_PUSH_SCHEDULE_DELETED",
+            "actorAdminId": "$uuid68",
+            "actorUsername": "operator",
+            "afterState": {},
+            "auditLogId": "$uuid80",
+            "beforeState": {
+              "sendTime": "07:30:00"
+            },
+            "occurredAt": "<t+20s iso Z>",
+            "reason": null,
+            "requestId": "$uuid64",
+            "targetId": "$uuid2",
+            "targetType": "TOPIC_PUSH_SCHEDULE"
+          }
+        ],
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 100
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid81"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "감사 로그 대상 시간표"
+    }
+  ]
+}

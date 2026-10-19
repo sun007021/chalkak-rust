@@ -6,11 +6,14 @@
 //! | 회원가입 토큰 소진 기록 정리 | 매일 04:40 | `chalkak.auth.consumed-signup-token.cleanup.enabled` |
 //! | 알림 정리 | 매일 04:50 | `chalkak.notification.cleanup.enabled` |
 //! | 임시 Apple 인증 정보 폐기·삭제 | 매시 정각 | `chalkak.auth.pending-apple-authorization.cleanup.enabled` |
+//! | 공지 알림함 배포 | 매분 0초 | `chalkak.notification.notice.distribution-enabled`(기본 꺼짐) |
 //! | 런타임 상태 로그 | 60초마다(시작 즉시 한 번) | `chalkak.monitoring.runtime-log.enabled` |
 //!
 //! 스케줄링 기능 전체를 끄는 키는 `chalkak.scheduling.enabled`(기본 켜짐)이고 작업별 키와 서로 독립이다. 환경변수
 //! 이름은 Spring 느슨한 바인딩을 따라 하이픈을 없애 `CHALKAK_AUTH_REFRESHTOKEN_CLEANUP_ENABLED`처럼 쓴다.
 //! 런타임 상태 로그는 원본처럼 기본 꺼짐이고 dev·prod 프로필에서만 켠다(`application-dev.yml`, `application-prod.yml`).
+//! 공지 배포도 기본 꺼짐이다(`NOTIFICATION_NOTICE_DISTRIBUTION_ENABLED`, `application.yml`). 원본은 이 작업만 전용 단일 스레드
+//! 스케줄러로 돌려 다른 예약 작업과 섞이지 않게 하는데, 여기서는 작업마다 스레드 하나라 같은 효과다.
 //!
 //! 실행은 `chalkak-core`의 [`Scheduler`]가 한다. 원본의 풀 크기 4 스레드 풀 대신 작업마다 스레드 하나를 쓴다. 같은
 //! 작업이 겹쳐 실행되지는 않고(앞 실행이 끝나야 다음 실행), 서로 다른 작업은 시각이 겹치지 않거나(04:30·04:40·04:50·
@@ -31,10 +34,15 @@ use chalkak_db::Pool;
 
 use crate::auth::apple::AppleTokenClient;
 use crate::auth::tokens::AppleCipher;
+use crate::notification;
 
 /// 실패한 예약 작업을 남기는 로거(Spring `TaskUtils$LoggingErrorHandler`)와 메시지.
 const ERROR_LOGGER: &str = "org.springframework.scheduling.support.TaskUtils$LoggingErrorHandler";
 const ERROR_MESSAGE: &str = "Unexpected error occurred in scheduled task";
+
+/// 공지 배포 작업이 실패했을 때 남기는 로거(원본 `NoticeDistributionScheduler`의 `@Slf4j`).
+const NOTICE_SCHEDULER_LOGGER: &str =
+    "com.chalkak.backend.notification.infrastructure.infra.NoticeDistributionScheduler";
 
 /// 런타임 상태 로그 주기(`@Scheduled(fixedRate = 60_000)`).
 pub const RUNTIME_LOG_PERIOD: Duration = Duration::from_secs(60);
@@ -46,6 +54,7 @@ pub enum Job {
     ConsumedSignupTokenCleanup,
     NotificationCleanup,
     PendingAppleAuthorizationCleanup,
+    NoticeDistribution,
     RuntimeSnapshot,
 }
 
@@ -59,11 +68,12 @@ pub enum Schedule {
 }
 
 impl Job {
-    pub const ALL: [Job; 5] = [
+    pub const ALL: [Job; 6] = [
         Job::RefreshTokenCleanup,
         Job::ConsumedSignupTokenCleanup,
         Job::NotificationCleanup,
         Job::PendingAppleAuthorizationCleanup,
+        Job::NoticeDistribution,
         Job::RuntimeSnapshot,
     ];
 
@@ -74,6 +84,7 @@ impl Job {
             Job::ConsumedSignupTokenCleanup => "deleteExpiredTokens",
             Job::NotificationCleanup => "deleteExpiredNotifications",
             Job::PendingAppleAuthorizationCleanup => "revokeAndDeleteExpiredAuthorizations",
+            Job::NoticeDistribution => "distributeNotices",
             Job::RuntimeSnapshot => "logSnapshot",
         }
     }
@@ -84,6 +95,7 @@ impl Job {
             Job::ConsumedSignupTokenCleanup => Schedule::Cron("0 40 4 * * *"),
             Job::NotificationCleanup => Schedule::Cron("0 50 4 * * *"),
             Job::PendingAppleAuthorizationCleanup => Schedule::Cron("0 0 * * * *"),
+            Job::NoticeDistribution => Schedule::Cron("0 * * * * *"),
             Job::RuntimeSnapshot => Schedule::FixedRate(RUNTIME_LOG_PERIOD),
         }
     }
@@ -109,6 +121,8 @@ pub struct JobsSettings {
     pub consumed_signup_token_cleanup: bool,
     pub notification_cleanup: bool,
     pub pending_apple_authorization_cleanup: bool,
+    /// `chalkak.notification.notice.distribution-enabled`(환경변수 `NOTIFICATION_NOTICE_DISTRIBUTION_ENABLED`, 기본 꺼짐).
+    pub notice_distribution: bool,
     pub runtime_log: bool,
 }
 
@@ -126,6 +140,7 @@ impl JobsSettings {
                 "CHALKAK_AUTH_PENDINGAPPLEAUTHORIZATION_CLEANUP_ENABLED",
                 true,
             )?,
+            notice_distribution: env.bool_or("NOTIFICATION_NOTICE_DISTRIBUTION_ENABLED", false)?,
             runtime_log: env
                 .bool_or("CHALKAK_MONITORING_RUNTIMELOG_ENABLED", runtime_log_default)?,
         })
@@ -138,6 +153,7 @@ impl JobsSettings {
             Job::ConsumedSignupTokenCleanup => self.consumed_signup_token_cleanup,
             Job::NotificationCleanup => self.notification_cleanup,
             Job::PendingAppleAuthorizationCleanup => self.pending_apple_authorization_cleanup,
+            Job::NoticeDistribution => self.notice_distribution,
             Job::RuntimeSnapshot => self.runtime_log,
         }
     }
@@ -272,6 +288,19 @@ fn body(
                 );
             })
         }
+        Job::NoticeDistribution => Box::new(move || {
+            // `NoticeDistributionScheduler`: 대상 조회가 실패해도 예외를 밖으로 내지 않고 다음 분에 다시 시도한다.
+            if let Err(error) =
+                notification::distribution::distribute_notices(&pool, &*clock, &logger)
+            {
+                logger
+                    .error(NOTICE_SCHEDULER_LOGGER)
+                    .field("type", "notification")
+                    .field("stage", "notice_scheduler_failed")
+                    .field("errorCode", error.exception_name())
+                    .log("공지 배포 대상 조회 실패");
+            }
+        }),
         Job::RuntimeSnapshot => {
             let reader = runtime::RuntimeSnapshotReader::for_process(pool);
             Box::new(move || runtime::log_snapshot(&logger, &reader))
@@ -475,6 +504,48 @@ mod tests {
             cron.next_after(ts("2026-10-12T00:00:00Z")),
             Some(ts("2026-10-12T19:30:00Z"))
         );
+    }
+
+    // NoticeDistributionConfigurationTest: 공지 배포는 기본 꺼짐, 환경변수가 켠다, 스케줄링 전체가 꺼지면 돌지 않는다.
+    #[test]
+    fn notice_distribution_is_off_by_default_and_env_turns_it_on() {
+        assert!(
+            !settings(&[], false)
+                .planned()
+                .contains(&Job::NoticeDistribution)
+        );
+        let on = settings(
+            &[("NOTIFICATION_NOTICE_DISTRIBUTION_ENABLED", "true")],
+            false,
+        );
+        assert!(on.planned().contains(&Job::NoticeDistribution));
+        let off = settings(
+            &[
+                ("NOTIFICATION_NOTICE_DISTRIBUTION_ENABLED", "true"),
+                ("CHALKAK_SCHEDULING_ENABLED", "false"),
+            ],
+            false,
+        );
+        assert!(off.planned().is_empty());
+        assert!(off.job_enabled(Job::NoticeDistribution));
+    }
+
+    #[test]
+    fn notice_distribution_fires_every_minute_at_second_zero() {
+        let cron = Job::NoticeDistribution.cron().unwrap();
+        assert_eq!(
+            cron.next_after(ts("2026-10-12T19:29:59Z")),
+            Some(ts("2026-10-12T19:30:00Z"))
+        );
+        assert_eq!(
+            cron.next_after(ts("2026-10-12T19:30:00Z")),
+            Some(ts("2026-10-12T19:31:00Z"))
+        );
+        assert_eq!(
+            cron.next_after(ts("2026-10-12T19:30:00.5Z")),
+            Some(ts("2026-10-12T19:31:00Z"))
+        );
+        assert_eq!(Job::NoticeDistribution.name(), "distributeNotices");
     }
 
     #[test]
