@@ -1,0 +1,91 @@
+REQUEST_SEND	POST /\namz-sdk-invocation-id: 78c9bcd3-a6b1-e811-cb90-af2b87a08b08\namz-sdk-request: attempt=1; max=1\nauthorization: AWS4-HMAC-SHA256 Credential=AKIDEXAMPLE/20261019/ap-northeast-2/sqs/aws4_request, SignedHeaders=amz-sdk-invocation-id;amz-sdk-request;content-length;content-type;host;x-amz-content-sha256;x-amz-date;x-amz-target;x-amzn-query-mode, Signature=1aaaa9995c7573f908fba67b6681a7a139599425802605541a266e2aed36a9b1\nconnection: keep-alive\ncontent-length: 189\ncontent-type: application/x-amz-json-1.0\nhost: 127.0.0.1:45829\nuser-agent: aws-sdk-java/2.54.1 md/io#sync md/http#Apache5 ua/2.1 api/SQS#2.54.x os/Linux#6.18.44-fc-v139 lang/java#25.0.4.1 md/OpenJDK_64-Bit_Server_VM#25.0.4.1+1-LTS md/vendor#Eclipse_Adoptium md/en_US m/E,AJ,N,e\nx-amz-content-sha256: c43058cd3ab7c4a94ea33ae330b9bacc8b0e0646fd09d4a98c8558e9f54c4548\nx-amz-date: 20261019T114123Z\nx-amz-target: AmazonSQS.SendMessage\nx-amzn-query-mode: true\nBODY {"QueueUrl":"https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-dev-push","MessageBody":"{\"eventId\":\"0190f3a2-7b1c-7d2e-8f4a-123456789abc\",\"text\":\"한글 \\\" \\u0001\"}"}
+REQUEST_RECEIVE	POST /\namz-sdk-invocation-id: d7489f0c-5452-259a-7181-131712f6e526\namz-sdk-request: attempt=1; max=1\nauthorization: AWS4-HMAC-SHA256 Credential=AKIDEXAMPLE/20261019/ap-northeast-2/sqs/aws4_request, SignedHeaders=amz-sdk-invocation-id;amz-sdk-request;content-length;content-type;host;x-amz-content-sha256;x-amz-date;x-amz-target;x-amzn-query-mode, Signature=3a23d59812bf5e13d11126e0e0c23bb40d4d85829ea73e282fadb5f098c72d29\nconnection: keep-alive\ncontent-length: 191\ncontent-type: application/x-amz-json-1.0\nhost: 127.0.0.1:45829\nuser-agent: aws-sdk-java/2.54.1 md/io#sync md/http#Apache5 ua/2.1 api/SQS#2.54.x os/Linux#6.18.44-fc-v139 lang/java#25.0.4.1 md/OpenJDK_64-Bit_Server_VM#25.0.4.1+1-LTS md/vendor#Eclipse_Adoptium md/en_US m/E,AJ,N,e\nx-amz-content-sha256: 305a0b808822a17c8e4de4c0fc11bfab13916ea277f661d3f435ab3a409fc43e\nx-amz-date: 20261019T114124Z\nx-amz-target: AmazonSQS.ReceiveMessage\nx-amzn-query-mode: true\nBODY {"QueueUrl":"https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-dev-push","MessageSystemAttributeNames":["All"],"MaxNumberOfMessages":1,"VisibilityTimeout":60,"WaitTimeSeconds":20}
+REQUEST_DELETE	POST /\namz-sdk-invocation-id: afce2e80-464c-e081-8e20-8acd233a95be\namz-sdk-request: attempt=1; max=1\nauthorization: AWS4-HMAC-SHA256 Credential=AKIDEXAMPLE/20261019/ap-northeast-2/sqs/aws4_request, SignedHeaders=amz-sdk-invocation-id;amz-sdk-request;content-length;content-type;host;x-amz-content-sha256;x-amz-date;x-amz-target;x-amzn-query-mode, Signature=816d729d05dee2e3983c86c99618570fcc74b2894c68195a85fd06f0a878433b\nconnection: keep-alive\ncontent-length: 108\ncontent-type: application/x-amz-json-1.0\nhost: 127.0.0.1:45829\nuser-agent: aws-sdk-java/2.54.1 md/io#sync md/http#Apache5 ua/2.1 api/SQS#2.54.x os/Linux#6.18.44-fc-v139 lang/java#25.0.4.1 md/OpenJDK_64-Bit_Server_VM#25.0.4.1+1-LTS md/vendor#Eclipse_Adoptium md/en_US m/E,AJ,N,e\nx-amz-content-sha256: ab7454f93a00e71f66e50bdd33efdb630728265f4d2840d2d69bdc2778740b62\nx-amz-date: 20261019T114124Z\nx-amz-target: AmazonSQS.DeleteMessage\nx-amzn-query-mode: true\nBODY {"QueueUrl":"https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-dev-push","ReceiptHandle":"rh-1"}
+REQUEST_VISIBILITY	POST /\namz-sdk-invocation-id: f81cbe42-68b1-8dc4-fac1-48f38c6a7f83\namz-sdk-request: attempt=1; max=1\nauthorization: AWS4-HMAC-SHA256 Credential=AKIDEXAMPLE/20261019/ap-northeast-2/sqs/aws4_request, SignedHeaders=amz-sdk-invocation-id;amz-sdk-request;content-length;content-type;host;x-amz-content-sha256;x-amz-date;x-amz-target;x-amzn-query-mode, Signature=444f874f1311cd5836d545c2c9f3fbb179f4a032608074979d6af2a45477b099\nconnection: keep-alive\ncontent-length: 131\ncontent-type: application/x-amz-json-1.0\nhost: 127.0.0.1:45829\nuser-agent: aws-sdk-java/2.54.1 md/io#sync md/http#Apache5 ua/2.1 api/SQS#2.54.x os/Linux#6.18.44-fc-v139 lang/java#25.0.4.1 md/OpenJDK_64-Bit_Server_VM#25.0.4.1+1-LTS md/vendor#Eclipse_Adoptium md/en_US m/E,AJ,N,e\nx-amz-content-sha256: ee8bd3a9a8053d3a39d733860a953223c53c38eca2330ba27a722aaf57483aff\nx-amz-date: 20261019T114124Z\nx-amz-target: AmazonSQS.ChangeMessageVisibility\nx-amzn-query-mode: true\nBODY {"QueueUrl":"https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-dev-push","ReceiptHandle":"rh-1","VisibilityTimeout":60}
+CASE	ok	OK	[m-1]
+CASE	ok_no_md5	CLIENT	SdkClientException	MD5 returned by SQS does not match the calculation on the original request. (MD5 calculated by the message body: "518dfaa419665e127b41e733eccf85c7", MD5 checksum returned: "null")
+CASE	ok_bad_md5	CLIENT	SdkClientException	MD5 returned by SQS does not match the calculation on the original request. (MD5 calculated by the message body: "518dfaa419665e127b41e733eccf85c7", MD5 checksum returned: "00000000000000000000000000000000")
+CASE	ok_no_id	OK	<null>
+CASE	ok_blank_id	OK	[ ]
+CASE	ok_empty_id	OK	[]
+CASE	ok_empty_body	CLIENT	SdkClientException	MD5 returned by SQS does not match the calculation on the original request. (MD5 calculated by the message body: "518dfaa419665e127b41e733eccf85c7", MD5 checksum returned: "null")
+CASE	ok_empty_object	CLIENT	SdkClientException	MD5 returned by SQS does not match the calculation on the original request. (MD5 calculated by the message body: "518dfaa419665e127b41e733eccf85c7", MD5 checksum returned: "null")
+CASE	ok_invalid_json	CLIENT	SdkClientException	Unable to unmarshall response (software.amazon.awssdk.thirdparty.jackson.core.JsonParseException: Unrecognized token 'not': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')  at [Source: (software.amazon.awssdk.http.AbortableInputStream); line: 1, column: 1]). Response Code: 200, Response Text: OK (SDK Attempt Count: 1)
+CASE	ok_extra_fields	OK	[m-2]
+CASE	status_202	OK	[m-1]
+CASE	s500_type	SQS	status=500	code=InternalError	throttling=false
+CASE	s500_plain_type	SQS	status=500	code=InternalError	throttling=false
+CASE	s503_query_header	SQS	status=503	code=AWS.SimpleQueueService.ServiceUnavailable	throttling=false
+CASE	s400_nonexistent	SQS	status=400	code=AWS.SimpleQueueService.NonExistentQueue	throttling=false
+CASE	s400_nonexistent_nohdr	SQS	status=400	code=QueueDoesNotExist	throttling=false
+CASE	s400_throttled	SQS	status=400	code=RequestThrottled	throttling=true
+CASE	s400_throttled_hdr	SQS	status=400	code=RequestThrottled	throttling=true
+CASE	s400_throttling	SQS	status=400	code=Throttling	throttling=true
+CASE	s400_throttlingexception	SQS	status=400	code=ThrottlingException	throttling=true
+CASE	s400_toomany	SQS	status=400	code=TooManyRequestsException	throttling=true
+CASE	s400_reqlimit	SQS	status=400	code=RequestLimitExceeded	throttling=true
+CASE	s400_slowdown	SQS	status=400	code=SlowDown	throttling=true
+CASE	s400_provisioned	SQS	status=400	code=ProvisionedThroughputExceededException	throttling=true
+CASE	s400_limitexceeded	SQS	status=400	code=LimitExceededException	throttling=false
+CASE	s400_bandwidth	SQS	status=400	code=BandwidthLimitExceeded	throttling=true
+CASE	s400_prior	SQS	status=400	code=PriorRequestNotComplete	throttling=false
+CASE	s400_ec2throttled	SQS	status=400	code=EC2ThrottledException	throttling=true
+CASE	s400_transactioninprogress	SQS	status=400	code=TransactionInProgressException	throttling=true
+CASE	s400_throttledexc	SQS	status=400	code=RequestThrottledException	throttling=true
+CASE	s429_plain	SQS	status=429	code=TooManyRequests	throttling=true
+CASE	s429_nothrottle_code	SQS	status=429	code=SomethingElse	throttling=true
+CASE	s403_denied	SQS	status=403	code=AccessDenied	throttling=false
+CASE	s403_denied_colon	SQS	status=403	code=AccessDenied	throttling=false
+CASE	s403_denied_ns_colon	SQS	status=403	code=AccessDeniedException	throttling=false
+CASE	s400_space_type	SQS	status=400	code=SECRET PRIVATE BODY	throttling=false
+CASE	s500_space_type	SQS	status=500	code=SECRET PRIVATE BODY	throttling=false
+CASE	s400_long_type	SQS	status=400	code=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA	throttling=false
+CASE	s400_100_type	SQS	status=400	code=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA	throttling=false
+CASE	s400_msg_only	SQS	status=400	code=null	throttling=false
+CASE	s400_Message_cap	SQS	status=400	code=InvalidParameterValue	throttling=false
+CASE	s400_empty	SQS	status=400	code=null	throttling=false
+CASE	s400_html	SQS	status=400	code=null	throttling=false
+CASE	s500_empty	SQS	status=500	code=null	throttling=false
+CASE	s500_html	SQS	status=500	code=null	throttling=false
+CASE	s502_html	SQS	status=502	code=null	throttling=false
+CASE	s503_empty	SQS	status=503	code=null	throttling=false
+CASE	s301	SQS	status=301	code=null	throttling=false
+CASE	s302_body	SQS	status=302	code=X	throttling=false
+CASE	s304	SQS	status=304	code=null	throttling=false
+CASE	s404_json	SQS	status=404	code=NotFound	throttling=false
+CASE	s404_html	SQS	status=404	code=null	throttling=false
+CASE	s400_hdr_only	SQS	status=400	code=AWS.SimpleQueueService.NonExistentQueue	throttling=false
+CASE	s400_hdr_badcode	SQS	status=400	code=BAD CODE	throttling=false
+CASE	s400_hdr_nofault	SQS	status=400	code=null	throttling=false
+CASE	s400_hdr_and_type_differ	SQS	status=400	code=HeaderCode	throttling=false
+CASE	s400_type_nonascii	SQS	status=400	code=오류	throttling=false
+CASE	s400_type_null	SQS	status=400	code=null	throttling=false
+CASE	s400_type_empty	SQS	status=400	code=	throttling=false
+CASE	s400_type_number	SQS	status=400	code=5	throttling=false
+CASE	s400_hdr_nofault_type	SQS	status=400	code=TypeCode	throttling=false
+CASE	s400_hdr_empty_type	SQS	status=400	code=TypeCode	throttling=false
+CASE	s400_hdr_three	SQS	status=400	code=A	throttling=false
+CASE	s400_hdr_semicolon_only	SQS	status=400	code=TypeCode	throttling=false
+CASE	s400_type_two_hash	SQS	status=400	code=b#c	throttling=false
+CASE	s400_type_colon_hash	SQS	status=400	code=a	throttling=false
+CASE	s400_type_hash_colon	SQS	status=400	code=B	throttling=false
+CASE	s400_throttledexception2	SQS	status=400	code=ThrottledException	throttling=true
+CASE	s400_type_bool	SQS	status=400	code=true	throttling=false
+CASE	s400_type_object	SQS	status=400	code=null	throttling=false
+CASE	s400_code_field	SQS	status=400	code=FromCode	throttling=false
+CASE	s400_Code_field	SQS	status=400	code=null	throttling=false
+CASE	s400_type_with_hdr_lower	SQS	status=400	code=LowerCase.Code	throttling=false
+RCASE	r_ok	OK	count=1	id=a	handle=rh	body=hello 한글	attrs={ApproximateReceiveCount=2}
+RCASE	r_no_md5	CLIENT	SdkClientException
+RCASE	r_bad_md5	CLIENT	SdkClientException
+RCASE	r_empty_obj	OK	count=0
+RCASE	r_empty_list	OK	count=0
+RCASE	r_empty_body	OK	count=0
+RCASE	r_no_body_field	CLIENT	SdkClientException
+RCASE	r_err	SQS	status=400	code=QueueDoesNotExist
+DCASE	d_empty_200	OK	OK
+DCASE	d_json_200	OK	OK
+DCASE	d_err	SQS:400:ReceiptHandleIsInvalid	SQS:400:ReceiptHandleIsInvalid
+DCASE	d_500	SQS:500:null	SQS:500:null
+CASE	timeout_6s	CLIENT	ApiCallTimeoutException	Client execution did not complete before the specified timeout configuration: 5000 millis	elapsedMs=5000
+CASE	conn_refused	CLIENT	SdkClientException	Unable to execute HTTP request: Connect to http://127.0.0.1:1 failed: Connection refused (connect failed) (SDK Attempt Count: 1)
