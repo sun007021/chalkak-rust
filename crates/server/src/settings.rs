@@ -268,6 +268,7 @@ mod tests {
         assert!(local.scheduling_enabled);
         assert!(local.refresh_token_cleanup && local.notification_cleanup);
         assert!(!local.runtime_log);
+        let local_planned = local.planned().len();
 
         let prod = env(&[
             ("SPRING_PROFILES_ACTIVE", "prod"),
@@ -281,7 +282,9 @@ mod tests {
         ]);
         let prod = Settings::from_env(&prod).unwrap().jobs;
         assert!(prod.runtime_log);
-        assert_eq!(prod.planned().len(), 5);
+        // prod 프로필은 사용자 지표 집계도 켠다(application-prod.yml).
+        assert_eq!(prod.planned().len(), 6);
+        assert_eq!(local_planned, 4);
     }
 
     #[test]
