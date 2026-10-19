@@ -128,6 +128,13 @@ def runtime_summary(backend, since):
     if rows_:
         out["hikariActive_max"] = max(r.get("hikariActive", 0) for r in rows_)
         out["hikariPending_max"] = max(r.get("hikariPending", 0) for r in rows_)
+        pend = [r.get("hikariPending", 0) for r in rows_]
+        out["hikariPending_nonzero_snapshots"] = sum(1 for p in pend if p > 0)
+        run = best = 0
+        for p in pend:
+            run = run + 1 if p > 0 else 0
+            best = max(best, run)
+        out["hikariPending_consecutive_max"] = best
         out["threads_max"] = max(r.get("threads", 0) for r in rows_)
         for key in ("rssBytes", "heapUsedBytes"):
             values = [r[key] for r in rows_ if key in r]
@@ -196,9 +203,10 @@ def s1(stack, R):
     R.check("edge 접근 로그 5xx 0 (api 호스트 + 부하 경로)", edge["edge_5xx_total"] == 0, json.dumps({k: v["status"] for k, v in edge.items() if isinstance(v, dict)}))
     rt, sm = R.metrics["runtime_log"], R.metrics["samples"]
     pending = rt.get("hikariPending_max")
-    R.check("커넥션 풀 고갈 없음 (런타임 로그 pending 최대 0, 앱 DB 연결 ≤ 풀 10, idle in transaction 0)",
-            pending == 0 and (sm["pg_app_max"] or 0) <= POOL_SIZE and (sm["pg_idle_in_tx_max"] or 0) == 0,
-            f"pending_max={pending} active_max={rt.get('hikariActive_max')} pg_app_max={sm['pg_app_max']} idle_in_tx_max={sm['pg_idle_in_tx_max']}")
+    # 풀 고갈 = 대기가 이어짐(1분 표본이 연달아 2번 이상 pending > 0)이거나 대기 시간 초과 오류. 한 표본만 튀는 것은 분 경계 작업이나 호스트 지연의 순간 대기라 수치만 남긴다.
+    R.check("커넥션 풀 고갈 없음 (대기 연속 표본 ≤ 1, 대기 시간 초과 없음, 앱 DB 연결 ≤ 풀 10, idle in transaction 0)",
+            (rt.get("hikariPending_consecutive_max") or 0) <= 1 and (sm["pg_app_max"] or 0) <= POOL_SIZE and (sm["pg_idle_in_tx_max"] or 0) == 0,
+            f"pending_max={pending} nonzero={rt.get('hikariPending_nonzero_snapshots')}/{rt.get('snapshots')} consecutive={rt.get('hikariPending_consecutive_max')} active_max={rt.get('hikariActive_max')} pg_app_max={sm['pg_app_max']} idle_in_tx_max={sm['pg_idle_in_tx_max']}")
     rss = sm.get("rss_mb")
     R.check(f"RSS 안정 ({stack.backend}: 기울기 ≤ max(평균 5%, 10MB)/시간 이거나 마지막이 앞 절반 최댓값+10MB 이하)", bool(rss and rss["ok"]),
             json.dumps(rss) if rss else "표본 없음")

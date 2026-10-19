@@ -25,6 +25,9 @@ scripts/e2e-image.sh                 # 사인 PNG + 게시물 WebP 종단 확인
 scripts/smoke.sh                     # 앱 없이 6.5 스모크: 가입 -> 로그인 -> 게시물 -> 피드 -> 승인 -> 좋아요 -> 알림 -> cdn 이미지
 scripts/trace.sh <uploadId|notificationId|userId>   # DB 행·SQS·S3·서비스 로그를 한 화면에
 scripts/s7.sh rust                   # S7 푸시 경로 안정성(승인 몰림, FCM 5xx·429, SQS 지연, 30분 기한, DLQ). 약 20분, docs/local-aws/report-s7.md
+scripts/l5.sh rust                   # L5 안정성 시험 S1~S6·S8(compose.l5.yaml 겹침: toxiproxy DB 경로, fault-proxy S3 경로, edge 평문 8081). rust|java 를 같은 시나리오로 돌린다. docs/local-aws/report-l5.md
+scripts/l5.sh compare                # 가장 최근 rust·java 결과를 놓고 A/B 기준(p99, 응답 형식) 판정
+scripts/s9.sh rust --duration 8h     # S9 장시간 저부하(표본을 파일로 남기고 끝에서 판정). 1시간 검증은 --duration 1h
 scripts/lambda-unit-tests.sh         # 원본 Lambda 단위 테스트(99개)를 lambda 컨테이너에서 실행
 ```
 앱(에뮬레이터·시뮬레이터·실기기) 연결은 [`docs/local-aws/app.md`](../docs/local-aws/app.md).

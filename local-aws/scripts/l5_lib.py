@@ -138,7 +138,8 @@ class Stack:
         self.env = {**os.environ, "HOST_IP": HOST_IP, "ESM_CONCURRENCY": os.environ.get("ESM_CONCURRENCY", "4")}
 
     def compose_cmd(self, *args):
-        return ["docker", "compose", "-f", "compose.yaml", "-f", "compose.l5.yaml", "--profile", "chaos", "--profile", "rust", "--profile", "java",
+        extra = ["-f", "compose.s9-static.yaml"] if os.environ.get("S9_STATIC_CREDENTIALS") == "1" else []
+        return ["docker", "compose", "-f", "compose.yaml", "-f", "compose.l5.yaml", *extra, "--profile", "chaos", "--profile", "rust", "--profile", "java",
                 *args]
 
     def compose(self, *args, timeout=600, check=True):
