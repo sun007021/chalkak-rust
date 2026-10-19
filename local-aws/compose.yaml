@@ -135,6 +135,9 @@ services:
     image: ${LAMBDA_IMAGE:-amazon/aws-lambda-python:3.13}
     restart: unless-stopped
     mem_limit: 1024m
+    # 동시 실행 수. RIE 한 컨테이너는 한 번에 하나만 처리하므로 컨테이너를 늘린다(esm-poller 의 ESM_CONCURRENCY 와 같은 값).
+    deploy:
+      replicas: ${ESM_CONCURRENCY:-1}
     command: ["handler.lambda_handler"]
     environment:
       AWS_REGION: ap-northeast-2
@@ -178,6 +181,8 @@ services:
       SQS_ENDPOINT_URL: http://aws:4566
       QUEUE_NAME: chalkak-image-processing
       LAMBDA_INVOKE_URL: http://lambda-image:8080/2015-03-31/functions/function/invocations
+      # 동시성(워커 스레드 수 = lambda-image 컨테이너 수). 업로드 몰림(S2) 시험에서 올린다. 기본 1 은 순차.
+      ESM_CONCURRENCY: "${ESM_CONCURRENCY:-1}"
       # 이벤트 소스 매핑 설정(원본 README: batch size 1, batch window 0, ReportBatchItemFailures는 Lambda 환경변수와 짝).
       BATCH_SIZE: "1"
       REPORT_BATCH_ITEM_FAILURES: ${SQS_PARTIAL_BATCH_RESPONSE:-true}
