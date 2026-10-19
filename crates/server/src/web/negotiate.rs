@@ -29,7 +29,19 @@ fn json_producible() -> Vec<MediaType> {
         MediaType::new("application", "json"),
         MediaType::new("application", "*+json"),
         MediaType::new("application", "yaml"),
+        // Boot가 XML 컨버터를 맨 뒤로 보낸다. XML 컨버터는 UTF-8을 매개변수로 가진다.
+        with_utf8("application", "xml"),
+        with_utf8("text", "xml"),
+        with_utf8("application", "*+xml"),
     ]
+}
+
+fn with_utf8(ty: &str, sub: &str) -> MediaType {
+    let mut media = MediaType::new(ty, sub);
+    media
+        .params
+        .push(("charset".to_owned(), "UTF-8".to_owned()));
+    media
 }
 
 /// springdoc YAML 문서(`/v3/api-docs.yaml`)가 응답 가능한 타입.
@@ -40,7 +52,7 @@ const ACTUATOR_V2: &str = "vnd.spring-boot.actuator.v2+json";
 /// 액추에이터가 406일 때 `Accept`에 싣는 목록.
 const ACTUATOR_ACCEPT: &str = "application/vnd.spring-boot.actuator.v3+json, application/vnd.spring-boot.actuator.v2+json, application/json";
 /// 컨트롤러 응답이 406일 때 `Accept`에 싣는 목록.
-const JSON_ACCEPT: &str = "application/json, application/*+json, application/yaml";
+const JSON_ACCEPT: &str = "application/json, application/*+json, application/yaml, application/xml;charset=UTF-8, text/xml;charset=UTF-8, application/*+xml;charset=UTF-8";
 
 fn actuator_producible() -> Vec<MediaType> {
     vec![
@@ -55,6 +67,7 @@ fn actuator_producible() -> Vec<MediaType> {
 pub struct Wanted {
     accept: Result<Vec<MediaType>, InvalidAccept>,
     language: String,
+    method: String,
     /// 컨버터가 쓰는 응답에 `Content-Disposition: inline;filename=f.txt`를 붙이는 요청 경로인가.
     disposition: bool,
 }
@@ -66,6 +79,7 @@ impl Wanted {
         Wanted {
             accept: parse_accept(&accept),
             language: whitelabel::content_language(&languages),
+            method: req.method.as_str().to_owned(),
             disposition: needs_disposition(&req.raw_path),
         }
     }
@@ -196,11 +210,30 @@ fn needs_disposition(raw_path: &str) -> bool {
 }
 
 /// 컨버터가 응답을 쓸 때의 부가 처리: 미디어 타입 설정, YAML 변환, `Content-Disposition`.
-fn write_converted(mut response: Response, media: &MediaType, wanted: &Wanted) -> Response {
+fn write_converted(
+    mut response: Response,
+    media: &MediaType,
+    wanted: &Wanted,
+    kind: Kind,
+) -> Response {
     if media.is("application", "yaml")
         && let Some(yaml) = super::yaml::from_json(&response.body)
     {
         response.body = yaml;
+    }
+    if media.sub == "xml" || media.sub.ends_with("+xml") {
+        let route = chalkak_app::web::context::route().unwrap_or_default();
+        let root = match kind {
+            Kind::Success => super::xml::Root::Controller {
+                method: &wanted.method,
+                route: &route,
+            },
+            Kind::Boot => super::xml::Root::Map,
+            _ => super::xml::Root::Error,
+        };
+        if let Some(xml) = super::xml::from_json(&response.body, &root, response.status) {
+            response.body = xml;
+        }
     }
     response.headers.set("Content-Type", media.render());
     if wanted.disposition {
@@ -293,7 +326,7 @@ pub fn finish(mut response: Response, wanted: &Wanted, clock: &dyn Clock) -> Res
         return fail(kind, response, carried, wanted, false, clock);
     }
     match wanted.select(&json_producible()) {
-        Ok(Some(media)) => write_converted(response, &media, wanted),
+        Ok(Some(media)) => write_converted(response, &media, wanted, kind),
         failed => {
             let parse_failed = failed.is_err();
             fail(kind, response, carried, wanted, parse_failed, clock)
@@ -324,7 +357,7 @@ fn finish_restricted(
                     chalkak_core::error::messages::UNSUPPORTED_REQUEST,
                 );
                 let mut out = Response::new(406).with_body(body.into_bytes());
-                out = write_converted(out, &media, wanted);
+                out = write_converted(out, &media, wanted, Kind::Spring);
                 copy_common_headers(&response, &mut out);
                 return out;
             }
@@ -518,6 +551,29 @@ mod tests {
     }
 
     // 아래 기대값은 java-a에 Accept를 바꿔 보낸 결과다.
+    // java-1: Accept text/*는 text/xml, application/xml은 application/xml(둘 다 charset=UTF-8)
+    #[test]
+    fn xml을_받으면_루트_이름으로_감싼_xml이다() {
+        let c = clock();
+        for (accept, content_type) in [
+            ("text/*", "text/xml;charset=UTF-8"),
+            ("application/xml", "application/xml;charset=UTF-8"),
+            ("*/*;q=0.1, application/vnd.x+xml", "application/vnd.x+xml"),
+        ] {
+            let r = finish(json(404, Some(marker::SPRING)), &wanted(accept), &c);
+            assert_eq!(r.status, 404, "{accept}");
+            assert_eq!(
+                r.headers.get("content-type"),
+                Some(content_type),
+                "{accept}"
+            );
+            assert!(
+                String::from_utf8_lossy(&r.body).starts_with("<ErrorResponse><errorCode>"),
+                "{accept}"
+            );
+        }
+    }
+
     #[test]
     fn 성공_응답은_타입만_바꾸고_받을_수_없으면_406이다() {
         let c = clock();
@@ -541,7 +597,7 @@ mod tests {
         assert_eq!(r.headers.get("accept"), Some(JSON_ACCEPT));
         assert_eq!(r.headers.get("x-request-id"), Some("r1"));
 
-        let r = finish(json(200, None), &wanted("application/xml"), &c);
+        let r = finish(json(200, None), &wanted("application/pdf"), &c);
         assert_eq!(summary(&r), (406, None, String::new()));
         assert_eq!(r.headers.get("accept"), Some(JSON_ACCEPT));
 
@@ -572,7 +628,7 @@ mod tests {
         assert_eq!(r.headers.get("allow"), Some("GET, PUT"));
         assert!(!r.headers.has_token("connection", "close"));
 
-        let r = finish(spring(405), &wanted("application/xml"), &c);
+        let r = finish(spring(405), &wanted("application/pdf"), &c);
         assert_eq!(summary(&r), (405, None, String::new()));
         assert_eq!(r.headers.get("allow"), Some("GET, PUT"));
 
@@ -595,7 +651,7 @@ mod tests {
 
         let r = finish(
             json(404, Some(marker::HANDLER)),
-            &wanted("application/xml"),
+            &wanted("application/pdf"),
             &c,
         );
         assert_eq!(summary(&r), (500, None, String::new()));
@@ -663,7 +719,7 @@ mod tests {
         assert_eq!(r.status, 400);
         assert!(String::from_utf8_lossy(&r.body).contains("type=Bad Request, status=400"));
         assert!(r.headers.has_token("connection", "close"));
-        let r = finish(failed(), &wanted("application/xml"), &c);
+        let r = finish(failed(), &wanted("application/pdf"), &c);
         assert_eq!(summary(&r), (400, None, String::new()));
         let r = finish(failed(), &wanted("bad"), &c);
         assert_eq!(summary(&r), (500, None, String::new()));
@@ -686,7 +742,7 @@ mod tests {
         let r = finish(failed(), &wanted("text/html"), &c);
         assert_eq!(r.status, 406);
         assert_eq!(r.headers.get("accept"), Some(ACTUATOR_ACCEPT));
-        let r = finish(failed(), &wanted("application/xml"), &c);
+        let r = finish(failed(), &wanted("application/pdf"), &c);
         assert_eq!(summary(&r), (406, None, String::new()));
         let r = finish(failed(), &wanted("application/problem+json, text/html"), &c);
         assert_eq!(r.status, 406);
@@ -770,7 +826,15 @@ mod tests {
         assert_eq!(r.status, 406);
         assert_eq!(r.headers.get("accept"), Some(ACTUATOR_ACCEPT));
         assert!(String::from_utf8_lossy(&r.body).contains("type=Not Acceptable, status=406"));
-        let r = finish(health(), &wanted("application/xml"), &c);
+        let r = finish(health(), &wanted("application/pdf"), &c);
         assert_eq!(summary(&r), (406, None, String::new()));
+        // XML은 예외 처리기가 쓸 수 있어 XML 406 본문이 나간다(java-1).
+        let r = finish(health(), &wanted("application/xml"), &c);
+        assert_eq!(r.status, 406);
+        assert_eq!(
+            r.headers.get("content-type"),
+            Some("application/xml;charset=UTF-8")
+        );
+        assert!(String::from_utf8_lossy(&r.body).starts_with("<ErrorResponse>"));
     }
 }

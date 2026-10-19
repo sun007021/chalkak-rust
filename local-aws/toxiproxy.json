@@ -1,0 +1,5 @@
+[
+  { "name": "postgres", "listen": "0.0.0.0:15432", "upstream": "postgres:5432", "enabled": true },
+  { "name": "aws", "listen": "0.0.0.0:14566", "upstream": "aws:4566", "enabled": true },
+  { "name": "backend", "listen": "0.0.0.0:18080", "upstream": "backend:8080", "enabled": true }
+]

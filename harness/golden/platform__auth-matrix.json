@@ -1,8 +1,11 @@
 {
+  "db": {},
   "steps": [
     {
-      "step": "공개 GET 익명",
-      "status": 404,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제를 찾을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -37,14 +40,14 @@
           "0"
         ]
       ],
+      "status": 404,
+      "step": "공개 GET 익명"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "주제를 찾을 수 없습니다."
-      }
-    },
-    {
-      "step": "공개 GET 회원",
-      "status": 404,
+      },
       "headers": [
         [
           "cache-control",
@@ -79,14 +82,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "주제를 찾을 수 없습니다."
-      }
+      "status": 404,
+      "step": "공개 GET 회원"
     },
     {
-      "step": "공개 GET 관리자",
-      "status": 403,
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "접근 권한이 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -121,14 +124,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "FORBIDDEN",
-        "message": "접근 권한이 없습니다."
-      }
+      "status": 403,
+      "step": "공개 GET 관리자"
     },
     {
-      "step": "공개 GET 만료 토큰",
-      "status": 401,
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -167,14 +170,14 @@
           "0"
         ]
       ],
+      "status": 401,
+      "step": "공개 GET 만료 토큰"
+    },
+    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 인증 정보입니다."
-      }
-    },
-    {
-      "step": "공개 GET 만료 10초 지남(원본 허용 오차 30초, iat보다 exp가 앞섬)",
-      "status": 401,
+      },
       "headers": [
         [
           "cache-control",
@@ -213,14 +216,14 @@
           "0"
         ]
       ],
+      "status": 401,
+      "step": "공개 GET 만료 10초 지남(원본 허용 오차 30초, iat보다 exp가 앞섬)"
+    },
+    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 인증 정보입니다."
-      }
-    },
-    {
-      "step": "공개 GET 형식 오류 토큰",
-      "status": 401,
+      },
       "headers": [
         [
           "cache-control",
@@ -259,14 +262,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      }
+      "status": 401,
+      "step": "공개 GET 형식 오류 토큰"
     },
     {
-      "step": "공개 GET Bearer 아닌 스킴",
-      "status": 404,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제를 찾을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -301,14 +304,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "주제를 찾을 수 없습니다."
-      }
+      "status": 404,
+      "step": "공개 GET Bearer 아닌 스킴"
     },
     {
-      "step": "공개 GET 서명 위조",
-      "status": 401,
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -347,14 +350,14 @@
           "0"
         ]
       ],
+      "status": 401,
+      "step": "공개 GET 서명 위조"
+    },
+    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 인증 정보입니다."
-      }
-    },
-    {
-      "step": "회원 전용 익명",
-      "status": 401,
+      },
       "headers": [
         [
           "cache-control",
@@ -393,14 +396,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      }
+      "status": 401,
+      "step": "회원 전용 익명"
     },
     {
-      "step": "회원 전용 관리자 토큰",
-      "status": 403,
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "접근 권한이 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -435,14 +438,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "FORBIDDEN",
-        "message": "접근 권한이 없습니다."
-      }
+      "status": 403,
+      "step": "회원 전용 관리자 토큰"
     },
     {
-      "step": "관리자 전용 익명",
-      "status": 401,
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -493,14 +496,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      }
+      "status": 401,
+      "step": "관리자 전용 익명"
     },
     {
-      "step": "관리자 전용 회원 토큰",
-      "status": 403,
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "접근 권한이 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -547,14 +550,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "FORBIDDEN",
-        "message": "접근 권한이 없습니다."
-      }
+      "status": 403,
+      "step": "관리자 전용 회원 토큰"
     },
     {
-      "step": "관리자 공개 경로(로그아웃) 익명",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "리프레시 토큰은 필수입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -601,11 +604,8 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "리프레시 토큰은 필수입니다."
-      }
+      "status": 400,
+      "step": "관리자 공개 경로(로그아웃) 익명"
     }
-  ],
-  "db": {}
+  ]
 }

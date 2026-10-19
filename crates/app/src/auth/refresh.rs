@@ -57,12 +57,14 @@ fn expires_in(now: Timestamp, expires_at: Timestamp) -> i64 {
 
 fn issued(
     generated: GeneratedRefreshToken,
+    session_id: Uuid,
     now: Timestamp,
     expires_at: Timestamp,
 ) -> IssuedRefreshToken {
     IssuedRefreshToken {
         value: generated.value,
         expires_in_seconds: expires_in(now, expires_at),
+        session_id,
     }
 }
 
@@ -90,18 +92,19 @@ impl UserRefreshTokenService {
         let expires_at = self.policy.next_expires_at(now, absolute_expires_at);
         let generated = generate_refresh_token();
         validate_new_refresh_token(&generated.token_hash, expires_at, absolute_expires_at)?;
+        let session_id = Uuid::new_v4();
         self.repository.insert(
             db,
             &NewRefreshToken {
                 user_id,
-                session_id: Uuid::new_v4(),
+                session_id,
                 token_hash: &generated.token_hash,
                 expires_at,
                 absolute_expires_at,
                 created_at: now,
             },
         )?;
-        Ok(issued(generated, now, expires_at))
+        Ok(issued(generated, session_id, now, expires_at))
     }
 
     /// 제시된 토큰을 소비해 다음 리프레시 토큰과 액세스 토큰을 함께 내준다(`refresh`).
@@ -115,8 +118,7 @@ impl UserRefreshTokenService {
                 return Err(reauthentication_required());
             }
             if consumed.is_reused() || consumed.is_expired(now) {
-                self.repository
-                    .revoke_session(tx, consumed.session_id, now)?;
+                self.revoke_session(tx, consumed.session_id, now)?;
                 return Err(reauthentication_required());
             }
             self.rotate(tx, &consumed, now)
@@ -128,8 +130,7 @@ impl UserRefreshTokenService {
         transact(&self.pool, |tx| {
             let token = self.lock_lineage_and_read(tx, &hash_refresh_token(presented_token))?;
             if let Some(token) = token.filter(|t| !t.is_revoked()) {
-                self.repository
-                    .revoke_session(tx, token.session_id, self.clock.now())?;
+                self.revoke_session(tx, token.session_id, self.clock.now())?;
             }
             Ok(())
         })
@@ -146,6 +147,22 @@ impl UserRefreshTokenService {
         }
         self.repository
             .revoke_all_by_user_id(db, user_id, self.clock.now())?;
+        // 로그인이 모두 끝났으므로 푸시 기기 연결도 지운다(`revokeOwner`의 `deleteByUserId`).
+        self.repository
+            .delete_push_devices_by_user_id(db, user_id)?;
+        Ok(())
+    }
+
+    /// 계보 하나를 폐기하고 그 로그인에 연결된 푸시 기기를 지운다(`revokeSession`의 `deleteBySessionId`).
+    fn revoke_session(
+        &self,
+        db: &mut impl Db,
+        session_id: Uuid,
+        revoked_at: Timestamp,
+    ) -> Result<(), ApiError> {
+        self.repository.revoke_session(db, session_id, revoked_at)?;
+        self.repository
+            .delete_push_devices_by_session_id(db, session_id)?;
         Ok(())
     }
 
@@ -193,8 +210,10 @@ impl UserRefreshTokenService {
             },
         )?;
         Ok(TokenRefreshResult {
-            access_token: self.access_tokens.issue(consumed.user_id),
-            refresh_token: issued(generated, now, expires_at),
+            access_token: self
+                .access_tokens
+                .issue_for_session(consumed.user_id, consumed.session_id),
+            refresh_token: issued(generated, consumed.session_id, now, expires_at),
         })
     }
 }

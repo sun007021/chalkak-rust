@@ -1,8 +1,68 @@
 {
+  "db": {
+    "consumed_signup_tokens": [
+      "{\"expires_at\":\"<t+300s db +09:00>\",\"jti\":\"$uuid?\"}"
+    ],
+    "social_accounts": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"id\":\"$uuid?\",\"provider\":\"GOOGLE\",\"subject_hmac\":\"bfee95275b48de8b21b60a797c9cb4b2448ffadf18e85184bf39a5247a4c79aa\",\"user_id\":\"$uuid7\"}"
+    ],
+    "user_refresh_tokens": [
+      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t+0s db +09:00>\",\"rotated_at\":\"<t+0s db +09:00>\",\"session_id\":\"$uuid12\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid7\"}",
+      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t+0s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid12\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid7\"}",
+      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":null,\"rotated_at\":null,\"session_id\":\"$uuid10\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid7\"}",
+      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":null,\"rotated_at\":null,\"session_id\":\"$uuid8\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid7\"}"
+    ],
+    "users": [
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"flow@example.com\",\"id\":\"$uuid7\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid3.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid3.png\",\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}"
+    ]
+  },
+  "fakes": [
+    {
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid3.png",
+      "method": "HEAD",
+      "service": "s3_head"
+    },
+    {
+      "detail": "test-bucket/chalkak/signatures/local/original/$uuid3.png",
+      "method": "HEAD",
+      "service": "s3_head"
+    },
+    {
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid3.png",
+      "method": "HEAD",
+      "service": "s3_head"
+    },
+    {
+      "detail": "test-bucket/chalkak/signatures/local/original/$uuid3.png",
+      "method": "HEAD",
+      "service": "s3_head"
+    },
+    {
+      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid3.png",
+      "method": "HEAD",
+      "service": "s3_head"
+    },
+    {
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid3.png",
+      "method": "HEAD",
+      "service": "s3_head"
+    },
+    {
+      "detail": "test-bucket/chalkak/signatures/local/original/$uuid3.png",
+      "method": "HEAD",
+      "service": "s3_head"
+    },
+    {
+      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid3.png",
+      "method": "HEAD",
+      "service": "s3_head"
+    }
+  ],
   "steps": [
     {
-      "step": "미가입 회원 로그인",
-      "status": 200,
+      "body": {
+        "status": "SIGN_UP_REQUIRED"
+      },
       "headers": [
         [
           "cache-control",
@@ -37,13 +97,16 @@
           "0"
         ]
       ],
-      "body": {
-        "status": "SIGN_UP_REQUIRED"
-      }
+      "status": 200,
+      "step": "미가입 회원 로그인"
     },
     {
-      "step": "사인 업로드 URL 발급",
-      "status": 200,
+      "body": {
+        "expiresInSeconds": 300,
+        "signupToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"google-sub-flow\",\"aud\":\"chalkak-social-signup\",\"uploadId\":\"$uuid3\",\"purpose\":\"SOCIAL_SIGNUP\",\"provider\":\"GOOGLE\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\",\"email\":\"flow@example.com\"}>",
+        "uploadId": "$uuid3",
+        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid3.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>"
+      },
       "headers": [
         [
           "cache-control",
@@ -78,16 +141,14 @@
           "0"
         ]
       ],
-      "body": {
-        "uploadId": "$uuid3",
-        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid3.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
-        "expiresInSeconds": 300,
-        "signupToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"google-sub-flow\",\"aud\":\"chalkak-social-signup\",\"uploadId\":\"$uuid3\",\"purpose\":\"SOCIAL_SIGNUP\",\"provider\":\"GOOGLE\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\",\"email\":\"flow@example.com\"}>"
-      }
+      "status": 200,
+      "step": "사인 업로드 URL 발급"
     },
     {
-      "step": "이미지가 없으면 가입 불가",
-      "status": 404,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "업로드한 사인 이미지를 찾을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -122,14 +183,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "업로드한 사인 이미지를 찾을 수 없습니다."
-      }
+      "status": 404,
+      "step": "이미지가 없으면 가입 불가"
     },
     {
-      "step": "원본만 있고 썸네일 처리 전",
-      "status": 400,
+      "body": {
+        "errorCode": "SIGNATURE_PROCESSING_PENDING",
+        "message": "사인 이미지 처리 중입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -164,14 +225,17 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "SIGNATURE_PROCESSING_PENDING",
-        "message": "사인 이미지 처리 중입니다."
-      }
+      "status": 400,
+      "step": "원본만 있고 썸네일 처리 전"
     },
     {
-      "step": "썸네일까지 있으면 가입 완료",
-      "status": 200,
+      "body": {
+        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid7\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"session_id\":\"$uuid8\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
+        "expiresIn": 900,
+        "refreshToken": "<opaque len=43>",
+        "refreshTokenExpiresIn": 2592000,
+        "userId": "$uuid7"
+      },
       "headers": [
         [
           "cache-control",
@@ -206,62 +270,17 @@
           "0"
         ]
       ],
-      "body": {
-        "userId": "$uuid7",
-        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid7\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
-        "expiresIn": 900,
-        "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000
-      }
+      "status": 200,
+      "step": "썸네일까지 있으면 가입 완료"
     },
     {
-      "step": "같은 가입 토큰 재전송",
-      "status": 200,
-      "headers": [
-        [
-          "cache-control",
-          "no-cache, no-store, max-age=0, must-revalidate"
-        ],
-        [
-          "content-type",
-          "application/json"
-        ],
-        [
-          "expires",
-          "0"
-        ],
-        [
-          "pragma",
-          "no-cache"
-        ],
-        [
-          "x-content-type-options",
-          "nosniff"
-        ],
-        [
-          "x-frame-options",
-          "DENY"
-        ],
-        [
-          "x-request-id",
-          "$uuid8"
-        ],
-        [
-          "x-xss-protection",
-          "0"
-        ]
-      ],
       "body": {
-        "userId": "$uuid7",
-        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid7\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
+        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid7\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"session_id\":\"$uuid10\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
         "expiresIn": 900,
         "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000
-      }
-    },
-    {
-      "step": "가입한 회원 로그인",
-      "status": 200,
+        "refreshTokenExpiresIn": 2592000,
+        "userId": "$uuid7"
+      },
       "headers": [
         [
           "cache-control",
@@ -296,60 +315,18 @@
           "0"
         ]
       ],
+      "status": 200,
+      "step": "같은 가입 토큰 재전송"
+    },
+    {
       "body": {
-        "status": "LOGIN_SUCCESS",
-        "userId": "$uuid7",
-        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid7\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
+        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid7\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"session_id\":\"$uuid12\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
         "expiresIn": 900,
         "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000
-      }
-    },
-    {
-      "step": "이미 가입한 계정의 업로드 URL 발급",
-      "status": 400,
-      "headers": [
-        [
-          "cache-control",
-          "no-cache, no-store, max-age=0, must-revalidate"
-        ],
-        [
-          "content-type",
-          "application/json"
-        ],
-        [
-          "expires",
-          "0"
-        ],
-        [
-          "pragma",
-          "no-cache"
-        ],
-        [
-          "x-content-type-options",
-          "nosniff"
-        ],
-        [
-          "x-frame-options",
-          "DENY"
-        ],
-        [
-          "x-request-id",
-          "$uuid10"
-        ],
-        [
-          "x-xss-protection",
-          "0"
-        ]
-      ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미 가입된 소셜 계정입니다."
-      }
-    },
-    {
-      "step": "리프레시 토큰으로 재발급",
-      "status": 200,
+        "refreshTokenExpiresIn": 2592000,
+        "status": "LOGIN_SUCCESS",
+        "userId": "$uuid7"
+      },
       "headers": [
         [
           "cache-control",
@@ -384,16 +361,14 @@
           "0"
         ]
       ],
-      "body": {
-        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid7\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
-        "expiresIn": 900,
-        "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000
-      }
+      "status": 200,
+      "step": "가입한 회원 로그인"
     },
     {
-      "step": "회전 전 리프레시 토큰 재사용",
-      "status": 401,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미 가입된 소셜 계정입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -421,76 +396,101 @@
         ],
         [
           "x-request-id",
-          "$uuid12"
+          "$uuid13"
         ],
         [
           "x-xss-protection",
           "0"
         ]
       ],
+      "status": 400,
+      "step": "이미 가입한 계정의 업로드 URL 발급"
+    },
+    {
+      "body": {
+        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid7\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"session_id\":\"$uuid12\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
+        "expiresIn": 900,
+        "refreshToken": "<opaque len=43>",
+        "refreshTokenExpiresIn": 2592000
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid14"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "리프레시 토큰으로 재발급"
+    },
+    {
       "body": {
         "errorCode": "REAUTHENTICATION_REQUIRED",
         "message": "다시 로그인해 주세요."
-      }
-    }
-  ],
-  "db": {
-    "consumed_signup_tokens": [
-      "{\"jti\":\"$uuid?\",\"expires_at\":\"<t+300s db +09:00>\"}"
-    ],
-    "social_accounts": [
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid7\",\"provider\":\"GOOGLE\",\"created_at\":\"<t+0s db +09:00>\",\"subject_hmac\":\"bfee95275b48de8b21b60a797c9cb4b2448ffadf18e85184bf39a5247a4c79aa\"}"
-    ],
-    "user_refresh_tokens": [
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid7\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"revoked_at\":\"<t+0s db +09:00>\",\"rotated_at\":\"<t+0s db +09:00>\",\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid7\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"revoked_at\":\"<t+0s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid7\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"revoked_at\":null,\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid7\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"revoked_at\":null,\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}"
-    ],
-    "users": [
-      "{\"id\":\"$uuid7\",\"email\":\"flow@example.com\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid3.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid3.png\"}"
-    ]
-  },
-  "fakes": [
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid3.png"
-    },
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/signatures/local/original/$uuid3.png"
-    },
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid3.png"
-    },
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/signatures/local/original/$uuid3.png"
-    },
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid3.png"
-    },
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid3.png"
-    },
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/signatures/local/original/$uuid3.png"
-    },
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid3.png"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid15"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "회전 전 리프레시 토큰 재사용"
     }
   ]
 }

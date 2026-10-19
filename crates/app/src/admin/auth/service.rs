@@ -68,6 +68,7 @@ pub fn issue_admin_access_token(
         expires_at,
         jti: &jti,
         scope: "ADMIN",
+        session_id: None,
     };
     let value = chalkak_jwt::hs256_encode(
         &chalkak_jwt::original::access_token_header(),

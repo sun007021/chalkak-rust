@@ -272,6 +272,44 @@ fn imds_endpoint_can_be_overridden_for_fakes() {
     );
 }
 
+#[test]
+fn imds_endpoint_is_read_from_the_sdk_environment_variable() {
+    let http = Arc::new(FakeTransport::default());
+    http.push(200, "t");
+    http.push(200, "role");
+    http.push(200, &role_json("ASIA1", "s1", "2026-10-12T06:00:00Z"));
+    let clock = TestClock::new("2026-10-12T00:00:00Z");
+    let lookup = |name: &str| {
+        (name == "AWS_EC2_METADATA_SERVICE_ENDPOINT").then(|| " http://imds-mock:1338/ ".to_owned())
+    };
+    let imds =
+        ImdsCredentialsProvider::new(http.clone(), clock.now_fn()).with_endpoint_from_env(&lookup);
+    imds.credentials().unwrap();
+    assert_eq!(
+        http.requests()[0].url,
+        "http://imds-mock:1338/latest/api/token"
+    );
+}
+
+#[test]
+fn imds_endpoint_stays_default_when_the_variable_is_missing_or_blank() {
+    for value in [None, Some(""), Some("  ")] {
+        let http = Arc::new(FakeTransport::default());
+        http.push(200, "t");
+        http.push(200, "role");
+        http.push(200, &role_json("ASIA1", "s1", "2026-10-12T06:00:00Z"));
+        let clock = TestClock::new("2026-10-12T00:00:00Z");
+        let lookup = |_: &str| value.map(str::to_owned);
+        let imds = ImdsCredentialsProvider::new(http.clone(), clock.now_fn())
+            .with_endpoint_from_env(&lookup);
+        imds.credentials().unwrap();
+        assert_eq!(
+            http.requests()[0].url,
+            "http://169.254.169.254/latest/api/token"
+        );
+    }
+}
+
 // ---- 체인 ----
 
 #[test]

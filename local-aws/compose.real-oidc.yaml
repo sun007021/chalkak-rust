@@ -1,0 +1,14 @@
+# 실계정 모드 오버레이. 백엔드(rust|java)가 진짜 OIDC 공개키를 쓰고 앱과 같은 클라이언트 값을 읽는다.
+#   cp env/real-oidc.env.example env/real-oidc.env   # 값을 채운다
+#   docker compose -f compose.yaml -f compose.real-oidc.yaml --profile rust up -d
+# 가짜 모드(하네스·smoke.sh)로 돌아가려면 이 파일 없이 다시 up -d 한다. compose 는 env_file 목록을 이어 붙여서
+# 뒤의 파일이 같은 키를 덮어쓴다. 백엔드 컨테이너는 인터넷(구글·카카오·애플 공개키)에 닿아야 한다.
+services:
+  rust:
+    env_file:
+      - ./env/local-aws.env
+      - ./env/real-oidc.env
+  java:
+    env_file:
+      - ./env/local-aws.env
+      - ./env/real-oidc.env

@@ -1,6 +1,7 @@
 //! 알림 도메인. 원본 `com.chalkak.backend.notification` 패키지.
 //!
 //! - 알림함(`/api/v1/notifications/**`): [`api`], [`service`], [`repository`].
+//! - 알림함 서비스는 원본에서 `NotificationService`로 이름이 바뀌었다. Rust에서는 `NotificationInboxService`로 둔다.
 //! - 검수 결과 알림 생성: [`create_for_moderation`](원본 `UserNotificationService.createForModeration`). 관리자 검수
 //!   트랜잭션 안에서 호출한다.
 //! - 관리자 Slack 알림(검수 대기): [`slack`].
@@ -92,14 +93,28 @@ pub fn create_for_moderation(
     rejection_reason: Option<&str>,
     occurred_at: Timestamp,
 ) -> Result<(), NotificationError> {
+    // 탈퇴하지 않았고 승인·반려 푸시를 받는 작성자에게만 발행한다(`createForModeration`의 `pushEnabled`).
+    let push_enabled = tx
+        .query_opt(
+            "SELECT deleted_at IS NULL AND moderation_push_enabled FROM users WHERE id = $1",
+            &[&user_id],
+        )?
+        .map(|row| row.try_get::<_, bool>(0))
+        .transpose()?
+        .unwrap_or(false);
     let mut notification = match decision {
         ModerationDecision::Approved => {
-            Notification::approved(user_id, post_id, event_key, occurred_at)
+            Notification::approved(user_id, post_id, event_key, occurred_at, push_enabled)
         }
-        ModerationDecision::Rejected => {
-            Notification::rejected(user_id, post_id, event_key, rejection_reason, occurred_at)
-                .map_err(NotificationError::Business)?
-        }
+        ModerationDecision::Rejected => Notification::rejected(
+            user_id,
+            post_id,
+            event_key,
+            rejection_reason,
+            occurred_at,
+            push_enabled,
+        )
+        .map_err(NotificationError::Business)?,
     };
     NotificationRepository.save(tx, &mut notification)?;
     Ok(())

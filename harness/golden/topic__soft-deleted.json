@@ -1,8 +1,15 @@
 {
+  "db": {
+    "topics": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t-3600s db +09:00>\",\"ends_at\":\"<t+54000s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-32400s db +09:00>\",\"title\":\"삭제된 주제\",\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ]
+  },
   "steps": [
     {
-      "step": "삭제된 주제의 날짜",
-      "status": 404,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제를 찾을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -37,15 +44,8 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "주제를 찾을 수 없습니다."
-      }
+      "status": 404,
+      "step": "삭제된 주제의 날짜"
     }
-  ],
-  "db": {
-    "topics": [
-      "{\"id\":\"$uuid?\",\"title\":\"삭제된 주제\",\"ends_at\":\"<t+54000s db +09:00>\",\"starts_at\":\"<t-32400s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t-3600s db +09:00>\",\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t+0s db +09:00>\"}"
-    ]
-  }
+  ]
 }

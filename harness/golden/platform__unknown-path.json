@@ -1,8 +1,11 @@
 {
+  "db": {},
   "steps": [
     {
-      "step": "토큰 없이 없는 경로",
-      "status": 401,
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -41,14 +44,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      }
+      "status": 401,
+      "step": "토큰 없이 없는 경로"
     },
     {
-      "step": "회원 토큰으로 없는 경로",
-      "status": 404,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "요청한 API를 찾을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -83,14 +86,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "요청한 API를 찾을 수 없습니다."
-      }
+      "status": 404,
+      "step": "회원 토큰으로 없는 경로"
     },
     {
-      "step": "공개 목록 경로 끝 슬래시",
-      "status": 401,
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -129,14 +132,14 @@
           "0"
         ]
       ],
+      "status": 401,
+      "step": "공개 목록 경로 끝 슬래시"
+    },
+    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 인증 정보입니다."
-      }
-    },
-    {
-      "step": "대소문자가 다른 경로",
-      "status": 401,
+      },
       "headers": [
         [
           "cache-control",
@@ -175,14 +178,14 @@
           "0"
         ]
       ],
+      "status": 401,
+      "step": "대소문자가 다른 경로"
+    },
+    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 인증 정보입니다."
-      }
-    },
-    {
-      "step": "actuator 비공개 경로",
-      "status": 401,
+      },
       "headers": [
         [
           "cache-control",
@@ -221,11 +224,8 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      }
+      "status": 401,
+      "step": "actuator 비공개 경로"
     }
-  ],
-  "db": {}
+  ]
 }

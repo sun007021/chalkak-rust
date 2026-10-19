@@ -433,7 +433,9 @@ mod tests {
 
         let n = client
             .query_one(
-                "SELECT user_id, event_key, type, title, rejection_reason FROM notifications WHERE post_id = $1",
+                "SELECT user_id, event_key, type, title, payload ->> 'rejectionReason', source_type, \
+                 sqs_publish_status, next_attempt_at IS NOT NULL \
+                 FROM notifications WHERE source_id = $1",
                 &[&post],
             )
             .unwrap();
@@ -442,6 +444,10 @@ mod tests {
         assert_eq!(n.get::<_, String>(2), "POST_APPROVED");
         assert_eq!(n.get::<_, String>(3), "게시물이 승인되었습니다.");
         assert_eq!(n.get::<_, Option<String>>(4), None);
+        assert_eq!(n.get::<_, String>(5), "POST");
+        // 푸시를 받는 작성자(기본값)의 알림은 발행 대기로 시작한다.
+        assert_eq!(n.get::<_, String>(6), "PENDING");
+        assert!(n.get::<_, bool>(7));
     }
 
     #[test]
@@ -461,7 +467,7 @@ mod tests {
         assert_eq!(result.rejection_reason.as_deref(), Some("정책 위반"));
         let n = client
             .query_one(
-                "SELECT type, title, body, rejection_reason FROM notifications WHERE post_id = $1",
+                "SELECT type, title, body, payload ->> 'rejectionReason' FROM notifications WHERE source_id = $1",
                 &[&post],
             )
             .unwrap();

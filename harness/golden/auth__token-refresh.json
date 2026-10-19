@@ -1,8 +1,53 @@
 {
+  "db": {
+    "consumed_signup_tokens": [
+      "{\"expires_at\":\"<t+300s db +09:00>\",\"jti\":\"$uuid?\"}"
+    ],
+    "social_accounts": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"id\":\"$uuid?\",\"provider\":\"GOOGLE\",\"subject_hmac\":\"105f1db738ec95582f01decb3aa715c1f73a8c9666a14303d163671dcc2d59dc\",\"user_id\":\"$uuid4\"}"
+    ],
+    "user_refresh_tokens": [
+      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t+0s db +09:00>\",\"rotated_at\":\"<t+0s db +09:00>\",\"session_id\":\"$uuid5\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid4\"}",
+      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t+0s db +09:00>\",\"rotated_at\":\"<t+0s db +09:00>\",\"session_id\":\"$uuid7\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid4\"}",
+      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t+0s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid5\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid4\"}",
+      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t+0s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid7\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid4\"}",
+      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t+0s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid9\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid4\"}",
+      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t+2592060s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid11\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid4\"}",
+      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t+7862400s db +09:00>\",\"rotated_at\":\"<t+0s db +09:00>\",\"session_id\":\"$uuid13\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid4\"}",
+      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t+7862400s db +09:00>\",\"rotated_at\":\"<t+2505600s db +09:00>\",\"session_id\":\"$uuid13\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid4\"}",
+      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+2505600s db +09:00>\",\"expires_at\":\"<t+5097600s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t+7862400s db +09:00>\",\"rotated_at\":\"<t+5011200s db +09:00>\",\"session_id\":\"$uuid13\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid4\"}",
+      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+5011200s db +09:00>\",\"expires_at\":\"<t+7603200s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t+7862400s db +09:00>\",\"rotated_at\":\"<t+7516800s db +09:00>\",\"session_id\":\"$uuid13\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid4\"}",
+      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+7516800s db +09:00>\",\"expires_at\":\"<t+7776000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t+7862400s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid13\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid4\"}"
+    ],
+    "users": [
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"refresh@example.com\",\"id\":\"$uuid4\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid2.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid2.png\",\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}"
+    ]
+  },
+  "fakes": [
+    {
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid2.png",
+      "method": "HEAD",
+      "service": "s3_head"
+    },
+    {
+      "detail": "test-bucket/chalkak/signatures/local/original/$uuid2.png",
+      "method": "HEAD",
+      "service": "s3_head"
+    },
+    {
+      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid2.png",
+      "method": "HEAD",
+      "service": "s3_head"
+    }
+  ],
   "steps": [
     {
-      "step": "업로드 URL 발급",
-      "status": 200,
+      "body": {
+        "expiresInSeconds": 300,
+        "signupToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"google-sub-refresh\",\"aud\":\"chalkak-social-signup\",\"uploadId\":\"$uuid2\",\"purpose\":\"SOCIAL_SIGNUP\",\"provider\":\"GOOGLE\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\",\"email\":\"refresh@example.com\"}>",
+        "uploadId": "$uuid2",
+        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid2.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>"
+      },
       "headers": [
         [
           "cache-control",
@@ -37,16 +82,17 @@
           "0"
         ]
       ],
-      "body": {
-        "uploadId": "$uuid2",
-        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid2.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
-        "expiresInSeconds": 300,
-        "signupToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"google-sub-refresh\",\"aud\":\"chalkak-social-signup\",\"uploadId\":\"$uuid2\",\"purpose\":\"SOCIAL_SIGNUP\",\"provider\":\"GOOGLE\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\",\"email\":\"refresh@example.com\"}>"
-      }
+      "status": 200,
+      "step": "업로드 URL 발급"
     },
     {
-      "step": "가입(첫 기기, 계보 1)",
-      "status": 200,
+      "body": {
+        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid4\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"session_id\":\"$uuid5\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
+        "expiresIn": 900,
+        "refreshToken": "<opaque len=43>",
+        "refreshTokenExpiresIn": 2592000,
+        "userId": "$uuid4"
+      },
       "headers": [
         [
           "cache-control",
@@ -81,63 +127,18 @@
           "0"
         ]
       ],
-      "body": {
-        "userId": "$uuid4",
-        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid4\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
-        "expiresIn": 900,
-        "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000
-      }
+      "status": 200,
+      "step": "가입(첫 기기, 계보 1)"
     },
     {
-      "step": "두 번째 기기 로그인(계보 2)",
-      "status": 200,
-      "headers": [
-        [
-          "cache-control",
-          "no-cache, no-store, max-age=0, must-revalidate"
-        ],
-        [
-          "content-type",
-          "application/json"
-        ],
-        [
-          "expires",
-          "0"
-        ],
-        [
-          "pragma",
-          "no-cache"
-        ],
-        [
-          "x-content-type-options",
-          "nosniff"
-        ],
-        [
-          "x-frame-options",
-          "DENY"
-        ],
-        [
-          "x-request-id",
-          "$uuid5"
-        ],
-        [
-          "x-xss-protection",
-          "0"
-        ]
-      ],
       "body": {
+        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid4\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"session_id\":\"$uuid7\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
+        "expiresIn": 900,
+        "refreshToken": "<opaque len=43>",
+        "refreshTokenExpiresIn": 2592000,
         "status": "LOGIN_SUCCESS",
-        "userId": "$uuid4",
-        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid4\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
-        "expiresIn": 900,
-        "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000
-      }
-    },
-    {
-      "step": "세 번째 기기 로그인(계보 3)",
-      "status": 200,
+        "userId": "$uuid4"
+      },
       "headers": [
         [
           "cache-control",
@@ -172,64 +173,18 @@
           "0"
         ]
       ],
-      "body": {
-        "status": "LOGIN_SUCCESS",
-        "userId": "$uuid4",
-        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid4\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
-        "expiresIn": 900,
-        "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000
-      }
+      "status": 200,
+      "step": "두 번째 기기 로그인(계보 2)"
     },
     {
-      "step": "네 번째 기기 로그인(계보 4)",
-      "status": 200,
-      "headers": [
-        [
-          "cache-control",
-          "no-cache, no-store, max-age=0, must-revalidate"
-        ],
-        [
-          "content-type",
-          "application/json"
-        ],
-        [
-          "expires",
-          "0"
-        ],
-        [
-          "pragma",
-          "no-cache"
-        ],
-        [
-          "x-content-type-options",
-          "nosniff"
-        ],
-        [
-          "x-frame-options",
-          "DENY"
-        ],
-        [
-          "x-request-id",
-          "$uuid7"
-        ],
-        [
-          "x-xss-protection",
-          "0"
-        ]
-      ],
       "body": {
-        "status": "LOGIN_SUCCESS",
-        "userId": "$uuid4",
-        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid4\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
+        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid4\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"session_id\":\"$uuid9\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
         "expiresIn": 900,
         "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000
-      }
-    },
-    {
-      "step": "다섯 번째 기기 로그인(계보 5)",
-      "status": 200,
+        "refreshTokenExpiresIn": 2592000,
+        "status": "LOGIN_SUCCESS",
+        "userId": "$uuid4"
+      },
       "headers": [
         [
           "cache-control",
@@ -264,60 +219,18 @@
           "0"
         ]
       ],
+      "status": 200,
+      "step": "세 번째 기기 로그인(계보 3)"
+    },
+    {
       "body": {
-        "status": "LOGIN_SUCCESS",
-        "userId": "$uuid4",
-        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid4\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
+        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid4\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"session_id\":\"$uuid11\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
         "expiresIn": 900,
         "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000
-      }
-    },
-    {
-      "step": "재발급: 본문 없음",
-      "status": 400,
-      "headers": [
-        [
-          "cache-control",
-          "no-cache, no-store, max-age=0, must-revalidate"
-        ],
-        [
-          "content-type",
-          "application/json"
-        ],
-        [
-          "expires",
-          "0"
-        ],
-        [
-          "pragma",
-          "no-cache"
-        ],
-        [
-          "x-content-type-options",
-          "nosniff"
-        ],
-        [
-          "x-frame-options",
-          "DENY"
-        ],
-        [
-          "x-request-id",
-          "$uuid9"
-        ],
-        [
-          "x-xss-protection",
-          "0"
-        ]
-      ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
-    },
-    {
-      "step": "재발급: 토큰 필드 없음",
-      "status": 400,
+        "refreshTokenExpiresIn": 2592000,
+        "status": "LOGIN_SUCCESS",
+        "userId": "$uuid4"
+      },
       "headers": [
         [
           "cache-control",
@@ -352,56 +265,18 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "리프레시 토큰은 필수입니다."
-      }
+      "status": 200,
+      "step": "네 번째 기기 로그인(계보 4)"
     },
     {
-      "step": "재발급: 토큰이 null",
-      "status": 400,
-      "headers": [
-        [
-          "cache-control",
-          "no-cache, no-store, max-age=0, must-revalidate"
-        ],
-        [
-          "content-type",
-          "application/json"
-        ],
-        [
-          "expires",
-          "0"
-        ],
-        [
-          "pragma",
-          "no-cache"
-        ],
-        [
-          "x-content-type-options",
-          "nosniff"
-        ],
-        [
-          "x-frame-options",
-          "DENY"
-        ],
-        [
-          "x-request-id",
-          "$uuid11"
-        ],
-        [
-          "x-xss-protection",
-          "0"
-        ]
-      ],
       "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "리프레시 토큰은 필수입니다."
-      }
-    },
-    {
-      "step": "재발급: 토큰이 공백",
-      "status": 400,
+        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid4\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"session_id\":\"$uuid13\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
+        "expiresIn": 900,
+        "refreshToken": "<opaque len=43>",
+        "refreshTokenExpiresIn": 2592000,
+        "status": "LOGIN_SUCCESS",
+        "userId": "$uuid4"
+      },
       "headers": [
         [
           "cache-control",
@@ -436,56 +311,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "리프레시 토큰은 필수입니다."
-      }
+      "status": 200,
+      "step": "다섯 번째 기기 로그인(계보 5)"
     },
     {
-      "step": "재발급: 토큰이 배열",
-      "status": 400,
-      "headers": [
-        [
-          "cache-control",
-          "no-cache, no-store, max-age=0, must-revalidate"
-        ],
-        [
-          "content-type",
-          "application/json"
-        ],
-        [
-          "expires",
-          "0"
-        ],
-        [
-          "pragma",
-          "no-cache"
-        ],
-        [
-          "x-content-type-options",
-          "nosniff"
-        ],
-        [
-          "x-frame-options",
-          "DENY"
-        ],
-        [
-          "x-request-id",
-          "$uuid13"
-        ],
-        [
-          "x-xss-protection",
-          "0"
-        ]
-      ],
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
-    },
-    {
-      "step": "재발급: 토큰이 숫자(문자열로 바뀌어 모르는 토큰)",
-      "status": 401,
+      },
       "headers": [
         [
           "cache-control",
@@ -520,14 +353,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "REAUTHENTICATION_REQUIRED",
-        "message": "다시 로그인해 주세요."
-      }
+      "status": 400,
+      "step": "재발급: 본문 없음"
     },
     {
-      "step": "재발급: 모르는 토큰",
-      "status": 401,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "리프레시 토큰은 필수입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -562,14 +395,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "REAUTHENTICATION_REQUIRED",
-        "message": "다시 로그인해 주세요."
-      }
+      "status": 400,
+      "step": "재발급: 토큰 필드 없음"
     },
     {
-      "step": "재발급: 앞뒤 공백이 붙은 토큰은 다른 토큰",
-      "status": 401,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "리프레시 토큰은 필수입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -604,14 +437,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "REAUTHENTICATION_REQUIRED",
-        "message": "다시 로그인해 주세요."
-      }
+      "status": 400,
+      "step": "재발급: 토큰이 null"
     },
     {
-      "step": "재발급: 알 수 없는 필드는 무시",
-      "status": 200,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "리프레시 토큰은 필수입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -646,16 +479,14 @@
           "0"
         ]
       ],
-      "body": {
-        "accessToken": "<opaque len=356>",
-        "expiresIn": 900,
-        "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000
-      }
+      "status": 400,
+      "step": "재발급: 토큰이 공백"
     },
     {
-      "step": "로그아웃: 본문 없음",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -690,14 +521,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
+      "status": 400,
+      "step": "재발급: 토큰이 배열"
     },
     {
-      "step": "로그아웃: 토큰 공백",
-      "status": 400,
+      "body": {
+        "errorCode": "REAUTHENTICATION_REQUIRED",
+        "message": "다시 로그인해 주세요."
+      },
       "headers": [
         [
           "cache-control",
@@ -732,14 +563,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "리프레시 토큰은 필수입니다."
-      }
+      "status": 401,
+      "step": "재발급: 토큰이 숫자(문자열로 바뀌어 모르는 토큰)"
     },
     {
-      "step": "정상 재발급(계보 1: r1 → r1b)",
-      "status": 200,
+      "body": {
+        "errorCode": "REAUTHENTICATION_REQUIRED",
+        "message": "다시 로그인해 주세요."
+      },
       "headers": [
         [
           "cache-control",
@@ -774,16 +605,14 @@
           "0"
         ]
       ],
-      "body": {
-        "accessToken": "<opaque len=356>",
-        "expiresIn": 900,
-        "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000
-      }
+      "status": 401,
+      "step": "재발급: 모르는 토큰"
     },
     {
-      "step": "회전된 r1을 재사용하면 계보 전체 폐기",
-      "status": 401,
+      "body": {
+        "errorCode": "REAUTHENTICATION_REQUIRED",
+        "message": "다시 로그인해 주세요."
+      },
       "headers": [
         [
           "cache-control",
@@ -818,14 +647,16 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "REAUTHENTICATION_REQUIRED",
-        "message": "다시 로그인해 주세요."
-      }
+      "status": 401,
+      "step": "재발급: 앞뒤 공백이 붙은 토큰은 다른 토큰"
     },
     {
-      "step": "폐기된 계보의 최신 토큰도 쓸 수 없다",
-      "status": 401,
+      "body": {
+        "accessToken": "<opaque len=425>",
+        "expiresIn": 900,
+        "refreshToken": "<opaque len=43>",
+        "refreshTokenExpiresIn": 2592000
+      },
       "headers": [
         [
           "cache-control",
@@ -860,14 +691,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "REAUTHENTICATION_REQUIRED",
-        "message": "다시 로그인해 주세요."
-      }
+      "status": 200,
+      "step": "재발급: 알 수 없는 필드는 무시"
     },
     {
-      "step": "다른 계보(2)는 영향받지 않는다",
-      "status": 200,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -902,20 +733,22 @@
           "0"
         ]
       ],
-      "body": {
-        "accessToken": "<opaque len=356>",
-        "expiresIn": 900,
-        "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000
-      }
+      "status": 400,
+      "step": "로그아웃: 본문 없음"
     },
     {
-      "step": "로그아웃(계보 3)",
-      "status": 204,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "리프레시 토큰은 필수입니다."
+      },
       "headers": [
         [
           "cache-control",
           "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
         ],
         [
           "expires",
@@ -942,11 +775,16 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 400,
+      "step": "로그아웃: 토큰 공백"
     },
     {
-      "step": "로그아웃한 토큰으로 재발급",
-      "status": 401,
+      "body": {
+        "accessToken": "<opaque len=425>",
+        "expiresIn": 900,
+        "refreshToken": "<opaque len=43>",
+        "refreshTokenExpiresIn": 2592000
+      },
       "headers": [
         [
           "cache-control",
@@ -981,119 +819,14 @@
           "0"
         ]
       ],
+      "status": 200,
+      "step": "정상 재발급(계보 1: r1 → r1b)"
+    },
+    {
       "body": {
         "errorCode": "REAUTHENTICATION_REQUIRED",
         "message": "다시 로그인해 주세요."
-      }
-    },
-    {
-      "step": "이미 폐기된 토큰의 로그아웃도 204",
-      "status": 204,
-      "headers": [
-        [
-          "cache-control",
-          "no-cache, no-store, max-age=0, must-revalidate"
-        ],
-        [
-          "expires",
-          "0"
-        ],
-        [
-          "pragma",
-          "no-cache"
-        ],
-        [
-          "x-content-type-options",
-          "nosniff"
-        ],
-        [
-          "x-frame-options",
-          "DENY"
-        ],
-        [
-          "x-request-id",
-          "$uuid26"
-        ],
-        [
-          "x-xss-protection",
-          "0"
-        ]
-      ],
-      "body": ""
-    },
-    {
-      "step": "모르는 토큰의 로그아웃도 204",
-      "status": 204,
-      "headers": [
-        [
-          "cache-control",
-          "no-cache, no-store, max-age=0, must-revalidate"
-        ],
-        [
-          "expires",
-          "0"
-        ],
-        [
-          "pragma",
-          "no-cache"
-        ],
-        [
-          "x-content-type-options",
-          "nosniff"
-        ],
-        [
-          "x-frame-options",
-          "DENY"
-        ],
-        [
-          "x-request-id",
-          "$uuid27"
-        ],
-        [
-          "x-xss-protection",
-          "0"
-        ]
-      ],
-      "body": ""
-    },
-    {
-      "step": "회전된 옛 토큰으로 로그아웃하면 계보가 폐기된다(계보 2)",
-      "status": 204,
-      "headers": [
-        [
-          "cache-control",
-          "no-cache, no-store, max-age=0, must-revalidate"
-        ],
-        [
-          "expires",
-          "0"
-        ],
-        [
-          "pragma",
-          "no-cache"
-        ],
-        [
-          "x-content-type-options",
-          "nosniff"
-        ],
-        [
-          "x-frame-options",
-          "DENY"
-        ],
-        [
-          "x-request-id",
-          "$uuid28"
-        ],
-        [
-          "x-xss-protection",
-          "0"
-        ]
-      ],
-      "body": ""
-    },
-    {
-      "step": "계보 2의 최신 토큰도 폐기됨",
-      "status": 401,
+      },
       "headers": [
         [
           "cache-control",
@@ -1121,6 +854,127 @@
         ],
         [
           "x-request-id",
+          "$uuid26"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "회전된 r1을 재사용하면 계보 전체 폐기"
+    },
+    {
+      "body": {
+        "errorCode": "REAUTHENTICATION_REQUIRED",
+        "message": "다시 로그인해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid27"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "폐기된 계보의 최신 토큰도 쓸 수 없다"
+    },
+    {
+      "body": {
+        "accessToken": "<opaque len=425>",
+        "expiresIn": 900,
+        "refreshToken": "<opaque len=43>",
+        "refreshTokenExpiresIn": 2592000
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid28"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "다른 계보(2)는 영향받지 않는다"
+    },
+    {
+      "body": "",
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
           "$uuid29"
         ],
         [
@@ -1128,14 +982,14 @@
           "0"
         ]
       ],
+      "status": 204,
+      "step": "로그아웃(계보 3)"
+    },
+    {
       "body": {
         "errorCode": "REAUTHENTICATION_REQUIRED",
         "message": "다시 로그인해 주세요."
-      }
-    },
-    {
-      "step": "29일을 보낸다",
-      "status": 404,
+      },
       "headers": [
         [
           "cache-control",
@@ -1170,22 +1024,15 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "주제를 찾을 수 없습니다."
-      }
+      "status": 401,
+      "step": "로그아웃한 토큰으로 재발급"
     },
     {
-      "step": "29일째 재발급(계보 5: r5 → r5b, 만료는 59일째)",
-      "status": 200,
+      "body": "",
       "headers": [
         [
           "cache-control",
           "no-cache, no-store, max-age=0, must-revalidate"
-        ],
-        [
-          "content-type",
-          "application/json"
         ],
         [
           "expires",
@@ -1212,24 +1059,15 @@
           "0"
         ]
       ],
-      "body": {
-        "accessToken": "<opaque len=356>",
-        "expiresIn": 900,
-        "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000
-      }
+      "status": 204,
+      "step": "이미 폐기된 토큰의 로그아웃도 204"
     },
     {
-      "step": "30일이 지나면 만료(계보 4)",
-      "status": 401,
+      "body": "",
       "headers": [
         [
           "cache-control",
           "no-cache, no-store, max-age=0, must-revalidate"
-        ],
-        [
-          "content-type",
-          "application/json"
         ],
         [
           "expires",
@@ -1256,22 +1094,15 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "REAUTHENTICATION_REQUIRED",
-        "message": "다시 로그인해 주세요."
-      }
+      "status": 204,
+      "step": "모르는 토큰의 로그아웃도 204"
     },
     {
-      "step": "만료로 폐기된 계보는 이후에도 쓸 수 없다",
-      "status": 401,
+      "body": "",
       "headers": [
         [
           "cache-control",
           "no-cache, no-store, max-age=0, must-revalidate"
-        ],
-        [
-          "content-type",
-          "application/json"
         ],
         [
           "expires",
@@ -1298,14 +1129,14 @@
           "0"
         ]
       ],
+      "status": 204,
+      "step": "회전된 옛 토큰으로 로그아웃하면 계보가 폐기된다(계보 2)"
+    },
+    {
       "body": {
         "errorCode": "REAUTHENTICATION_REQUIRED",
         "message": "다시 로그인해 주세요."
-      }
-    },
-    {
-      "step": "58일째 재발급(계보 5: r5b → r5c, 만료는 88일째)",
-      "status": 200,
+      },
       "headers": [
         [
           "cache-control",
@@ -1340,16 +1171,14 @@
           "0"
         ]
       ],
-      "body": {
-        "accessToken": "<opaque len=356>",
-        "expiresIn": 900,
-        "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000
-      }
+      "status": 401,
+      "step": "계보 2의 최신 토큰도 폐기됨"
     },
     {
-      "step": "87일째 재발급(만료는 절대 만료인 90일째로 줄어든다)",
-      "status": 200,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제를 찾을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1384,16 +1213,16 @@
           "0"
         ]
       ],
-      "body": {
-        "accessToken": "<opaque len=356>",
-        "expiresIn": 900,
-        "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": "<opaque number>"
-      }
+      "status": 404,
+      "step": "29일을 보낸다"
     },
     {
-      "step": "91일째는 절대 만료",
-      "status": 401,
+      "body": {
+        "accessToken": "<opaque len=425>",
+        "expiresIn": 900,
+        "refreshToken": "<opaque len=43>",
+        "refreshTokenExpiresIn": 2592000
+      },
       "headers": [
         [
           "cache-control",
@@ -1428,51 +1257,222 @@
           "0"
         ]
       ],
+      "status": 200,
+      "step": "29일째 재발급(계보 5: r5 → r5b, 만료는 59일째)"
+    },
+    {
       "body": {
         "errorCode": "REAUTHENTICATION_REQUIRED",
         "message": "다시 로그인해 주세요."
-      }
-    }
-  ],
-  "db": {
-    "consumed_signup_tokens": [
-      "{\"jti\":\"$uuid?\",\"expires_at\":\"<t+300s db +09:00>\"}"
-    ],
-    "social_accounts": [
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid4\",\"provider\":\"GOOGLE\",\"created_at\":\"<t+0s db +09:00>\",\"subject_hmac\":\"105f1db738ec95582f01decb3aa715c1f73a8c9666a14303d163671dcc2d59dc\"}"
-    ],
-    "user_refresh_tokens": [
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid4\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"revoked_at\":\"<t+0s db +09:00>\",\"rotated_at\":\"<t+0s db +09:00>\",\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid4\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"revoked_at\":\"<t+0s db +09:00>\",\"rotated_at\":\"<t+0s db +09:00>\",\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid4\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"revoked_at\":\"<t+0s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid4\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"revoked_at\":\"<t+0s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid4\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"revoked_at\":\"<t+0s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid4\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"revoked_at\":\"<t+2592060s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid4\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"revoked_at\":\"<t+7862400s db +09:00>\",\"rotated_at\":\"<t+0s db +09:00>\",\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid4\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"revoked_at\":\"<t+7862400s db +09:00>\",\"rotated_at\":\"<t+2505600s db +09:00>\",\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid4\",\"created_at\":\"<t+2505600s db +09:00>\",\"expires_at\":\"<t+5097600s db +09:00>\",\"revoked_at\":\"<t+7862400s db +09:00>\",\"rotated_at\":\"<t+5011200s db +09:00>\",\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid4\",\"created_at\":\"<t+5011200s db +09:00>\",\"expires_at\":\"<t+7603200s db +09:00>\",\"revoked_at\":\"<t+7862400s db +09:00>\",\"rotated_at\":\"<t+7516800s db +09:00>\",\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid4\",\"created_at\":\"<t+7516800s db +09:00>\",\"expires_at\":\"<t+7776000s db +09:00>\",\"revoked_at\":\"<t+7862400s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}"
-    ],
-    "users": [
-      "{\"id\":\"$uuid4\",\"email\":\"refresh@example.com\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid2.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid2.png\"}"
-    ]
-  },
-  "fakes": [
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid2.png"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid37"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "30일이 지나면 만료(계보 4)"
     },
     {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/signatures/local/original/$uuid2.png"
+      "body": {
+        "errorCode": "REAUTHENTICATION_REQUIRED",
+        "message": "다시 로그인해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid38"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "만료로 폐기된 계보는 이후에도 쓸 수 없다"
     },
     {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid2.png"
+      "body": {
+        "accessToken": "<opaque len=425>",
+        "expiresIn": 900,
+        "refreshToken": "<opaque len=43>",
+        "refreshTokenExpiresIn": 2592000
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid39"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "58일째 재발급(계보 5: r5b → r5c, 만료는 88일째)"
+    },
+    {
+      "body": {
+        "accessToken": "<opaque len=425>",
+        "expiresIn": 900,
+        "refreshToken": "<opaque len=43>",
+        "refreshTokenExpiresIn": "<opaque number>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid40"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "87일째 재발급(만료는 절대 만료인 90일째로 줄어든다)"
+    },
+    {
+      "body": {
+        "errorCode": "REAUTHENTICATION_REQUIRED",
+        "message": "다시 로그인해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid41"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "91일째는 절대 만료"
     }
   ]
 }

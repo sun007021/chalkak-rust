@@ -1,0 +1,44 @@
+# edge: TLS 종료. 로컬 CA(Caddy internal)가 인증서를 발급한다.
+#   api.<IP>.sslip.io      → 백엔드 (원본: 공개 EC2의 HTTPS)
+#   s3.<IP>.sslip.io       → S3 (path-style)
+#   *.s3.<IP>.sslip.io     → S3 (virtual-host: presigned PUT, HeadObject)
+#   cdn.<IP>.sslip.io      → S3 의 <bucket>/<prefix>/ (원본: CloudFront. 오리진 경로 /chalkak)
+{
+	local_certs
+	auto_https disable_redirects
+	skip_install_trust
+	admin off
+	servers {
+		protocols h1 h2
+	}
+	log {
+		output stdout
+		format json
+	}
+}
+
+api.{$HOST_IP}.sslip.io {
+	tls internal
+	reverse_proxy backend:8080
+}
+
+# virtual-host 버킷 주소는 와일드카드 인증서 하나로 받는다. 호스트 헤더는 그대로 LocalStack 에 넘어간다.
+s3.{$HOST_IP}.sslip.io, *.s3.{$HOST_IP}.sslip.io {
+	tls internal
+	reverse_proxy aws:4566 {
+		# 큰 업로드도 그대로 흘려 보낸다.
+		flush_interval -1
+	}
+}
+
+# CloudFront 역할: 공개 이미지 URL = https://cdn.<IP>.sslip.io/<key without root prefix>.
+# 읽기 전용. 오리진 경로(/<bucket>/<prefix>)를 앞에 붙여 S3 로 보낸다.
+cdn.{$HOST_IP}.sslip.io {
+	tls internal
+	@write not method GET HEAD OPTIONS
+	respond @write 403
+	rewrite * /{$S3_BUCKET}/{$S3_PREFIX}{uri}
+	reverse_proxy aws:4566 {
+		header_up Host aws:4566
+	}
+}

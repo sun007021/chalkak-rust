@@ -211,9 +211,10 @@ fn notification_inbox_flow() {
                before_state, after_state, occurred_at, request_id) VALUES \
                ('{event}', '{admin}', 'POST_REJECTED', 'POST', '{post}', '사진 품질', \
                 '{{\"status\":\"PENDING\"}}', '{{\"status\":\"REJECTED\"}}', '2026-10-12T00:00:00Z', gen_random_uuid()); \
-             INSERT INTO notifications (id, user_id, post_id, event_key, type, title, body, rejection_reason, created_at) VALUES \
-               ('{notification}', '{USER}', '{post}', '{event}', 'POST_REJECTED', '게시물이 반려되었습니다.', \
-                '반려 사유를 확인해 주세요.', '사진 품질', '2026-10-12T01:00:00.5Z')"
+             INSERT INTO notifications (id, user_id, source_type, source_id, event_key, type, title, body, payload, \
+               created_at, sqs_publish_status) VALUES \
+               ('{notification}', '{USER}', 'POST', '{post}', '{event}', 'POST_REJECTED', '게시물이 반려되었습니다.', \
+                '반려 사유를 확인해 주세요.', '{{\"rejectionReason\":\"사진 품질\"}}', '2026-10-12T01:00:00.5Z', 'NOT_REQUIRED')"
         ))
         .unwrap();
     let h = handler(&db);
@@ -236,6 +237,7 @@ fn notification_inbox_flow() {
             "currentPage": 1, "pageSize": 20, "hasNext": false,
             "notifications": [{
                 "id": notification, "type": "POST_REJECTED",
+                "sourceType": "POST", "sourceId": post,
                 "title": "게시물이 반려되었습니다.", "body": "반려 사유를 확인해 주세요.",
                 "thumbnailImageUrl": "https://cdn.test.chalkak/posts/p1/thumbnail.webp",
                 "readAt": null, "createdAt": "2026-10-12T01:00:00.500Z"

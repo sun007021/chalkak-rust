@@ -1,8 +1,64 @@
 {
+  "db": {
+    "consumed_signup_tokens": [
+      "{\"expires_at\":\"<t+300s db +09:00>\",\"jti\":\"$uuid?\"}",
+      "{\"expires_at\":\"<t+300s db +09:00>\",\"jti\":\"$uuid?\"}"
+    ],
+    "social_accounts": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"id\":\"$uuid?\",\"provider\":\"GOOGLE\",\"subject_hmac\":\"0e6e70817327e369bb138bc60e8ef67b497381a238b7342bd25d2696708f9078\",\"user_id\":\"$uuid19\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"id\":\"$uuid?\",\"provider\":\"GOOGLE\",\"subject_hmac\":\"2c6520382455db61891071b317a3dff463416e6d20a96e3b20ca005c90984308\",\"user_id\":\"$uuid?\"}"
+    ],
+    "user_refresh_tokens": [
+      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t+0s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid5\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid4\"}",
+      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":\"<t+0s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid7\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid4\"}",
+      "{\"absolute_expires_at\":\"<t+7776000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"id\":\"$uuid?\",\"revoked_at\":null,\"rotated_at\":null,\"session_id\":\"$uuid20\",\"token_hash\":\"<opaque len=64>\",\"user_id\":\"$uuid19\"}"
+    ],
+    "users": [
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t+0s db +09:00>\",\"email\":\"withdrawn+$uuid4@chalkak.invalid\",\"id\":\"$uuid4\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"withdrawn/$uuid4\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t+0s db +09:00>\",\"email\":\"withdrawn+$uuid?@chalkak.invalid\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"withdrawn/$uuid?\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"BANNED\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"withdraw@example.com\",\"id\":\"$uuid19\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid17.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid17.png\",\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}"
+    ]
+  },
+  "fakes": [
+    {
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid2.png",
+      "method": "HEAD",
+      "service": "s3_head"
+    },
+    {
+      "detail": "test-bucket/chalkak/signatures/local/original/$uuid2.png",
+      "method": "HEAD",
+      "service": "s3_head"
+    },
+    {
+      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid2.png",
+      "method": "HEAD",
+      "service": "s3_head"
+    },
+    {
+      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid17.png",
+      "method": "HEAD",
+      "service": "s3_head"
+    },
+    {
+      "detail": "test-bucket/chalkak/signatures/local/original/$uuid17.png",
+      "method": "HEAD",
+      "service": "s3_head"
+    },
+    {
+      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid17.png",
+      "method": "HEAD",
+      "service": "s3_head"
+    }
+  ],
   "steps": [
     {
-      "step": "사인 업로드 URL 발급",
-      "status": 200,
+      "body": {
+        "expiresInSeconds": 300,
+        "signupToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"google-sub-withdraw\",\"aud\":\"chalkak-social-signup\",\"uploadId\":\"$uuid2\",\"purpose\":\"SOCIAL_SIGNUP\",\"provider\":\"GOOGLE\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\",\"email\":\"withdraw@example.com\"}>",
+        "uploadId": "$uuid2",
+        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid2.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>"
+      },
       "headers": [
         [
           "cache-control",
@@ -37,16 +93,17 @@
           "0"
         ]
       ],
-      "body": {
-        "uploadId": "$uuid2",
-        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid2.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
-        "expiresInSeconds": 300,
-        "signupToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"google-sub-withdraw\",\"aud\":\"chalkak-social-signup\",\"uploadId\":\"$uuid2\",\"purpose\":\"SOCIAL_SIGNUP\",\"provider\":\"GOOGLE\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\",\"email\":\"withdraw@example.com\"}>"
-      }
+      "status": 200,
+      "step": "사인 업로드 URL 발급"
     },
     {
-      "step": "가입 완료",
-      "status": 200,
+      "body": {
+        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid4\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"session_id\":\"$uuid5\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
+        "expiresIn": 900,
+        "refreshToken": "<opaque len=43>",
+        "refreshTokenExpiresIn": 2592000,
+        "userId": "$uuid4"
+      },
       "headers": [
         [
           "cache-control",
@@ -81,17 +138,18 @@
           "0"
         ]
       ],
-      "body": {
-        "userId": "$uuid4",
-        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid4\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
-        "expiresIn": 900,
-        "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000
-      }
+      "status": 200,
+      "step": "가입 완료"
     },
     {
-      "step": "다른 기기로 한 번 더 로그인",
-      "status": 200,
+      "body": {
+        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid4\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"session_id\":\"$uuid7\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
+        "expiresIn": 900,
+        "refreshToken": "<opaque len=43>",
+        "refreshTokenExpiresIn": 2592000,
+        "status": "LOGIN_SUCCESS",
+        "userId": "$uuid4"
+      },
       "headers": [
         [
           "cache-control",
@@ -119,25 +177,21 @@
         ],
         [
           "x-request-id",
-          "$uuid5"
+          "$uuid6"
         ],
         [
           "x-xss-protection",
           "0"
         ]
       ],
-      "body": {
-        "status": "LOGIN_SUCCESS",
-        "userId": "$uuid4",
-        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid4\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
-        "expiresIn": 900,
-        "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000
-      }
+      "status": 200,
+      "step": "다른 기기로 한 번 더 로그인"
     },
     {
-      "step": "토큰 없이 탈퇴하면 401",
-      "status": 401,
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -169,21 +223,21 @@
         ],
         [
           "x-request-id",
-          "$uuid6"
+          "$uuid8"
         ],
         [
           "x-xss-protection",
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      }
+      "status": 401,
+      "step": "토큰 없이 탈퇴하면 401"
     },
     {
-      "step": "관리자 토큰으로 탈퇴하면 403",
-      "status": 403,
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "접근 권한이 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -211,83 +265,6 @@
         ],
         [
           "x-request-id",
-          "$uuid7"
-        ],
-        [
-          "x-xss-protection",
-          "0"
-        ]
-      ],
-      "body": {
-        "errorCode": "FORBIDDEN",
-        "message": "접근 권한이 없습니다."
-      }
-    },
-    {
-      "step": "탈퇴",
-      "status": 204,
-      "headers": [
-        [
-          "cache-control",
-          "no-cache, no-store, max-age=0, must-revalidate"
-        ],
-        [
-          "expires",
-          "0"
-        ],
-        [
-          "pragma",
-          "no-cache"
-        ],
-        [
-          "x-content-type-options",
-          "nosniff"
-        ],
-        [
-          "x-frame-options",
-          "DENY"
-        ],
-        [
-          "x-request-id",
-          "$uuid8"
-        ],
-        [
-          "x-xss-protection",
-          "0"
-        ]
-      ],
-      "body": ""
-    },
-    {
-      "step": "탈퇴 뒤 사인 조회는 401",
-      "status": 401,
-      "headers": [
-        [
-          "cache-control",
-          "no-cache, no-store, max-age=0, must-revalidate"
-        ],
-        [
-          "content-type",
-          "application/json"
-        ],
-        [
-          "expires",
-          "0"
-        ],
-        [
-          "pragma",
-          "no-cache"
-        ],
-        [
-          "x-content-type-options",
-          "nosniff"
-        ],
-        [
-          "x-frame-options",
-          "DENY"
-        ],
-        [
-          "x-request-id",
           "$uuid9"
         ],
         [
@@ -295,22 +272,15 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      }
+      "status": 403,
+      "step": "관리자 토큰으로 탈퇴하면 403"
     },
     {
-      "step": "이미 탈퇴한 회원의 탈퇴는 401",
-      "status": 401,
+      "body": "",
       "headers": [
         [
           "cache-control",
           "no-cache, no-store, max-age=0, must-revalidate"
-        ],
-        [
-          "content-type",
-          "application/json"
         ],
         [
           "expires",
@@ -337,14 +307,14 @@
           "0"
         ]
       ],
+      "status": 204,
+      "step": "탈퇴"
+    },
+    {
       "body": {
         "errorCode": "UNAUTHORIZED",
         "message": "유효하지 않은 인증 정보입니다."
-      }
-    },
-    {
-      "step": "탈퇴 뒤 첫 기기의 리프레시 토큰은 폐기됨",
-      "status": 401,
+      },
       "headers": [
         [
           "cache-control",
@@ -379,14 +349,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "REAUTHENTICATION_REQUIRED",
-        "message": "다시 로그인해 주세요."
-      }
+      "status": 401,
+      "step": "탈퇴 뒤 사인 조회는 401"
     },
     {
-      "step": "탈퇴 뒤 다른 기기의 리프레시 토큰도 폐기됨",
-      "status": 401,
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -421,14 +391,14 @@
           "0"
         ]
       ],
+      "status": 401,
+      "step": "이미 탈퇴한 회원의 탈퇴는 401"
+    },
+    {
       "body": {
         "errorCode": "REAUTHENTICATION_REQUIRED",
         "message": "다시 로그인해 주세요."
-      }
-    },
-    {
-      "step": "탈퇴 뒤 같은 계정으로 로그인하면 가입이 필요하다",
-      "status": 200,
+      },
       "headers": [
         [
           "cache-control",
@@ -463,13 +433,14 @@
           "0"
         ]
       ],
-      "body": {
-        "status": "SIGN_UP_REQUIRED"
-      }
+      "status": 401,
+      "step": "탈퇴 뒤 첫 기기의 리프레시 토큰은 폐기됨"
     },
     {
-      "step": "탈퇴한 계정으로 다시 가입할 업로드 URL",
-      "status": 200,
+      "body": {
+        "errorCode": "REAUTHENTICATION_REQUIRED",
+        "message": "다시 로그인해 주세요."
+      },
       "headers": [
         [
           "cache-control",
@@ -504,16 +475,57 @@
           "0"
         ]
       ],
-      "body": {
-        "uploadId": "$uuid15",
-        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid15.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
-        "expiresInSeconds": 300,
-        "signupToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"google-sub-withdraw\",\"aud\":\"chalkak-social-signup\",\"uploadId\":\"$uuid15\",\"purpose\":\"SOCIAL_SIGNUP\",\"provider\":\"GOOGLE\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\",\"email\":\"withdraw@example.com\"}>"
-      }
+      "status": 401,
+      "step": "탈퇴 뒤 다른 기기의 리프레시 토큰도 폐기됨"
     },
     {
-      "step": "재가입",
+      "body": {
+        "status": "SIGN_UP_REQUIRED"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid15"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
       "status": 200,
+      "step": "탈퇴 뒤 같은 계정으로 로그인하면 가입이 필요하다"
+    },
+    {
+      "body": {
+        "expiresInSeconds": 300,
+        "signupToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"google-sub-withdraw\",\"aud\":\"chalkak-social-signup\",\"uploadId\":\"$uuid17\",\"purpose\":\"SOCIAL_SIGNUP\",\"provider\":\"GOOGLE\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\",\"email\":\"withdraw@example.com\"}>",
+        "uploadId": "$uuid17",
+        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/signatures/$uuid17.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>"
+      },
       "headers": [
         [
           "cache-control",
@@ -548,21 +560,25 @@
           "0"
         ]
       ],
-      "body": {
-        "userId": "$uuid17",
-        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid17\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
-        "expiresIn": 900,
-        "refreshToken": "<opaque len=43>",
-        "refreshTokenExpiresIn": 2592000
-      }
+      "status": 200,
+      "step": "탈퇴한 계정으로 다시 가입할 업로드 URL"
     },
     {
-      "step": "정지 회원도 탈퇴할 수 있다",
-      "status": 204,
+      "body": {
+        "accessToken": "<jwt {\"typ\":\"JWT\",\"alg\":\"HS256\"} {\"sub\":\"$uuid19\",\"aud\":\"chalkak-access\",\"purpose\":\"ACCESS\",\"scope\":\"USER\",\"iss\":\"chalkak-backend\",\"session_id\":\"$uuid20\",\"exp\":\"<t+900s epoch>\",\"iat\":\"<t+0s epoch>\",\"jti\":\"<opaque len=36>\"}>",
+        "expiresIn": 900,
+        "refreshToken": "<opaque len=43>",
+        "refreshTokenExpiresIn": 2592000,
+        "userId": "$uuid19"
+      },
       "headers": [
         [
           "cache-control",
           "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
         ],
         [
           "expires",
@@ -589,19 +605,15 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 200,
+      "step": "재가입"
     },
     {
-      "step": "정지 회원이 탈퇴해도 소셜 계정 연결은 남아 로그인할 수 없다",
-      "status": 403,
+      "body": "",
       "headers": [
         [
           "cache-control",
           "no-cache, no-store, max-age=0, must-revalidate"
-        ],
-        [
-          "content-type",
-          "application/json"
         ],
         [
           "expires",
@@ -621,21 +633,21 @@
         ],
         [
           "x-request-id",
-          "$uuid19"
+          "$uuid21"
         ],
         [
           "x-xss-protection",
           "0"
         ]
       ],
+      "status": 204,
+      "step": "정지 회원도 탈퇴할 수 있다"
+    },
+    {
       "body": {
         "errorCode": "FORBIDDEN",
         "message": "탈퇴한 차단 소셜 계정입니다."
-      }
-    },
-    {
-      "step": "정지 회원의 소셜 계정으로 업로드 URL을 받을 수 없다",
-      "status": 403,
+      },
       "headers": [
         [
           "cache-control",
@@ -663,69 +675,57 @@
         ],
         [
           "x-request-id",
-          "$uuid20"
+          "$uuid22"
         ],
         [
           "x-xss-protection",
           "0"
         ]
       ],
+      "status": 403,
+      "step": "정지 회원이 탈퇴해도 소셜 계정 연결은 남아 로그인할 수 없다"
+    },
+    {
       "body": {
         "errorCode": "FORBIDDEN",
         "message": "차단된 소셜 계정입니다."
-      }
-    }
-  ],
-  "db": {
-    "consumed_signup_tokens": [
-      "{\"jti\":\"$uuid?\",\"expires_at\":\"<t+300s db +09:00>\"}",
-      "{\"jti\":\"$uuid?\",\"expires_at\":\"<t+300s db +09:00>\"}"
-    ],
-    "social_accounts": [
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid17\",\"provider\":\"GOOGLE\",\"created_at\":\"<t+0s db +09:00>\",\"subject_hmac\":\"0e6e70817327e369bb138bc60e8ef67b497381a238b7342bd25d2696708f9078\"}",
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid?\",\"provider\":\"GOOGLE\",\"created_at\":\"<t+0s db +09:00>\",\"subject_hmac\":\"2c6520382455db61891071b317a3dff463416e6d20a96e3b20ca005c90984308\"}"
-    ],
-    "user_refresh_tokens": [
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid17\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"revoked_at\":null,\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid4\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"revoked_at\":\"<t+0s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"user_id\":\"$uuid4\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+2592000s db +09:00>\",\"revoked_at\":\"<t+0s db +09:00>\",\"rotated_at\":null,\"session_id\":\"$uuid?\",\"token_hash\":\"<opaque len=64>\",\"absolute_expires_at\":\"<t+7776000s db +09:00>\"}"
-    ],
-    "users": [
-      "{\"id\":\"$uuid17\",\"email\":\"withdraw@example.com\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/local/original/$uuid15.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/local/thumbnail/$uuid15.png\"}",
-      "{\"id\":\"$uuid4\",\"email\":\"withdrawn+$uuid4@chalkak.invalid\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t+0s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"withdrawn/$uuid4\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}",
-      "{\"id\":\"$uuid?\",\"email\":\"withdrawn+$uuid?@chalkak.invalid\",\"status\":\"BANNED\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t+0s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"withdrawn/$uuid?\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}"
-    ]
-  },
-  "fakes": [
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid2.png"
-    },
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/signatures/local/original/$uuid2.png"
-    },
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid2.png"
-    },
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/staging/local/signatures/$uuid15.png"
-    },
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/signatures/local/original/$uuid15.png"
-    },
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/signatures/local/thumbnail/$uuid15.png"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid23"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 403,
+      "step": "정지 회원의 소셜 계정으로 업로드 URL을 받을 수 없다"
     }
   ]
 }

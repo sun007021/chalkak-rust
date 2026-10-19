@@ -109,9 +109,9 @@ fn applies_all_repository_migrations_to_an_empty_database() {
         .unwrap()
         .migrate(&mut client)
         .unwrap();
-    assert_eq!(report.applied.len(), 28);
+    assert_eq!(report.applied.len(), 45);
     let rows = rust_history(&mut client);
-    assert_eq!(rows.len(), 28);
+    assert_eq!(rows.len(), 45);
     for (i, row) in rows.iter().enumerate() {
         assert_eq!(row.installed_rank, i as i32 + 1);
         assert_eq!(row.kind, "SQL");
@@ -123,6 +123,7 @@ fn applies_all_repository_migrations_to_an_empty_database() {
     assert_eq!(rows[0].description, "create initial schema");
     assert_eq!(rows[0].checksum, Some(-62292960));
     assert_eq!(rows[27].checksum, Some(-1538072671));
+    assert_eq!(rows[44].checksum, Some(827061213));
     assert!(table_exists(&mut client, "notifications"));
 }
 

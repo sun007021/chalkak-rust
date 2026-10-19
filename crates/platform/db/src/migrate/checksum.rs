@@ -143,10 +143,10 @@ mod tests {
         );
     }
 
-    /// 근거: Java(Flyway)가 pg-java-a에 적용한 `flyway_schema_history.checksum` 28건.
+    /// 근거: Java(Flyway)가 pg-java-a에 적용한 `flyway_schema_history.checksum` 45건.
     /// `select script, checksum from flyway_schema_history order by installed_rank`의 결과를
     /// 그대로 고정했다. `migrations/` 파일은 원본과 바이트 동일해야 하므로 값이 바뀌면 안 된다.
-    const JAVA_FLYWAY_CHECKSUMS: [(&str, i32); 28] = [
+    const JAVA_FLYWAY_CHECKSUMS: [(&str, i32); 45] = [
         ("V202608191752__create_initial_schema.sql", -62292960),
         ("V202608202034__change_id_default_to_uuidv7.sql", 176110968),
         ("V202608211402__apply_soft_delete.sql", 1877203511),
@@ -220,6 +220,41 @@ mod tests {
             748777606,
         ),
         ("V202609291510__create_notifications.sql", -1538072671),
+        ("V202609301100__add_user_push_preferences.sql", 1061336191),
+        ("V202609301400__create_push_devices.sql", 1610206721),
+        (
+            "V202610061630__generalize_notification_sources.sql",
+            -911252264,
+        ),
+        (
+            "V202610062030__add_notification_sqs_publish_state.sql",
+            -550379768,
+        ),
+        (
+            "V202610062100__index_pending_notification_publication.sql",
+            -1116872963,
+        ),
+        ("V202610082110__create_topic_push_schedules.sql", -659322974),
+        (
+            "V202610111430__add_topic_push_schedule_audit_types.sql",
+            -1289978451,
+        ),
+        (
+            "V202610111431__allow_topic_push_schedule_audit_target.sql",
+            -1761396682,
+        ),
+        ("V202610121500__create_notices.sql", -824524522),
+        ("V202610121501__add_notice_audit_types.sql", -1520691758),
+        ("V202610121502__allow_notice_audit_target.sql", 615274859),
+        ("V202610131000__add_notice_distribution.sql", -1075364795),
+        ("V202610141600__add_notice_update_audit_type.sql", -75015388),
+        ("V202610141601__allow_notice_update_audit.sql", -483248610),
+        ("V202610141700__add_notice_deleted_at.sql", 101982600),
+        (
+            "V202610141701__add_notice_delete_audit_type.sql",
+            -602325464,
+        ),
+        ("V202610141702__allow_notice_delete_audit.sql", 827061213),
     ];
 
     #[test]

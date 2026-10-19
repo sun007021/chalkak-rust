@@ -1,8 +1,75 @@
 {
+  "db": {
+    "photos": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{\"width\":1},\"original_storage_key\":\"chalkak/posts/local/original/$uuid?.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/$uuid?.webp\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ],
+    "post_image_uploads": [
+      "{\"claimed_at\":\"<t+0s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"id\":\"$uuid?\",\"image_metadata\":{\"width\":1},\"rejection_reason\":null,\"status\":\"READY\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"claimed_at\":\"<t-3600s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"id\":\"$uuid?\",\"image_metadata\":{\"width\":1},\"rejection_reason\":null,\"status\":\"READY\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"claimed_at\":null,\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+3600s db +09:00>\",\"id\":\"$uuid28\",\"image_metadata\":null,\"rejection_reason\":null,\"status\":\"ISSUED\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"claimed_at\":null,\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"id\":\"$uuid29\",\"image_metadata\":null,\"rejection_reason\":\"BAD\",\"status\":\"REJECTED\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"claimed_at\":null,\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"id\":\"$uuid31\",\"image_metadata\":null,\"rejection_reason\":null,\"status\":\"ISSUED\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"claimed_at\":null,\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"id\":\"$uuid?\",\"image_metadata\":{\"width\":1},\"rejection_reason\":null,\"status\":\"READY\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"claimed_at\":null,\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t-5s db +09:00>\",\"id\":\"$uuid30\",\"image_metadata\":null,\"rejection_reason\":null,\"status\":\"ISSUED\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"claimed_at\":null,\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t-5s db +09:00>\",\"id\":\"$uuid?\",\"image_metadata\":{\"width\":1},\"rejection_reason\":null,\"status\":\"READY\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}"
+    ],
+    "posts": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid24\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":\"$uuid?\",\"title\":null,\"topic_id\":\"$uuid?\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}"
+    ],
+    "topics": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t+140400s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t+54000s db +09:00>\",\"title\":\"내일\",\"topic_date\":\"2026-10-13\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t+54000s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-32400s db +09:00>\",\"title\":\"오늘\",\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t-32400s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-118800s db +09:00>\",\"title\":\"어제\",\"topic_date\":\"2026-10-11\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ],
+    "users": [
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"banned@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u9/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"BANNED\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"u1@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u1/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"u2@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u2/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}"
+    ]
+  },
+  "fakes": [
+    {
+      "detail": "test-bucket/chalkak/staging/local/posts/$uuid29.webp",
+      "method": "HEAD",
+      "service": "s3_head"
+    },
+    {
+      "detail": "test-bucket/chalkak/staging/local/posts/$uuid30.webp",
+      "method": "HEAD",
+      "service": "s3_head"
+    },
+    {
+      "detail": "test-bucket/chalkak/staging/local/posts/$uuid31.webp",
+      "method": "HEAD",
+      "service": "s3_head"
+    },
+    {
+      "detail": "test-bucket/chalkak/staging/local/posts/$uuid31.webp",
+      "method": "HEAD",
+      "service": "s3_head"
+    },
+    {
+      "detail": "test-bucket/chalkak/staging/local/posts/$uuid31.webp",
+      "method": "HEAD",
+      "service": "s3_head"
+    },
+    {
+      "detail": "test-bucket/chalkak/staging/local/posts/$uuid31.webp",
+      "method": "HEAD",
+      "service": "s3_head"
+    },
+    {
+      "detail": "test-bucket/chalkak/staging/local/posts/$uuid31.webp",
+      "method": "HEAD",
+      "service": "s3_head"
+    }
+  ],
   "steps": [
     {
-      "step": "인증 없음",
-      "status": 401,
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -41,14 +108,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      }
+      "status": 401,
+      "step": "인증 없음"
     },
     {
-      "step": "차단된 회원",
-      "status": 403,
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "차단된 회원입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -83,14 +150,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "FORBIDDEN",
-        "message": "차단된 회원입니다."
-      }
+      "status": 403,
+      "step": "차단된 회원"
     },
     {
-      "step": "없는 회원",
-      "status": 401,
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -125,14 +192,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      }
+      "status": 401,
+      "step": "없는 회원"
     },
     {
-      "step": "없는 주제",
-      "status": 404,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "게시물을 작성할 주제를 찾을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -167,14 +234,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "게시물을 작성할 주제를 찾을 수 없습니다."
-      }
+      "status": 404,
+      "step": "없는 주제"
     },
     {
-      "step": "마감된 주제",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "현재 게시물을 작성할 수 없는 주제입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -209,14 +276,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "마감된 주제"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "현재 게시물을 작성할 수 없는 주제입니다."
-      }
-    },
-    {
-      "step": "시작 전 주제",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -251,14 +318,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "현재 게시물을 작성할 수 없는 주제입니다."
-      }
+      "status": 400,
+      "step": "시작 전 주제"
     },
     {
-      "step": "없는 업로드",
-      "status": 404,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "업로드한 사진을 찾을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -293,14 +360,14 @@
           "0"
         ]
       ],
+      "status": 404,
+      "step": "없는 업로드"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "업로드한 사진을 찾을 수 없습니다."
-      }
-    },
-    {
-      "step": "다른 회원의 업로드",
-      "status": 404,
+      },
       "headers": [
         [
           "cache-control",
@@ -335,14 +402,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "업로드한 사진을 찾을 수 없습니다."
-      }
+      "status": 404,
+      "step": "다른 회원의 업로드"
     },
     {
-      "step": "이미 사용한 업로드",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미 사용된 사진입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -377,14 +444,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미 사용된 사진입니다."
-      }
+      "status": 400,
+      "step": "이미 사용한 업로드"
     },
     {
-      "step": "반려된 업로드",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "처리할 수 없는 사진입니다. 다시 업로드해 주세요."
+      },
       "headers": [
         [
           "cache-control",
@@ -419,14 +486,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "처리할 수 없는 사진입니다. 다시 업로드해 주세요."
-      }
+      "status": 400,
+      "step": "반려된 업로드"
     },
     {
-      "step": "claim 기한이 지난 업로드",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "사진 업로드 유효 시간이 지났습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -461,14 +528,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "claim 기한이 지난 업로드"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "사진 업로드 유효 시간이 지났습니다."
-      }
-    },
-    {
-      "step": "claim 기한이 지난 미처리 업로드",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -503,14 +570,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "사진 업로드 유효 시간이 지났습니다."
-      }
+      "status": 400,
+      "step": "claim 기한이 지난 미처리 업로드"
     },
     {
-      "step": "S3가 403이면 사진이 없는 것으로 본다",
-      "status": 404,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "업로드한 사진을 찾을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -545,14 +612,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "업로드한 사진을 찾을 수 없습니다."
-      }
+      "status": 404,
+      "step": "S3가 403이면 사진이 없는 것으로 본다"
     },
     {
-      "step": "S3 확인이 5xx면 서버 오류",
-      "status": 500,
+      "body": {
+        "errorCode": "INTERNAL_ERROR",
+        "message": "서버에서 요청을 처리하지 못했습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -587,14 +654,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "INTERNAL_ERROR",
-        "message": "서버에서 요청을 처리하지 못했습니다."
-      }
+      "status": 500,
+      "step": "S3 확인이 5xx면 서버 오류"
     },
     {
-      "step": "본문 없음",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -629,14 +696,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "본문 없음"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
-    },
-    {
-      "step": "깨진 JSON",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -671,14 +738,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
+      "status": 400,
+      "step": "깨진 JSON"
     },
     {
-      "step": "주제 누락",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제 정보가 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -713,14 +780,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "주제 정보가 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "주제 누락"
     },
     {
-      "step": "업로드 누락",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "사진 업로드 정보가 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -755,14 +822,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "사진 업로드 정보가 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "업로드 누락"
     },
     {
-      "step": "제목이 10자를 넘는다",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "제목은 10자 이하여야 합니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -797,14 +864,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "제목은 10자 이하여야 합니다."
-      }
+      "status": 400,
+      "step": "제목이 10자를 넘는다"
     },
     {
-      "step": "잘못된 UUID 형식",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -839,14 +906,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "잘못된 UUID 형식"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
-    },
-    {
-      "step": "UUID가 아닌 값 타입",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -881,14 +948,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "UUID가 아닌 값 타입"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
-    },
-    {
-      "step": "JSON 배열 본문",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -923,14 +990,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
-      }
+      "status": 400,
+      "step": "JSON 배열 본문"
     },
     {
-      "step": "제목이 공백이면 비어 있는 제목으로 작성된다",
-      "status": 201,
+      "body": {
+        "moderationStatus": "PENDING",
+        "postId": "$uuid24"
+      },
       "headers": [
         [
           "cache-control",
@@ -965,14 +1032,14 @@
           "0"
         ]
       ],
-      "body": {
-        "postId": "$uuid24",
-        "moderationStatus": "PENDING"
-      }
+      "status": 201,
+      "step": "제목이 공백이면 비어 있는 제목으로 작성된다"
     },
     {
-      "step": "업로드 URL 발급은 인증이 필요하다",
-      "status": 401,
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1011,14 +1078,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      }
+      "status": 401,
+      "step": "업로드 URL 발급은 인증이 필요하다"
     },
     {
-      "step": "차단된 회원은 업로드를 못 받는다",
-      "status": 403,
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "차단된 회원입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1053,14 +1120,17 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "FORBIDDEN",
-        "message": "차단된 회원입니다."
-      }
+      "status": 403,
+      "step": "차단된 회원은 업로드를 못 받는다"
     },
     {
-      "step": "업로드 URL 발급에 본문이 있어도 된다",
-      "status": 200,
+      "body": {
+        "contentType": "image/webp",
+        "expiresInSeconds": 300,
+        "maxBytes": 5242880,
+        "uploadId": "$uuid28",
+        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/posts/$uuid28.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>"
+      },
       "headers": [
         [
           "cache-control",
@@ -1095,78 +1165,8 @@
           "0"
         ]
       ],
-      "body": {
-        "uploadId": "$uuid28",
-        "uploadUrl": "http://test-bucket.fakes:9000/chalkak/staging/local/posts/$uuid28.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=<t+0s amzdate>&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Credential=AKIAHARNESSTEST00000%2F20261012%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=300&X-Amz-Signature=<sigv4 len=64>",
-        "expiresInSeconds": 300,
-        "contentType": "image/webp",
-        "maxBytes": 5242880
-      }
-    }
-  ],
-  "db": {
-    "photos": [
-      "{\"id\":\"$uuid?\",\"metadata\":{\"width\":1},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/$uuid?.webp\",\"thumbnail_storage_key\":\"chalkak/posts/local/thumbnail/$uuid?.webp\"}"
-    ],
-    "post_image_uploads": [
-      "{\"id\":\"$uuid28\",\"status\":\"ISSUED\",\"user_id\":\"$uuid?\",\"claimed_at\":null,\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+3600s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"image_metadata\":null,\"rejection_reason\":null}",
-      "{\"id\":\"$uuid29\",\"status\":\"REJECTED\",\"user_id\":\"$uuid?\",\"claimed_at\":null,\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"image_metadata\":null,\"rejection_reason\":\"BAD\"}",
-      "{\"id\":\"$uuid30\",\"status\":\"ISSUED\",\"user_id\":\"$uuid?\",\"claimed_at\":null,\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t-5s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"image_metadata\":null,\"rejection_reason\":null}",
-      "{\"id\":\"$uuid31\",\"status\":\"ISSUED\",\"user_id\":\"$uuid?\",\"claimed_at\":null,\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"image_metadata\":null,\"rejection_reason\":null}",
-      "{\"id\":\"$uuid?\",\"status\":\"READY\",\"user_id\":\"$uuid?\",\"claimed_at\":\"<t+0s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"image_metadata\":{\"width\":1},\"rejection_reason\":null}",
-      "{\"id\":\"$uuid?\",\"status\":\"READY\",\"user_id\":\"$uuid?\",\"claimed_at\":\"<t-3600s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"image_metadata\":{\"width\":1},\"rejection_reason\":null}",
-      "{\"id\":\"$uuid?\",\"status\":\"READY\",\"user_id\":\"$uuid?\",\"claimed_at\":null,\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"image_metadata\":{\"width\":1},\"rejection_reason\":null}",
-      "{\"id\":\"$uuid?\",\"status\":\"READY\",\"user_id\":\"$uuid?\",\"claimed_at\":null,\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t-5s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"image_metadata\":{\"width\":1},\"rejection_reason\":null}"
-    ],
-    "posts": [
-      "{\"id\":\"$uuid24\",\"title\":null,\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":\"$uuid?\"}"
-    ],
-    "topics": [
-      "{\"id\":\"$uuid?\",\"title\":\"내일\",\"ends_at\":\"<t+140400s db +09:00>\",\"starts_at\":\"<t+54000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-13\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"title\":\"어제\",\"ends_at\":\"<t-32400s db +09:00>\",\"starts_at\":\"<t-118800s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-11\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"title\":\"오늘\",\"ends_at\":\"<t+54000s db +09:00>\",\"starts_at\":\"<t-32400s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t+0s db +09:00>\"}"
-    ],
-    "users": [
-      "{\"id\":\"$uuid?\",\"email\":\"banned@test.chalkak\",\"status\":\"BANNED\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u9/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}",
-      "{\"id\":\"$uuid?\",\"email\":\"u1@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u1/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}",
-      "{\"id\":\"$uuid?\",\"email\":\"u2@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u2/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}"
-    ]
-  },
-  "fakes": [
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/staging/local/posts/$uuid29.webp"
-    },
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/staging/local/posts/$uuid30.webp"
-    },
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/staging/local/posts/$uuid31.webp"
-    },
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/staging/local/posts/$uuid31.webp"
-    },
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/staging/local/posts/$uuid31.webp"
-    },
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/staging/local/posts/$uuid31.webp"
-    },
-    {
-      "service": "s3_head",
-      "method": "HEAD",
-      "detail": "test-bucket/chalkak/staging/local/posts/$uuid31.webp"
+      "status": 200,
+      "step": "업로드 URL 발급에 본문이 있어도 된다"
     }
   ]
 }

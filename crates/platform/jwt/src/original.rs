@@ -35,10 +35,12 @@ pub struct AccessTokenClaims<'a> {
     pub jti: &'a str,
     /// `USER` 또는 `ADMIN`.
     pub scope: &'a str,
+    /// 회원 로그인 세션(리프레시 토큰 계보) 식별자. 없으면 클레임 자체를 넣지 않는다(관리자 토큰).
+    pub session_id: Option<&'a str>,
 }
 
 impl AccessTokenClaims<'_> {
-    /// 순서: sub, aud, purpose, scope, iss, exp, iat, jti. `aud`는 값이 하나라 문자열로 나간다.
+    /// 순서: sub, aud, purpose, scope, iss, (session_id), exp, iat, jti. `aud`는 값이 하나라 문자열로 나간다.
     pub fn to_value(&self) -> Value {
         let mut m = Map::new();
         m.insert("sub".into(), self.subject.into());
@@ -46,6 +48,9 @@ impl AccessTokenClaims<'_> {
         m.insert("purpose".into(), "ACCESS".into());
         m.insert("scope".into(), self.scope.into());
         m.insert("iss".into(), self.issuer.into());
+        if let Some(session_id) = self.session_id {
+            m.insert("session_id".into(), session_id.into());
+        }
         m.insert("exp".into(), self.expires_at.into());
         m.insert("iat".into(), self.issued_at.into());
         m.insert("jti".into(), self.jti.into());

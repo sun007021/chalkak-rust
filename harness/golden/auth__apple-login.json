@@ -1,8 +1,113 @@
 {
+  "db": {
+    "pending_apple_authorizations": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"encrypted_refresh_token\":\"<opaque len=60>\",\"expires_at\":\"<t+900s db +09:00>\",\"id\":\"$uuid?\",\"subject_hmac\":\"1e0ac227ed3a1a352f216ab0ba02d1e5ff6b445c1b0635ba386a8b2c2db97994\"}"
+    ]
+  },
+  "fakes": [
+    {
+      "body": {
+        "client_id": "test-apple-client-id",
+        "client_secret": "<jwt {\"kid\":\"test-key-id\",\"alg\":\"ES256\"} {\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\",\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\"}>",
+        "code": "code-1",
+        "grant_type": "authorization_code"
+      },
+      "contentType": "application/x-www-form-urlencoded",
+      "method": "POST",
+      "path": "/apple/auth/token",
+      "service": "apple_token"
+    },
+    {
+      "body": {
+        "client_id": "test-apple-client-id",
+        "client_secret": "<jwt {\"kid\":\"test-key-id\",\"alg\":\"ES256\"} {\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\",\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\"}>",
+        "code": "code-3",
+        "grant_type": "authorization_code"
+      },
+      "contentType": "application/x-www-form-urlencoded",
+      "method": "POST",
+      "path": "/apple/auth/token",
+      "service": "apple_token"
+    },
+    {
+      "body": {
+        "client_id": "test-apple-client-id",
+        "client_secret": "<jwt {\"kid\":\"test-key-id\",\"alg\":\"ES256\"} {\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\",\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\"}>",
+        "code": "code-3b",
+        "grant_type": "authorization_code"
+      },
+      "contentType": "application/x-www-form-urlencoded",
+      "method": "POST",
+      "path": "/apple/auth/token",
+      "service": "apple_token"
+    },
+    {
+      "body": {
+        "client_id": "test-apple-client-id",
+        "client_secret": "<jwt {\"kid\":\"test-key-id\",\"alg\":\"ES256\"} {\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\",\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\"}>",
+        "code": "code-4",
+        "grant_type": "authorization_code"
+      },
+      "contentType": "application/x-www-form-urlencoded",
+      "method": "POST",
+      "path": "/apple/auth/token",
+      "service": "apple_token"
+    },
+    {
+      "body": {
+        "client_id": "test-apple-client-id",
+        "client_secret": "<jwt {\"kid\":\"test-key-id\",\"alg\":\"ES256\"} {\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\",\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\"}>",
+        "code": "code-5",
+        "grant_type": "authorization_code"
+      },
+      "contentType": "application/x-www-form-urlencoded",
+      "method": "POST",
+      "path": "/apple/auth/token",
+      "service": "apple_token"
+    },
+    {
+      "body": {
+        "client_id": "test-apple-client-id",
+        "client_secret": "<jwt {\"kid\":\"test-key-id\",\"alg\":\"ES256\"} {\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\",\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\"}>",
+        "code": "code-6",
+        "grant_type": "authorization_code"
+      },
+      "contentType": "application/x-www-form-urlencoded",
+      "method": "POST",
+      "path": "/apple/auth/token",
+      "service": "apple_token"
+    },
+    {
+      "body": {
+        "client_id": "test-apple-client-id",
+        "client_secret": "<jwt {\"kid\":\"test-key-id\",\"alg\":\"ES256\"} {\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\",\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\"}>",
+        "code": "code-7",
+        "grant_type": "authorization_code"
+      },
+      "contentType": "application/x-www-form-urlencoded",
+      "method": "POST",
+      "path": "/apple/auth/token",
+      "service": "apple_token"
+    },
+    {
+      "body": {
+        "client_id": "test-apple-client-id",
+        "client_secret": "<jwt {\"kid\":\"test-key-id\",\"alg\":\"ES256\"} {\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\",\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\"}>",
+        "code": "code-8",
+        "grant_type": "authorization_code"
+      },
+      "contentType": "application/x-www-form-urlencoded",
+      "method": "POST",
+      "path": "/apple/auth/token",
+      "service": "apple_token"
+    }
+  ],
   "steps": [
     {
-      "step": "authorizationCode 없이 Apple 로그인",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "Authorization Code는 APPLE 로그인에만 필요합니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -37,14 +142,13 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "Authorization Code는 APPLE 로그인에만 필요합니다."
-      }
+      "status": 400,
+      "step": "authorizationCode 없이 Apple 로그인"
     },
     {
-      "step": "신규 Apple 회원은 code를 교환하고 미가입으로 응답",
-      "status": 200,
+      "body": {
+        "status": "SIGN_UP_REQUIRED"
+      },
       "headers": [
         [
           "cache-control",
@@ -79,13 +183,13 @@
           "0"
         ]
       ],
-      "body": {
-        "status": "SIGN_UP_REQUIRED"
-      }
+      "status": 200,
+      "step": "신규 Apple 회원은 code를 교환하고 미가입으로 응답"
     },
     {
-      "step": "임시 보관분이 있으면 다시 교환하지 않는다",
-      "status": 200,
+      "body": {
+        "status": "SIGN_UP_REQUIRED"
+      },
       "headers": [
         [
           "cache-control",
@@ -120,13 +224,14 @@
           "0"
         ]
       ],
-      "body": {
-        "status": "SIGN_UP_REQUIRED"
-      }
+      "status": 200,
+      "step": "임시 보관분이 있으면 다시 교환하지 않는다"
     },
     {
-      "step": "교환한 ID Token의 사용자가 다르면 거절",
-      "status": 401,
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "Apple 로그인 사용자 정보가 일치하지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -161,14 +266,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "Apple 로그인 사용자 정보가 일치하지 않습니다."
-      }
+      "status": 401,
+      "step": "교환한 ID Token의 사용자가 다르면 거절"
     },
     {
-      "step": "교환한 ID Token의 nonce가 다르면 거절",
-      "status": 401,
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "APPLE ID Token nonce가 일치하지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -203,14 +308,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "APPLE ID Token nonce가 일치하지 않습니다."
-      }
+      "status": 401,
+      "step": "교환한 ID Token의 nonce가 다르면 거절"
     },
     {
-      "step": "만료되었거나 사용된 code (invalid_grant)",
-      "status": 401,
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "만료되었거나 이미 사용된 Apple authorizationCode입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -245,14 +350,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "만료되었거나 이미 사용된 Apple authorizationCode입니다."
-      }
+      "status": 401,
+      "step": "만료되었거나 사용된 code (invalid_grant)"
     },
     {
-      "step": "그 밖의 400 (invalid_client)",
-      "status": 500,
+      "body": {
+        "errorCode": "INTERNAL_ERROR",
+        "message": "서버에서 요청을 처리하지 못했습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -287,14 +392,14 @@
           "0"
         ]
       ],
+      "status": 500,
+      "step": "그 밖의 400 (invalid_client)"
+    },
+    {
       "body": {
         "errorCode": "INTERNAL_ERROR",
         "message": "서버에서 요청을 처리하지 못했습니다."
-      }
-    },
-    {
-      "step": "Apple 서버 오류",
-      "status": 500,
+      },
       "headers": [
         [
           "cache-control",
@@ -329,14 +434,14 @@
           "0"
         ]
       ],
+      "status": 500,
+      "step": "Apple 서버 오류"
+    },
+    {
       "body": {
         "errorCode": "INTERNAL_ERROR",
         "message": "서버에서 요청을 처리하지 못했습니다."
-      }
-    },
-    {
-      "step": "교환 응답에 refresh_token이 없음",
-      "status": 500,
+      },
       "headers": [
         [
           "cache-control",
@@ -371,14 +476,14 @@
           "0"
         ]
       ],
+      "status": 500,
+      "step": "교환 응답에 refresh_token이 없음"
+    },
+    {
       "body": {
         "errorCode": "INTERNAL_ERROR",
         "message": "서버에서 요청을 처리하지 못했습니다."
-      }
-    },
-    {
-      "step": "token_type이 bearer가 아님",
-      "status": 500,
+      },
       "headers": [
         [
           "cache-control",
@@ -413,113 +518,8 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "INTERNAL_ERROR",
-        "message": "서버에서 요청을 처리하지 못했습니다."
-      }
-    }
-  ],
-  "db": {
-    "pending_apple_authorizations": [
-      "{\"id\":\"$uuid?\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+900s db +09:00>\",\"subject_hmac\":\"1e0ac227ed3a1a352f216ab0ba02d1e5ff6b445c1b0635ba386a8b2c2db97994\",\"encrypted_refresh_token\":\"<opaque len=60>\"}"
-    ]
-  },
-  "fakes": [
-    {
-      "service": "apple_token",
-      "method": "POST",
-      "path": "/apple/auth/token",
-      "contentType": "application/x-www-form-urlencoded",
-      "body": {
-        "client_id": "test-apple-client-id",
-        "client_secret": "<jwt {\"kid\":\"test-key-id\",\"alg\":\"ES256\"} {\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\",\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\"}>",
-        "code": "code-1",
-        "grant_type": "authorization_code"
-      }
-    },
-    {
-      "service": "apple_token",
-      "method": "POST",
-      "path": "/apple/auth/token",
-      "contentType": "application/x-www-form-urlencoded",
-      "body": {
-        "client_id": "test-apple-client-id",
-        "client_secret": "<jwt {\"kid\":\"test-key-id\",\"alg\":\"ES256\"} {\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\",\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\"}>",
-        "code": "code-3",
-        "grant_type": "authorization_code"
-      }
-    },
-    {
-      "service": "apple_token",
-      "method": "POST",
-      "path": "/apple/auth/token",
-      "contentType": "application/x-www-form-urlencoded",
-      "body": {
-        "client_id": "test-apple-client-id",
-        "client_secret": "<jwt {\"kid\":\"test-key-id\",\"alg\":\"ES256\"} {\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\",\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\"}>",
-        "code": "code-3b",
-        "grant_type": "authorization_code"
-      }
-    },
-    {
-      "service": "apple_token",
-      "method": "POST",
-      "path": "/apple/auth/token",
-      "contentType": "application/x-www-form-urlencoded",
-      "body": {
-        "client_id": "test-apple-client-id",
-        "client_secret": "<jwt {\"kid\":\"test-key-id\",\"alg\":\"ES256\"} {\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\",\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\"}>",
-        "code": "code-4",
-        "grant_type": "authorization_code"
-      }
-    },
-    {
-      "service": "apple_token",
-      "method": "POST",
-      "path": "/apple/auth/token",
-      "contentType": "application/x-www-form-urlencoded",
-      "body": {
-        "client_id": "test-apple-client-id",
-        "client_secret": "<jwt {\"kid\":\"test-key-id\",\"alg\":\"ES256\"} {\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\",\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\"}>",
-        "code": "code-5",
-        "grant_type": "authorization_code"
-      }
-    },
-    {
-      "service": "apple_token",
-      "method": "POST",
-      "path": "/apple/auth/token",
-      "contentType": "application/x-www-form-urlencoded",
-      "body": {
-        "client_id": "test-apple-client-id",
-        "client_secret": "<jwt {\"kid\":\"test-key-id\",\"alg\":\"ES256\"} {\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\",\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\"}>",
-        "code": "code-6",
-        "grant_type": "authorization_code"
-      }
-    },
-    {
-      "service": "apple_token",
-      "method": "POST",
-      "path": "/apple/auth/token",
-      "contentType": "application/x-www-form-urlencoded",
-      "body": {
-        "client_id": "test-apple-client-id",
-        "client_secret": "<jwt {\"kid\":\"test-key-id\",\"alg\":\"ES256\"} {\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\",\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\"}>",
-        "code": "code-7",
-        "grant_type": "authorization_code"
-      }
-    },
-    {
-      "service": "apple_token",
-      "method": "POST",
-      "path": "/apple/auth/token",
-      "contentType": "application/x-www-form-urlencoded",
-      "body": {
-        "client_id": "test-apple-client-id",
-        "client_secret": "<jwt {\"kid\":\"test-key-id\",\"alg\":\"ES256\"} {\"iss\":\"test-team-id\",\"sub\":\"test-apple-client-id\",\"aud\":\"https://appleid.apple.com\",\"exp\":\"<t+300s epoch>\",\"iat\":\"<t+0s epoch>\"}>",
-        "code": "code-8",
-        "grant_type": "authorization_code"
-      }
+      "status": 500,
+      "step": "token_type이 bearer가 아님"
     }
   ]
 }
