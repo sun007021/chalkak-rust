@@ -1,0 +1,56 @@
+name = "SQS Relay: 게시물 승인·반려 알림이 큐까지 간다"
+tags = ["relay", "notification", "admin-api"]
+lane = "relay"
+clock = "2026-10-12T09:00:00+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO admins (id, username, password) VALUES
+  ('01990000-0000-7000-8000-0000000000a1', 'operator', 'hash-not-used');
+INSERT INTO users (id, email, signature_original_storage_key, moderation_push_enabled) VALUES
+  ('01990000-0000-7000-8000-000000000001', 'user1@test.chalkak', 'chalkak/signatures/user1/original.png', TRUE),
+  ('01990000-0000-7000-8000-000000000002', 'user2@test.chalkak', 'chalkak/signatures/user2/original.png', FALSE);
+INSERT INTO topics (id, title, topic_date, starts_at, ends_at) VALUES
+  ('01990000-0000-7000-8000-0000000000f1', '주제1', '2026-10-01', '2026-10-01T00:00:00+09:00', '2026-10-01T23:59:59+09:00'),
+  ('01990000-0000-7000-8000-0000000000f2', '주제2', '2026-10-02', '2026-10-02T00:00:00+09:00', '2026-10-02T23:59:59+09:00'),
+  ('01990000-0000-7000-8000-0000000000f3', '주제3', '2026-10-03', '2026-10-03T00:00:00+09:00', '2026-10-03T23:59:59+09:00');
+INSERT INTO photos (id, original_storage_key, thumbnail_storage_key) VALUES
+  ('01990000-0000-7000-8000-0000000000b1', 'chalkak/posts/p1/original.webp', 'chalkak/posts/p1/thumbnail.webp'),
+  ('01990000-0000-7000-8000-0000000000b2', 'chalkak/posts/p2/original.webp', 'chalkak/posts/p2/thumbnail.webp'),
+  ('01990000-0000-7000-8000-0000000000b3', 'chalkak/posts/p3/original.webp', 'chalkak/posts/p3/thumbnail.webp');
+INSERT INTO posts (id, user_id, topic_id, photo_id, title, moderation_status) VALUES
+  ('01990000-0000-7000-8000-0000000000c1', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-0000000000b1', '승인될 사진', 'PENDING'),
+  ('01990000-0000-7000-8000-0000000000c2', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000000f2', '01990000-0000-7000-8000-0000000000b2', '반려될 사진', 'PENDING'),
+  ('01990000-0000-7000-8000-0000000000c3', '01990000-0000-7000-8000-000000000002', '01990000-0000-7000-8000-0000000000f3', '01990000-0000-7000-8000-0000000000b3', '푸시 끈 사용자', 'PENDING');
+"""]
+
+[[step]]
+name = "승인"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000000c1/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"APPROVED"}'''
+
+[[step]]
+name = "반려"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000000c2/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"REJECTED","rejectionReason":"사진 품질"}'''
+
+[[step]]
+name = "푸시를 끈 사용자의 게시물 승인(발행 대상 아님)"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000000c3/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"APPROVED"}'''
+
+[[step]]
+name = "Relay가 두 건을 큐로 보낼 때까지 기다린 뒤 알림함 확인"
+method = "GET"
+path = "/api/v1/notifications?size=10"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+wait_until_sql = "SELECT count(*) = 2 FROM notifications WHERE sqs_publish_status = 'PUBLISHED'"

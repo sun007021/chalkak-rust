@@ -8,13 +8,13 @@
 | 경로 | 내용 |
 | --- | --- |
 | `parity/` | 시나리오 러너, 정규화, 비교기, ID Token 서명 (`chalkak-parity`) |
-| `fakes/` | 가짜 외부 서버 (`chalkak-fakes`): OIDC JWKS, Apple 토큰 교환·철회, Slack Webhook, S3 HeadObject. 받은 요청을 기록한다 |
+| `fakes/` | 가짜 외부 서버 (`chalkak-fakes`): OIDC JWKS, Apple 토큰 교환·철회, Slack Webhook, S3 HeadObject, SQS(SendMessage·Receive·Delete·ChangeMessageVisibility). 받은 요청을 기록한다 |
 | `keys/` | 가짜 JWKS와 러너가 ID Token 서명에 쓰는 테스트 RSA 키 쌍 (비밀 아님) |
 | `scenarios/` | 시나리오(TOML). 형식은 `parity/src/scenario.rs` 상단 주석 참고 |
 | `golden/` | Java oracle에서 녹화한 정규화 결과 |
 | `env/` | 대상별 설정(`java-a`, `java-b`, `rust`)과 앱 공통 환경변수(`oracle.env`) |
 | `scripts/check.sh` | **기본 진입점.** 빌드 → lane 준비 → 시나리오를 lane에 나눠 병렬 실행(`verify`·`compare`·`record`) |
-| `scripts/lane.sh`, `lane/compose.yaml` | lane(서로 섞이지 않는 비교 대상 하나) 띄우기·목록·정리. `TXLOG=1`이면 DB 문장 로그를 켠다(`lane/compose.txlog.yaml`) |
+| `scripts/lane.sh`, `lane/compose.yaml` | lane(서로 섞이지 않는 비교 대상 하나) 띄우기·목록·정리. `TXLOG=1`이면 DB 문장 로그를, `RELAY=1`이면 SQS Relay를 켠 lane을 띄운다(`lane/compose.txlog.yaml`, `env/oracle-relay.env`) |
 | `scripts/oracle-jar.sh` | Java lane이 쓰는 원본 JAR(`BASELINE` 커밋)을 호스트에서 빌드 |
 | `loadgen/`, `perf/`, `scripts/perf.sh` | 성능·동시성·장시간·스트레스(트래픽 급증·연결 폭주·DB 장애) 시험: 부하 발생기(`chalkak-loadgen`)와, libfaketime 없는 Java 대 Rust 비교 스택. 사용법은 [docs/perf/README.md](../docs/perf/README.md) |
 | `scripts/up.sh`, `down.sh` | 예전 고정 환경(java-a·java-b·rust 한 벌) 기동·정리. 서비스 정의는 저장소 루트 `compose.yaml` |
@@ -156,6 +156,7 @@ FAKES_LOCAL=1 COMPOSE_UP_ARGS="--no-build" harness/scripts/up.sh selfcheck
 | `POST /apple/auth/token`, `/apple/auth/revoke` | Apple 토큰 교환·철회 | 시나리오가 지정. 지정하지 않으면 500 |
 | `POST /slack/...` | Slack Incoming Webhook | 본문 기록. 지정하지 않으면 200 `ok` |
 | `HEAD /<키>` (가상 호스트 `<버킷>.fakes`) 또는 `HEAD /<버킷>/<키>` | S3 HeadObject | 키별 크기·Content-Type·상태를 시나리오가 지정. 지정하지 않은 키는 404 |
+| `POST /` + `X-Amz-Target: AmazonSQS.<작업>` | SQS (JSON 프로토콜) | `SendMessage`는 메시지를 저장하고 정상 응답(본문 MD5·`MessageId`). `ReceiveMessage`·`DeleteMessage`·`ChangeMessageVisibility`는 저장한 메시지에 대해 동작한다(롱 폴링 없음). 오류·지연은 규칙 목록(`[[fakes.sqs]]`)으로 지정 |
 | `PUT /__admin/responses`, `GET /__admin/requests`, `POST /__admin/reset`, `GET /__admin/health` | 관리 | 응답 지정(통째로 교체), 기록 조회, 초기화 |
 
 ID Token은 러너가 `keys/oidc-test-private.pem`으로 RS256 서명해 만든다. **발급자(issuer)는 실제 값을 그대로** 두고
@@ -170,11 +171,32 @@ Spring은 `chalkak.*` 속성을 환경변수로 덮어쓸 수 있다. Rust 서�
 | `CHALKAK_AUTH_OIDC_{GOOGLE,KAKAO,APPLE}_JWKSETURI` | `http://fakes:9000/oidc/...` | `chalkak.auth.oidc.*.jwk-set-uri` |
 | `CHALKAK_AUTH_APPLE_TOKEN_TOKENURI`, `..._REVOKEURI` | `http://fakes:9000/apple/auth/{token,revoke}` | `chalkak.auth.apple.token.token-uri`, `revoke-uri` |
 | `AWS_ENDPOINT_URL_S3` | `http://fakes:9000` | AWS SDK 공통 환경변수. HeadObject뿐 아니라 **presigned URL의 호스트도** `test-bucket.fakes:9000`으로 바뀐다 |
+| `AWS_ENDPOINT_URL_SQS` | `http://fakes:9000` | AWS SDK 공통 환경변수. Java SDK(2.54.1)가 존중함을 확인했다(요청이 fakes에 도착한다). 큐 URL은 요청 본문에만 들어간다 |
 | `CHALKAK_IMAGE_ANONYMOUSACCESS` | `false` | `chalkak.image.anonymous-access`. local 프로필의 익명 자격증명으로는 presigned URL을 만들 수 없다("Only SigV4 signers are supported") |
 
 **Slack은 가짜 서버로 돌릴 수 없다.** 원본의 `SlackNotificationProperties`가 `https://hooks.slack.com/services/…`
 (포트 없음)만 받는다. 그래서 oracle은 `ADMIN_NOTIFICATION_DELIVERY_ENABLED=false`를 유지하고, fakes의 Slack 경로는
 URL 검증이 느슨한 Rust 서버용이다. 원본의 Slack 본문 형식은 Java 단위 테스트 이식으로 확인한다.
+
+### relay lane (SQS Relay)
+
+원본 `oracle.env`는 Spring 스케줄링 전체를 끈다(시계를 옮기는 시나리오에서 정리 작업이 DB를 바꾸면 안 된다). SQS Relay처럼 앱이
+스스로 도는 작업을 확인하려면 그 작업만 켠 lane이 따로 필요하다.
+
+- `RELAY=1 harness/scripts/lane.sh up rust|java [개수]`가 `env/oracle-relay.env`를 더한 lane을 띄운다(스케줄링 켬, 정리 작업과
+  런타임 로그 끔, `NOTIFICATION_RELAY_ENABLED=true`, 큐 URL은 표준 형식의 가짜 값). `target.toml`에 `flavor = "relay"`가 들어가고
+  `lane.sh targets rust|java --relay`가 그런 lane만 낸다. 기본 `targets`에는 섞이지 않는다.
+- 시나리오는 최상위에 `lane = "relay"`를 쓴다. `parity`는 `--lane`(기본 `default`)과 같은 시나리오만 고르고, 시나리오 `lane`과 대상
+  `flavor`가 다르면 하네스 오류다. `check.sh verify|compare|record`는 기본 lane을 돌린 뒤 relay 시나리오가 있으면 relay lane
+  하나(없으면 띄운다)에서 이어서 돌린다. `parity count --lane relay`가 개수를 센다.
+- 단계의 `wait_until_sql = "SELECT ..."`는 요청 전에 쿼리의 첫 열(bool)이 참이 될 때까지(최대 30초) 지켜본다. 앱이 스스로 도는
+  작업의 결과를 기다릴 때 쓴다.
+- `[[fakes.sqs]]` 규칙(`op`, `contains`, `status`, `content_type`, `body`, `headers`, `delay_ms`)으로 SQS 응답을 지정한다. `contains`는 요청
+  본문에 든 문자열(알림 ID)이고, 규칙이 없으면 정상 응답이다. `delay_ms`로 5초 제한 시나리오를 만든다.
+- 비교에서 SQS 요청은 작업 이름·큐 URL·`MessageBody`(JSON으로 풀어 정규화)만 남기고 서명·SDK 헤더는 버린다. JSON 키 순서(Jackson
+  레코드 선언 순서)는 정규화로 정렬되어 보이지 않으므로 cargo 시험(`sqs_push_tests`)이 바이트 단위로 확인한다.
+- **주제 푸시(cron)와 발행 대기 모니터는 relay lane에서 켜지 않는다.** Java cron은 기동 때 계산한 지연을 단조 시계로 기다려
+  faketime을 따르지 않는다. 이 둘은 시계를 고정한 DB 시험(`topic_push_tests`, `publication_monitor_tests`)으로 확인한다.
 
 ## 시나리오 형식 추가분
 
@@ -192,7 +214,7 @@ email = "a@example.com"
 email_verified = true
 # issued_in, expires_in(시계 기준 초), aud, iss, kid, claims, omit, tamper_signature
 
-[fakes.apple_token]                           # 시작 시 응답 지정. apple_revoke, slack, s3."<키>"도 같은 방식
+[fakes.apple_token]                           # 시작 시 응답 지정. apple_revoke, slack, s3."<키>", [[fakes.sqs]]도 같은 방식
 status = 200
 body = '''{"access_token":"a","token_type":"Bearer","expires_in":3600,"refresh_token":"r","id_token":"${apple}"}'''
 

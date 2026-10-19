@@ -14,6 +14,8 @@
 # 다시 띄운다. Java lane은 모든 작업 트리가 함께 쓴다. 하나도 없으면 하나 띄우고, 있으면 쉬고 있는 것만 골라 쓴다
 # (parity가 lane 잠금으로 나눠 가진다). Java lane을 늘리려면 harness/scripts/lane.sh up java N.
 #
+# 시나리오에 `lane = "relay"`가 있으면 기본 lane 실행 뒤에 SQS Relay를 켠 lane(RELAY=1, 하나)에서 이어서 돌린다.
+#
 # 끝나도 lane은 내리지 않는다(다음 실행이 바로 시작한다). 다 쓰면 harness/scripts/lane.sh down rust.
 set -euo pipefail
 
@@ -68,9 +70,40 @@ elif [[ $mode != verify ]]; then
 fi
 
 parity="$ROOT/target/release/chalkak-parity"
-case $mode in
-  verify) exec "$parity" verify --target "$("$LANE" targets rust)" "${args[@]}" ;;
-  compare) exec "$parity" compare --left "$("$LANE" targets java)" --right "$("$LANE" targets rust)" "${args[@]}" ;;
-  record) exec "$parity" record --target "$("$LANE" targets java)" "${args[@]}" ;;
-  txshape) exec "$parity" txshape --java "$("$LANE" targets java --txlog)" --rust "$("$LANE" targets rust --txlog)" "${args[@]}" ;;
-esac
+
+# txshape는 기본 lane만 쓴다. 나머지는 기본 lane 시나리오를 돌린 뒤, SQS Relay처럼 앱이 스스로 도는 작업을 켠 relay lane에서
+# 돌 시나리오(`lane = "relay"`)가 있으면 이어서 그 lane에서도 돌린다(lane 종류가 다르면 환경변수가 달라 기본 lane에서 못 돈다).
+if [[ $mode == txshape ]]; then
+  exec "$parity" txshape --java "$("$LANE" targets java --txlog)" --rust "$("$LANE" targets rust --txlog)" "${args[@]}"
+fi
+
+run_pass() { # [relay]  -> 종료 코드
+  local lane_args=() rust_flag=() java_flag=()
+  if [[ ${1:-} == relay ]]; then
+    lane_args=(--lane relay)
+    rust_flag=(--relay)
+    java_flag=(--relay)
+  fi
+  case $mode in
+    verify) "$parity" verify "${lane_args[@]}" --target "$("$LANE" targets rust "${rust_flag[@]}")" "${args[@]}" ;;
+    compare) "$parity" compare "${lane_args[@]}" --left "$("$LANE" targets java "${java_flag[@]}")" --right "$("$LANE" targets rust "${rust_flag[@]}")" "${args[@]}" ;;
+    record) "$parity" record "${lane_args[@]}" --target "$("$LANE" targets java "${java_flag[@]}")" "${args[@]}" ;;
+  esac
+}
+
+rc=0
+run_pass || rc=$?
+
+relay_scenarios=$("$parity" count --lane relay "${args[@]}")
+if ((relay_scenarios > 0)); then
+  echo "relay lane 시나리오 ${relay_scenarios}개"
+  if ((need_rust)) && [[ -z "$("$LANE" targets rust --relay)" ]]; then
+    RELAY=1 "$LANE" up rust 1 >/dev/null
+  fi
+  if [[ $mode != verify && -z "$("$LANE" targets java --relay)" ]]; then
+    [[ -f "${ORACLE_JAR:-/tmp/chalkak-lanes/oracle/app.jar}" ]] || "$ROOT/harness/scripts/oracle-jar.sh" >/dev/null
+    RELAY=1 "$LANE" up java 1 >/dev/null
+  fi
+  run_pass relay || rc=$?
+fi
+exit "$rc"

@@ -50,6 +50,18 @@
 //! content_type = "image/png"
 //! ```
 //!
+//! [[fakes.sqs]]                       # SQS 응답 규칙(위에서부터 처음 맞는 것). 없으면 모든 SendMessage가 정상 응답
+//! op = "SendMessage"                   # 생략하면 모든 작업
+//! contains = "${notificationId}"       # 요청 본문에 이 문자열이 있을 때만(생략하면 모두)
+//! status = 500
+//! body = '''{"__type":"InternalError"}'''
+//! headers = { "x-amzn-query-error" = "..." }
+//! delay_ms = 6000                      # 응답을 이만큼 늦춘다(호출 쪽 시간 제한 시험)
+//!
+//! SQS Relay처럼 앱이 스스로 도는 작업을 확인하는 시나리오는 최상위에 `lane = "relay"`를 쓴다. 그 작업을 켠 lane
+//! (`harness/env/oracle-relay.env`, `lane.sh up ... --relay`)에서만 돌고 기본 lane에서는 건너뛴다. 단계에
+//! `wait_until_sql = "SELECT ..."`를 쓰면 요청을 보내기 전에 그 쿼리의 첫 열(bool)이 참이 될 때까지 기다린다(최대 30초).
+//!
 //! DB에 무작위 값이 들어가는 컬럼(암호문 등)은 최상위에 `db_opaque = ["encrypted_refresh_token"]`처럼 적어 길이만 비교한다.
 //!
 //! 시나리오가 끝나면 가짜 서버가 받은 요청(JWKS 조회 제외)을 정규화해 결과의 `fakes`에 넣어 비교한다.
@@ -67,6 +79,9 @@ pub struct Scenario {
     pub tags: Vec<String>,
     /// RFC 3339. 생략하면 기본 시각을 쓴다.
     pub clock: Option<String>,
+    /// 이 시나리오가 도는 lane 종류. 생략하면 `default`. 대상 설정의 `flavor`와 같아야 한다.
+    #[serde(default = "default_lane")]
+    pub lane: String,
     #[serde(default)]
     pub setup: Setup,
     /// 시나리오 시작 시 서명해 변수로 만드는 소셜 로그인 ID Token.
@@ -113,6 +128,8 @@ pub struct Step {
     pub advance_seconds: Option<i64>,
     /// 이 단계 요청을 보내기 전에 가짜 서버 응답을 덧씌운다(항목 단위로 덮고 s3 키는 합친다).
     pub fakes: Option<FakesSpec>,
+    /// 요청 전에 이 쿼리의 첫 열(bool)이 참이 될 때까지 DB를 지켜본다(앱이 스스로 도는 작업의 결과를 기다릴 때).
+    pub wait_until_sql: Option<String>,
     /// 이미지 처리 콜백 서명 헤더를 붙인다(`/internal/v1/...`). 시각은 단계 시작 시 앱 시각이다.
     pub callback: Option<CallbackSpec>,
 }
@@ -173,6 +190,21 @@ pub struct FakesSpec {
     /// 객체 키 → HeadObject 응답.
     #[serde(default)]
     pub s3: BTreeMap<String, S3Spec>,
+    /// SQS 응답 규칙. 지정하면 이전 규칙을 통째로 바꾼다.
+    pub sqs: Option<Vec<SqsRuleSpec>>,
+}
+
+#[derive(Debug, Clone, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct SqsRuleSpec {
+    pub op: Option<String>,
+    pub contains: Option<String>,
+    pub status: u16,
+    pub content_type: Option<String>,
+    pub body: Option<String>,
+    #[serde(default)]
+    pub headers: BTreeMap<String, String>,
+    pub delay_ms: Option<u64>,
 }
 
 #[derive(Debug, Clone, Deserialize, PartialEq)]
@@ -204,6 +236,9 @@ impl FakesSpec {
         if over.slack.is_some() {
             self.slack.clone_from(&over.slack);
         }
+        if over.sqs.is_some() {
+            self.sqs.clone_from(&over.sqs);
+        }
         for (k, v) in &over.s3 {
             self.s3.insert(k.clone(), v.clone());
         }
@@ -229,7 +264,13 @@ fn default_true() -> bool {
     true
 }
 
-pub fn load_dir(dir: &Path, filter: Option<&str>) -> Result<Vec<Scenario>, String> {
+pub const DEFAULT_LANE: &str = "default";
+
+fn default_lane() -> String {
+    DEFAULT_LANE.to_string()
+}
+
+pub fn load_dir(dir: &Path, filter: Option<&str>, lane: &str) -> Result<Vec<Scenario>, String> {
     let mut files = Vec::new();
     collect(dir, &mut files)?;
     files.sort();
@@ -239,7 +280,9 @@ pub fn load_dir(dir: &Path, filter: Option<&str>) -> Result<Vec<Scenario>, Strin
         let mut s: Scenario = toml::from_str(&text).map_err(|e| format!("{}: {e}", f.display()))?;
         s.path = f.clone();
         let key = f.display().to_string();
-        if filter.is_none_or(|flt| key.contains(flt) || s.tags.iter().any(|t| t == flt)) {
+        if s.lane == lane
+            && filter.is_none_or(|flt| key.contains(flt) || s.tags.iter().any(|t| t == flt))
+        {
             out.push(s);
         }
     }
@@ -334,5 +377,40 @@ path = "/"
     #[test]
     fn 알_수_없는_fakes_항목은_거절한다() {
         assert!(toml::from_str::<FakesSpec>("[nope]\nstatus = 1\n").is_err());
+    }
+
+    #[test]
+    fn lane과_sqs_규칙과_대기_쿼리를_읽는다() {
+        let s: Scenario = toml::from_str(
+            r#"
+name = "relay"
+lane = "relay"
+[[fakes.sqs]]
+contains = "x"
+status = 500
+delay_ms = 10
+headers = { a = "b" }
+[[step]]
+name = "a"
+method = "GET"
+path = "/"
+wait_until_sql = "SELECT true"
+"#,
+        )
+        .unwrap();
+        assert_eq!(s.lane, "relay");
+        let rules = s.fakes.unwrap().sqs.unwrap();
+        assert_eq!((rules[0].status, rules[0].delay_ms), (500, Some(10)));
+        assert_eq!(rules[0].headers["a"], "b");
+        assert_eq!(s.steps[0].wait_until_sql.as_deref(), Some("SELECT true"));
+    }
+
+    #[test]
+    fn lane을_생략하면_기본_lane이다() {
+        let s: Scenario = toml::from_str(
+            "name = \"x\"\n[[step]]\nname = \"a\"\nmethod = \"GET\"\npath = \"/\"\n",
+        )
+        .unwrap();
+        assert_eq!(s.lane, DEFAULT_LANE);
     }
 }

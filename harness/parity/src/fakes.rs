@@ -3,7 +3,7 @@
 
 use crate::http::{self, Request};
 use crate::normalize::Normalizer;
-use crate::scenario::{CannedSpec, FakesSpec, S3Spec};
+use crate::scenario::{CannedSpec, FakesSpec, S3Spec, SqsRuleSpec};
 use serde_json::{Map, Value, json};
 use std::collections::BTreeMap;
 
@@ -81,6 +81,37 @@ fn s3_json(s: &S3Spec) -> Value {
     Value::Object(o)
 }
 
+fn sqs_json(rules: &[SqsRuleSpec], subst: &dyn Fn(&str) -> String) -> Value {
+    Value::Array(
+        rules
+            .iter()
+            .map(|r| {
+                let mut o = Map::new();
+                o.insert("status".into(), json!(r.status));
+                if let Some(v) = &r.op {
+                    o.insert("op".into(), json!(v));
+                }
+                if let Some(v) = &r.contains {
+                    o.insert("contains".into(), json!(subst(v)));
+                }
+                if let Some(v) = &r.content_type {
+                    o.insert("content_type".into(), json!(v));
+                }
+                if let Some(v) = &r.body {
+                    o.insert("body".into(), json!(subst(v)));
+                }
+                if !r.headers.is_empty() {
+                    o.insert("headers".into(), json!(r.headers));
+                }
+                if let Some(v) = r.delay_ms {
+                    o.insert("delay_ms".into(), json!(v));
+                }
+                Value::Object(o)
+            })
+            .collect(),
+    )
+}
+
 pub fn admin_json(spec: &FakesSpec, subst: &dyn Fn(&str) -> String) -> Value {
     let mut o = Map::new();
     for (name, c) in [
@@ -98,6 +129,9 @@ pub fn admin_json(spec: &FakesSpec, subst: &dyn Fn(&str) -> String) -> Value {
         .map(|(k, v)| (subst(k), s3_json(v)))
         .collect();
     o.insert("s3".into(), Value::Object(s3));
+    if let Some(rules) = &spec.sqs {
+        o.insert("sqs".into(), sqs_json(rules, subst));
+    }
     Value::Object(o)
 }
 
@@ -105,6 +139,7 @@ pub fn admin_json(spec: &FakesSpec, subst: &dyn Fn(&str) -> String) -> Value {
 /// - JWKS 조회: 앱의 공개키 캐시 상태에 따라 횟수가 달라 동작 차이가 아니다.
 /// - 요청 헤더: Content-Type만 남긴다(User-Agent, Host, SDK 서명 헤더는 구현 세부).
 /// - S3: 경로·가상 호스트 방식 차이를 버리고 `버킷/키`만 남긴다.
+/// - SQS: 작업 이름과 큐 URL, 메시지 본문(JSON이면 풀어서 정규화)만 남긴다. 서명·SDK 헤더는 구현 세부다.
 /// - Apple 요청 본문: 폼 필드로 풀어 이름순으로 비교하고, `client_secret`(JWT)은 클레임을 풀어 정규화한다.
 pub fn normalize(records: &[Value], norm: &mut Normalizer) -> Value {
     let mut out = Vec::new();
@@ -132,6 +167,7 @@ pub fn normalize(records: &[Value], norm: &mut Normalizer) -> Value {
         if !body.is_empty() {
             let v = match service {
                 "apple_token" | "apple_revoke" => form_value(body, norm),
+                "sqs" => sqs_body(body, norm),
                 "slack" => match serde_json::from_str::<Value>(body) {
                     Ok(v) => norm.value(&v, &[], ""),
                     Err(_) => json!(norm.string(body)),
@@ -143,6 +179,22 @@ pub fn normalize(records: &[Value], norm: &mut Normalizer) -> Value {
         out.push(Value::Object(o));
     }
     Value::Array(out)
+}
+
+/// SQS 요청 본문(`{"QueueUrl":..., "MessageBody":"<JSON 문자열>"}`)에서 `MessageBody`를 JSON으로 풀어 정규화한다.
+/// 키 순서는 비교하지 않으므로(정규화 결과가 정렬된다) 바이트 동일 여부는 cargo 시험이 확인한다.
+fn sqs_body(body: &str, norm: &mut Normalizer) -> Value {
+    let Ok(Value::Object(mut req)) = serde_json::from_str::<Value>(body) else {
+        return json!(norm.string(body));
+    };
+    if let Some(Value::String(message)) = req.get("MessageBody").cloned() {
+        let inner = match serde_json::from_str::<Value>(&message) {
+            Ok(v) => norm.value(&v, &[], ""),
+            Err(_) => json!(norm.string(&message)),
+        };
+        req.insert("MessageBody".into(), inner);
+    }
+    norm.value(&Value::Object(req), &[], "")
 }
 
 fn form_value(body: &str, norm: &mut Normalizer) -> Value {
@@ -274,5 +326,41 @@ mod tests {
     fn 퍼센트_해석() {
         assert_eq!(percent_decode("a%2Fb+c%"), "a/b c%");
         assert_eq!(percent_decode("%zz"), "%zz");
+    }
+
+    #[test]
+    fn sqs_규칙을_관리_json으로_바꾸고_변수를_채운다() {
+        let spec: FakesSpec = toml::from_str(
+            "[[sqs]]\nop = \"SendMessage\"\ncontains = \"${n}\"\nstatus = 500\ndelay_ms = 7\nheaders = { a = \"b\" }\n",
+        )
+        .unwrap();
+        let v = admin_json(&spec, &|s| s.replace("${n}", "N1"));
+        assert_eq!(
+            v["sqs"],
+            json!([{"status": 500, "op": "SendMessage", "contains": "N1",
+                    "headers": {"a": "b"}, "delay_ms": 7}])
+        );
+        let none: FakesSpec = toml::from_str("").unwrap();
+        assert!(admin_json(&none, &|s| s.into()).get("sqs").is_none());
+    }
+
+    #[test]
+    fn sqs_기록은_메시지_본문을_풀어_정규화한다() {
+        let message =
+            r#"{"id":"0199aaaa-0000-7000-8000-000000000001","at":"2026-10-12T00:00:05Z"}"#;
+        let body = json!({"QueueUrl": "https://sqs.x/1/q", "MessageBody": message}).to_string();
+        let recs = vec![
+            json!({"service": "sqs", "method": "POST", "path": "/", "query": "",
+            "headers": {"content-type": "application/x-amz-json-1.0", "authorization": "x"},
+            "body": body, "detail": "SendMessage"}),
+        ];
+        let out = normalize(&recs, &mut Normalizer::new(CLOCK));
+        assert_eq!(out[0]["detail"], "SendMessage");
+        assert_eq!(out[0]["contentType"], "application/x-amz-json-1.0");
+        assert_eq!(
+            out[0]["body"]["MessageBody"],
+            json!({"id": "$uuid1", "at": "<t+5s iso Z>"})
+        );
+        assert_eq!(out[0]["body"]["QueueUrl"], "https://sqs.x/1/q");
     }
 }
