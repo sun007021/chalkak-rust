@@ -115,6 +115,16 @@ pub struct Step {
     pub fakes: Option<FakesSpec>,
     /// 이미지 처리 콜백 서명 헤더를 붙인다(`/internal/v1/...`). 시각은 단계 시작 시 앱 시각이다.
     pub callback: Option<CallbackSpec>,
+    /// 응답을 받은 뒤, 비동기로 도는 일이 가짜 서버를 이만큼 부를 때까지 기다린다(누적 횟수).
+    /// 응답 뒤에 외부 호출을 이어 가는 일(사용자 지표 집계)은 앱마다 걸리는 시간이 달라 다음 단계와 겹치지 않게 맞춘다.
+    pub await_fakes: Option<AwaitFakes>,
+}
+
+/// 가짜 서버 호출 대기 지정. `service`가 같은 기록이 시나리오 시작부터 `count`개 이상 쌓일 때까지 기다린다.
+#[derive(Debug, Clone, Deserialize, PartialEq)]
+pub struct AwaitFakes {
+    pub service: String,
+    pub count: usize,
 }
 
 /// 콜백 서명 지정. 필드를 생략하면 올바른 서명(비밀키·audience는 하네스 기본값)이다.
@@ -170,6 +180,8 @@ pub struct FakesSpec {
     pub apple_token: Option<CannedSpec>,
     pub apple_revoke: Option<CannedSpec>,
     pub slack: Option<CannedSpec>,
+    /// CloudWatch Logs Insights. 쿼리는 즉시 끝난다.
+    pub logs: Option<LogsSpec>,
     /// 객체 키 → HeadObject 응답.
     #[serde(default)]
     pub s3: BTreeMap<String, S3Spec>,
@@ -181,6 +193,16 @@ pub struct CannedSpec {
     pub status: u16,
     pub content_type: Option<String>,
     pub body: Option<String>,
+}
+
+/// 쿼리의 `stats ... as <지표>` 이름 → 결과 행의 필드(값은 Logs Insights처럼 문자열).
+#[derive(Debug, Clone, Default, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct LogsSpec {
+    /// `GetQueryResults` 상태. 기본 `Complete`.
+    pub status: Option<String>,
+    #[serde(default)]
+    pub rows: BTreeMap<String, BTreeMap<String, String>>,
 }
 
 #[derive(Debug, Clone, Deserialize, PartialEq)]
@@ -203,6 +225,9 @@ impl FakesSpec {
         }
         if over.slack.is_some() {
             self.slack.clone_from(&over.slack);
+        }
+        if over.logs.is_some() {
+            self.logs.clone_from(&over.logs);
         }
         for (k, v) in &over.s3 {
             self.s3.insert(k.clone(), v.clone());
@@ -334,5 +359,31 @@ path = "/"
     #[test]
     fn 알_수_없는_fakes_항목은_거절한다() {
         assert!(toml::from_str::<FakesSpec>("[nope]\nstatus = 1\n").is_err());
+    }
+
+    #[test]
+    fn 로그_지정과_호출_대기를_읽는다() {
+        let s: Scenario = toml::from_str(
+            "name = \"x\"\n[fakes.logs.rows.visitors]\nvisitors = \"7\"\n[[step]]\nname = \"a\"\nmethod = \"POST\"\npath = \"/\"\nawait_fakes = { service = \"cloudwatch_logs\", count = 10 }\n[step.fakes.logs]\nstatus = \"Failed\"\n",
+        )
+        .unwrap();
+        assert_eq!(
+            s.fakes.unwrap().logs.unwrap().rows["visitors"]["visitors"],
+            "7"
+        );
+        let wait = s.steps[0].await_fakes.as_ref().unwrap();
+        assert_eq!((wait.service.as_str(), wait.count), ("cloudwatch_logs", 10));
+        assert_eq!(
+            s.steps[0]
+                .fakes
+                .as_ref()
+                .unwrap()
+                .logs
+                .as_ref()
+                .unwrap()
+                .status
+                .as_deref(),
+            Some("Failed")
+        );
     }
 }

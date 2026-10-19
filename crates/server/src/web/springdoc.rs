@@ -316,6 +316,36 @@ mod tests {
         );
     }
 
+    // AdminAnalyticsOpenApiTest#adminApiDocs_aggregationEndpoint_exposesContract
+    #[test]
+    fn admin_api_문서에_수동_집계_계약을_노출하고_user_api에서는_제외한다() {
+        let s = springdoc(true);
+        let json = |group: &str| -> serde_json::Value {
+            let r = call(&s, Method::Get, &format!("/v3/api-docs/{group}"));
+            assert_eq!(r.status, 200, "{group}");
+            serde_json::from_slice(&r.body).unwrap()
+        };
+        let admin = json("admin-api");
+        let op = &admin["paths"]["/api/v1/admin/analytics/aggregations"]["post"];
+        assert!(op["security"][0].get("adminAccessToken").is_some());
+        assert_eq!(
+            op["requestBody"]["content"]["application/json"]["schema"]["$ref"],
+            "#/components/schemas/AdminUserMetricsAggregationRequest"
+        );
+        let request = &admin["components"]["schemas"]["AdminUserMetricsAggregationRequest"];
+        assert_eq!(request["required"], serde_json::json!(["metricDate"]));
+        assert_eq!(request["properties"]["metricDate"]["format"], "date");
+        assert!(op["responses"]["202"].is_object());
+        assert!(op["responses"]["202"].get("content").is_none());
+        assert!(op["responses"]["400"].is_object());
+        assert!(op["responses"]["403"].is_object());
+        assert!(
+            json("user-api")["paths"]
+                .get("/api/v1/admin/analytics/aggregations")
+                .is_none()
+        );
+    }
+
     // java-3: 없는 그룹 -> 500, /v3/api-docs/ -> 404, 그룹 문서에 POST -> 405
     #[test]
     fn 없는_그룹은_500이고_빈_그룹은_404다() {

@@ -586,6 +586,12 @@ impl World {
                 Arc::new(NoObjects),
                 Arc::new(chalkak_app::post::NoopPostModerationPendingListener),
             ),
+            analytics: chalkak_app::analytics::build_runner_without_access_logs(
+                Vec::new(),
+                self.pool.clone(),
+                Arc::clone(&clock),
+                Arc::clone(&logger),
+            ),
         };
         (ctx, logger)
     }

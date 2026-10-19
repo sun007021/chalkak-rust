@@ -92,6 +92,14 @@ pub fn admin_json(spec: &FakesSpec, subst: &dyn Fn(&str) -> String) -> Value {
             o.insert(name.into(), canned_json(c, subst));
         }
     }
+    if let Some(logs) = &spec.logs {
+        let mut l = Map::new();
+        if let Some(status) = &logs.status {
+            l.insert("status".into(), json!(status));
+        }
+        l.insert("rows".into(), json!(logs.rows));
+        o.insert("logs".into(), Value::Object(l));
+    }
     let s3: Map<String, Value> = spec
         .s3
         .iter()
@@ -132,7 +140,7 @@ pub fn normalize(records: &[Value], norm: &mut Normalizer) -> Value {
         if !body.is_empty() {
             let v = match service {
                 "apple_token" | "apple_revoke" => form_value(body, norm),
-                "slack" => match serde_json::from_str::<Value>(body) {
+                "slack" | "cloudwatch_logs" => match serde_json::from_str::<Value>(body) {
                     Ok(v) => norm.value(&v, &[], ""),
                     Err(_) => json!(norm.string(body)),
                 },
@@ -274,5 +282,31 @@ mod tests {
     fn 퍼센트_해석() {
         assert_eq!(percent_decode("a%2Fb+c%"), "a/b c%");
         assert_eq!(percent_decode("%zz"), "%zz");
+    }
+
+    #[test]
+    fn 로그_지정을_관리_json으로_바꾼다() {
+        let spec: FakesSpec =
+            toml::from_str("[logs]\nstatus = \"Failed\"\n[logs.rows.visitors]\nvisitors = \"7\"\n")
+                .unwrap();
+        let v = admin_json(&spec, &|s| s.to_string());
+        assert_eq!(
+            v["logs"],
+            json!({"status": "Failed", "rows": {"visitors": {"visitors": "7"}}})
+        );
+    }
+
+    #[test]
+    fn 로그_쿼리_본문은_json으로_풀고_제외_사용자_uuid를_기호로_바꾼다() {
+        let body = r#"{"logGroupName":"g","queryString":"filter userId not in [\"01990000-0000-7000-8000-0000000000e1\"]"}"#;
+        let recs = vec![
+            json!({"service": "cloudwatch_logs", "detail": "StartQuery", "method": "POST", "path": "/",
+            "query": "", "headers": {"content-type": "application/x-amz-json-1.1"}, "body": body}),
+        ];
+        let out = normalize(&recs, &mut Normalizer::new(CLOCK));
+        assert_eq!(out[0]["detail"], "StartQuery");
+        assert_eq!(out[0]["body"]["logGroupName"], "g");
+        let q = out[0]["body"]["queryString"].as_str().unwrap();
+        assert!(q.contains("$uuid") && !q.contains("0000-7000"), "{q}");
     }
 }

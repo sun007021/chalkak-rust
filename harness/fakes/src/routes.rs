@@ -6,6 +6,7 @@
 //! | `POST /apple/auth/token`, `/apple/auth/revoke` | 지정한 응답 |
 //! | `POST /slack/...` | Slack Incoming Webhook. 본문 기록 |
 //! | `HEAD /<key>` 또는 `HEAD /<bucket>/<key>` | S3 HeadObject. 키별 크기·Content-Type·404 지정 |
+//! | `POST /` + `X-Amz-Target: Logs_20140328.*` | CloudWatch Logs Insights(StartQuery·GetQueryResults·StopQuery). 지표 이름별 결과 행 지정 |
 //! | `PUT /__admin/responses`, `GET /__admin/requests`, `POST /__admin/reset` | 관리 |
 
 use crate::http::{Request, Response};
@@ -28,6 +29,15 @@ struct S3Object {
     content_type: String,
 }
 
+/// CloudWatch Logs Insights 응답 지정. `rows`는 쿼리의 `stats ... as <지표>` 이름 → 결과 행의 필드(값은 문자열).
+/// 지정하지 않은 지표는 결과 행이 없다(일치하는 로그가 없는 것과 같다).
+#[derive(Debug, Clone)]
+struct LogsConfig {
+    /// `GetQueryResults`가 돌려줄 상태. 기본 `Complete`.
+    status: String,
+    rows: BTreeMap<String, BTreeMap<String, String>>,
+}
+
 #[derive(Debug, Default)]
 pub struct Fakes {
     s3_bucket: String,
@@ -35,6 +45,9 @@ pub struct Fakes {
     apple_revoke: Option<Canned>,
     slack: Option<Canned>,
     s3: BTreeMap<String, S3Object>,
+    logs: Option<LogsConfig>,
+    /// `StartQuery`가 받은 쿼리 문자열. 인덱스 + 1이 쿼리 ID(`fake-query-N`).
+    log_queries: Vec<String>,
     records: Vec<Value>,
 }
 
@@ -55,7 +68,7 @@ impl Fakes {
         res
     }
 
-    fn route(&self, req: &Request) -> (String, Option<String>, Response) {
+    fn route(&mut self, req: &Request) -> (String, Option<String>, Response) {
         match (req.method.as_str(), req.path.as_str()) {
             ("GET", "/oidc/apple/keys") => ("oidc_jwks:apple".into(), None, jwks()),
             ("GET", "/oidc/google/certs") => ("oidc_jwks:google".into(), None, jwks()),
@@ -77,6 +90,19 @@ impl Fakes {
                 };
                 ("slack".into(), None, res)
             }
+            ("POST", "/")
+                if req
+                    .header("x-amz-target")
+                    .is_some_and(|t| t.starts_with("Logs_20140328.")) =>
+            {
+                let action = req
+                    .header("x-amz-target")
+                    .and_then(|t| t.strip_prefix("Logs_20140328."))
+                    .unwrap_or_default()
+                    .to_string();
+                let res = self.logs_action(&action, &req.body);
+                ("cloudwatch_logs".into(), Some(action), res)
+            }
             ("HEAD", _) => {
                 let (bucket, key) = self.split_s3(req);
                 let res = self.head_object(&key);
@@ -86,6 +112,59 @@ impl Fakes {
                 "unmatched".into(),
                 None,
                 Response::json(404, r#"{"error":"fakes_no_route"}"#),
+            ),
+        }
+    }
+
+    /// CloudWatch Logs Insights. 쿼리는 즉시 끝나고, 결과 행은 쿼리의 지표 이름(`as <지표>`)으로 고른다.
+    fn logs_action(&mut self, action: &str, body: &[u8]) -> Response {
+        let json: Value = serde_json::from_slice(body).unwrap_or(Value::Null);
+        match action {
+            "StartQuery" => {
+                self.log_queries
+                    .push(json["queryString"].as_str().unwrap_or_default().to_string());
+                let id = format!("fake-query-{}", self.log_queries.len());
+                logs_json(&json!({ "queryId": id }))
+            }
+            "GetQueryResults" => {
+                let query = json["queryId"]
+                    .as_str()
+                    .and_then(|id| id.strip_prefix("fake-query-"))
+                    .and_then(|n| n.parse::<usize>().ok())
+                    .and_then(|n| self.log_queries.get(n.wrapping_sub(1)))
+                    .cloned()
+                    .unwrap_or_default();
+                let config = self.logs.clone().unwrap_or(LogsConfig {
+                    status: "Complete".into(),
+                    rows: BTreeMap::new(),
+                });
+                // 쿼리 하나는 지표 하나(요약 쿼리는 requests)만 센다. 쿼리 끝의 `as <이름>` 중 지정한 행이 있는 첫 이름을 쓴다.
+                let row = config
+                    .rows
+                    .iter()
+                    .find(|(metric, _)| query.contains(&format!(" as {metric}")))
+                    .map(|(_, fields)| fields.clone());
+                let results: Vec<Value> = row
+                    .map(|fields| {
+                        vec![Value::Array(
+                            fields
+                                .into_iter()
+                                .map(|(f, v)| json!({ "field": f, "value": v }))
+                                .collect(),
+                        )]
+                    })
+                    .unwrap_or_default();
+                logs_json(&json!({
+                    "results": results,
+                    "statistics": {"recordsMatched": 0.0, "recordsScanned": 0.0, "bytesScanned": 0.0},
+                    "status": config.status,
+                }))
+            }
+            "StopQuery" => logs_json(&json!({ "success": true })),
+            _ => Response::new(
+                400,
+                "application/x-amz-json-1.1",
+                r#"{"__type":"UnknownOperationException"}"#,
             ),
         }
     }
@@ -179,11 +258,13 @@ impl Fakes {
         let mut apple_revoke = None;
         let mut slack = None;
         let mut s3 = BTreeMap::new();
+        let mut logs = None;
         for (name, value) in obj {
             match name.as_str() {
                 "apple_token" => apple_token = Some(parse_canned(name, value)?),
                 "apple_revoke" => apple_revoke = Some(parse_canned(name, value)?),
                 "slack" => slack = Some(parse_canned(name, value)?),
+                "logs" => logs = Some(parse_logs(value)?),
                 "s3" => {
                     let objects = value.as_object().ok_or("s3는 객체여야 합니다")?;
                     for (key, spec) in objects {
@@ -197,8 +278,42 @@ impl Fakes {
         self.apple_revoke = apple_revoke;
         self.slack = slack;
         self.s3 = s3;
+        self.logs = logs;
         Ok(())
     }
+}
+
+fn logs_json(v: &Value) -> Response {
+    Response::new(200, "application/x-amz-json-1.1", v.to_string())
+}
+
+fn parse_logs(v: &Value) -> Result<LogsConfig, String> {
+    if !v.is_object() {
+        return Err("logs는 객체여야 합니다".into());
+    }
+    let mut rows = BTreeMap::new();
+    if let Some(r) = v.get("rows") {
+        for (metric, fields) in r.as_object().ok_or("logs.rows는 객체여야 합니다")? {
+            let fields = fields
+                .as_object()
+                .ok_or_else(|| format!("logs.rows.{metric}는 객체여야 합니다"))?;
+            rows.insert(
+                metric.clone(),
+                fields
+                    .iter()
+                    .map(|(k, val)| (k.clone(), val.as_str().unwrap_or_default().to_string()))
+                    .collect(),
+            );
+        }
+    }
+    Ok(LogsConfig {
+        status: v
+            .get("status")
+            .and_then(Value::as_str)
+            .unwrap_or("Complete")
+            .to_string(),
+        rows,
+    })
 }
 
 fn jwks() -> Response {
@@ -463,5 +578,93 @@ mod tests {
         let mut f = Fakes::new("b");
         f.handle(&req("GET", "/__admin/health", &[], ""));
         assert!(records(&mut f).is_empty());
+    }
+
+    const LOGS_TARGET: (&str, &str) = ("x-amz-target", "Logs_20140328.");
+
+    fn logs_call(f: &mut Fakes, action: &str, body: &str) -> Value {
+        let target = format!("{}{action}", LOGS_TARGET.1);
+        let res = f.handle(&req("POST", "/", &[(LOGS_TARGET.0, &target)], body));
+        assert_eq!(res.status, 200);
+        serde_json::from_slice(&res.body).unwrap()
+    }
+
+    #[test]
+    fn 로그_쿼리는_순번_id를_주고_지표_이름으로_행을_고른다() {
+        let mut f = Fakes::new("b");
+        configure(
+            &mut f,
+            r#"{"logs":{"rows":{"visitors":{"visitors":"7"},"requests":{"requests":"12","latencyAvg":"1.5"}}}}"#,
+        );
+        let q1 = logs_call(
+            &mut f,
+            "StartQuery",
+            r#"{"queryString":"filter x\n| stats count_distinct(userId) as visitors"}"#,
+        );
+        assert_eq!(q1["queryId"], "fake-query-1");
+        let q2 = logs_call(
+            &mut f,
+            "StartQuery",
+            r#"{"queryString":"filter x\n| stats count(*) as requests, avg(d) as latencyAvg"}"#,
+        );
+        assert_eq!(q2["queryId"], "fake-query-2");
+        let r1 = logs_call(&mut f, "GetQueryResults", r#"{"queryId":"fake-query-1"}"#);
+        assert_eq!(r1["status"], "Complete");
+        assert_eq!(r1["results"][0][0], json!({"field":"visitors","value":"7"}));
+        let r2 = logs_call(&mut f, "GetQueryResults", r#"{"queryId":"fake-query-2"}"#);
+        assert_eq!(r2["results"][0].as_array().unwrap().len(), 2);
+        // 행을 지정하지 않은 지표는 결과 행이 없다.
+        logs_call(
+            &mut f,
+            "StartQuery",
+            r#"{"queryString":"... as server5xx"}"#,
+        );
+        let r3 = logs_call(&mut f, "GetQueryResults", r#"{"queryId":"fake-query-3"}"#);
+        assert_eq!(r3["results"], json!([]));
+        let recs = records(&mut f);
+        assert_eq!(recs.len(), 6);
+        assert_eq!(recs[0]["service"], "cloudwatch_logs");
+        assert_eq!(recs[0]["detail"], "StartQuery");
+    }
+
+    #[test]
+    fn 로그_쿼리_상태를_지정할_수_있고_지정이_없으면_완료다() {
+        let mut f = Fakes::new("b");
+        logs_call(&mut f, "StartQuery", r#"{"queryString":"as visitors"}"#);
+        let r = logs_call(&mut f, "GetQueryResults", r#"{"queryId":"fake-query-1"}"#);
+        assert_eq!(r["status"], "Complete");
+        configure(&mut f, r#"{"logs":{"status":"Failed"}}"#);
+        let r = logs_call(&mut f, "GetQueryResults", r#"{"queryId":"fake-query-1"}"#);
+        assert_eq!(r["status"], "Failed");
+        // 쿼리 번호는 설정을 바꿔도 이어진다. 중단 요청은 성공으로 답한다.
+        assert_eq!(
+            logs_call(&mut f, "StopQuery", r#"{"queryId":"fake-query-1"}"#)["success"],
+            true
+        );
+    }
+
+    #[test]
+    fn 로그_지정의_형식이_틀리면_거절한다() {
+        let mut f = Fakes::new("b");
+        for bad in [
+            r#"{"logs":[]}"#,
+            r#"{"logs":{"rows":[]}}"#,
+            r#"{"logs":{"rows":{"v":1}}}"#,
+        ] {
+            let res = f.handle(&req("PUT", "/__admin/responses", &[], bad));
+            assert_eq!(res.status, 400, "{bad}");
+        }
+    }
+
+    #[test]
+    fn 모르는_로그_동작은_400이다() {
+        let mut f = Fakes::new("b");
+        let res = f.handle(&req(
+            "POST",
+            "/",
+            &[(LOGS_TARGET.0, "Logs_20140328.Nope")],
+            "{}",
+        ));
+        assert_eq!(res.status, 400);
     }
 }

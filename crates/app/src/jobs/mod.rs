@@ -6,6 +6,7 @@
 //! | 회원가입 토큰 소진 기록 정리 | 매일 04:40 | `chalkak.auth.consumed-signup-token.cleanup.enabled` |
 //! | 알림 정리 | 매일 04:50 | `chalkak.notification.cleanup.enabled` |
 //! | 임시 Apple 인증 정보 폐기·삭제 | 매시 정각 | `chalkak.auth.pending-apple-authorization.cleanup.enabled` |
+//! | 사용자 지표 집계 | 매일 01:00 | `chalkak.analytics.aggregation.enabled`(기본 꺼짐, prod만 켬) |
 //! | 공지 알림함 배포 | 매분 0초 | `chalkak.notification.notice.distribution-enabled`(기본 꺼짐) |
 //! | 런타임 상태 로그 | 60초마다(시작 즉시 한 번) | `chalkak.monitoring.runtime-log.enabled` |
 //!
@@ -32,6 +33,7 @@ use chalkak_core::scheduler::{CronSchedule, SEOUL, Scheduler};
 use chalkak_core::{Clock, ShutdownSignal};
 use chalkak_db::Pool;
 
+use crate::analytics::UserMetricsAggregationRunner;
 use crate::auth::apple::AppleTokenClient;
 use crate::auth::tokens::AppleCipher;
 use crate::notification;
@@ -54,6 +56,7 @@ pub enum Job {
     ConsumedSignupTokenCleanup,
     NotificationCleanup,
     PendingAppleAuthorizationCleanup,
+    UserMetricsAggregation,
     NoticeDistribution,
     RuntimeSnapshot,
 }
@@ -68,11 +71,12 @@ pub enum Schedule {
 }
 
 impl Job {
-    pub const ALL: [Job; 6] = [
+    pub const ALL: [Job; 7] = [
         Job::RefreshTokenCleanup,
         Job::ConsumedSignupTokenCleanup,
         Job::NotificationCleanup,
         Job::PendingAppleAuthorizationCleanup,
+        Job::UserMetricsAggregation,
         Job::NoticeDistribution,
         Job::RuntimeSnapshot,
     ];
@@ -84,6 +88,7 @@ impl Job {
             Job::ConsumedSignupTokenCleanup => "deleteExpiredTokens",
             Job::NotificationCleanup => "deleteExpiredNotifications",
             Job::PendingAppleAuthorizationCleanup => "revokeAndDeleteExpiredAuthorizations",
+            Job::UserMetricsAggregation => "aggregateYesterday",
             Job::NoticeDistribution => "distributeNotices",
             Job::RuntimeSnapshot => "logSnapshot",
         }
@@ -95,6 +100,7 @@ impl Job {
             Job::ConsumedSignupTokenCleanup => Schedule::Cron("0 40 4 * * *"),
             Job::NotificationCleanup => Schedule::Cron("0 50 4 * * *"),
             Job::PendingAppleAuthorizationCleanup => Schedule::Cron("0 0 * * * *"),
+            Job::UserMetricsAggregation => Schedule::Cron("0 0 1 * * *"),
             Job::NoticeDistribution => Schedule::Cron("0 * * * * *"),
             Job::RuntimeSnapshot => Schedule::FixedRate(RUNTIME_LOG_PERIOD),
         }
@@ -121,6 +127,8 @@ pub struct JobsSettings {
     pub consumed_signup_token_cleanup: bool,
     pub notification_cleanup: bool,
     pub pending_apple_authorization_cleanup: bool,
+    /// `chalkak.analytics.aggregation.enabled`.
+    pub user_metrics_aggregation: bool,
     /// `chalkak.notification.notice.distribution-enabled`(환경변수 `NOTIFICATION_NOTICE_DISTRIBUTION_ENABLED`, 기본 꺼짐).
     pub notice_distribution: bool,
     pub runtime_log: bool,
@@ -128,7 +136,12 @@ pub struct JobsSettings {
 
 impl JobsSettings {
     /// `runtime_log_default`: 프로필이 정하는 `chalkak.monitoring.runtime-log.enabled`의 기본값(local false, dev·prod true).
-    pub fn from_env(env: &Env, runtime_log_default: bool) -> Result<Self, ConfigError> {
+    /// `aggregation_default`: 프로필이 정하는 `chalkak.analytics.aggregation.enabled`의 기본값(prod만 true).
+    pub fn from_env(
+        env: &Env,
+        runtime_log_default: bool,
+        aggregation_default: bool,
+    ) -> Result<Self, ConfigError> {
         Ok(JobsSettings {
             scheduling_enabled: env.bool_or("CHALKAK_SCHEDULING_ENABLED", true)?,
             refresh_token_cleanup: env
@@ -140,6 +153,8 @@ impl JobsSettings {
                 "CHALKAK_AUTH_PENDINGAPPLEAUTHORIZATION_CLEANUP_ENABLED",
                 true,
             )?,
+            user_metrics_aggregation: env
+                .bool_or("CHALKAK_ANALYTICS_AGGREGATION_ENABLED", aggregation_default)?,
             notice_distribution: env.bool_or("NOTIFICATION_NOTICE_DISTRIBUTION_ENABLED", false)?,
             runtime_log: env
                 .bool_or("CHALKAK_MONITORING_RUNTIMELOG_ENABLED", runtime_log_default)?,
@@ -153,6 +168,7 @@ impl JobsSettings {
             Job::ConsumedSignupTokenCleanup => self.consumed_signup_token_cleanup,
             Job::NotificationCleanup => self.notification_cleanup,
             Job::PendingAppleAuthorizationCleanup => self.pending_apple_authorization_cleanup,
+            Job::UserMetricsAggregation => self.user_metrics_aggregation,
             Job::NoticeDistribution => self.notice_distribution,
             Job::RuntimeSnapshot => self.runtime_log,
         }
@@ -185,6 +201,8 @@ pub struct JobDeps {
     pub logger: Arc<Logger>,
     /// 임시 Apple 인증 정보 정리가 켜져 있으면 필요하다.
     pub apple: Option<AppleRevocation>,
+    /// 사용자 지표 집계가 켜져 있으면 필요하다. 관리자 수동 집계와 같은 러너여야 한다.
+    pub analytics: Option<Arc<UserMetricsAggregationRunner>>,
 }
 
 /// 돌고 있는 주기 작업들.
@@ -204,6 +222,14 @@ impl Jobs {
     pub fn join(self) {
         self.scheduler.join();
     }
+}
+
+/// 집계 작업이 집계할 날짜: KST 기준 어제(`LocalDate.now(clock.withZone(KST)).minusDays(1)`).
+pub fn yesterday_kst(now: jiff::Timestamp) -> jiff::civil::Date {
+    now.to_zoned(crate::analytics::service::KST.clone())
+        .date()
+        .yesterday()
+        .expect("어제 날짜는 표현 가능하다")
 }
 
 /// 켜진 작업을 시작한다(스케줄링이 꺼져 있으면 아무것도 시작하지 않는다).
@@ -288,6 +314,16 @@ fn body(
                 );
             })
         }
+        Job::UserMetricsAggregation => {
+            let runner = deps
+                .analytics
+                .clone()
+                .ok_or_else(|| "사용자 지표 집계에는 집계 러너가 필요합니다".to_owned())?;
+            // 매일 새벽 전날(KST)을 집계한다. 실패는 러너가 로그를 남기고, 지표 알람이 성공 로그가 없는 것을 감지한다.
+            Box::new(move || {
+                report(&logger, runner.run(yesterday_kst(clock.now())));
+            })
+        }
         Job::NoticeDistribution => Box::new(move || {
             // `NoticeDistributionScheduler`: 대상 조회가 실패해도 예외를 밖으로 내지 않고 다음 분에 다시 시도한다.
             if let Err(error) =
@@ -350,7 +386,7 @@ mod tests {
 
     fn settings(pairs: &[(&str, &str)], runtime_log_default: bool) -> JobsSettings {
         let env = Env::from_pairs(pairs.iter().copied());
-        JobsSettings::from_env(&env, runtime_log_default).unwrap()
+        JobsSettings::from_env(&env, runtime_log_default, false).unwrap()
     }
 
     // SchedulingConfigurationTest#schedulingConfiguration_defaultSettings_enablesBoth
@@ -448,7 +484,7 @@ mod tests {
     #[test]
     fn invalid_flag_value_is_a_config_error() {
         let env = Env::from_pairs([("CHALKAK_SCHEDULING_ENABLED", "yes")]);
-        assert!(JobsSettings::from_env(&env, false).is_err());
+        assert!(JobsSettings::from_env(&env, false, false).is_err());
     }
 
     /// 각 cron 작업이 KST(UTC+9) 기준 시각에 맞는지: 직전 초는 같은 실행, 정각에 다음 실행.
@@ -504,6 +540,59 @@ mod tests {
             cron.next_after(ts("2026-10-12T00:00:00Z")),
             Some(ts("2026-10-12T19:30:00Z"))
         );
+    }
+
+    // UserMetricsAggregationSchedulerTest#aggregateYesterday_fixedClock_aggregatesYesterdayInKst
+    #[test]
+    fn aggregation_job_targets_yesterday_in_kst() {
+        // UTC 2030-01-02 16:30은 KST 2030-01-03 01:30이다.
+        assert_eq!(
+            yesterday_kst(ts("2030-01-02T16:30:00Z")).to_string(),
+            "2030-01-02"
+        );
+        // KST 자정 직전(UTC 14:59:59)은 아직 같은 날이다.
+        assert_eq!(
+            yesterday_kst(ts("2030-01-02T14:59:59Z")).to_string(),
+            "2030-01-01"
+        );
+    }
+
+    // @Scheduled(cron = "0 0 1 * * *", zone = "Asia/Seoul")
+    #[test]
+    fn aggregation_job_fires_at_one_am_kst() {
+        let cron = Job::UserMetricsAggregation.cron().unwrap();
+        // 01:00 KST는 UTC 전날 16:00이다.
+        assert_eq!(
+            cron.next_after(ts("2026-10-12T15:59:59Z")),
+            Some(ts("2026-10-12T16:00:00Z"))
+        );
+        assert_eq!(
+            cron.next_after(ts("2026-10-12T16:00:00Z")),
+            Some(ts("2026-10-13T16:00:00Z"))
+        );
+    }
+
+    // UserMetricsAggregationConfigurationTest: 기본 꺼짐, prod 프로필이 켜고, 환경변수가 덮는다.
+    #[test]
+    fn aggregation_follows_profile_default_and_env_override() {
+        let planned = |pairs: &[(&str, &str)], default: bool| {
+            let env = Env::from_pairs(pairs.iter().copied());
+            JobsSettings::from_env(&env, false, default)
+                .unwrap()
+                .planned()
+        };
+        assert!(!planned(&[], false).contains(&Job::UserMetricsAggregation));
+        assert!(planned(&[], true).contains(&Job::UserMetricsAggregation));
+        assert!(
+            planned(&[("CHALKAK_ANALYTICS_AGGREGATION_ENABLED", "true")], false)
+                .contains(&Job::UserMetricsAggregation)
+        );
+        assert!(
+            !planned(&[("CHALKAK_ANALYTICS_AGGREGATION_ENABLED", "false")], true)
+                .contains(&Job::UserMetricsAggregation)
+        );
+        // 스케줄링 전체가 꺼져 있으면 집계도 돌지 않는다.
+        assert!(planned(&[("CHALKAK_SCHEDULING_ENABLED", "false")], true).is_empty());
     }
 
     // NoticeDistributionConfigurationTest: 공지 배포는 기본 꺼짐, 환경변수가 켠다, 스케줄링 전체가 꺼지면 돌지 않는다.
