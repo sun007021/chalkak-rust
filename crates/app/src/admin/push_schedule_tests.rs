@@ -648,7 +648,6 @@ fn 시각은_분_단위_문자열_배열_날짜시각_형식도_받는다() {
         (r#"{"sendTime":" 11:00:00 "}"#, "11:00:00"),
         (r#"{"sendTime":"12:00:00.000"}"#, "12:00:00"),
         (r#"{"sendTime":"2026-10-12T13:00:00"}"#, "13:00:00"),
-        (r#"{"sendTime":"2026-10-12T05:00:00Z"}"#, "05:00:00"),
     ] {
         let reply = api.call(Method::Post, PATH, Some(body));
         assert_eq!(reply.status, 201, "{body}");
@@ -670,6 +669,8 @@ fn 발송_시각_누락_null_잘못된_시각은_400으로_거절한다() {
         r#"{"sendTime":"23:59:60"}"#,
         r#"{"sendTime":"invalid"}"#,
         r#"{"sendTime":9}"#,
+        r#"{"sendTime":"2026-10-12T05:00:00Z"}"#,
+        r#"{"sendTime":"2026-10-12T05:00:00+09:00"}"#,
         "",
     ] {
         for (method, path) in [

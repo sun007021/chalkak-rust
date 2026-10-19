@@ -227,7 +227,7 @@ fn read_send_time(req: &Request) -> Result<Time, ApiError> {
     }
 }
 
-/// Jackson `LocalTime`: 문자열(`ISO_LOCAL_TIME`, `T`가 붙은 날짜시각 포함, 앞뒤 공백 허용, 빈 문자열은 `null`)과
+/// Jackson `LocalTime`: 문자열(`ISO_LOCAL_TIME`, `T`가 붙은 로컬 날짜시각 포함, 앞뒤 공백 허용, 빈 문자열은 `null`)과
 /// `[시, 분(, 초(, 나노초))]` 배열을 받는다. 그 밖의 값과 범위를 벗어난 시각은 읽을 수 없는 본문(400)이다.
 fn json_local_time(value: Option<&Value>) -> Result<Option<Time>, ApiError> {
     match value {
@@ -268,15 +268,13 @@ fn time_of(hour: i64, minute: i64, second: i64, nanos: i64) -> Option<Time> {
 }
 
 fn parse_local_time_text(text: &str) -> Option<Time> {
-    // 자바스크립트가 보내는 날짜시각(`...T...`): `Z`로 끝나면 UTC 시각, 아니면 `ISO_LOCAL_DATE_TIME`의 시간 부분.
+    // 자바스크립트가 보내는 날짜시각(`...T...`): `ISO_LOCAL_DATE_TIME`의 시간 부분만 받는다. `Z`나 오프셋이 붙으면 거절한다
+    // (원본에서 확인한 동작).
     if text.len() > 10 && text.as_bytes()[10] == b'T' {
-        return if let Some(instant) = text.strip_suffix('Z') {
-            let timestamp: Timestamp = format!("{instant}Z").parse().ok()?;
-            Some(timestamp.to_zoned(jiff::tz::TimeZone::UTC).time())
-        } else {
-            parse_iso_local_time(&text[11..])
-                .filter(|_| text[..10].parse::<jiff::civil::Date>().is_ok())
-        };
+        return text
+            .get(..10)
+            .filter(|date| date.parse::<jiff::civil::Date>().is_ok())
+            .and_then(|_| parse_iso_local_time(&text[11..]));
     }
     parse_iso_local_time(text)
 }

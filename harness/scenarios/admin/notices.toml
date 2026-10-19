@@ -1,0 +1,509 @@
+name = "관리자 공지: 목록, 단건, 등록, 수정, 삭제"
+tags = ["admin-api", "notice"]
+clock = "2026-10-12T09:00:00+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO admins (id, username, password, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000000a1', 'operator', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-01T00:00:00Z', '2026-09-01T00:00:00Z');
+INSERT INTO notices (id, title, body, scheduled_at, distributed_at, deleted_at, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-000000000801', '배포된 공지', '이미 배포했습니다.', '2026-10-11T00:00:00Z', '2026-10-11T00:01:00Z', NULL, '2026-10-10T00:00:00Z', '2026-10-11T00:01:00Z'),
+  ('01990000-0000-7000-8000-000000000802', '예약된 공지', '곧 배포합니다.', '2026-10-20T00:00:00Z', NULL, NULL, '2026-10-10T01:00:00Z', '2026-10-10T01:00:00Z'),
+  ('01990000-0000-7000-8000-000000000803', '삭제된 공지', '삭제했습니다.', '2026-10-15T00:00:00Z', NULL, '2026-10-11T12:00:00Z', '2026-10-10T02:00:00Z', '2026-10-11T12:00:00Z');
+INSERT INTO notices (id, title, body, scheduled_at, distributed_at, created_at, updated_at)
+SELECT ('01990000-0000-7000-8000-0000000008' || lpad((i + 10)::text, 2, '0'))::uuid, '공지 ' || i, '본문 ' || i,
+  '2026-10-01T00:00:00Z'::timestamptz + (i || ' hours')::interval, '2026-10-01T00:00:00Z'::timestamptz + (i || ' hours')::interval,
+  '2026-10-02T00:00:00Z'::timestamptz + (i || ' minutes')::interval, '2026-10-02T00:00:00Z'::timestamptz + (i || ' minutes')::interval
+FROM generate_series(1, 22) AS i;
+"""]
+
+[[step]]
+name = "목록 기본"
+method = "GET"
+path = "/api/v1/admin/notices"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "목록 2쪽 크기 5"
+method = "GET"
+path = "/api/v1/admin/notices?page=2&pageSize=5"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "목록 마지막 쪽"
+method = "GET"
+path = "/api/v1/admin/notices?page=5&pageSize=5"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "목록 범위 밖"
+method = "GET"
+path = "/api/v1/admin/notices?page=9&pageSize=5"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "목록 크기 100"
+method = "GET"
+path = "/api/v1/admin/notices?pageSize=100"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "목록 page 0"
+method = "GET"
+path = "/api/v1/admin/notices?page=0"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "목록 pageSize 0"
+method = "GET"
+path = "/api/v1/admin/notices?pageSize=0"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "목록 pageSize 101"
+method = "GET"
+path = "/api/v1/admin/notices?pageSize=101"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "목록 page 문자"
+method = "GET"
+path = "/api/v1/admin/notices?page=abc"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "목록 page 오버플로"
+method = "GET"
+path = "/api/v1/admin/notices?page=2147483648"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "상세 배포됨"
+method = "GET"
+path = "/api/v1/admin/notices/01990000-0000-7000-8000-000000000801"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "상세 예약됨"
+method = "GET"
+path = "/api/v1/admin/notices/01990000-0000-7000-8000-000000000802"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "상세 삭제됨"
+method = "GET"
+path = "/api/v1/admin/notices/01990000-0000-7000-8000-000000000803"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "상세 없음"
+method = "GET"
+path = "/api/v1/admin/notices/01990000-0000-7000-8000-000000000899"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "상세 잘못된 id"
+method = "GET"
+path = "/api/v1/admin/notices/invalid"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "등록 거절 본문 없음"
+method = "POST"
+path = "/api/v1/admin/notices"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "등록 거절 제목 null"
+method = "POST"
+path = "/api/v1/admin/notices"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":null,"body":"b","scheduledAt":"2026-10-20T00:00:00Z"}'''
+
+[[step]]
+name = "등록 거절 제목 공백"
+method = "POST"
+path = "/api/v1/admin/notices"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":" ","body":"b","scheduledAt":"2026-10-20T00:00:00Z"}'''
+
+[[step]]
+name = "등록 거절 본문 null"
+method = "POST"
+path = "/api/v1/admin/notices"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"t","body":null,"scheduledAt":"2026-10-20T00:00:00Z"}'''
+
+[[step]]
+name = "등록 거절 본문 공백"
+method = "POST"
+path = "/api/v1/admin/notices"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"t","body":"  ","scheduledAt":"2026-10-20T00:00:00Z"}'''
+
+[[step]]
+name = "등록 거절 예약 없음"
+method = "POST"
+path = "/api/v1/admin/notices"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"t","body":"b"}'''
+
+[[step]]
+name = "등록 거절 예약 null"
+method = "POST"
+path = "/api/v1/admin/notices"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"t","body":"b","scheduledAt":null}'''
+
+[[step]]
+name = "등록 거절 예약 형식 오류"
+method = "POST"
+path = "/api/v1/admin/notices"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"t","body":"b","scheduledAt":"2026-10-20 09:00"}'''
+
+[[step]]
+name = "등록 거절 예약 숫자"
+method = "POST"
+path = "/api/v1/admin/notices"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"t","body":"b","scheduledAt":1791600000}'''
+
+[[step]]
+name = "등록 거절 제목 숫자"
+method = "POST"
+path = "/api/v1/admin/notices"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":1,"body":"b","scheduledAt":"2026-10-20T00:00:00Z"}'''
+
+[[step]]
+name = "등록 거절 제목 51자"
+method = "POST"
+path = "/api/v1/admin/notices"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가","body":"b","scheduledAt":"2026-10-20T00:00:00Z"}'''
+
+[[step]]
+name = "등록 거절 본문 501자"
+method = "POST"
+path = "/api/v1/admin/notices"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"t","body":"나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나","scheduledAt":"2026-10-20T00:00:00Z"}'''
+
+[[step]]
+name = "등록 거절 예약 6분 과거"
+method = "POST"
+path = "/api/v1/admin/notices"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"t","body":"b","scheduledAt":"2026-10-11T23:54:00Z"}'''
+
+[[step]]
+name = "등록 거절 민감 문구 제목"
+method = "POST"
+path = "/api/v1/admin/notices"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"password: 8자 이상","body":"비밀번호 정책이 변경됩니다.","scheduledAt":"2026-10-20T00:00:00Z"}'''
+
+[[step]]
+name = "등록 거절 깨진 JSON"
+method = "POST"
+path = "/api/v1/admin/notices"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":'''
+
+[[step]]
+name = "등록 성공 4분 과거"
+method = "POST"
+path = "/api/v1/admin/notices"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"  경계  ","body":"\n본문\r\n둘째 줄\n","scheduledAt":"2026-10-11T23:56:00Z"}'''
+capture = { noticeA = "noticeId" }
+advance_seconds = 2
+
+[[step]]
+name = "등록 성공 오프셋"
+method = "POST"
+path = "/api/v1/admin/notices"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"오프셋 예약","body":"본문","scheduledAt":"2026-10-20T09:00:00+09:00"}'''
+capture = { noticeB = "noticeId" }
+advance_seconds = 2
+
+[[step]]
+name = "등록 성공 소수 초"
+method = "POST"
+path = "/api/v1/admin/notices"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"소수 초","body":"본문","scheduledAt":"2026-10-20T09:00:00.123456789Z"}'''
+capture = { noticeC = "noticeId" }
+advance_seconds = 2
+
+[[step]]
+name = "등록 성공 50자 500자"
+method = "POST"
+path = "/api/v1/admin/notices"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가","body":"나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나","scheduledAt":"2026-10-20T00:00:00Z"}'''
+capture = { noticeD = "noticeId" }
+advance_seconds = 2
+
+[[step]]
+name = "등록 성공 이모지 제목"
+method = "POST"
+path = "/api/v1/admin/notices"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀","body":"😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀","scheduledAt":"2026-10-20T00:00:00Z"}'''
+advance_seconds = 2
+
+[[step]]
+name = "상세 방금 등록"
+method = "GET"
+path = "/api/v1/admin/notices/${noticeA}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "수정 거절 본문 없음"
+method = "PUT"
+path = "/api/v1/admin/notices/${noticeB}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "수정 거절 제목 길이"
+method = "PUT"
+path = "/api/v1/admin/notices/${noticeB}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가","body":"b","scheduledAt":"2026-10-20T00:00:00Z"}'''
+
+[[step]]
+name = "수정 거절 과거"
+method = "PUT"
+path = "/api/v1/admin/notices/${noticeB}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"t","body":"b","scheduledAt":"2026-10-01T00:00:00Z"}'''
+
+[[step]]
+name = "수정 성공"
+method = "PUT"
+path = "/api/v1/admin/notices/${noticeB}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":" 수정된 제목 ","body":"수정된 본문","scheduledAt":"2026-10-21T00:00:00Z"}'''
+advance_seconds = 2
+
+[[step]]
+name = "수정 같은 내용"
+method = "PUT"
+path = "/api/v1/admin/notices/${noticeB}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"수정된 제목","body":"수정된 본문","scheduledAt":"2026-10-21T00:00:00Z"}'''
+advance_seconds = 2
+
+[[step]]
+name = "수정 같은 시각 다른 표기"
+method = "PUT"
+path = "/api/v1/admin/notices/${noticeB}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"수정된 제목","body":"수정된 본문","scheduledAt":"2026-10-21T09:00:00+09:00"}'''
+
+[[step]]
+name = "수정 배포된 공지"
+method = "PUT"
+path = "/api/v1/admin/notices/01990000-0000-7000-8000-000000000801"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"t","body":"b","scheduledAt":"2026-10-20T00:00:00Z"}'''
+
+[[step]]
+name = "수정 삭제된 공지"
+method = "PUT"
+path = "/api/v1/admin/notices/01990000-0000-7000-8000-000000000803"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"t","body":"b","scheduledAt":"2026-10-20T00:00:00Z"}'''
+
+[[step]]
+name = "수정 없는 공지"
+method = "PUT"
+path = "/api/v1/admin/notices/01990000-0000-7000-8000-000000000899"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"t","body":"b","scheduledAt":"2026-10-20T00:00:00Z"}'''
+
+[[step]]
+name = "수정 잘못된 id"
+method = "PUT"
+path = "/api/v1/admin/notices/invalid"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"t","body":"b","scheduledAt":"2026-10-20T00:00:00Z"}'''
+
+[[step]]
+name = "삭제 거절 본문 없음"
+method = "DELETE"
+path = "/api/v1/admin/notices/${noticeA}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "삭제 거절 사유 없음"
+method = "DELETE"
+path = "/api/v1/admin/notices/${noticeA}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{}'''
+
+[[step]]
+name = "삭제 거절 사유 null"
+method = "DELETE"
+path = "/api/v1/admin/notices/${noticeA}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"reason":null}'''
+
+[[step]]
+name = "삭제 거절 사유 공백"
+method = "DELETE"
+path = "/api/v1/admin/notices/${noticeA}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"reason":"   "}'''
+
+[[step]]
+name = "삭제 거절 사유 501자"
+method = "DELETE"
+path = "/api/v1/admin/notices/${noticeA}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"reason":"가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가"}'''
+
+[[step]]
+name = "삭제 거절 잘못된 id"
+method = "DELETE"
+path = "/api/v1/admin/notices/invalid"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"reason":"사유"}'''
+
+[[step]]
+name = "삭제 거절 없는 공지"
+method = "DELETE"
+path = "/api/v1/admin/notices/01990000-0000-7000-8000-000000000899"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"reason":"사유"}'''
+
+[[step]]
+name = "삭제 성공 예약 공지"
+method = "DELETE"
+path = "/api/v1/admin/notices/${noticeA}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"reason":"  잘못 등록  "}'''
+advance_seconds = 2
+
+[[step]]
+name = "삭제 다시"
+method = "DELETE"
+path = "/api/v1/admin/notices/${noticeA}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"reason":"다시"}'''
+advance_seconds = 2
+
+[[step]]
+name = "삭제 성공 500자 사유"
+method = "DELETE"
+path = "/api/v1/admin/notices/${noticeC}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"reason":"가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가"}'''
+advance_seconds = 2
+
+[[step]]
+name = "삭제 성공 배포된 공지"
+method = "DELETE"
+path = "/api/v1/admin/notices/01990000-0000-7000-8000-000000000801"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"reason":"배포 후 숨김"}'''
+advance_seconds = 2
+
+[[step]]
+name = "삭제 이미 삭제된 공지"
+method = "DELETE"
+path = "/api/v1/admin/notices/01990000-0000-7000-8000-000000000803"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"reason":"다시"}'''
+
+[[step]]
+name = "삭제된 공지 수정"
+method = "PUT"
+path = "/api/v1/admin/notices/${noticeA}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"title":"t","body":"b","scheduledAt":"2026-10-20T00:00:00Z"}'''
+
+[[step]]
+name = "상세 삭제 후"
+method = "GET"
+path = "/api/v1/admin/notices/${noticeA}"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "상세 배포 후 삭제"
+method = "GET"
+path = "/api/v1/admin/notices/01990000-0000-7000-8000-000000000801"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "목록 최종"
+method = "GET"
+path = "/api/v1/admin/notices?pageSize=100"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "감사 로그 공지 등록"
+method = "GET"
+path = "/api/v1/admin/audit-logs?action=NOTICE_CREATED&sort=occurredAtAsc&pageSize=100"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "감사 로그 공지 수정"
+method = "GET"
+path = "/api/v1/admin/audit-logs?action=NOTICE_UPDATED&sort=occurredAtAsc"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "감사 로그 공지 삭제"
+method = "GET"
+path = "/api/v1/admin/audit-logs?action=NOTICE_DELETED&sort=occurredAtAsc"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "감사 로그 대상 NOTICE"
+method = "GET"
+path = "/api/v1/admin/audit-logs?targetType=NOTICE&sort=occurredAtAsc&pageSize=100"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
