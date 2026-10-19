@@ -1,0 +1,11 @@
+# S7 시험(scripts/s7.sh)용 겹침 설정. 매분 도는 주제 푸시·공지 배포가 알림 수치(큐 깊이, FCM 요청 수)에 끼지 않게 끈다.
+# 승인·반려 알림 경로(Relay·Worker)만 본다. compose.yaml 이 이 둘을 켜 두어도 여기서 꺼진다.
+services:
+  rust:
+    environment:
+      NOTIFICATION_TOPIC_PUSH_ENABLED: "false"
+      NOTIFICATION_NOTICE_DISTRIBUTION_ENABLED: "false"
+  java:
+    environment:
+      NOTIFICATION_TOPIC_PUSH_ENABLED: "false"
+      NOTIFICATION_NOTICE_DISTRIBUTION_ENABLED: "false"

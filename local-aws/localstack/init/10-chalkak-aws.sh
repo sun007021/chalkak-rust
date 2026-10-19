@@ -34,20 +34,25 @@ aws_ sqs create-queue --queue-name "$IMAGE_QUEUE" --attributes '{
   "ReceiveMessageWaitTimeSeconds": "20"
 }' >/dev/null
 
-aws_ sqs create-queue --queue-name "$PUSH_DLQ" --attributes '{
-  "MessageRetentionPeriod": "1209600"
-}' >/dev/null
-
-aws_ sqs create-queue --queue-name "$PUSH_QUEUE" --attributes "{
-  \"VisibilityTimeout\": \"60\",
-  \"MessageRetentionPeriod\": \"1209600\",
-  \"RedrivePolicy\": \"{\\\"deadLetterTargetArn\\\":\\\"$(arn "$PUSH_DLQ")\\\",\\\"maxReceiveCount\\\":10}\"
-}" >/dev/null
+# 푸시 큐·DLQ 는 이름만으로 만들고 속성은 아래에서 적는다(create-queue 는 속성이 다르면 이미 있는 큐에서 실패한다).
+aws_ sqs create-queue --queue-name "$PUSH_DLQ" >/dev/null
+aws_ sqs create-queue --queue-name "$PUSH_QUEUE" >/dev/null
 
 # create-queue 는 이미 있는 큐의 속성을 바꾸지 못하므로 항상 속성을 다시 적는다(재시작해도 같은 값).
 image_url="$(aws_ sqs get-queue-url --queue-name "$IMAGE_QUEUE" --query QueueUrl --output text)"
 aws_ sqs set-queue-attributes --queue-url "$image_url" --attributes \
   VisibilityTimeout=360,MessageRetentionPeriod=345600,ReceiveMessageWaitTimeSeconds=20
+
+# 푸시 큐도 같은 이유로 다시 적는다(notification-sqs-setup.md 표: Visibility 60초, Receive wait 20초, redrive 10회, DLQ 보관 14일).
+push_url="$(aws_ sqs get-queue-url --queue-name "$PUSH_QUEUE" --query QueueUrl --output text)"
+aws_ sqs set-queue-attributes --queue-url "$push_url" --attributes "{
+  \"VisibilityTimeout\": \"60\",
+  \"MessageRetentionPeriod\": \"1209600\",
+  \"ReceiveMessageWaitTimeSeconds\": \"20\",
+  \"RedrivePolicy\": \"{\\\"deadLetterTargetArn\\\":\\\"$(arn "$PUSH_DLQ")\\\",\\\"maxReceiveCount\\\":10}\"
+}"
+dlq_url="$(aws_ sqs get-queue-url --queue-name "$PUSH_DLQ" --query QueueUrl --output text)"
+aws_ sqs set-queue-attributes --queue-url "$dlq_url" --attributes MessageRetentionPeriod=1209600
 
 echo "[init] s3 event notification: s3:ObjectCreated:* prefix ${ROOT_PREFIX}/staging/ -> $IMAGE_QUEUE"
 aws_ s3api put-bucket-notification-configuration --bucket "$BUCKET" --notification-configuration "{
