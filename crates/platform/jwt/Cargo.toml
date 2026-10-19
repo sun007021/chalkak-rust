@@ -13,8 +13,8 @@ hmac.workspace = true
 sha2.workspace = true
 # ES256: PKCS#8 PEM 개인키, 결정적(RFC 6979) ECDSA 서명과 공개키 검증.
 p256 = { workspace = true, features = ["std", "ecdsa", "pkcs8", "pem"] }
-# RS256은 검증만 쓴다(개인키 연산 없음).
-rsa = { workspace = true, features = ["std", "sha2"] }
+# RS256 검증과, FCM OAuth용 서비스 계정 JWT 서명(PKCS#8 PEM 개인키).
+rsa = { workspace = true, features = ["std", "sha2", "pem"] }
 
 [lints]
 workspace = true

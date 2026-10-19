@@ -1,4 +1,4 @@
-//! HS256 발급·검증, RS256 검증, ES256 서명, JWKS 캐시.
+//! HS256 발급·검증, RS256 검증·서명(Google 서비스 계정), ES256 서명, JWKS 캐시.
 //!
 //! JWT 라이브러리 없이 RustCrypto(`hmac`, `sha2`, `p256`, `rsa`)로 직접 구현한다. 원본 동작의 근거는
 //! Spring Security `NimbusJwtDecoder`/`NimbusJwtEncoder`와 Nimbus JOSE 라이브러리다. 각 모듈 머리말과 테스트 이름에
@@ -14,6 +14,7 @@ mod jwks;
 mod jwks_cache;
 mod jws;
 pub mod original;
+mod rs256;
 mod validator;
 
 pub use b64::decode_hex;
@@ -26,4 +27,5 @@ pub use jwks_cache::{
     Clock, JWKS_ACCEPT, JWKS_CONNECT_TIMEOUT, JWKS_READ_TIMEOUT, JwksCache, JwksCacheConfig,
     JwksEvents, JwksFetchError, JwksSource, SystemClock,
 };
+pub use rs256::Rs256Signer;
 pub use validator::{ClaimError, Validator};
