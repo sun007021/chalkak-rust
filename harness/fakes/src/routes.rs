@@ -7,10 +7,14 @@
 //! | `POST /slack/...` | Slack Incoming Webhook. 본문 기록 |
 //! | `HEAD /<key>` 또는 `HEAD /<bucket>/<key>` | S3 HeadObject. 키별 크기·Content-Type·404 지정 |
 //! | `POST /` + `X-Amz-Target: AmazonSQS.*` | SQS JSON 프로토콜(SendMessage 저장, Receive·Delete·ChangeMessageVisibility). `sqs.rs` 참고 |
+//! | `POST /oauth2/token` | Google OAuth 토큰 교환(서비스 계정 JWT → 액세스 토큰). 기본은 성공, `oauth` 규칙으로 바꾼다 |
+//! | `POST /v1/projects/<프로젝트>/messages:send` | FCM HTTP v1 발송. 기본은 성공, `fcm` 규칙으로 바꾼다 |
+//! | `POST /__admin/sqs/messages` | 시나리오가 큐에 미리 넣는 메시지 |
 //! | `POST /` + `X-Amz-Target: Logs_20140328.*` | CloudWatch Logs Insights(StartQuery·GetQueryResults·StopQuery). 지표 이름별 결과 행 지정 |
 //! | `PUT /__admin/responses`, `GET /__admin/requests`, `POST /__admin/reset` | 관리 |
 
 use crate::http::{Request, Response};
+use crate::rules::{self, Rule};
 use crate::sqs::Sqs;
 use serde_json::{Map, Value, json};
 use std::collections::BTreeMap;
@@ -48,6 +52,11 @@ pub struct Fakes {
     slack: Option<Canned>,
     s3: BTreeMap<String, S3Object>,
     sqs: Sqs,
+    /// OAuth 토큰 교환 규칙(`oauth`). 규칙이 없으면 성공 응답이다.
+    oauth: Vec<Rule>,
+    /// FCM 발송 규칙(`fcm`). 규칙이 없으면 성공 응답이다.
+    fcm: Vec<Rule>,
+    fcm_sent: u64,
     logs: Option<LogsConfig>,
     /// `StartQuery`가 받은 쿼리 문자열. 인덱스 + 1이 쿼리 ID(`fake-query-N`).
     log_queries: Vec<String>,
@@ -67,7 +76,13 @@ impl Fakes {
             return self.admin(rest, req);
         }
         if let Some(op) = Sqs::operation(req) {
-            let res = self.sqs.handle(&op, req);
+            let mut res = self.sqs.handle(&op, req);
+            if op == "ReceiveMessage" && self.sqs.last_receive_empty() {
+                // 빈 응답은 기록하지 않고 롱 폴링처럼 잠시 기다린다. 앱은 쉬지 않고 다시 받으므로 횟수가 대상마다 달라
+                // 비교에 넣을 수 없다. 메시지를 돌려준 수신만 기록한다.
+                res.long_poll_ms = Sqs::long_poll_wait(req).as_millis() as u64;
+                return res;
+            }
             self.record("sqs", Some(op), req);
             return res;
         }
@@ -76,8 +91,43 @@ impl Fakes {
         res
     }
 
+    /// 롱 폴링 대기 중 다시 확인한다. 메시지가 있으면 기록하고 응답을, 없으면 `None`을 돌려준다.
+    pub fn poll_receive(&mut self, req: &Request) -> Option<Response> {
+        let res = self.sqs.handle("ReceiveMessage", req);
+        if self.sqs.last_receive_empty() {
+            return None;
+        }
+        self.record("sqs", Some("ReceiveMessage".into()), req);
+        Some(res)
+    }
+
     fn route(&mut self, req: &Request) -> (String, Option<String>, Response) {
         match (req.method.as_str(), req.path.as_str()) {
+            ("POST", "/oauth2/token") => {
+                let body = String::from_utf8_lossy(&req.body).into_owned();
+                let res = rules::respond(&self.oauth, "", &body).unwrap_or_else(|| {
+                    Response::json(
+                        200,
+                        r#"{"access_token":"fake-access-token","expires_in":3600,"token_type":"Bearer"}"#,
+                    )
+                });
+                ("oauth_token".into(), None, res)
+            }
+            ("POST", p) if p.starts_with("/v1/projects/") && p.ends_with("/messages:send") => {
+                let body = String::from_utf8_lossy(&req.body).into_owned();
+                let project = p
+                    .trim_start_matches("/v1/projects/")
+                    .trim_end_matches("/messages:send");
+                self.fcm_sent += 1;
+                let res = rules::respond(&self.fcm, "", &body).unwrap_or_else(|| {
+                    Response::json(
+                        200,
+                        &json!({"name": format!("projects/{project}/messages/fake-{}", self.fcm_sent)})
+                            .to_string(),
+                    )
+                });
+                ("fcm_send".into(), None, res)
+            }
             ("GET", "/oidc/apple/keys") => ("oidc_jwks:apple".into(), None, jwks()),
             ("GET", "/oidc/google/certs") => ("oidc_jwks:google".into(), None, jwks()),
             ("GET", "/oidc/kakao/jwks.json") => ("oidc_jwks:kakao".into(), None, jwks()),
@@ -247,6 +297,10 @@ impl Fakes {
                 Ok(()) => Response::json(200, r#"{"ok":true}"#),
                 Err(e) => Response::json(400, &json!({ "error": e }).to_string()),
             },
+            ("POST", "sqs/messages") => match self.seed_sqs(&req.body) {
+                Ok(()) => Response::json(200, r#"{"ok":true}"#),
+                Err(e) => Response::json(400, &json!({ "error": e }).to_string()),
+            },
             ("GET", "requests") => {
                 Response::json(200, &Value::Array(self.records.clone()).to_string())
             }
@@ -258,6 +312,23 @@ impl Fakes {
         }
     }
 
+    /// `{"messages":["본문", ...]}`을 큐에 넣는다.
+    fn seed_sqs(&mut self, body: &[u8]) -> Result<(), String> {
+        let v: Value = serde_json::from_slice(body).map_err(|e| format!("JSON 오류: {e}"))?;
+        let messages = v
+            .get("messages")
+            .and_then(Value::as_array)
+            .ok_or("messages 배열이 필요합니다")?;
+        let bodies: Vec<&str> = messages
+            .iter()
+            .map(|m| m.as_str().ok_or("messages 항목은 문자열이어야 합니다"))
+            .collect::<Result<_, _>>()?;
+        for body in bodies {
+            self.sqs.seed(body);
+        }
+        Ok(())
+    }
+
     /// 지정한 응답을 통째로 바꾼다(이전 지정은 사라진다). 기록은 건드리지 않는다.
     fn set_responses(&mut self, body: &[u8]) -> Result<(), String> {
         let v: Value = serde_json::from_slice(body).map_err(|e| format!("JSON 오류: {e}"))?;
@@ -267,6 +338,8 @@ impl Fakes {
         let mut slack = None;
         let mut s3 = BTreeMap::new();
         let mut sqs_rules = Vec::new();
+        let mut oauth = Vec::new();
+        let mut fcm = Vec::new();
         let mut logs = None;
         for (name, value) in obj {
             match name.as_str() {
@@ -281,6 +354,8 @@ impl Fakes {
                     }
                 }
                 "sqs" => sqs_rules = Sqs::parse_rules(value)?,
+                "oauth" => oauth = rules::parse_rules("oauth", "application/json", value)?,
+                "fcm" => fcm = rules::parse_rules("fcm", "application/json", value)?,
                 other => return Err(format!("알 수 없는 항목: {other}")),
             }
         }
@@ -289,6 +364,8 @@ impl Fakes {
         self.slack = slack;
         self.s3 = s3;
         self.sqs.set_rules(sqs_rules);
+        self.oauth = oauth;
+        self.fcm = fcm;
         self.logs = logs;
         Ok(())
     }
@@ -700,5 +777,125 @@ mod tests {
             "{}",
         ));
         assert_eq!(res.status, 400);
+    }
+
+    #[test]
+    fn oauth_토큰_교환은_기본_성공이고_규칙으로_바꾼다() {
+        let mut f = Fakes::new("test-bucket");
+        let form =
+            "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=a.b.c";
+        let res = f.handle(&req("POST", "/oauth2/token", &[], form));
+        assert_eq!(res.status, 200);
+        let v: Value = serde_json::from_slice(&res.body).unwrap();
+        assert_eq!(v["access_token"], "fake-access-token");
+        assert_eq!(v["token_type"], "Bearer");
+
+        configure(
+            &mut f,
+            r#"{"oauth":[{"contains":"assertion=bad","status":400,"body":"{\"error\":\"invalid_grant\"}"}]}"#,
+        );
+        let res = f.handle(&req("POST", "/oauth2/token", &[], "assertion=bad.x.y"));
+        assert_eq!(res.status, 400);
+        let res = f.handle(&req("POST", "/oauth2/token", &[], "assertion=good"));
+        assert_eq!(res.status, 200);
+        let rs = records(&mut f);
+        assert_eq!(rs.len(), 3);
+        assert_eq!(rs[0]["service"], "oauth_token");
+        assert_eq!(rs[0]["body"], form);
+    }
+
+    #[test]
+    fn fcm_발송은_프로젝트별_경로로_받고_기본_성공_응답에_번호를_붙인다() {
+        let mut f = Fakes::new("test-bucket");
+        let path = "/v1/projects/chalkak-test/messages:send";
+        let body = r#"{"message":{"token":"t"}}"#;
+        let res = f.handle(&req("POST", path, &[("authorization", "Bearer x")], body));
+        assert_eq!(res.status, 200);
+        let v: Value = serde_json::from_slice(&res.body).unwrap();
+        assert_eq!(v["name"], "projects/chalkak-test/messages/fake-1");
+        let v: Value =
+            serde_json::from_slice(&f.handle(&req("POST", path, &[], body)).body).unwrap();
+        assert_eq!(v["name"], "projects/chalkak-test/messages/fake-2");
+
+        configure(
+            &mut f,
+            r#"{"fcm":[{"contains":"bad-token","status":404,"headers":{"retry-after":"7"},
+                "body":"{\"error\":{\"code\":404,\"status\":\"NOT_FOUND\"}}"}]}"#,
+        );
+        let res = f.handle(&req(
+            "POST",
+            path,
+            &[],
+            r#"{"message":{"token":"bad-token"}}"#,
+        ));
+        assert_eq!(res.status, 404);
+        assert!(
+            res.headers
+                .iter()
+                .any(|(k, v)| k == "retry-after" && v == "7")
+        );
+        let rs = records(&mut f);
+        assert_eq!(rs.len(), 3);
+        assert_eq!(rs[0]["service"], "fcm_send");
+        assert_eq!(rs[0]["path"], path);
+        assert_eq!(rs[0]["headers"]["authorization"], "Bearer x");
+    }
+
+    #[test]
+    fn 잘못된_oauth_fcm_규칙은_거절한다() {
+        let mut f = Fakes::new("test-bucket");
+        for config in [r#"{"oauth":{}}"#, r#"{"fcm":[{}]}"#] {
+            let res = f.handle(&req("PUT", "/__admin/responses", &[], config));
+            assert_eq!(res.status, 400, "{config}");
+        }
+    }
+
+    #[test]
+    fn 빈_수신은_기록하지_않고_기다리며_넣어_둔_메시지를_받으면_기록한다() {
+        let mut f = Fakes::new("test-bucket");
+        let receive = req(
+            "POST",
+            "/",
+            &[("x-amz-target", "AmazonSQS.ReceiveMessage")],
+            r#"{"MaxNumberOfMessages":1,"WaitTimeSeconds":20}"#,
+        );
+        let res = f.handle(&receive);
+        assert_eq!(res.status, 200);
+        assert_eq!(res.long_poll_ms, 1000);
+        assert!(records(&mut f).is_empty());
+        assert!(f.poll_receive(&receive).is_none());
+
+        let res = f.handle(&req(
+            "POST",
+            "/__admin/sqs/messages",
+            &[],
+            r#"{"messages":["{\"a\":1}","invalid"]}"#,
+        ));
+        assert_eq!(res.status, 200);
+        let res = f.poll_receive(&receive).expect("넣어 둔 메시지");
+        let v: Value = serde_json::from_slice(&res.body).unwrap();
+        assert_eq!(v["Messages"][0]["Body"], "{\"a\":1}");
+        assert_eq!(
+            v["Messages"][0]["Attributes"]["ApproximateReceiveCount"],
+            "1"
+        );
+        let rs = records(&mut f);
+        assert_eq!(rs.len(), 1);
+        assert_eq!(rs[0]["service"], "sqs");
+        assert_eq!(rs[0]["detail"], "ReceiveMessage");
+
+        // 메시지를 바로 돌려주는 수신은 기다리지 않는다.
+        let res = f.handle(&receive);
+        assert_eq!(res.long_poll_ms, 0);
+        assert_eq!(records(&mut f).len(), 2);
+    }
+
+    #[test]
+    fn 시나리오가_넣는_메시지_형식이_틀리면_거절한다() {
+        let mut f = Fakes::new("test-bucket");
+        for body in [r#"{}"#, r#"{"messages":[1]}"#, "not json"] {
+            let res = f.handle(&req("POST", "/__admin/sqs/messages", &[], body));
+            assert_eq!(res.status, 400, "{body}");
+        }
     }
 }

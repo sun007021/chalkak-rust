@@ -50,6 +50,17 @@ pub fn configure(
     .map(|_| ())
 }
 
+/// 가짜 SQS 큐에 메시지를 미리 넣는다.
+pub fn seed_sqs(base_url: &str, bodies: &[String]) -> Result<(), String> {
+    admin(
+        base_url,
+        "POST",
+        "/__admin/sqs/messages",
+        Some(json!({ "messages": bodies }).to_string()),
+    )
+    .map(|_| ())
+}
+
 pub fn records(base_url: &str) -> Result<Vec<Value>, String> {
     let body = admin(base_url, "GET", "/__admin/requests", None)?;
     serde_json::from_slice(&body).map_err(|e| format!("fakes 기록 해석 실패: {e}"))
@@ -137,8 +148,14 @@ pub fn admin_json(spec: &FakesSpec, subst: &dyn Fn(&str) -> String) -> Value {
         .map(|(k, v)| (subst(k), s3_json(v)))
         .collect();
     o.insert("s3".into(), Value::Object(s3));
-    if let Some(rules) = &spec.sqs {
-        o.insert("sqs".into(), sqs_json(rules, subst));
+    for (name, rules) in [
+        ("sqs", &spec.sqs),
+        ("oauth", &spec.oauth),
+        ("fcm", &spec.fcm),
+    ] {
+        if let Some(rules) = rules {
+            o.insert(name.into(), sqs_json(rules, subst));
+        }
     }
     Value::Object(o)
 }
@@ -148,6 +165,7 @@ pub fn admin_json(spec: &FakesSpec, subst: &dyn Fn(&str) -> String) -> Value {
 /// - 요청 헤더: Content-Type만 남긴다(User-Agent, Host, SDK 서명 헤더는 구현 세부).
 /// - S3: 경로·가상 호스트 방식 차이를 버리고 `버킷/키`만 남긴다.
 /// - SQS: 작업 이름과 큐 URL, 메시지 본문(JSON이면 풀어서 정규화)만 남긴다. 서명·SDK 헤더는 구현 세부다.
+/// - FCM 발송 본문: JSON으로 풀어 정규화한다. OAuth 토큰 교환 본문은 Apple처럼 폼 필드로 푼다(`assertion`은 서명한 JWT).
 /// - Apple 요청 본문: 폼 필드로 풀어 이름순으로 비교하고, `client_secret`(JWT)은 클레임을 풀어 정규화한다.
 pub fn normalize(records: &[Value], norm: &mut Normalizer) -> Value {
     let mut out = Vec::new();
@@ -174,12 +192,14 @@ pub fn normalize(records: &[Value], norm: &mut Normalizer) -> Value {
         }
         if !body.is_empty() {
             let v = match service {
-                "apple_token" | "apple_revoke" => form_value(body, norm),
+                "apple_token" | "apple_revoke" | "oauth_token" => form_value(body, norm),
                 "sqs" => sqs_body(body, norm),
-                "slack" | "cloudwatch_logs" => match serde_json::from_str::<Value>(body) {
-                    Ok(v) => norm.value(&v, &[], ""),
-                    Err(_) => json!(norm.string(body)),
-                },
+                "slack" | "cloudwatch_logs" | "fcm_send" => {
+                    match serde_json::from_str::<Value>(body) {
+                        Ok(v) => norm.value(&v, &[], ""),
+                        Err(_) => json!(norm.string(body)),
+                    }
+                }
                 _ => json!(norm.string(body)),
             };
             o.insert("body".into(), v);
@@ -396,5 +416,41 @@ mod tests {
         assert_eq!(out[0]["body"]["logGroupName"], "g");
         let q = out[0]["body"]["queryString"].as_str().unwrap();
         assert!(q.contains("$uuid") && !q.contains("0000-7000"), "{q}");
+    }
+
+    #[test]
+    fn fcm_oauth_규칙을_관리_json으로_바꾼다() {
+        let spec: FakesSpec = toml::from_str(
+            "[[fcm]]\ncontains = \"${t}\"\nstatus = 404\nbody = \"{}\"\n[[oauth]]\nstatus = 400\n",
+        )
+        .unwrap();
+        let v = admin_json(&spec, &|s| s.replace("${t}", "tok"));
+        assert_eq!(
+            v["fcm"],
+            json!([{"status": 404, "contains": "tok", "body": "{}"}])
+        );
+        assert_eq!(v["oauth"], json!([{"status": 400}]));
+    }
+
+    #[test]
+    fn fcm_발송과_oauth_교환_기록을_정규화한다() {
+        let fcm = r#"{"message":{"token":"t","data":{"eventId":"0199aaaa-0000-7000-8000-000000000001"}}}"#;
+        let recs = vec![
+            json!({"service": "fcm_send", "method": "POST", "path": "/v1/projects/p/messages:send",
+            "query": "", "headers": {"content-type": "application/json; charset=UTF-8", "authorization": "Bearer x"},
+            "body": fcm}),
+            json!({"service": "oauth_token", "method": "POST", "path": "/oauth2/token", "query": "",
+            "headers": {"content-type": "application/x-www-form-urlencoded"},
+            "body": "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=x"}),
+        ];
+        let out = normalize(&recs, &mut Normalizer::new(CLOCK));
+        assert_eq!(out[0]["path"], "/v1/projects/p/messages:send");
+        assert_eq!(out[0]["body"]["message"]["token"], "t");
+        assert_eq!(out[0]["body"]["message"]["data"]["eventId"], "$uuid1");
+        assert!(out[0].get("headers").is_none());
+        assert_eq!(
+            out[1]["body"]["grant_type"],
+            "urn:ietf:params:oauth:grant-type:jwt-bearer"
+        );
     }
 }

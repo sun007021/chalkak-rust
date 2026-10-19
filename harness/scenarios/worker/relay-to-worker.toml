@@ -1,0 +1,37 @@
+name = "푸시 Worker: Relay가 큐에 넣은 승인 알림을 받아 처리하고 지운다"
+tags = ["worker", "notification", "admin-api"]
+lane = "worker"
+clock = "2026-10-12T09:00:00+09:00"
+
+# 근거: NotificationSqsRelay -> SQS -> SqsPushService -> PushWorkerService. 기기가 없는 사용자라 FCM은 부르지 않는다(NO_DEVICES).
+# SendMessage 한 번, ReceiveMessage 한 번, DeleteMessage 한 번이 가짜 SQS에 남는다.
+
+[setup]
+sql = ["""
+INSERT INTO admins (id, username, password) VALUES
+  ('01990000-0000-7000-8000-0000000000a1', 'operator', 'hash-not-used');
+INSERT INTO users (id, email, signature_original_storage_key, moderation_push_enabled) VALUES
+  ('01990000-0000-7000-8000-000000000001', 'user1@test.chalkak', 'chalkak/signatures/user1/original.png', TRUE);
+INSERT INTO topics (id, title, topic_date, starts_at, ends_at) VALUES
+  ('01990000-0000-7000-8000-0000000000f1', '주제1', '2026-10-01', '2026-10-01T00:00:00+09:00', '2026-10-01T23:59:59+09:00');
+INSERT INTO photos (id, original_storage_key, thumbnail_storage_key) VALUES
+  ('01990000-0000-7000-8000-0000000000b1', 'chalkak/posts/p1/original.webp', 'chalkak/posts/p1/thumbnail.webp');
+INSERT INTO posts (id, user_id, topic_id, photo_id, title, moderation_status) VALUES
+  ('01990000-0000-7000-8000-0000000000c1', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-0000000000b1', '승인될 사진', 'PENDING');
+"""]
+
+[[step]]
+name = "승인"
+method = "PUT"
+path = "/api/v1/admin/posts/01990000-0000-7000-8000-0000000000c1/moderation"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"status":"APPROVED"}'''
+
+[[step]]
+name = "Relay 발행, Worker 수신·삭제까지 기다린 뒤 알림함 확인"
+method = "GET"
+path = "/api/v1/notifications?size=10"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+wait_until_sql = "SELECT count(*) = 1 FROM notifications WHERE sqs_publish_status = 'PUBLISHED'"
+await_fakes = { service = "sqs", count = 3 }

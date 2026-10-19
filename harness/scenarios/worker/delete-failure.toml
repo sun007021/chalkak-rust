@@ -1,0 +1,24 @@
+name = "푸시 Worker: 삭제가 실패해도 Worker는 멈추지 않고 메시지는 큐에 남는다"
+tags = ["worker", "notification"]
+lane = "worker"
+clock = "2026-10-12T09:00:00+09:00"
+
+# 근거: SqsPushServiceTest(삭제 실패는 로그만 남기고 계속). 처리한 메시지 삭제가 500이면 ReceiveMessage + DeleteMessage(500)만 남고
+# 가짜 큐는 삭제된 메시지를 비우지 않아 다음 폴링에서 다시 올 수 있으므로 기록은 "최소 두 건"을 기다린 뒤 비교한다.
+
+[setup]
+sql = ["""INSERT INTO users (id, email, signature_original_storage_key) VALUES
+  ('01990000-0000-7000-8000-000000000001', 'user1@test.chalkak', 'chalkak/signatures/user1/original.png')"""]
+
+[[fakes.sqs]]
+op = "DeleteMessage"
+status = 500
+body = '''{"__type":"InternalError","message":"boom"}'''
+
+[[step]]
+name = "잘못된 본문 하나를 받아 처리하고 삭제를 시도할 때까지 기다린다"
+method = "GET"
+path = "/api/v1/notifications/unread-status"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+sqs_seed = ['''invalid''']
+await_fakes = { service = "sqs", count = 2 }

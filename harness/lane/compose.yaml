@@ -121,6 +121,8 @@ services:
       - ${FAKETIME_LIB}:/opt/faketime/libfaketime.so.1:ro
       - ${LANE_RUST_BIN}:/app/chalkak-server:ro
       - ../../migrations:/app/migrations:ro
+      # 푸시 Worker가 읽는 서비스 계정 파일(worker lane만 경로를 설정한다)
+      - ../keys/fcm-service-account.json:/secrets/fcm-service-account.json:ro
     ports: ["127.0.0.1:${LANE_APP_PORT}:8080"]
     depends_on:
       pg: { condition: service_healthy }
@@ -148,6 +150,8 @@ services:
       - ${LANE_DIR}:/clock:ro
       - ${FAKETIME_LIB}:/opt/faketime/libfaketime.so.1:ro
       - ${LANE_JAVA_JAR}:/app/app.jar:ro
+      # 푸시 Worker가 읽는 서비스 계정 파일(worker lane만 경로를 설정한다)
+      - ../keys/fcm-service-account.json:/secrets/fcm-service-account.json:ro
     ports: ["127.0.0.1:${LANE_APP_PORT}:8080"]
     depends_on:
       pg: { condition: service_healthy }

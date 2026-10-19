@@ -8,13 +8,13 @@
 | 경로 | 내용 |
 | --- | --- |
 | `parity/` | 시나리오 러너, 정규화, 비교기, ID Token 서명 (`chalkak-parity`) |
-| `fakes/` | 가짜 외부 서버 (`chalkak-fakes`): OIDC JWKS, Apple 토큰 교환·철회, Slack Webhook, S3 HeadObject, SQS(SendMessage·Receive·Delete·ChangeMessageVisibility), CloudWatch Logs Insights. 받은 요청을 기록한다 |
+| `fakes/` | 가짜 외부 서버 (`chalkak-fakes`): OIDC JWKS, Apple 토큰 교환·철회, Slack Webhook, S3 HeadObject, SQS(SendMessage·Receive·Delete·ChangeMessageVisibility), FCM v1 전송·OAuth 토큰 교환, CloudWatch Logs Insights. 받은 요청을 기록한다 |
 | `keys/` | 가짜 JWKS와 러너가 ID Token 서명에 쓰는 테스트 RSA 키 쌍 (비밀 아님) |
 | `scenarios/` | 시나리오(TOML). 형식은 `parity/src/scenario.rs` 상단 주석 참고 |
 | `golden/` | Java oracle에서 녹화한 정규화 결과 |
 | `env/` | 대상별 설정(`java-a`, `java-b`, `rust`)과 앱 공통 환경변수(`oracle.env`) |
 | `scripts/check.sh` | **기본 진입점.** 빌드 → lane 준비 → 시나리오를 lane에 나눠 병렬 실행(`verify`·`compare`·`record`) |
-| `scripts/lane.sh`, `lane/compose.yaml` | lane(서로 섞이지 않는 비교 대상 하나) 띄우기·목록·정리. `TXLOG=1`이면 DB 문장 로그를, `RELAY=1`이면 SQS Relay를 켠 lane을 띄운다(`lane/compose.txlog.yaml`, `env/oracle-relay.env`) |
+| `scripts/lane.sh`, `lane/compose.yaml` | lane(서로 섞이지 않는 비교 대상 하나) 띄우기·목록·정리. `TXLOG=1`이면 DB 문장 로그를, `RELAY=1`이면 SQS Relay를, `WORKER=1`이면 Relay와 푸시 Worker를 함께 켠 lane을 띄운다(`lane/compose.txlog.yaml`, `env/oracle-relay.env`, `env/oracle-worker.env`) |
 | `scripts/oracle-jar.sh` | Java lane이 쓰는 원본 JAR(`BASELINE` 커밋)을 호스트에서 빌드 |
 | `loadgen/`, `perf/`, `scripts/perf.sh` | 성능·동시성·장시간·스트레스(트래픽 급증·연결 폭주·DB 장애) 시험: 부하 발생기(`chalkak-loadgen`)와, libfaketime 없는 Java 대 Rust 비교 스택. 사용법은 [docs/perf/README.md](../docs/perf/README.md) |
 | `scripts/up.sh`, `down.sh` | 예전 고정 환경(java-a·java-b·rust 한 벌) 기동·정리. 서비스 정의는 저장소 루트 `compose.yaml` |
@@ -156,7 +156,9 @@ FAKES_LOCAL=1 COMPOSE_UP_ARGS="--no-build" harness/scripts/up.sh selfcheck
 | `POST /apple/auth/token`, `/apple/auth/revoke` | Apple 토큰 교환·철회 | 시나리오가 지정. 지정하지 않으면 500 |
 | `POST /slack/...` | Slack Incoming Webhook | 본문 기록. 지정하지 않으면 200 `ok` |
 | `HEAD /<키>` (가상 호스트 `<버킷>.fakes`) 또는 `HEAD /<버킷>/<키>` | S3 HeadObject | 키별 크기·Content-Type·상태를 시나리오가 지정. 지정하지 않은 키는 404 |
-| `POST /` + `X-Amz-Target: AmazonSQS.<작업>` | SQS (JSON 프로토콜) | `SendMessage`는 메시지를 저장하고 정상 응답(본문 MD5·`MessageId`). `ReceiveMessage`·`DeleteMessage`·`ChangeMessageVisibility`는 저장한 메시지에 대해 동작한다(롱 폴링 없음). 오류·지연은 규칙 목록(`[[fakes.sqs]]`)으로 지정 |
+| `POST /` + `X-Amz-Target: AmazonSQS.<작업>` | SQS (JSON 프로토콜) | `SendMessage`는 메시지를 저장하고 정상 응답(본문 MD5·`MessageId`). `ReceiveMessage`·`DeleteMessage`·`ChangeMessageVisibility`는 저장한 메시지에 대해 동작한다. 빈 `ReceiveMessage`는 `WaitTimeSeconds`만큼(최대 1초) 기다렸다 비어서 돌아가고 기록하지 않는다(Worker의 유휴 폴링이 기록을 흐리지 않게). 오류·지연은 규칙 목록(`[[fakes.sqs]]`)으로 지정. `POST /__admin/sqs/messages`(`{"messages":[...]}`)로 Relay를 거치지 않는 본문을 큐에 넣는다 |
+| `POST /oauth2/token` | Google OAuth 토큰 교환(FCM 서비스 계정) | 정상이면 `{"access_token":"fake-access-token","expires_in":3600}`. 규칙 `[[fakes.oauth]]`로 응답 지정. 서비스 `oauth_token` |
+| `POST /v1/projects/<id>/messages:send` | FCM HTTP v1 | 정상이면 `{"name":"projects/<id>/messages/fake-N"}`. 규칙 `[[fakes.fcm]]`. 서비스 `fcm_send` |
 | `POST /` + `X-Amz-Target: Logs_20140328.*` | CloudWatch Logs Insights(`StartQuery`·`GetQueryResults`·`StopQuery`) | 쿼리는 즉시 `Complete`. 쿼리의 `as <지표>` 이름으로 시나리오가 지정한 결과 행을 돌려주고, 지정하지 않은 지표는 행이 없다. 쿼리 ID는 `fake-query-N` |
 | `PUT /__admin/responses`, `GET /__admin/requests`, `POST /__admin/reset`, `GET /__admin/health` | 관리 | 응답 지정(통째로 교체), 기록 조회, 초기화 |
 
@@ -200,6 +202,21 @@ URL 검증이 느슨한 Rust 서버용이다. 원본의 Slack 본문 형식은 J
   레코드 선언 순서)는 정규화로 정렬되어 보이지 않으므로 cargo 시험(`sqs_push_tests`)이 바이트 단위로 확인한다.
 - **주제 푸시(cron)와 발행 대기 모니터는 relay lane에서 켜지 않는다.** Java cron은 기동 때 계산한 지연을 단조 시계로 기다려
   faketime을 따르지 않는다. 이 둘은 시계를 고정한 DB 시험(`topic_push_tests`, `publication_monitor_tests`)으로 확인한다.
+
+### worker lane (푸시 Worker)
+
+`WORKER=1 harness/scripts/lane.sh up rust|java [개수]`는 relay lane에 `env/oracle-worker.env`를 더해 푸시 Worker를 켠다
+(`NOTIFICATION_WORKER_ENABLED=true`, 프로젝트 `chalkak-harness`, 서비스 계정 `keys/fcm-service-account.json`을 `/secrets/`에 마운트,
+`token_uri`는 `http://fakes:9000/oauth2/token`). `flavor = "worker"`, 시나리오는 `lane = "worker"`, 목록은 `lane.sh targets ... --worker`.
+단계의 `sqs_seed = ['''본문''']`은 요청 전에 가짜 큐에 메시지를 넣고, `await_fakes = { service = "sqs", count = N }`은 Worker가 받아 지울 때까지 기다린다.
+
+- **Java로는 FCM 전송을 녹화할 수 없다.** Firebase Admin SDK가 FCM 호스트를 `https://fcm.googleapis.com`으로 고정해 바꿀 수 없다.
+  (OAuth 주소만 서비스 계정 JSON의 `token_uri`로 돌릴 수 있다.) 그래서 worker lane 시나리오는 보내지 않는 경로(잘못된 본문, 만료,
+  기기 없음, 읽음, 탈퇴 등)와 큐 수신·삭제 흐름만 담고, 전송·재시도·오류 분류는 Rust 단위 시험과 DB 시험
+  (`crates/app/tests/push_worker_db.rs`, `fcm/tests.rs`, 원본 JAR로 기록한 표 `fcm_java_parity.rs`)이 맡는다.
+- Rust에는 원본에 없는 `NOTIFICATION_FCM_ENDPOINT_URL`이 있어 같은 가짜 FCM 서버(`fcm_send`)로 전송 경로를 직접 확인할 수 있다
+  (env는 `oracle-worker.env`가 Rust lane에도 주지만 Java는 무시한다).
+- 비교에서 `fcm_send`는 본문을 JSON으로 풀어 정규화하고 `oauth_token`은 폼 본문을 푼다.
 
 ## 시나리오 형식 추가분
 

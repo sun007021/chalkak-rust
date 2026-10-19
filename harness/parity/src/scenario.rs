@@ -50,6 +50,9 @@
 //! content_type = "image/png"
 //! ```
 //!
+//! [[fakes.fcm]] / [[fakes.oauth]]      # FCM 발송·OAuth 토큰 교환 응답 규칙(sqs와 같은 형식, op는 쓰지 않는다). 없으면 성공
+//! # sqs_seed = ["본문", ...]           # (단계) 요청 전에 가짜 큐에 미리 넣을 메시지 본문
+//!
 //! [[fakes.sqs]]                       # SQS 응답 규칙(위에서부터 처음 맞는 것). 없으면 모든 SendMessage가 정상 응답
 //! op = "SendMessage"                   # 생략하면 모든 작업
 //! contains = "${notificationId}"       # 요청 본문에 이 문자열이 있을 때만(생략하면 모두)
@@ -135,6 +138,10 @@ pub struct Step {
     /// 응답을 받은 뒤, 비동기로 도는 일이 가짜 서버를 이만큼 부를 때까지 기다린다(누적 횟수).
     /// 응답 뒤에 외부 호출을 이어 가는 일(사용자 지표 집계)은 앱마다 걸리는 시간이 달라 다음 단계와 겹치지 않게 맞춘다.
     pub await_fakes: Option<AwaitFakes>,
+    /// 요청 전에 가짜 SQS 큐에 미리 넣는 메시지 본문(`${변수}` 치환). 응답 지정과 달리 단계마다 새로 넣을 뿐 유지되지 않는다.
+    /// Worker가 큐에서 받아 처리하는 시나리오에서 Relay를 거치지 않는 메시지(잘못된 JSON 등)를 만들 때 쓴다.
+    #[serde(default)]
+    pub sqs_seed: Vec<String>,
 }
 
 /// 가짜 서버 호출 대기 지정. `service`가 같은 기록이 시나리오 시작부터 `count`개 이상 쌓일 때까지 기다린다.
@@ -204,6 +211,10 @@ pub struct FakesSpec {
     pub s3: BTreeMap<String, S3Spec>,
     /// SQS 응답 규칙. 지정하면 이전 규칙을 통째로 바꾼다.
     pub sqs: Option<Vec<SqsRuleSpec>>,
+    /// Google OAuth 토큰 교환(`POST /oauth2/token`) 응답 규칙. `op`는 쓰지 않는다. 규칙이 없으면 성공 응답이다.
+    pub oauth: Option<Vec<SqsRuleSpec>>,
+    /// FCM HTTP v1 발송(`POST /v1/projects/<프로젝트>/messages:send`) 응답 규칙. 규칙이 없으면 성공 응답이다.
+    pub fcm: Option<Vec<SqsRuleSpec>>,
 }
 
 #[derive(Debug, Clone, Deserialize, PartialEq)]
@@ -260,6 +271,12 @@ impl FakesSpec {
         }
         if over.sqs.is_some() {
             self.sqs.clone_from(&over.sqs);
+        }
+        if over.oauth.is_some() {
+            self.oauth.clone_from(&over.oauth);
+        }
+        if over.fcm.is_some() {
+            self.fcm.clone_from(&over.fcm);
         }
         if over.logs.is_some() {
             self.logs.clone_from(&over.logs);
@@ -463,5 +480,34 @@ wait_until_sql = "SELECT true"
                 .as_deref(),
             Some("Failed")
         );
+    }
+
+    #[test]
+    fn fcm_oauth_규칙과_큐_미리_넣기를_읽고_단계_지정이_덮는다() {
+        let s: Scenario = toml::from_str(
+            r#"
+name = "worker"
+lane = "worker"
+[[fakes.fcm]]
+status = 200
+[[fakes.oauth]]
+status = 500
+[[step]]
+name = "a"
+method = "GET"
+path = "/"
+sqs_seed = ["invalid", "null"]
+[[step.fakes.fcm]]
+status = 404
+"#,
+        )
+        .unwrap();
+        assert_eq!(s.steps[0].sqs_seed, vec!["invalid", "null"]);
+        let mut base = s.fakes.clone().unwrap();
+        assert_eq!(base.fcm.as_ref().unwrap()[0].status, 200);
+        assert_eq!(base.oauth.as_ref().unwrap()[0].status, 500);
+        base.merge(s.steps[0].fakes.as_ref().unwrap());
+        assert_eq!(base.fcm.unwrap()[0].status, 404);
+        assert_eq!(base.oauth.unwrap()[0].status, 500);
     }
 }
