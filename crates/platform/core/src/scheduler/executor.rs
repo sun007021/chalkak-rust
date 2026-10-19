@@ -183,6 +183,31 @@ impl Scheduler {
         })
     }
 
+    /// `@Scheduled(fixedDelay = ...)`. 시작하자마자 한 번 실행하고, 앞 실행이 끝난 뒤 `delay`가 지나면 다시 실행한다.
+    pub fn fixed_delay(
+        &mut self,
+        name: &str,
+        delay: Duration,
+        mut task: impl FnMut() + Send + 'static,
+    ) -> io::Result<()> {
+        if delay.is_zero() {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "fixed-delay 간격은 0보다 커야 합니다",
+            ));
+        }
+        let shutdown = self.shutdown.clone();
+        let reporter = self.reporter(name);
+        self.spawn(name, move || {
+            while !shutdown.is_triggered() {
+                run_guarded(&reporter, &mut task);
+                if shutdown.wait_timeout(delay) {
+                    return;
+                }
+            }
+        })
+    }
+
     /// `@Scheduled(cron = ..., zone = ...)`. 다음 실행 시각이 없으면 스레드를 끝낸다.
     pub fn cron(
         &mut self,
@@ -287,6 +312,7 @@ mod tests {
     use super::*;
     use crate::clock::FixedClock;
     use crate::scheduler::cron::SEOUL;
+    use std::sync::Mutex;
     use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
     fn wait_until(what: &str, mut cond: impl FnMut() -> bool) {
@@ -373,6 +399,38 @@ mod tests {
     }
 
     #[test]
+    fn fixed_delay_는_앞_실행이_끝난_뒤_간격을_둔다() {
+        let shutdown = ShutdownSignal::new();
+        let mut scheduler = Scheduler::new(shutdown.clone(), fixed_clock("2026-10-12T00:00:00Z"));
+        let starts = Arc::new(Mutex::new(Vec::<Instant>::new()));
+        let log = Arc::clone(&starts);
+        scheduler
+            .fixed_delay("tick", Duration::from_millis(40), move || {
+                log.lock().unwrap().push(Instant::now());
+                std::thread::sleep(Duration::from_millis(30));
+            })
+            .unwrap();
+        wait_until("세 번 실행", || starts.lock().unwrap().len() >= 3);
+        shutdown.trigger();
+        scheduler.join();
+        let starts = starts.lock().unwrap();
+        // 실행(30ms)이 끝난 뒤 40ms를 쉬므로 시작 간격은 70ms 이상이다(fixed-rate면 40ms).
+        assert!(starts[1] - starts[0] >= Duration::from_millis(70));
+        assert!(starts[2] - starts[1] >= Duration::from_millis(70));
+    }
+
+    #[test]
+    fn fixed_delay_간격_0은_거절한다() {
+        let mut scheduler =
+            Scheduler::new(ShutdownSignal::new(), fixed_clock("2026-10-12T00:00:00Z"));
+        assert!(
+            scheduler
+                .fixed_delay("tick", Duration::ZERO, || {})
+                .is_err()
+        );
+    }
+
+    #[test]
     fn 간격이_긴_fixed_rate도_종료_신호에_바로_끝난다() {
         let shutdown = ShutdownSignal::new();
         let mut scheduler = Scheduler::new(shutdown.clone(), fixed_clock("2026-10-12T00:00:00Z"));
@@ -428,6 +486,41 @@ mod tests {
         shutdown.trigger();
         scheduler.join();
         assert!(!overlapped.load(Ordering::SeqCst));
+    }
+
+    // SqsPushConfigurationTest#configuration_publicationBlocked_keepsCommonSchedulerFreeAndClosesExecutor:
+    // 외부 호출에서 막힌 작업이 있어도 다른 작업은 제때 돌고, 종료 신호 뒤 막힘이 풀리면 모두 끝난다.
+    #[test]
+    fn 한_작업이_막혀도_다른_작업은_제때_돌고_막힘이_풀리면_모두_끝난다() {
+        let shutdown = ShutdownSignal::new();
+        let mut scheduler = Scheduler::new(shutdown.clone(), fixed_clock("2026-10-12T00:00:00Z"));
+        let release = Arc::new(AtomicBool::new(false));
+        let blocked_started = Arc::new(AtomicBool::new(false));
+        let (gate, started) = (Arc::clone(&release), Arc::clone(&blocked_started));
+        scheduler
+            .fixed_delay("relay", Duration::from_millis(5), move || {
+                started.store(true, Ordering::SeqCst);
+                while !gate.load(Ordering::SeqCst) {
+                    std::thread::sleep(Duration::from_millis(2));
+                }
+            })
+            .unwrap();
+        let ticks = Arc::new(AtomicUsize::new(0));
+        let counter = Arc::clone(&ticks);
+        scheduler
+            .fixed_rate("common", Duration::from_millis(5), move || {
+                counter.fetch_add(1, Ordering::SeqCst);
+            })
+            .unwrap();
+        wait_until("막힌 작업 시작", || {
+            blocked_started.load(Ordering::SeqCst)
+        });
+        wait_until("공용 작업이 계속 돈다", || {
+            ticks.load(Ordering::SeqCst) >= 3
+        });
+        shutdown.trigger();
+        release.store(true, Ordering::SeqCst);
+        scheduler.join();
     }
 
     #[test]

@@ -4,7 +4,11 @@
 //! parity compare --left harness/env/java-a.toml --right harness/env/rust.toml [--scenarios DIR] [--filter TAG]
 //! parity record  --target harness/env/java-a.toml --out harness/golden [--scenarios DIR] [--filter TAG]
 //! parity verify  --target harness/env/rust.toml  --golden harness/golden [--scenarios DIR] [--filter TAG]
+//! parity count   [--lane relay] [--filter TAG]    # 그 lane에서 돌 시나리오 수만 출력
 //! ```
+//!
+//! 모든 명령은 `--lane 이름`(기본 `default`)에 맞는 시나리오만 고른다. 시나리오의 `lane`과 대상 설정의 `flavor`가
+//! 같아야 하며, 다르면 하네스 오류다.
 //!
 //! `compare`는 두 대상에 같은 시나리오를 실행해 정규화 결과를 비교한다. 결과는
 //! `harness/out/<시나리오>.{left,right}.json`에도 남는다. 하나라도 다르면 종료 코드 1, 하네스 오류가 있으면 2.
@@ -62,7 +66,13 @@ fn opt<'a>(args: &'a [String], name: &str) -> Option<&'a str> {
 fn run(args: &[String]) -> Result<bool, String> {
     let cmd = args.first().map(String::as_str).unwrap_or("");
     let scenarios_dir = PathBuf::from(opt(args, "--scenarios").unwrap_or("harness/scenarios"));
-    let scenarios = scenario::load_dir(&scenarios_dir, opt(args, "--filter"))?;
+    let lane = opt(args, "--lane").unwrap_or(scenario::DEFAULT_LANE);
+    let scenarios = scenario::load_dir(&scenarios_dir, opt(args, "--filter"), lane)?;
+    if cmd == "count" {
+        // check.sh가 이 lane에 돌릴 시나리오가 있는지 알아볼 때 쓴다.
+        println!("{}", scenarios.len());
+        return Ok(true);
+    }
     let out_dir = PathBuf::from("harness/out");
     std::fs::create_dir_all(&out_dir).map_err(|e| e.to_string())?;
     let key = |s: &Scenario| file_key(&s.path, &scenarios_dir);

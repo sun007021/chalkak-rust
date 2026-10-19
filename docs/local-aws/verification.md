@@ -38,3 +38,16 @@ Rust: `feat/44-local-aws`의 `target/release/chalkak-server`(origin/main 기준 
 | loadgen 단위·린트 | `cargo test -p chalkak-loadgen uploads`, `cargo clippy -p chalkak-loadgen --all-targets -- -D warnings`, `cargo fmt --all --check` | 5 통과, 경고 0 |
 
 발견: **Java 가 올린 DB 에 Rust 를 붙이면** `notifications.post_id` 컬럼이 없어 관리자 승인이 500(`postgres error: db error`)이 된다. Java 원본 HEAD 의 스키마가 현재 Rust(main)보다 앞서 있기 때문이다(L0 범위). 백엔드를 바꿀 때 `down -v` 로 DB 를 비운다.
+
+## SQS Relay 검증 결과 (2026-10-19, #42)
+
+같은 환경. Rust 프로필(`compose.yaml`의 `rust` 서비스가 `NOTIFICATION_RELAY_ENABLED=true`를 준다. Java 프로필은 푸시 Worker가 없어 끈 채 둔다)로 `postgres aws edge imds-mock fakes rust`만 띄워 확인했다.
+
+| 확인 | 방법 | 결과 |
+| --- | --- | --- |
+| 승인 알림이 큐에 도착 | 회원·주제·사진·게시물(`PENDING`)을 DB에 넣고, `operator`로 로그인해 `PUT /api/v1/admin/posts/{id}/moderation`(`APPROVED`) → `awslocal sqs receive-message`(`chalkak-dev-push`, `--visibility-timeout 0`) | 승인 응답 200, 약 1초 안에 알림 `sqs_publish_status = PUBLISHED`·`sqs_published_at` 기록, 큐에 메시지 1건. 본문 `{"eventId":…,"notificationId":…,"userId":…,"type":"POST_APPROVED","sourceType":"POST","sourceId":…,"occurredAt":…,"expiresAt":…}`(expiresAt = occurredAt + 30분) |
+| 서명·무결성 | 자격증명은 IMDS(imds-mock), 요청은 SigV4(`sqs`), 응답의 `MD5OfMessageBody` 검증 | LocalStack이 요청을 받아들이고 Rust가 MD5를 확인한 뒤 수락으로 처리 |
+| 로그 | `docker compose logs rust` | `stage=relay`(요청·수락)와 `relay_transaction_committed`가 `notification-sqs-setup.md`의 필드로 남음 |
+
+큐 URL은 `https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-dev-push` 형식 그대로이고 전송 주소만 `AWS_ENDPOINT_URL_SQS=http://aws:4566`로 돌렸다.
+이 확인은 큐에 들어가는 데까지다. 큐를 읽어 FCM으로 보내는 Worker(`SqsPushService`)는 #43 범위다.

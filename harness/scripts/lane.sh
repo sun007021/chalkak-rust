@@ -5,9 +5,10 @@
 #   harness/scripts/lane.sh up rust [개수]    # 이 작업 트리의 target/release 바이너리로 Rust lane을 띄운다(기본 1개)
 #   harness/scripts/lane.sh up java [개수]    # 원본 JAR로 Java oracle lane을 띄운다. 작업 트리와 무관하게 모두가 함께 쓴다
 #   harness/scripts/lane.sh restart rust      # 이 작업 트리의 Rust lane 앱만 다시 띄운다(cargo build 후)
-#   harness/scripts/lane.sh targets rust|java [--txlog]
+#   harness/scripts/lane.sh targets rust|java [--txlog|--relay]
 #                                             # 쓸 수 있는 lane의 대상 설정 경로를 쉼표로 잇는다(parity --target 값).
-#                                             # --txlog이면 TXLOG=1로 띄운 lane만(parity txshape용)
+#                                             # --txlog이면 TXLOG=1로 띄운 lane만(parity txshape용),
+#                                             # --relay이면 RELAY=1로 띄운 lane만. 둘 다 없으면 기본 lane만
 #   harness/scripts/lane.sh ls
 #   harness/scripts/lane.sh down rust|java|<lane 이름>|all
 #
@@ -19,6 +20,10 @@
 # TXLOG=1 harness/scripts/lane.sh up rust|java [개수]: DB 문장 로그를 켠 lane(`log_statement=all`, 세션·application_name 등을
 #   줄 머리에 붙여 <lane 디렉터리>/pglog/postgres.log에 쓴다). 로그가 늘어나므로 평소 lane은 끄고 `parity txshape`가 쓸
 #   때만 켠다. target.toml에 pg_log_file이 들어가고 lane 디렉터리에 txlog 표시 파일이 생긴다.
+#
+# RELAY=1 harness/scripts/lane.sh up rust|java [개수]: SQS Relay를 켠 lane(harness/env/oracle-relay.env를 더한다). 앱이 스스로
+#   도는 작업을 확인하는 시나리오(`lane = "relay"`)만 이 lane에서 돈다. target.toml에 flavor = "relay"가 들어가고 lane
+#   디렉터리에 relay 표시 파일이 생긴다. 기본 lane에는 영향이 없다(targets가 서로 섞지 않는다).
 #
 # 포트: lane 번호 N마다 20000+N*10 (앱), +1 (DB), +2 (가짜 서버). 번호는 잠금 아래에서 비어 있는 가장 작은 수로 정한다.
 #
@@ -45,7 +50,11 @@ lane_env() { # <이름> <번호> <종류>
   export LANE_FAKES_BIN="${LANE_FAKES_BIN:-$ROOT/target/release/chalkak-fakes}"
   export LANE_RUST_BIN="$ROOT/target/release/chalkak-server"
   export LANE_JAVA_JAR="$ORACLE_JAR"
+  if is_relay "$name"; then export LANE_ENV_EXTRA="$ROOT/harness/env/oracle-relay.env"; else unset LANE_ENV_EXTRA; fi
 }
+
+# RELAY=1로 띄운 lane인가(lane 디렉터리의 표시 파일).
+is_relay() { [[ -f "$LANES_DIR/$1/relay" ]]; }
 
 # TXLOG=1로 띄운 lane인가(lane 디렉터리의 표시 파일).
 is_txlog() { [[ -f "$LANES_DIR/$1/txlog" ]]; }
@@ -69,11 +78,14 @@ used_numbers() {
 }
 
 # lane 이름 목록(종류별). Rust는 이 작업 트리 것만.
-lanes_of() { # <종류> [--txlog]
-  local kind=$1 only_txlog=${2:-}
+# 둘째 인자: --txlog(문장 로그 lane만) | --relay(Relay lane만) | --all(종류의 모든 lane) | 없음(기본 lane만).
+lanes_of() { # <종류> [--txlog|--relay|--all]
+  local kind=$1 only=${2:-}
   for d in "$LANES_DIR"/"$kind"-*/; do
     [[ -f "$d/target.toml" ]] || continue
-    [[ $only_txlog == --txlog && ! -f "$d/txlog" ]] && continue
+    [[ $only == --txlog && ! -f "$d/txlog" ]] && continue
+    [[ $only == --relay && ! -f "$d/relay" ]] && continue
+    [[ $only != --relay && $only != --all && -f "$d/relay" ]] && continue
     if [[ $kind == rust && "$(cat "$d/owner" 2>/dev/null)" != "$ROOT" ]]; then continue; fi
     basename "$d"
   done
@@ -93,6 +105,9 @@ fakes_url = "http://127.0.0.1:$((base + 2))"
 lock_file = "$LANES_DIR/$name/lock"
 clock_settle_ms = $settle
 EOF
+  if is_relay "$name"; then
+    echo 'flavor = "relay"' >> "$LANES_DIR/$name/target.toml"
+  fi
   if is_txlog "$name"; then
     echo "pg_log_file = \"$LANES_DIR/$name/pglog/postgres.log\"" >> "$LANES_DIR/$name/target.toml"
   fi
@@ -136,6 +151,7 @@ cmd_up() { # <종류> [개수]
       chmod 777 "$LANES_DIR/$name/pglog"
       touch "$LANES_DIR/$name/txlog"
     fi
+    [[ "${RELAY:-}" == 1 ]] && touch "$LANES_DIR/$name/relay"
     names+=("$name")
   done
   flock -u 9
@@ -159,7 +175,7 @@ cmd_up() { # <종류> [개수]
 
 cmd_restart() { # rust
   local kind=${1:-rust} name
-  for name in $(lanes_of "$kind"); do
+  for name in $(lanes_of "$kind" --all); do
     (lane_env "$name" "$(cat "$LANES_DIR/$name/number")" "$kind"
      if is_txlog "$name"; then txlog_env; fi
      compose "$kind" up -d --wait --force-recreate --no-deps "$kind" >/dev/null 2>&1) &
@@ -183,6 +199,7 @@ cmd_ls() {
     owner=$(cat "$d/owner" 2>/dev/null || echo "(공용)")
     if [[ -f "$d/target.toml" ]]; then state=ready; else state=starting; fi
     [[ -f "$d/txlog" ]] && state="$state+txlog"
+    [[ -f "$d/relay" ]] && state="$state+relay"
     if [[ -f "$d/lock" ]] && ! flock -n "$d/lock" true 2>/dev/null; then state=busy; fi
     printf "%-10s %-6s %-40s %s\n" "$name" "$((20000 + n * 10))" "$owner" "$state"
   done
@@ -192,7 +209,7 @@ cmd_down() { # rust|java|<이름>|all
   local what=${1:?무엇을 내릴지: rust, java, lane 이름, all} names=() name
   case $what in
     all) for d in "$LANES_DIR"/*/; do [[ -f "$d/number" ]] && names+=("$(basename "$d")"); done ;;
-    rust | java) names=($(lanes_of "$what")) ;;
+    rust | java) names=($(lanes_of "$what" --all)) ;;
     *) names=("$what") ;;
   esac
   for name in "${names[@]}"; do

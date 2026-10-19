@@ -1,11 +1,12 @@
 //! 하네스용 가짜 외부 서버. 한 프로세스, 한 포트에서 OIDC JWKS, Apple 토큰 교환·철회, Slack Webhook,
-//! S3 HeadObject를 흉내 내고 받은 요청을 모두 기록한다. 러너가 관리 경로(`/__admin/*`)로 응답을 지정하고
+//! S3 HeadObject, SQS(JSON 프로토콜)를 흉내 내고 받은 요청을 모두 기록한다. 러너가 관리 경로(`/__admin/*`)로 응답을 지정하고
 //! 기록을 가져간다. 경로 표는 `routes.rs` 상단 주석 참고.
 //!
 //! 환경변수: `FAKES_ADDR`(기본 `0.0.0.0:9000`), `FAKES_S3_BUCKET`(기본 `test-bucket`).
 
 mod http;
 mod routes;
+mod sqs;
 
 use std::io::{BufRead, BufReader, Read, Write};
 use std::net::{TcpListener, TcpStream};
@@ -53,6 +54,9 @@ fn serve(stream: TcpStream, state: &Mutex<routes::Fakes>) {
             Ok(mut s) => s.handle(&req),
             Err(_) => return,
         };
+        if res.delay_ms > 0 {
+            thread::sleep(Duration::from_millis(res.delay_ms));
+        }
         if http::write_response(&mut conn.writer, &res, req.close).is_err() || req.close {
             return;
         }

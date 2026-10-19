@@ -92,6 +92,15 @@ fn run_once(target: &Target, scenario: &Scenario, trace: bool) -> Result<(Value,
         .ok_or("clock 형식이 올바르지 않습니다")?
         .epoch as i64;
 
+    if scenario.lane != target.flavor() {
+        return Err(format!(
+            "[{}] {}: 시나리오 lane({})과 대상 flavor({})가 다릅니다",
+            target.name,
+            scenario.path.display(),
+            scenario.lane,
+            target.flavor()
+        ));
+    }
     let mut db = target.db()?;
     let mut sync = ClockSync::default();
     sync.ensure(target, clock)?;
@@ -135,6 +144,9 @@ fn run_once(target: &Target, scenario: &Scenario, trace: bool) -> Result<(Value,
         }
         if let (true, Some(url)) = (uses_fakes, fakes_url) {
             fakes::configure(url, &fakes_spec, &|s| subst(s, &vars))?;
+        }
+        if let Some(sql) = &step.wait_until_sql {
+            wait_until(&mut db, &subst(sql, &vars), target, &step.name)?;
         }
         let mut headers: Vec<(String, String)> = step
             .headers
@@ -251,6 +263,39 @@ fn run_once(target: &Target, scenario: &Scenario, trace: bool) -> Result<(Value,
         outcome["fakes"] = calls;
     }
     Ok((outcome, traced))
+}
+
+/// 앱이 스스로 도는 작업(SQS Relay 등)의 결과가 DB에 나타날 때까지 기다린다. 쿼리의 첫 열은 bool이다.
+const WAIT_UNTIL_LIMIT: f64 = 30.0;
+
+fn wait_until(
+    db: &mut postgres::Client,
+    sql: &str,
+    target: &Target,
+    step: &str,
+) -> Result<(), String> {
+    let started = time::now_epoch();
+    loop {
+        let row = db
+            .query_one(sql, &[])
+            .map_err(|e| format!("[{}] {step}: wait_until_sql 실패: {e}", target.name))?;
+        let done: bool = row.try_get(0).map_err(|e| {
+            format!(
+                "[{}] {step}: wait_until_sql 첫 열은 bool이어야 합니다: {e}",
+                target.name
+            )
+        })?;
+        if done {
+            return Ok(());
+        }
+        if time::now_epoch() - started > WAIT_UNTIL_LIMIT {
+            return Err(format!(
+                "[{}] {step}: {WAIT_UNTIL_LIMIT}초 안에 조건이 참이 되지 않았습니다: {sql}",
+                target.name
+            ));
+        }
+        std::thread::sleep(std::time::Duration::from_millis(100));
+    }
 }
 
 /// 서버가 요청의 `Host`로 만들어 응답에 싣는 자기 주소(OpenAPI `servers`, `Location` 등)는 레인마다 포트가 달라

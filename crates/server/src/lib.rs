@@ -19,6 +19,7 @@ use chalkak_app::notification::slack::{
     NotificationMessageFactory, PostModerationPendingNotifier,
     SlackIncomingWebhookNotificationSender,
 };
+use chalkak_app::notification::sqs_push::build_publisher;
 use chalkak_app::post::{
     NoopPostModerationPendingListener, PostModerationPendingListener, PostWiring,
 };
@@ -236,7 +237,7 @@ pub fn run(settings: &Settings, shutdown: ShutdownSignal) -> Result<(), Box<dyn 
     result.map_err(Into::into)
 }
 
-/// 주기 작업(정리 4종, 런타임 상태 로그)을 시작한다. 스케줄링이 꺼져 있으면 아무것도 시작하지 않는다.
+/// 주기 작업(정리 4종, 공지 배포, 알림 SQS 발행·주제 푸시·발행 대기 모니터, 런타임 상태 로그)을 시작한다. 스케줄링이 꺼져 있으면 아무것도 시작하지 않는다.
 fn start_jobs(
     settings: &Settings,
     pool: &Pool,
@@ -255,11 +256,23 @@ fn start_jobs(
     } else {
         None
     };
+    // Relay·주제 푸시가 켜져 있을 때만 SQS 클라이언트를 만든다(원본은 항상 만들지만 자격증명은 첫 호출 때 읽는다).
+    let publisher = if settings
+        .jobs
+        .planned()
+        .iter()
+        .any(|job| matches!(job, Job::NotificationRelay | Job::TopicPush))
+    {
+        Some(build_publisher(&settings.jobs.sqs, Arc::clone(clock))?)
+    } else {
+        None
+    };
     let deps = JobDeps {
         pool: pool.clone(),
         clock: Arc::clone(clock),
         logger: Arc::clone(logger),
         apple,
+        publisher,
         analytics: Some(analytics),
     };
     Ok(jobs::start(&deps, &settings.jobs, shutdown)?)

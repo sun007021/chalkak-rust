@@ -6,10 +6,12 @@
 //! | `POST /apple/auth/token`, `/apple/auth/revoke` | 지정한 응답 |
 //! | `POST /slack/...` | Slack Incoming Webhook. 본문 기록 |
 //! | `HEAD /<key>` 또는 `HEAD /<bucket>/<key>` | S3 HeadObject. 키별 크기·Content-Type·404 지정 |
+//! | `POST /` + `X-Amz-Target: AmazonSQS.*` | SQS JSON 프로토콜(SendMessage 저장, Receive·Delete·ChangeMessageVisibility). `sqs.rs` 참고 |
 //! | `POST /` + `X-Amz-Target: Logs_20140328.*` | CloudWatch Logs Insights(StartQuery·GetQueryResults·StopQuery). 지표 이름별 결과 행 지정 |
 //! | `PUT /__admin/responses`, `GET /__admin/requests`, `POST /__admin/reset` | 관리 |
 
 use crate::http::{Request, Response};
+use crate::sqs::Sqs;
 use serde_json::{Map, Value, json};
 use std::collections::BTreeMap;
 
@@ -45,6 +47,7 @@ pub struct Fakes {
     apple_revoke: Option<Canned>,
     slack: Option<Canned>,
     s3: BTreeMap<String, S3Object>,
+    sqs: Sqs,
     logs: Option<LogsConfig>,
     /// `StartQuery`가 받은 쿼리 문자열. 인덱스 + 1이 쿼리 ID(`fake-query-N`).
     log_queries: Vec<String>,
@@ -62,6 +65,11 @@ impl Fakes {
     pub fn handle(&mut self, req: &Request) -> Response {
         if let Some(rest) = req.path.strip_prefix("/__admin/") {
             return self.admin(rest, req);
+        }
+        if let Some(op) = Sqs::operation(req) {
+            let res = self.sqs.handle(&op, req);
+            self.record("sqs", Some(op), req);
+            return res;
         }
         let (service, detail, res) = self.route(req);
         self.record(&service, detail, req);
@@ -258,6 +266,7 @@ impl Fakes {
         let mut apple_revoke = None;
         let mut slack = None;
         let mut s3 = BTreeMap::new();
+        let mut sqs_rules = Vec::new();
         let mut logs = None;
         for (name, value) in obj {
             match name.as_str() {
@@ -271,6 +280,7 @@ impl Fakes {
                         s3.insert(key.clone(), parse_s3(key, spec)?);
                     }
                 }
+                "sqs" => sqs_rules = Sqs::parse_rules(value)?,
                 other => return Err(format!("알 수 없는 항목: {other}")),
             }
         }
@@ -278,6 +288,7 @@ impl Fakes {
         self.apple_revoke = apple_revoke;
         self.slack = slack;
         self.s3 = s3;
+        self.sqs.set_rules(sqs_rules);
         self.logs = logs;
         Ok(())
     }
@@ -571,6 +582,29 @@ mod tests {
         let mut f = Fakes::new("b");
         assert_eq!(f.handle(&req("GET", "/nope", &[], "")).status, 404);
         assert_eq!(records(&mut f)[0]["service"], "unmatched");
+    }
+
+    #[test]
+    fn sqs_요청은_작업_이름과_본문을_기록하고_지정을_따른다() {
+        let mut f = Fakes::new("b");
+        configure(
+            &mut f,
+            r#"{"sqs":[{"contains":"fail","status":500,"body":"{\"__type\":\"InternalError\"}"}]}"#,
+        );
+        let send = |body: &str| {
+            req(
+                "POST",
+                "/",
+                &[("x-amz-target", "AmazonSQS.SendMessage")],
+                body,
+            )
+        };
+        assert_eq!(f.handle(&send(r#"{"MessageBody":"ok"}"#)).status, 200);
+        assert_eq!(f.handle(&send(r#"{"MessageBody":"fail"}"#)).status, 500);
+        let rs = records(&mut f);
+        assert_eq!(rs[0]["service"], "sqs");
+        assert_eq!(rs[0]["detail"], "SendMessage");
+        assert_eq!(rs[1]["body"], r#"{"MessageBody":"fail"}"#);
     }
 
     #[test]

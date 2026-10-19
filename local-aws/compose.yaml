@@ -204,6 +204,9 @@ services:
     env_file: ./env/local-aws.env
     environment:
       DB_HOST: postgres
+      # SQS Relay(알림 발행). Java 프로필은 푸시 Worker(L4)가 없어 아직 끈 채 둔다. 승인된 게시물의 알림이
+      # LocalStack 큐 chalkak-dev-push 로 간다(docs/local-aws/verification.md 의 SQS Relay 절).
+      NOTIFICATION_RELAY_ENABLED: "true"
     volumes:
       - ${CHALKAK_SERVER_BIN:-../target/release/chalkak-server}:/app/chalkak-server:ro
       - ../migrations:/app/migrations:ro

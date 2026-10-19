@@ -8,10 +8,15 @@
 //! | 임시 Apple 인증 정보 폐기·삭제 | 매시 정각 | `chalkak.auth.pending-apple-authorization.cleanup.enabled` |
 //! | 사용자 지표 집계 | 매일 01:00 | `chalkak.analytics.aggregation.enabled`(기본 꺼짐, prod만 켬) |
 //! | 공지 알림함 배포 | 매분 0초 | `chalkak.notification.notice.distribution-enabled`(기본 꺼짐) |
+//! | 알림 SQS 발행(Relay) | 앞 실행이 끝난 뒤 1초(시작 즉시 한 번) | `chalkak.notification.sqs.relay-enabled`(기본 꺼짐) |
+//! | 주제 푸시 발행 | 매분 0초 | `chalkak.notification.sqs.topic-push-enabled`(기본 꺼짐) |
+//! | 알림 발행 대기 모니터 | 60초마다(시작 즉시 한 번) | dev·prod 프로필에서만(끄는 키 없음) |
 //! | 런타임 상태 로그 | 60초마다(시작 즉시 한 번) | `chalkak.monitoring.runtime-log.enabled` |
 //!
 //! 스케줄링 기능 전체를 끄는 키는 `chalkak.scheduling.enabled`(기본 켜짐)이고 작업별 키와 서로 독립이다. 환경변수
 //! 이름은 Spring 느슨한 바인딩을 따라 하이픈을 없애 `CHALKAK_AUTH_REFRESHTOKEN_CLEANUP_ENABLED`처럼 쓴다.
+//! SQS 발행 설정은 `application.yml`의 환경변수 이름 그대로 `NOTIFICATION_RELAY_ENABLED`, `NOTIFICATION_TOPIC_PUSH_ENABLED`,
+//! `NOTIFICATION_SQS_QUEUE_URL`, `AWS_REGION`을 쓴다.
 //! 런타임 상태 로그는 원본처럼 기본 꺼짐이고 dev·prod 프로필에서만 켠다(`application-dev.yml`, `application-prod.yml`).
 //! 공지 배포도 기본 꺼짐이다(`NOTIFICATION_NOTICE_DISTRIBUTION_ENABLED`, `application.yml`). 원본은 이 작업만 전용 단일 스레드
 //! 스케줄러로 돌려 다른 예약 작업과 섞이지 않게 하는데, 여기서는 작업마다 스레드 하나라 같은 효과다.
@@ -37,6 +42,10 @@ use crate::analytics::UserMetricsAggregationRunner;
 use crate::auth::apple::AppleTokenClient;
 use crate::auth::tokens::AppleCipher;
 use crate::notification;
+use crate::notification::publication_monitor::NotificationPublicationMonitor;
+use crate::notification::relay::NotificationRelayService;
+use crate::notification::sqs_push::{PushMessagePublisher, SqsPushSettings};
+use crate::notification::topic_push::TopicPushService;
 
 /// 실패한 예약 작업을 남기는 로거(Spring `TaskUtils$LoggingErrorHandler`)와 메시지.
 const ERROR_LOGGER: &str = "org.springframework.scheduling.support.TaskUtils$LoggingErrorHandler";
@@ -45,6 +54,13 @@ const ERROR_MESSAGE: &str = "Unexpected error occurred in scheduled task";
 /// 공지 배포 작업이 실패했을 때 남기는 로거(원본 `NoticeDistributionScheduler`의 `@Slf4j`).
 const NOTICE_SCHEDULER_LOGGER: &str =
     "com.chalkak.backend.notification.infrastructure.infra.NoticeDistributionScheduler";
+
+/// 주제 푸시 작업이 실패했을 때 남기는 로거(원본 `TopicPushScheduler`의 `@Slf4j`).
+const TOPIC_SCHEDULER_LOGGER: &str =
+    "com.chalkak.backend.notification.infrastructure.infra.TopicPushScheduler";
+
+/// Relay가 앞 실행을 마친 뒤 다음 실행까지 쉬는 시간(`@Scheduled(fixedDelay = 1000)`).
+pub const RELAY_DELAY: Duration = Duration::from_secs(1);
 
 /// 런타임 상태 로그 주기(`@Scheduled(fixedRate = 60_000)`).
 pub const RUNTIME_LOG_PERIOD: Duration = Duration::from_secs(60);
@@ -58,6 +74,9 @@ pub enum Job {
     PendingAppleAuthorizationCleanup,
     UserMetricsAggregation,
     NoticeDistribution,
+    NotificationRelay,
+    TopicPush,
+    PublicationMonitor,
     RuntimeSnapshot,
 }
 
@@ -68,16 +87,21 @@ pub enum Schedule {
     Cron(&'static str),
     /// 시작 즉시 한 번, 이후 시작 시각 기준으로 이 간격마다.
     FixedRate(Duration),
+    /// 시작 즉시 한 번, 이후 앞 실행이 끝난 시각부터 이 간격 뒤에.
+    FixedDelay(Duration),
 }
 
 impl Job {
-    pub const ALL: [Job; 7] = [
+    pub const ALL: [Job; 10] = [
         Job::RefreshTokenCleanup,
         Job::ConsumedSignupTokenCleanup,
         Job::NotificationCleanup,
         Job::PendingAppleAuthorizationCleanup,
         Job::UserMetricsAggregation,
         Job::NoticeDistribution,
+        Job::NotificationRelay,
+        Job::TopicPush,
+        Job::PublicationMonitor,
         Job::RuntimeSnapshot,
     ];
 
@@ -90,6 +114,9 @@ impl Job {
             Job::PendingAppleAuthorizationCleanup => "revokeAndDeleteExpiredAuthorizations",
             Job::UserMetricsAggregation => "aggregateYesterday",
             Job::NoticeDistribution => "distributeNotices",
+            Job::NotificationRelay => "publishPendingNotifications",
+            Job::TopicPush => "publishDueTopics",
+            Job::PublicationMonitor => "logBacklog",
             Job::RuntimeSnapshot => "logSnapshot",
         }
     }
@@ -102,6 +129,9 @@ impl Job {
             Job::PendingAppleAuthorizationCleanup => Schedule::Cron("0 0 * * * *"),
             Job::UserMetricsAggregation => Schedule::Cron("0 0 1 * * *"),
             Job::NoticeDistribution => Schedule::Cron("0 * * * * *"),
+            Job::NotificationRelay => Schedule::FixedDelay(RELAY_DELAY),
+            Job::TopicPush => Schedule::Cron("0 * * * * *"),
+            Job::PublicationMonitor => Schedule::FixedRate(RUNTIME_LOG_PERIOD),
             Job::RuntimeSnapshot => Schedule::FixedRate(RUNTIME_LOG_PERIOD),
         }
     }
@@ -113,7 +143,7 @@ impl Job {
                 CronSchedule::parse(expression, SEOUL)
                     .expect("원본 cron 식은 파싱되는 값이다(시험이 확인한다)"),
             ),
-            Schedule::FixedRate(_) => None,
+            Schedule::FixedRate(_) | Schedule::FixedDelay(_) => None,
         }
     }
 }
@@ -131,15 +161,20 @@ pub struct JobsSettings {
     pub user_metrics_aggregation: bool,
     /// `chalkak.notification.notice.distribution-enabled`(환경변수 `NOTIFICATION_NOTICE_DISTRIBUTION_ENABLED`, 기본 꺼짐).
     pub notice_distribution: bool,
+    /// SQS 발행 설정(Relay·주제 푸시 켜기, 큐 URL, 리전). 둘 중 하나라도 켜면 큐 URL을 검증한다.
+    pub sqs: SqsPushSettings,
+    /// `NotificationPublicationMonitor`는 dev·prod 프로필에서만 존재한다(`@Profile({"dev", "prod"})`).
+    pub publication_monitor: bool,
     pub runtime_log: bool,
 }
 
 impl JobsSettings {
-    /// `runtime_log_default`: 프로필이 정하는 `chalkak.monitoring.runtime-log.enabled`의 기본값(local false, dev·prod true).
+    /// `deployed`: 배포 프로필(dev·prod)인가. 런타임 상태 로그의 기본값(`chalkak.monitoring.runtime-log.enabled`, local false,
+    /// dev·prod true)과 발행 대기 모니터의 존재를 정한다.
     /// `aggregation_default`: 프로필이 정하는 `chalkak.analytics.aggregation.enabled`의 기본값(prod만 true).
     pub fn from_env(
         env: &Env,
-        runtime_log_default: bool,
+        deployed: bool,
         aggregation_default: bool,
     ) -> Result<Self, ConfigError> {
         Ok(JobsSettings {
@@ -156,8 +191,9 @@ impl JobsSettings {
             user_metrics_aggregation: env
                 .bool_or("CHALKAK_ANALYTICS_AGGREGATION_ENABLED", aggregation_default)?,
             notice_distribution: env.bool_or("NOTIFICATION_NOTICE_DISTRIBUTION_ENABLED", false)?,
-            runtime_log: env
-                .bool_or("CHALKAK_MONITORING_RUNTIMELOG_ENABLED", runtime_log_default)?,
+            sqs: SqsPushSettings::from_env(env)?,
+            publication_monitor: deployed,
+            runtime_log: env.bool_or("CHALKAK_MONITORING_RUNTIMELOG_ENABLED", deployed)?,
         })
     }
 
@@ -170,6 +206,9 @@ impl JobsSettings {
             Job::PendingAppleAuthorizationCleanup => self.pending_apple_authorization_cleanup,
             Job::UserMetricsAggregation => self.user_metrics_aggregation,
             Job::NoticeDistribution => self.notice_distribution,
+            Job::NotificationRelay => self.sqs.relay_enabled,
+            Job::TopicPush => self.sqs.topic_push_enabled,
+            Job::PublicationMonitor => self.publication_monitor,
             Job::RuntimeSnapshot => self.runtime_log,
         }
     }
@@ -201,6 +240,8 @@ pub struct JobDeps {
     pub logger: Arc<Logger>,
     /// 임시 Apple 인증 정보 정리가 켜져 있으면 필요하다.
     pub apple: Option<AppleRevocation>,
+    /// Relay·주제 푸시가 켜져 있으면 필요하다.
+    pub publisher: Option<Arc<dyn PushMessagePublisher>>,
     /// 사용자 지표 집계가 켜져 있으면 필요하다. 관리자 수동 집계와 같은 러너여야 한다.
     pub analytics: Option<Arc<UserMetricsAggregationRunner>>,
 }
@@ -263,6 +304,7 @@ fn register(
             scheduler.cron(name, job.cron().expect("cron 작업은 판정기가 있다"), body)
         }
         Schedule::FixedRate(period) => scheduler.fixed_rate(name, period, body),
+        Schedule::FixedDelay(delay) => scheduler.fixed_delay(name, delay, body),
     };
     result.map_err(|e| format!("주기 작업 {name} 스레드를 시작할 수 없습니다: {e}"))
 }
@@ -337,11 +379,49 @@ fn body(
                     .log("공지 배포 대상 조회 실패");
             }
         }),
+        Job::NotificationRelay => {
+            let service = NotificationRelayService::new(
+                pool,
+                clock,
+                publisher_for(deps, "알림 Relay")?,
+                Arc::clone(&logger),
+            );
+            Box::new(move || report(&logger, service.publish_pending_notifications()))
+        }
+        Job::TopicPush => {
+            let service = TopicPushService::new(
+                pool,
+                clock,
+                publisher_for(deps, "주제 푸시 발행")?,
+                Arc::clone(&logger),
+            );
+            Box::new(move || {
+                // `TopicPushScheduler`: 설정 조회가 실패해도 예외를 밖으로 내지 않고 다음 분에 다시 시도한다.
+                if let Err(error) = service.publish_due_topics() {
+                    logger
+                        .error(TOPIC_SCHEDULER_LOGGER)
+                        .field("type", "notification")
+                        .field("stage", "topic_scheduler_failed")
+                        .field("errorCode", error.exception_name())
+                        .log("주제 푸시 설정 조회 실패");
+                }
+            })
+        }
+        Job::PublicationMonitor => {
+            let monitor = NotificationPublicationMonitor::new(pool, clock, logger);
+            Box::new(move || monitor.log_backlog())
+        }
         Job::RuntimeSnapshot => {
             let reader = runtime::RuntimeSnapshotReader::for_process(pool);
             Box::new(move || runtime::log_snapshot(&logger, &reader))
         }
     })
+}
+
+fn publisher_for(deps: &JobDeps, what: &str) -> Result<Arc<dyn PushMessagePublisher>, String> {
+    deps.publisher
+        .clone()
+        .ok_or_else(|| format!("{what}에는 SQS 발행기가 필요합니다"))
 }
 
 fn report<T>(logger: &Logger, result: Result<T, crate::web::ApiError>) {
@@ -644,5 +724,129 @@ mod tests {
             Schedule::FixedRate(Duration::from_secs(60))
         );
         assert!(Job::RuntimeSnapshot.cron().is_none());
+    }
+
+    const QUEUE: &str = "https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-dev-push";
+
+    // SqsPushConfigurationTest#configuration_disabled_startsWithoutRelayScheduler
+    #[test]
+    fn relay_and_topic_push_are_off_by_default() {
+        let planned = settings(&[], false).planned();
+        assert!(!planned.contains(&Job::NotificationRelay));
+        assert!(!planned.contains(&Job::TopicPush));
+    }
+
+    // SqsPushConfigurationTest#configuration_enabledWithQueue_createsRelayScheduler,
+    // configuration_topicEnabled_createsDedicatedSchedulerWithoutRelay
+    #[test]
+    fn relay_and_topic_push_are_enabled_independently() {
+        let relay = settings(
+            &[
+                ("NOTIFICATION_RELAY_ENABLED", "true"),
+                ("NOTIFICATION_SQS_QUEUE_URL", QUEUE),
+            ],
+            false,
+        );
+        assert!(relay.planned().contains(&Job::NotificationRelay));
+        assert!(!relay.planned().contains(&Job::TopicPush));
+        let topic = settings(
+            &[
+                ("NOTIFICATION_TOPIC_PUSH_ENABLED", "true"),
+                ("NOTIFICATION_RELAY_ENABLED", "false"),
+                ("NOTIFICATION_SQS_QUEUE_URL", QUEUE),
+            ],
+            false,
+        );
+        assert!(topic.planned().contains(&Job::TopicPush));
+        assert!(!topic.planned().contains(&Job::NotificationRelay));
+        let off = settings(
+            &[
+                ("NOTIFICATION_RELAY_ENABLED", "true"),
+                ("NOTIFICATION_SQS_QUEUE_URL", QUEUE),
+                ("CHALKAK_SCHEDULING_ENABLED", "false"),
+            ],
+            false,
+        );
+        assert!(off.planned().is_empty());
+        assert!(off.job_enabled(Job::NotificationRelay));
+    }
+
+    // SqsPushConfigurationTest#configuration_enabledWithInvalidQueue_rejectsConfiguration
+    #[test]
+    fn enabling_publication_with_a_bad_queue_url_is_a_config_error() {
+        for url in ["", "REPLACE_WITH_QUEUE"] {
+            for flag in [
+                "NOTIFICATION_RELAY_ENABLED",
+                "NOTIFICATION_TOPIC_PUSH_ENABLED",
+            ] {
+                let env = Env::from_pairs([(flag, "true"), ("NOTIFICATION_SQS_QUEUE_URL", url)]);
+                assert!(
+                    JobsSettings::from_env(&env, false, false).is_err(),
+                    "{flag} {url:?}"
+                );
+            }
+        }
+        // 스케줄링 전체가 꺼져 있어도 설정 검증은 한다(원본은 설정 빈 생성 때 검증한다).
+        let env = Env::from_pairs([
+            ("NOTIFICATION_RELAY_ENABLED", "true"),
+            ("CHALKAK_SCHEDULING_ENABLED", "false"),
+        ]);
+        assert!(JobsSettings::from_env(&env, false, false).is_err());
+    }
+
+    // NotificationPublicationMonitor: @Profile({"dev", "prod"})
+    #[test]
+    fn publication_monitor_exists_only_in_deployed_profiles() {
+        assert!(
+            !settings(&[], false)
+                .planned()
+                .contains(&Job::PublicationMonitor)
+        );
+        assert!(
+            settings(&[], true)
+                .planned()
+                .contains(&Job::PublicationMonitor)
+        );
+    }
+
+    // NotificationPublicationMonitorTest#logBacklog_schedule_usesFixedRate
+    #[test]
+    fn publication_monitor_is_fixed_rate_sixty_seconds() {
+        assert_eq!(
+            Job::PublicationMonitor.schedule(),
+            Schedule::FixedRate(Duration::from_secs(60))
+        );
+        assert_eq!(Job::PublicationMonitor.name(), "logBacklog");
+    }
+
+    // NotificationRelayScheduler: @Scheduled(fixedDelay = 1000)
+    #[test]
+    fn relay_is_fixed_delay_one_second() {
+        assert_eq!(
+            Job::NotificationRelay.schedule(),
+            Schedule::FixedDelay(Duration::from_secs(1))
+        );
+        assert!(Job::NotificationRelay.cron().is_none());
+        assert_eq!(Job::NotificationRelay.name(), "publishPendingNotifications");
+    }
+
+    // SqsPushConfigurationTest#configuration_topicSchedule_pollsAtEveryMinuteBoundary
+    #[test]
+    fn topic_push_polls_at_every_kst_minute_boundary() {
+        let cron = Job::TopicPush.cron().unwrap();
+        // 2026-10-12 08:59:59 KST -> 09:00:00 KST, 09:00:00 -> 09:01:00, 09:00:30 -> 09:01:00
+        assert_eq!(
+            cron.next_after(ts("2026-10-11T23:59:59Z")),
+            Some(ts("2026-10-12T00:00:00Z"))
+        );
+        assert_eq!(
+            cron.next_after(ts("2026-10-12T00:00:00Z")),
+            Some(ts("2026-10-12T00:01:00Z"))
+        );
+        assert_eq!(
+            cron.next_after(ts("2026-10-12T00:00:30Z")),
+            Some(ts("2026-10-12T00:01:00Z"))
+        );
+        assert_eq!(Job::TopicPush.name(), "publishDueTopics");
     }
 }

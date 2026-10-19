@@ -55,6 +55,13 @@ pub struct NotificationSlice {
     pub has_next: bool,
 }
 
+/// 발행 대기 현황(`PublicationBacklog`): `PENDING` 건수와 그중 가장 오래된 생성 시각.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct PublicationBacklog {
+    pub pending_count: i64,
+    pub oldest_created_at: Option<Timestamp>,
+}
+
 #[derive(Clone, Copy, Debug, Default)]
 pub struct NotificationRepository;
 
@@ -251,5 +258,92 @@ impl NotificationRepository {
              WHERE n.user_id IN (SELECT u.id FROM users u WHERE u.deleted_at < $1)",
             &[&withdrawn_before],
         )?)
+    }
+
+    /// `getPublicationBacklog`. 호출 측이 제한 시간을 건 트랜잭션 안에서 부른다.
+    pub fn get_publication_backlog(&self, db: &mut impl Db) -> Result<PublicationBacklog, DbError> {
+        let row = db.query_one(
+            "SELECT COUNT(*), MIN(created_at) FROM notifications WHERE sqs_publish_status = 'PENDING'",
+            &[],
+        )?;
+        Ok(PublicationBacklog {
+            pending_count: row.try_get(0)?,
+            oldest_created_at: row.try_get(1)?,
+        })
+    }
+
+    /// `findTopicPushRecipientIds`: 탈퇴하지 않은 ACTIVE 회원 중 주제 푸시를 받고 그 주제에 반려되지 않은 글이 없는 회원
+    /// (참여한 회원은 제외). 회원 ID 순.
+    pub fn find_topic_push_recipient_ids(
+        &self,
+        db: &mut impl Db,
+        topic_id: Uuid,
+    ) -> Result<Vec<Uuid>, DbError> {
+        let rows = db.query(
+            "SELECT u.id FROM users u \
+             WHERE u.deleted_at IS NULL AND u.status = 'ACTIVE'::user_status AND u.topic_push_enabled = true \
+             AND NOT EXISTS (SELECT 1 FROM posts p WHERE p.user_id = u.id AND p.topic_id = $1 \
+                 AND p.deleted_at IS NULL AND p.moderation_status <> 'REJECTED') \
+             ORDER BY u.id",
+            &[&topic_id],
+        )?;
+        rows.iter()
+            .map(|row| row.try_get::<_, Uuid>(0).map_err(DbError::from))
+            .collect()
+    }
+
+    /// `findDuePublicationIds`: 지금 발행할 차례인 알림을 다음 시도 시각 순으로 `limit`건.
+    pub fn find_due_publication_ids(
+        &self,
+        db: &mut impl Db,
+        now: Timestamp,
+        limit: i64,
+    ) -> Result<Vec<Uuid>, DbError> {
+        let rows = db.query(
+            "SELECT id FROM notifications WHERE sqs_publish_status = 'PENDING' AND next_attempt_at <= $1 \
+             ORDER BY next_attempt_at, id LIMIT $2",
+            &[&now, &limit],
+        )?;
+        rows.iter()
+            .map(|row| row.try_get::<_, Uuid>(0).map_err(DbError::from))
+            .collect()
+    }
+
+    /// `findPendingPublicationForUpdate`: 발행할 차례인 알림 하나를 잠그고 읽는다. 다른 트랜잭션이 잠근 행은 기다리지 않고
+    /// 건너뛴다(`FOR UPDATE SKIP LOCKED`).
+    pub fn find_pending_publication_for_update(
+        &self,
+        db: &mut impl Db,
+        notification_id: Uuid,
+        now: Timestamp,
+    ) -> Result<Option<Notification>, DbError> {
+        let sql = format!(
+            "SELECT {NOTIFICATION_COLUMNS} FROM notifications n \
+             WHERE n.id = $1 AND n.sqs_publish_status = 'PENDING' AND n.next_attempt_at <= $2 \
+             FOR UPDATE OF n SKIP LOCKED"
+        );
+        db.query_opt(&sql, &[&notification_id, &now])?
+            .as_ref()
+            .map(from_row)
+            .transpose()
+    }
+
+    /// 발행 결과 저장(JPA 더티 체킹이 하던 UPDATE): 상태, 다음 시도 시각, 발행 시각.
+    pub fn save_publication(
+        &self,
+        db: &mut impl Db,
+        notification: &Notification,
+    ) -> Result<(), DbError> {
+        db.execute(
+            "UPDATE notifications SET sqs_publish_status = $2, next_attempt_at = $3, sqs_published_at = $4 \
+             WHERE id = $1",
+            &[
+                &notification.id,
+                &notification.publish_status.as_str(),
+                &notification.next_attempt_at,
+                &notification.published_at,
+            ],
+        )?;
+        Ok(())
     }
 }

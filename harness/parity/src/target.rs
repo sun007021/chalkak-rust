@@ -26,6 +26,9 @@ pub struct Target {
     pub clock_settle_ms: Option<u64>,
     /// lane DB가 문장 로그를 쓰는 파일(호스트 경로). `TXLOG=1`로 띄운 lane에만 있다(`txshape` 명령이 읽는다).
     pub pg_log_file: Option<PathBuf>,
+    /// 이 대상이 켜 둔 작업 구성. 생략하면 `default`(주기 작업 모두 꺼짐), `relay`는 SQS Relay를 켠 lane이다.
+    /// 시나리오의 `lane`과 같아야 돈다.
+    pub flavor: Option<String>,
 }
 
 impl Target {
@@ -97,6 +100,12 @@ impl Target {
         let _ = std::fs::write(&self.clock_file, "+0\n");
     }
 
+    pub fn flavor(&self) -> &str {
+        self.flavor
+            .as_deref()
+            .unwrap_or(crate::scenario::DEFAULT_LANE)
+    }
+
     pub fn db(&self) -> Result<postgres::Client, String> {
         // 앱이 보낸 문장과 하네스 문장을 DB 문장 로그에서 구분하게 application_name을 붙인다(txshape).
         let url = format!(
@@ -122,8 +131,13 @@ pub fn reset_db(db: &mut postgres::Client, setup: &[String]) -> Result<(), Strin
             .map_err(|e| format!("TRUNCATE 실패: {e}"))?;
     }
     for sql in setup {
-        db.batch_execute(sql)
-            .map_err(|e| format!("준비 SQL 실패: {e}\n{sql}"))?;
+        db.batch_execute(sql).map_err(|e| {
+            // postgres::Error의 Display는 "db error"뿐이라 서버가 준 메시지를 꺼내 보인다.
+            let detail = e
+                .as_db_error()
+                .map_or_else(|| e.to_string(), |d| d.to_string());
+            format!("준비 SQL 실패: {detail}\n{sql}")
+        })?;
     }
     Ok(())
 }

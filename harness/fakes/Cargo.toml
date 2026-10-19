@@ -5,9 +5,11 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 publish.workspace = true
-description = "하네스용 가짜 외부 서버: OIDC JWKS, Apple 토큰 교환·철회, Slack Webhook, S3 HeadObject. 받은 요청을 기록한다"
+description = "하네스용 가짜 외부 서버: OIDC JWKS, Apple 토큰 교환·철회, Slack Webhook, S3 HeadObject, SQS. 받은 요청을 기록한다"
 
 [dependencies]
+# SQS 본문 MD5(응답 검증용)만 쓴다. 저장소 안의 crate라 새 외부 crate는 아니다.
+chalkak-aws = { path = "../../crates/platform/aws" }
 serde_json.workspace = true
 
 [lints]

@@ -91,7 +91,7 @@ target/release/chalkak-loadgen uploads --base 127.0.0.1:18080 --s3 127.0.0.1:456
 ### 환경변수 계약
 `env/local-aws.env`는 원본 `application.dev.env.example`의 키 이름 그대로다(`SPRING_PROFILES_ACTIVE=dev`: Lambda가 처리하는 staging 환경은 `dev`·`prod` 뿐이고
 원본 `local` 프로필은 `environment: local`이라 Lambda가 반려한다). 값은 시험용 더미다. `[로컬 전용]` 블록(`AWS_ENDPOINT_URL_*`, `AWS_EC2_METADATA_SERVICE_ENDPOINT`,
-`SSL_CERT_FILE`, `CHALKAK_AUTH_*`)만 빼면 #32의 실제 AWS에서 같은 파일을 쓸 수 있다. 푸시 관련 키(`NOTIFICATION_*`)는 이름만 두고 꺼 둔다(L4).
+`SSL_CERT_FILE`, `CHALKAK_AUTH_*`)만 빼면 #32의 실제 AWS에서 같은 파일을 쓸 수 있다. 푸시 관련 키(`NOTIFICATION_*`)는 이름만 두고 꺼 둔다(L4). 예외로 Rust 프로필은 SQS Relay(`NOTIFICATION_RELAY_ENABLED`)를 compose에서 켜서 승인·반려 알림이 `chalkak-dev-push` 큐까지 가게 한다.
 `NOTIFICATION_SQS_QUEUE_URL`은 `https://sqs.ap-northeast-2.amazonaws.com/000000000000/chalkak-dev-push` 형식을 유지하고, 전송 주소만 `AWS_ENDPOINT_URL_SQS=http://aws:4566`로 돌린다.
 
 ### 실계정 모드 (앱 시험)

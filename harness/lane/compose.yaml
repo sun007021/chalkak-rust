@@ -105,7 +105,10 @@ services:
     profiles: [rust]
     entrypoint: ["/app/chalkak-server"]
     working_dir: /app
-    env_file: ../env/oracle.env
+    # 뒤 파일이 앞 파일을 덮는다. LANE_ENV_EXTRA는 lane 종류별 추가 환경(relay lane은 oracle-relay.env).
+    env_file:
+      - ../env/oracle.env
+      - ${LANE_ENV_EXTRA:-../env/oracle-default.env}
     environment:
       DB_HOST: pg
       DB_PORT: "5432"
@@ -131,7 +134,10 @@ services:
     image: eclipse-temurin:25-jre
     profiles: [java]
     entrypoint: ["bash", "-c", "exec java -XX:MaxRAMPercentage=70 $$LANE_JAVA_OPTS -jar /app/app.jar"]
-    env_file: ../env/oracle.env
+    # 뒤 파일이 앞 파일을 덮는다. LANE_ENV_EXTRA는 lane 종류별 추가 환경(relay lane은 oracle-relay.env).
+    env_file:
+      - ../env/oracle.env
+      - ${LANE_ENV_EXTRA:-../env/oracle-default.env}
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://pg:5432/chalkak
       SPRING_DATASOURCE_USERNAME: chalkak

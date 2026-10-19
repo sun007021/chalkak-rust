@@ -224,6 +224,7 @@ dependencies = [
 name = "chalkak-fakes"
 version = "0.0.0"
 dependencies = [
+ "chalkak-aws",
  "serde_json",
 ]
 

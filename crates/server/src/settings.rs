@@ -282,8 +282,12 @@ mod tests {
         ]);
         let prod = Settings::from_env(&prod).unwrap().jobs;
         assert!(prod.runtime_log);
-        // prod 프로필은 사용자 지표 집계도 켠다(application-prod.yml).
-        assert_eq!(prod.planned().len(), 6);
+        // 정리 4종, 런타임 로그, 발행 대기 모니터, 사용자 지표 집계(application-prod.yml). Relay·주제 푸시는 기본 꺼짐.
+        assert_eq!(prod.planned().len(), 7);
+        assert!(
+            prod.planned()
+                .contains(&chalkak_app::jobs::Job::PublicationMonitor)
+        );
         assert_eq!(local_planned, 4);
     }
 
