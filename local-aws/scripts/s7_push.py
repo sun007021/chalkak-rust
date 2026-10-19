@@ -178,6 +178,16 @@ def parse_ts(text):
     return datetime.fromisoformat(text).timestamp()
 
 
+def unknown_count(cohort, since):
+    """Relay 의 수락 불명(SQS_UNKNOWN) 건수. Rust 는 구조화 로그에서, Java 는 콘솔 로그에 결과 필드가 없어 DB 로 센다
+    (PENDING 이면서 다음 시도가 30초 넘게 남은 알림 = 실패·불명으로 재시도가 예약된 것)."""
+    if BACKEND == "rust":
+        return sum(1 for r in logs(since) if r.get("result") == "SQS_UNKNOWN")
+    return int(psql("SELECT count(*) FROM notifications n JOIN users u ON u.id = n.user_id "
+                    f"WHERE u.email LIKE 's7-{cohort.run}-%' AND n.sqs_publish_status = 'PENDING' "
+                    "AND n.next_attempt_at > now() + interval '30 seconds'"))
+
+
 def now_iso():
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
@@ -375,8 +385,9 @@ def scenario_burst(count):
     RESULTS["burst"] = metrics
     say(json.dumps(metrics, ensure_ascii=False))
     check("전 알림 PENDING -> PUBLISHED", statuses == {"PUBLISHED": count}, str(statuses))
-    check("Relay 결과가 SQS_ACCEPTED 로만 구성(재시도 없음)", results.get("SQS_ACCEPTED") == count and
-          not (results.keys() - {"REQUESTED", "SQS_ACCEPTED"}), str(dict(results)))
+    if worker:  # Java 콘솔 로그에는 결과 필드가 없다
+        check("Relay 결과가 SQS_ACCEPTED 로만 구성(재시도 없음)", results.get("SQS_ACCEPTED") == count and
+              not (results.keys() - {"REQUESTED", "SQS_ACCEPTED"}), str(dict(results)))
     if worker:
         check("FCM 이 모든 기기에 정확히 한 번 수락(중복 0)", len(per_token) == count and metrics["fcm_duplicates"] == 0,
               f"요청 {len(sends)}, 기기 {len(per_token)}")
@@ -448,7 +459,7 @@ def scenario_expire():
     toxic(6000)
     cohort.approve()
     ok, _ = wait_for("SQS_UNKNOWN 으로 PENDING 재시도 대기",
-                     lambda: sum(1 for r in logs(since) if r.get("result") == "SQS_UNKNOWN") >= 2, 90, 2)
+                     lambda: unknown_count(cohort, since) >= 2, 90, 2)
     pend = psql(f"SELECT count(*) FROM notifications n JOIN users u ON u.id=n.user_id WHERE u.email LIKE 's7-{cohort.run}-%' "
                 "AND n.sqs_publish_status='PENDING' AND n.next_attempt_at > now() + interval '30 seconds'")
     out["relay_unknown_pending_with_next_attempt"] = int(pend)
@@ -461,7 +472,7 @@ def scenario_expire():
     row = psql(f"SELECT n.sqs_publish_status, n.sqs_published_at IS NULL, n.next_attempt_at IS NULL FROM notifications n "
                f"JOIN users u ON u.id=n.user_id WHERE u.email LIKE 's7-{cohort.run}-%' LIMIT 1")
     out["relay_expired_s"] = round(took, 1)
-    check("(c) 기한 초과 PENDING 은 발행하지 않고 EXPIRED(발행 시각·다음 시도 비움)", ok and row == "EXPIRED|t|t" and len(rows) == 2, row)
+    check("(c) 기한 초과 PENDING 은 발행하지 않고 EXPIRED(발행 시각·다음 시도 비움)", ok and row == "EXPIRED|t|t" and (len(rows) == 2 or BACKEND != "rust"), row)
     # UNKNOWN 시도에서 큐가 실제로 받은 메시지는 Worker 가 곧바로 소비해 FCM 으로 보낸다(Java 는 Worker 가 없어 큐에 남는다).
     # 만료 처리는 "더 보내지 않는다"는 뜻일 뿐 이미 나간 한 번을 거두지는 못한다.
     if worker:
@@ -513,7 +524,7 @@ def fakes_requests_of(service):
     return [r for r in fakes_requests() if r["service"] == service]
 
 
-def scenario_sqsdelay(slow_count=20, unknown_count=5):
+def scenario_sqsdelay(slow_count=20, unknown_total=5):
     say("== sqsdelay: SQS 응답 지연 (toxiproxy)")
     worker = BACKEND == "rust"
     out = {}
@@ -529,8 +540,11 @@ def scenario_sqsdelay(slow_count=20, unknown_count=5):
     results = Counter(r.get("result") for r in logs(since) if r.get("stage") == "relay")
     out["delay_2s"] = {"count": slow_count, "published_all_s": round(time.monotonic() - t0, 1),
                        "per_notification_s": round((time.monotonic() - t0) / slow_count, 2), "relay_results": dict(results)}
-    check("(a) 2초 지연: 모두 PUBLISHED, SQS_ACCEPTED 만(UNKNOWN 0)", ok and results.get("SQS_UNKNOWN", 0) == 0
-          and results.get("SQS_ACCEPTED") == slow_count, str(dict(results)))
+    if worker:
+        check("(a) 2초 지연: 모두 PUBLISHED, SQS_ACCEPTED 만(UNKNOWN 0)", ok and results.get("SQS_UNKNOWN", 0) == 0
+              and results.get("SQS_ACCEPTED") == slow_count, str(dict(results)))
+    else:
+        check("(a) 2초 지연: 모두 PUBLISHED, 큐에 알림당 1건(중복 없음)", ok and depth() == slow_count, f"큐 {depth()}")
     if worker:
         wait_for("소비", lambda: depth() == 0 and len({t for _, t in cohort.sends()}) == slow_count, 300, 2)
         per = Counter(t for _, t in cohort.sends())
@@ -539,20 +553,19 @@ def scenario_sqsdelay(slow_count=20, unknown_count=5):
 
     # (b) 6초 지연(제한 밖): 응답이 늦어 UNKNOWN. 서버는 이미 받았으므로 다음 시도에서 같은 사건이 한 번 더 간다.
     reset_world()
-    cohort = Cohort(unknown_count)
+    cohort = Cohort(unknown_total)
     since = now_iso()
     toxic(6000)
     t0 = time.monotonic()
     cohort.approve()
-    ok, took = wait_for("모두 SQS_UNKNOWN", lambda: sum(1 for r in logs(since) if r.get("result") == "SQS_UNKNOWN") >= unknown_count, 120, 2)
-    unknown_after = {"statuses": cohort.statuses(), "unknown_logs": sum(1 for r in logs(since) if r.get("result") == "SQS_UNKNOWN"),
-                     "queue_depth": depth()}
+    ok, took = wait_for("모두 SQS_UNKNOWN", lambda: unknown_count(cohort, since) >= unknown_total, 120, 2)
+    unknown_after = {"statuses": cohort.statuses(), "unknown_seen": unknown_count(cohort, since), "queue_depth": depth()}
     out["delay_6s_during"] = unknown_after
     check("(b) 6초 지연: 발행은 UNKNOWN 으로 PENDING, 그런데 큐에는 이미 들어가 있다(수락 불명의 실제 모습)",
-          ok and unknown_after["statuses"].get("PENDING") == unknown_count
-          and (unknown_after["queue_depth"] >= unknown_count or (worker and len(cohort.sends()) > 0)), json.dumps(unknown_after))
+          ok and unknown_after["statuses"].get("PENDING") == unknown_total
+          and (unknown_after["queue_depth"] >= unknown_total or (worker and len(cohort.sends()) > 0)), json.dumps(unknown_after))
     toxic(None)
-    ok, took = wait_for("지연 해소 뒤 PUBLISHED", lambda: cohort.statuses().get("PUBLISHED") == unknown_count, 200, 2)
+    ok, took = wait_for("지연 해소 뒤 PUBLISHED", lambda: cohort.statuses().get("PUBLISHED") == unknown_total, 200, 2)
     out["delay_6s_recovery_s"] = round(took, 1)
     if worker:
         wait_for("소비 안정", lambda: depth() == 0, 120, 2)
@@ -573,9 +586,9 @@ def scenario_sqsdelay(slow_count=20, unknown_count=5):
     else:
         # Java 는 Worker 가 없어 큐에 쌓인 메시지 수가 곧 발행 횟수다.
         out["delay_6s_after"]["queue_depth"] = depth()
-        check("(b) Java: UNKNOWN 시도 뒤 재시도가 한 번 더 들어가 같은 알림이 큐에 2건씩", depth() == unknown_count * 2,
-              f"큐 {depth()}건(알림 {unknown_count}건)")
-    check("(b) 지연이 풀리면 모두 PUBLISHED", ok and cohort.statuses() == {"PUBLISHED": unknown_count}, str(cohort.statuses()))
+        check("(b) Java: UNKNOWN 시도 뒤 재시도가 한 번 더 들어가 같은 알림이 큐에 2건씩", depth() == unknown_total * 2,
+              f"큐 {depth()}건(알림 {unknown_total}건)")
+    check("(b) 지연이 풀리면 모두 PUBLISHED", ok and cohort.statuses() == {"PUBLISHED": unknown_total}, str(cohort.statuses()))
     RESULTS["sqsdelay"] = out
     say(json.dumps(out, ensure_ascii=False))
     reset_world()
