@@ -177,19 +177,38 @@ def purge_image_queue():
     )
 
 
-def main():
-    if not CA_FILE.exists():
-        raise Failure(f"로컬 CA 루트가 없다: {CA_FILE} (docker compose up 으로 edge 를 먼저 띄운다)")
-    purge_image_queue()
-    run = uuid.uuid4().hex[:10]
+def psql(sql):
+    return subprocess.run(
+        ["docker", "compose", "exec", "-T", "postgres", "psql", "-q", "-tA", "-U", "chalkak", "-d", "chalkak",
+         "-v", "ON_ERROR_STOP=1", "-c", sql], cwd=COMPOSE_DIR, check=True, capture_output=True, text=True,
+    ).stdout.strip()
 
-    # ---- 1. 회원가입 사인 ----------------------------------------------------------------------
+
+def todays_topic_id():
+    """주제는 날짜마다 하나다: 오늘 주제가 있으면 쓰고 없으면 만든다."""
+    today = datetime.now(KST).date()
+    start = datetime.combine(today, datetime.min.time(), KST)
+    topic_id = psql(f"SELECT id FROM topics WHERE topic_date = '{today}'")
+    if not topic_id:
+        topic_id = str(uuid.uuid4())
+        psql("INSERT INTO topics (id, title, topic_date, starts_at, ends_at) VALUES "
+             f"('{topic_id}', 'e2e', '{today}', '{start.isoformat()}', '{(start + timedelta(days=1)).isoformat()}')")
+    return topic_id
+
+
+def signup_user(run):
+    """회원가입 사인 흐름. 가짜 ID Token -> 사인 업로드 URL -> PNG PUT -> Lambda 처리 -> 가입 -> 사인 cdn GET 200.
+
+    돌려주는 값: sub(가짜 소셜 계정 식별자), userId, accessToken, refreshToken, signature(응답), uploadId.
+    """
+    sub = f"e2e-sub-{run}"
+    email = f"e2e-{run}@example.com"
     nonce = f"nonce-{run}"
-    token = id_token(f"e2e-sub-{run}", nonce, f"e2e-{run}@example.com")
+    token = id_token(sub, nonce, email)
     step("사인 업로드 URL 발급 (가짜 ID Token)")
     _, upload = api("POST", "/api/v1/auth/social-signup/signature/uploads",
                     {"provider": "GOOGLE", "idToken": token, "rawNonce": nonce})
-    sig_id, signup_token = upload["uploadId"], upload["signupToken"]
+    signup_token = upload["signupToken"]
     if not upload["uploadUrl"].startswith("https://") or f".s3.{HOST_IP}.sslip.io" not in upload["uploadUrl"]:
         raise Failure(f"사인 uploadUrl 이 예상한 S3 이름이 아니다: {upload['uploadUrl'][:120]}")
     step(f"사인 PNG presigned PUT -> {upload['uploadUrl'].split('?')[0]}")
@@ -214,24 +233,12 @@ def main():
     for url in urls:
         size = len(cdn_get(url))
         step(f"cdn GET 200 {url} ({size} bytes)")
+    return {"sub": sub, "email": email, "userId": signup.get("userId"), "accessToken": access_token,
+            "refreshToken": signup.get("refreshToken"), "signature": signature, "uploadId": upload["uploadId"]}
 
-    # ---- 2. 게시물 이미지 ------------------------------------------------------------------------
-    today = datetime.now(KST).date()
-    start = datetime.combine(today, datetime.min.time(), KST)
 
-    def psql(sql):
-        return subprocess.run(
-            ["docker", "compose", "exec", "-T", "postgres", "psql", "-q", "-tA", "-U", "chalkak", "-d", "chalkak",
-             "-v", "ON_ERROR_STOP=1", "-c", sql], cwd=COMPOSE_DIR, check=True, capture_output=True, text=True,
-        ).stdout.strip()
-
-    # 주제는 날짜마다 하나다: 오늘 주제가 있으면 쓰고 없으면 만든다.
-    topic_id = psql(f"SELECT id FROM topics WHERE topic_date = '{today}'")
-    if not topic_id:
-        topic_id = str(uuid.uuid4())
-        psql("INSERT INTO topics (id, title, topic_date, starts_at, ends_at) VALUES "
-             f"('{topic_id}', 'e2e', '{today}', '{start.isoformat()}', '{(start + timedelta(days=1)).isoformat()}')")
-
+def create_post(access_token, topic_id, run):
+    """게시물 업로드 URL -> WebP PUT -> 게시물 작성 -> 콜백으로 PENDING 이 될 때까지. (postId, uploadId, 오늘 게시물) 반환."""
     step("게시물 업로드 URL 발급")
     _, post_upload = api("POST", "/api/v1/posts/uploads", token=access_token)
     post_upload_id = post_upload["uploadId"]
@@ -252,10 +259,29 @@ def main():
     step(f"게시물 상태 {today_post['moderationStatus']}")
     if today_post["moderationStatus"] != "PENDING":
         raise Failure(f"게시물이 PENDING 이 아니다: {today_post}")
+    return post_id, post_upload_id, today_post
 
-    step("관리자가 게시물을 승인 (operator / operator-password)")
+
+def admin_login():
+    step("관리자 로그인 (operator / operator-password)")
     _, admin = api("POST", "/api/v1/admin/auth/login", {"username": "operator", "password": "operator-password"})
-    admin_token = admin["accessToken"]
+    return admin["accessToken"]
+
+
+def main():
+    if not CA_FILE.exists():
+        raise Failure(f"로컬 CA 루트가 없다: {CA_FILE} (docker compose up 으로 edge 를 먼저 띄운다)")
+    purge_image_queue()
+    run = uuid.uuid4().hex[:10]
+
+    # ---- 1. 회원가입 사인 ----------------------------------------------------------------------
+    access_token = signup_user(run)["accessToken"]
+
+    # ---- 2. 게시물 이미지 ------------------------------------------------------------------------
+    post_id, _, _ = create_post(access_token, todays_topic_id(), run)
+
+    step("관리자가 게시물을 승인")
+    admin_token = admin_login()
     api("PUT", f"/api/v1/admin/posts/{post_id}/moderation", {"status": "APPROVED"}, token=admin_token)
     _, detail = api("GET", f"/api/v1/posts/{post_id}", token=access_token)
     photo_urls = [detail.get("originalImageUrl"), detail.get("thumbnailImageUrl")]
