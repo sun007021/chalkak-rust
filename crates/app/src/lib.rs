@@ -55,6 +55,7 @@ pub fn register_routes(routes: web::Routes, ctx: &AppContext) -> web::Routes {
     let routes = topic::api::register(routes, ctx);
     let routes = feedback::api::register(routes, ctx);
     let routes = notification::api::register(routes, ctx);
+    let routes = notification::push_api::register(routes, ctx);
     let routes = auth::api::register(routes, ctx, &components);
     let routes = user::api::register(routes, ctx, &components);
     let routes = post::api::register(routes, ctx);

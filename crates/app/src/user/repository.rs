@@ -16,7 +16,7 @@ use super::domain::{SignatureProcessingStatus, User, UserStatus};
 pub const COLUMNS: &str = "u.id, u.email, u.status::text AS status, u.signature_original_storage_key, \
      u.signature_thumbnail_storage_key, u.app_version, u.pending_signature_upload_id, \
      u.signature_processing_status::text AS signature_processing_status, \
-     u.signature_processing_started_at, u.created_at, u.updated_at, u.deleted_at";
+     u.signature_processing_started_at, u.topic_push_enabled, u.moderation_push_enabled, u.created_at, u.updated_at, u.deleted_at";
 
 fn corrupt(column: &str, value: &str) -> DbError {
     DbError::Config(format!("users.{column} 값을 해석할 수 없습니다: {value}"))
@@ -41,6 +41,8 @@ pub fn user_from_row(row: &Row) -> Result<User, DbError> {
         },
         signature_processing_started_at: row.try_get("signature_processing_started_at")?,
         app_version: row.try_get("app_version")?,
+        topic_push_enabled: row.try_get("topic_push_enabled")?,
+        moderation_push_enabled: row.try_get("moderation_push_enabled")?,
         created_at: row.try_get("created_at")?,
         updated_at: row.try_get("updated_at")?,
         deleted_at: row.try_get("deleted_at")?,
@@ -81,6 +83,15 @@ impl UserRepository {
         id: Uuid,
     ) -> Result<Option<User>, DbError> {
         self.find_one(db, "u.id = $1 AND u.deleted_at IS NULL", &id, true)
+    }
+
+    /// `findByIdForUpdate`: 탈퇴 회원도 읽고 잠근다.
+    pub fn find_by_id_for_update(
+        &self,
+        db: &mut impl Db,
+        id: Uuid,
+    ) -> Result<Option<User>, DbError> {
+        self.find_one(db, "u.id = $1", &id, true)
     }
 
     /// `findActiveByPendingSignatureUploadIdForUpdate`.
@@ -147,7 +158,8 @@ impl UserRepository {
              signature_original_storage_key = $4, signature_thumbnail_storage_key = $5, \
              app_version = $6, pending_signature_upload_id = $7, \
              signature_processing_status = CAST($8::text AS signature_processing_status), \
-             signature_processing_started_at = $9, deleted_at = $10, updated_at = $11 \
+             signature_processing_started_at = $9, deleted_at = $10, updated_at = $11, \
+             topic_push_enabled = $12, moderation_push_enabled = $13 \
              WHERE id = $1",
             &[
                 &after.id,
@@ -163,6 +175,8 @@ impl UserRepository {
                 &after.signature_processing_started_at,
                 &after.deleted_at,
                 &now,
+                &after.topic_push_enabled,
+                &after.moderation_push_enabled,
             ],
         )?;
         Ok(true)

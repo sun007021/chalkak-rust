@@ -33,20 +33,30 @@ impl Principal {
 
 thread_local! {
     static CURRENT: RefCell<Option<Principal>> = const { RefCell::new(None) };
+    /// 액세스 토큰의 `session_id` 클레임(로그인 식별자). 클레임이 없거나 표준형 UUID가 아니면 `None`이다.
+    static CURRENT_SESSION: RefCell<Option<Uuid>> = const { RefCell::new(None) };
 }
 
 /// 가드를 버리면 이전 값으로 돌아간다.
 #[must_use = "가드를 버리면 인증 범위가 바로 끝난다"]
 pub struct PrincipalGuard {
     previous: Option<Principal>,
+    previous_session: Option<Uuid>,
     _not_send: std::marker::PhantomData<*const ()>,
 }
 
-/// 현재 스레드에 주체를 올린다.
+/// 현재 스레드에 주체를 올린다. 로그인 식별자는 없는 것으로 본다.
 pub fn enter(principal: Principal) -> PrincipalGuard {
+    enter_with_session(principal, None)
+}
+
+/// 현재 스레드에 주체와 로그인 식별자(`session_id` 클레임)를 올린다.
+pub fn enter_with_session(principal: Principal, session_id: Option<Uuid>) -> PrincipalGuard {
     let previous = CURRENT.with(|c| c.borrow_mut().replace(principal));
+    let previous_session = CURRENT_SESSION.with(|c| c.replace(session_id));
     PrincipalGuard {
         previous,
+        previous_session,
         _not_send: std::marker::PhantomData,
     }
 }
@@ -55,7 +65,17 @@ impl Drop for PrincipalGuard {
     fn drop(&mut self) {
         let previous = self.previous.take();
         CURRENT.with(|c| *c.borrow_mut() = previous);
+        let previous_session = self.previous_session.take();
+        CURRENT_SESSION.with(|c| *c.borrow_mut() = previous_session);
     }
+}
+
+/// `AuthenticatedUsers.findSessionId`: `session_id` 클레임을 문자열이고 표준형 UUID(대소문자 무시)일 때만 읽는다.
+/// 그렇지 않으면 이전 토큰처럼 로그인 식별자가 없는 것으로 처리한다.
+pub fn session_id_from_claim(claim: Option<&str>) -> Option<Uuid> {
+    let value = claim?;
+    java_uuid_from_string(value)
+        .filter(|id| id.hyphenated().to_string().eq_ignore_ascii_case(value))
 }
 
 /// 현재 요청의 주체. 익명이면 `None`.
@@ -67,6 +87,8 @@ pub fn current() -> Option<Principal> {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct AuthenticatedUser {
     pub user_id: Uuid,
+    /// 토큰의 로그인 식별자. 로그인 식별자 도입 전에 발급한 토큰에는 없다.
+    pub session_id: Option<Uuid>,
 }
 
 fn unauthorized() -> ApiError {
@@ -83,7 +105,11 @@ fn unauthorized() -> ApiError {
 pub fn login_user() -> Result<AuthenticatedUser, ApiError> {
     let principal = current().ok_or_else(unauthorized)?;
     let user_id = java_uuid_from_string(&principal.subject).ok_or_else(unauthorized)?;
-    Ok(AuthenticatedUser { user_id })
+    let session_id = CURRENT_SESSION.with(|c| *c.borrow());
+    Ok(AuthenticatedUser {
+        user_id,
+        session_id,
+    })
 }
 
 #[cfg(test)]

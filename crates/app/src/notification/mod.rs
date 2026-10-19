@@ -10,8 +10,11 @@
 pub mod api;
 pub mod cleanup;
 pub mod domain;
+pub mod push_api;
+pub mod push_device;
 pub mod repository;
 pub mod service;
+pub mod settings;
 pub mod slack;
 
 use std::fmt;
