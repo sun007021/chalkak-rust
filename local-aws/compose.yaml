@@ -213,6 +213,8 @@ services:
       NOTIFICATION_WORKER_ENABLED: "true"
       NOTIFICATION_FCM_CREDENTIALS_PATH: /secrets/fcm-service-account.json
       NOTIFICATION_FCM_ENDPOINT_URL: http://fakes:9000
+      # SQS 전송 주소. 기본은 LocalStack 직접. S7(scripts/s7.sh)은 toxiproxy 를 거쳐 SQS 지연을 주입한다.
+      AWS_ENDPOINT_URL_SQS: ${SQS_ENDPOINT_URL:-http://aws:4566}
     volumes:
       - ${CHALKAK_SERVER_BIN:-../target/release/chalkak-server}:/app/chalkak-server:ro
       - ../harness/keys/fcm-service-account.json:/secrets/fcm-service-account.json:ro
@@ -252,7 +254,15 @@ services:
       SPRING_DATASOURCE_USERNAME: chalkak
       SPRING_DATASOURCE_PASSWORD: local-aws-password
       DB_HOST: postgres
+      # 알림 푸시 경로(S7 비교용). 기본은 꺼 둔다(env 파일의 false). Relay 는 SQS 로 발행만 한다.
+      NOTIFICATION_RELAY_ENABLED: ${JAVA_NOTIFICATION_RELAY:-false}
+      # Worker 는 Admin SDK 가 FCM 호스트를 고정해서 가짜 FCM 으로 보낼 수 없다. 켜면 인터넷이 막힌 이 환경에서는 발송이 항상
+      # 일시 실패(UNAVAILABLE)가 되어 재수신·DLQ 이동만 관찰할 수 있다.
+      NOTIFICATION_WORKER_ENABLED: ${JAVA_NOTIFICATION_WORKER:-false}
+      NOTIFICATION_FCM_CREDENTIALS_PATH: ${JAVA_FCM_CREDENTIALS_PATH:-/dev/null}
+      AWS_ENDPOINT_URL_SQS: ${SQS_ENDPOINT_URL:-http://aws:4566}
     volumes:
+      - ../harness/keys/fcm-service-account.json:/secrets/fcm-service-account.json:ro
       - ${ORACLE_JAR:-/tmp/chalkak-lanes/oracle/app.jar}:/app/app.jar:ro
       - ./.state/caddy/data/caddy/pki/authorities/local:/ca:ro
     ports:
