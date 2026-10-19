@@ -80,7 +80,8 @@ mod tests {
             scope.info(),
             RequestInfo {
                 route: Some("/api/v1/topics".into()),
-                user_id: Some("u".into())
+                user_id: Some("u".into()),
+                feed_query: None,
             }
         );
         drop(scope);
