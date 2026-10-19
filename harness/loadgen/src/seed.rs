@@ -98,12 +98,13 @@ SELECT ('01990000-0000-7000-8004-' || lpad(to_hex(n), 12, '0'))::uuid, (SELECT i
 FROM generate_series(0, {npu} - 1) n
 WHERE EXISTS (SELECT 1 FROM admins);
 
-INSERT INTO notifications (user_id, post_id, event_key, type, title, body, created_at)
+INSERT INTO notifications (user_id, source_type, source_id, event_key, type, title, body, created_at, sqs_publish_status)
 SELECT ('01990000-0000-7000-8000-' || lpad(to_hex(u), 12, '0'))::uuid,
+       'POST',
        ('01990000-0000-7000-8001-' || lpad(to_hex(n * 100000 + u), 12, '0'))::uuid,
        ('01990000-0000-7000-8004-' || lpad(to_hex(n), 12, '0'))::uuid,
        'POST_APPROVED', '게시물이 승인되었어요', '게시물이 공개되었습니다.',
-       now() - (n || ' hours')::interval
+       now() - (n || ' hours')::interval, 'NOT_REQUIRED'
 FROM generate_series(1, LEAST(100, {ppt})) u, generate_series(0, {npu} - 1) n
 WHERE EXISTS (SELECT 1 FROM admins);
 
@@ -139,6 +140,25 @@ mod tests {
         assert!(sql.contains("generate_series(1, 7) g"));
         assert!(sql.contains("generate_series(0, 3 - 1) d"));
         assert!(sql.contains("generate_series(1, 5) u"));
+    }
+
+    #[test]
+    fn 알림은_일반화된_출처_컬럼으로_넣는다() {
+        // V202610061630 이 notifications.post_id 를 없애고 source_type·source_id 를 만들었다. 옛 컬럼으로 넣으면 시드가 42703 으로 실패한다.
+        let sql = seed_sql(&SeedSize::default());
+        let insert = sql
+            .split("INSERT INTO notifications")
+            .nth(1)
+            .expect("알림 INSERT 가 있다");
+        let columns = insert.split(')').next().unwrap();
+        assert!(!columns.contains("post_id"), "{columns}");
+        assert!(
+            columns.contains("source_type") && columns.contains("source_id"),
+            "{columns}"
+        );
+        // 푸시 발행 상태가 NOT NULL 이다. 시드 알림은 발송 대상이 아니라 NOT_REQUIRED 다.
+        assert!(columns.contains("sqs_publish_status"), "{columns}");
+        assert!(insert.contains("'NOT_REQUIRED'"));
     }
 
     #[test]
