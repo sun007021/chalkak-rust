@@ -1,0 +1,56 @@
+# L5(안정성 시험 S1~S6·S8·S9) 겹침 설정. compose.yaml 위에 얹어 쓴다: scripts/l5.sh, scripts/s9.sh 가 알아서 얹는다.
+#   docker compose -f compose.yaml -f compose.l5.yaml --profile chaos --profile rust up -d
+# 바뀌는 것
+#  - 백엔드의 DB 경로가 toxiproxy 를 거친다(S5: 지연·끊김 주입). Rust·Java 모두 같은 경로라 A/B 비교가 공평하다.
+#  - edge 의 S3 경로가 fault-proxy 를 거친다(S6: 5xx·지연·403 주입). 규칙이 없으면 그대로 LocalStack 으로 넘긴다.
+#  - edge 에 평문 리스너 8081 을 열어 부하 발생기가 edge 를 거치게 한다(edge 접근 로그에서 p50/p99).
+#  - Rust 프로필의 주제 푸시·공지 배포는 compose.yaml 대로 켜 둔다. S1~S6·S8 은 compose.s7.yaml 을 얹지 않는다(알림 수치를 보지 않는다).
+x-toxi-health: &toxi-health
+  interval: 2s
+  timeout: 5s
+  retries: 60
+
+services:
+  edge:
+    environment:
+      S3_UPSTREAM: fault-proxy:8080
+    ports:
+      - "127.0.0.1:${EDGE_HTTP_PORT:-18081}:8081"
+    depends_on:
+      fault-proxy: { condition: service_started }
+
+  fault-proxy:
+    image: ${LAMBDA_IMAGE:-amazon/aws-lambda-python:3.13}
+    restart: unless-stopped
+    entrypoint: ["python", "-u", "/fault/proxy.py"]
+    environment:
+      UPSTREAM: aws:4566
+    volumes:
+      - ./fault-proxy:/fault:ro
+    ports:
+      - "127.0.0.1:${FAULT_PROXY_PORT:-18090}:9099"
+    depends_on:
+      aws: { condition: service_healthy }
+
+  toxiproxy:
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8474"]
+      <<: *toxi-health
+    depends_on:
+      postgres: { condition: service_healthy }
+      aws: { condition: service_healthy }
+
+  rust:
+    environment:
+      DB_HOST: toxiproxy
+      DB_PORT: "15432"
+    depends_on:
+      toxiproxy: { condition: service_healthy }
+
+  java:
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://toxiproxy:15432/chalkak
+      DB_HOST: toxiproxy
+      DB_PORT: "15432"
+    depends_on:
+      toxiproxy: { condition: service_healthy }

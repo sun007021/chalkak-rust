@@ -17,15 +17,38 @@
 	}
 }
 
+# 접근 로그(요청별 duration·status). L5 시험이 edge 로그에서 p50/p99·5xx 를 센다.
+(access) {
+	log {
+		output stdout
+		format filter {
+			wrap json
+			fields {
+				request>headers delete
+				request>tls delete
+				resp_headers delete
+			}
+		}
+	}
+}
+
 api.{$HOST_IP}.sslip.io {
 	tls internal
+	import access
+	reverse_proxy backend:8080
+}
+
+# 부하 발생기용 평문 리스너(L5). loadgen 에는 TLS 가 없다. 이 포트로 보낸 요청도 edge 접근 로그에 남아 p50/p99 를 edge 에서 읽는다.
+http://:8081 {
+	import access
 	reverse_proxy backend:8080
 }
 
 # virtual-host 버킷 주소는 와일드카드 인증서 하나로 받는다. 호스트 헤더는 그대로 LocalStack 에 넘어간다.
 s3.{$HOST_IP}.sslip.io, *.s3.{$HOST_IP}.sslip.io {
 	tls internal
-	reverse_proxy aws:4566 {
+	# S3_UPSTREAM 기본은 LocalStack. L5 시험(compose.l5.yaml)은 S3 장애 주입 프록시(fault-proxy)를 끼운다.
+	reverse_proxy {$S3_UPSTREAM:aws:4566} {
 		# 큰 업로드도 그대로 흘려 보낸다.
 		flush_interval -1
 	}
