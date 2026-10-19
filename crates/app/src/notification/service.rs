@@ -8,7 +8,7 @@ use chalkak_db::Pool;
 use jiff::Timestamp;
 use uuid::Uuid;
 
-use super::domain::NotificationType;
+use super::domain::{NotificationSourceType, NotificationType, retention_threshold};
 use super::repository::NotificationRepository;
 use crate::photo::url::ImageUrlProvider;
 use crate::web::ApiError;
@@ -27,6 +27,8 @@ pub struct NotificationListResult {
 pub struct NotificationSummaryResult {
     pub id: Uuid,
     pub kind: NotificationType,
+    pub source_type: Option<NotificationSourceType>,
+    pub source_id: Option<Uuid>,
     pub title: String,
     pub body: String,
     pub thumbnail_image_url: Option<String>,
@@ -86,15 +88,21 @@ impl NotificationInboxService {
             ));
         }
         let mut conn = self.pool.get()?;
-        let slice =
-            self.repository
-                .find_by_user_id(&mut conn, user_id, offset, i64::from(page_size))?;
+        let slice = self.repository.find_by_user_id(
+            &mut conn,
+            user_id,
+            offset,
+            i64::from(page_size),
+            retention_threshold(self.clock.now()),
+        )?;
         let mut notifications = Vec::with_capacity(slice.notifications.len());
         for summary in slice.notifications {
             let n = summary.notification;
             notifications.push(NotificationSummaryResult {
                 id: n.id.expect("저장된 알림에는 식별자가 있다"),
                 kind: n.kind,
+                source_type: n.source_type,
+                source_id: n.source_id,
                 title: n.title,
                 body: n.body,
                 thumbnail_image_url: self.image_url(summary.thumbnail_storage_key.as_deref())?,
@@ -119,7 +127,12 @@ impl NotificationInboxService {
         let mut conn = self.pool.get()?;
         let detail = self
             .repository
-            .find_detail_by_id_and_user_id(&mut conn, notification_id, user_id)?
+            .find_detail_by_id_and_user_id(
+                &mut conn,
+                notification_id,
+                user_id,
+                retention_threshold(self.clock.now()),
+            )?
             .ok_or_else(not_found)?;
         let n = detail.notification;
         Ok(NotificationDetailResult {
@@ -127,7 +140,7 @@ impl NotificationInboxService {
             kind: n.kind,
             title: n.title,
             body: n.body,
-            original_image_url: self.image_url(Some(&detail.original_storage_key))?,
+            original_image_url: self.image_url(detail.original_storage_key.as_deref())?,
             rejection_reason: n.rejection_reason,
             read_at: n.read_at,
             created_at: n.created_at,
@@ -137,17 +150,24 @@ impl NotificationInboxService {
     /// `hasUnreadNotification`
     pub fn has_unread_notification(&self, user_id: Uuid) -> Result<bool, ApiError> {
         let mut conn = self.pool.get()?;
-        Ok(self
-            .repository
-            .exists_unread_by_user_id(&mut conn, user_id)?)
+        Ok(self.repository.exists_unread_by_user_id(
+            &mut conn,
+            user_id,
+            retention_threshold(self.clock.now()),
+        )?)
     }
 
     /// `markRead`: 반복 호출해도 처음 읽은 시각을 유지한다. 없거나 남의 알림이면 404.
     pub fn mark_read(&self, user_id: Uuid, notification_id: Uuid) -> Result<(), ApiError> {
         let mut conn = self.pool.get()?;
-        let updated =
-            self.repository
-                .mark_read(&mut conn, notification_id, user_id, self.clock.now())?;
+        let now = self.clock.now();
+        let updated = self.repository.mark_read(
+            &mut conn,
+            notification_id,
+            user_id,
+            now,
+            retention_threshold(now),
+        )?;
         if updated == 0 {
             return Err(not_found());
         }
@@ -157,8 +177,9 @@ impl NotificationInboxService {
     /// `markAllRead`
     pub fn mark_all_read(&self, user_id: Uuid) -> Result<(), ApiError> {
         let mut conn = self.pool.get()?;
+        let now = self.clock.now();
         self.repository
-            .mark_all_read(&mut conn, user_id, self.clock.now())?;
+            .mark_all_read(&mut conn, user_id, now, retention_threshold(now))?;
         Ok(())
     }
 }

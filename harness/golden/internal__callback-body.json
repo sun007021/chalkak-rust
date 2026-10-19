@@ -1,8 +1,39 @@
 {
+  "db": {
+    "photos": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/local/original/$uuid?.webp\",\"thumbnail_storage_key\":null,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/local/original/$uuid?.webp\",\"thumbnail_storage_key\":null,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/local/original/$uuid?.webp\",\"thumbnail_storage_key\":null,\"updated_at\":\"<t+0s db +09:00>\"}"
+    ],
+    "post_image_uploads": [
+      "{\"claimed_at\":\"<t-3600s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"id\":\"$uuid?\",\"image_metadata\":null,\"rejection_reason\":null,\"status\":\"ISSUED\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"claimed_at\":\"<t-3600s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"id\":\"$uuid?\",\"image_metadata\":null,\"rejection_reason\":null,\"status\":\"ISSUED\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"claimed_at\":\"<t-3600s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"id\":\"$uuid?\",\"image_metadata\":{\"width\":1},\"rejection_reason\":null,\"status\":\"READY\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"claimed_at\":null,\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"id\":\"$uuid?\",\"image_metadata\":null,\"rejection_reason\":\"OLD\",\"status\":\"REJECTED\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"claimed_at\":null,\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"id\":\"$uuid?\",\"image_metadata\":null,\"rejection_reason\":\"rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\",\"status\":\"REJECTED\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"claimed_at\":null,\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"id\":\"$uuid?\",\"image_metadata\":{\"byteSize\":null,\"capturedAt\":null,\"height\":null,\"location\":null,\"metaAttributes\":{},\"width\":null},\"rejection_reason\":null,\"status\":\"READY\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}"
+    ],
+    "posts": [
+      "{\"created_at\":\"<t-3600s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":\"$uuid?\",\"title\":\"셋\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t-3600s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-3600s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"VALIDATING\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":\"$uuid?\",\"title\":\"둘\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t-3600s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t-3600s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"VALIDATING\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":\"$uuid?\",\"title\":\"하나\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t-3600s db +09:00>\",\"user_id\":\"$uuid?\"}"
+    ],
+    "topics": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t+54000s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-32400s db +09:00>\",\"title\":\"오늘\",\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ],
+    "users": [
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"u1@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u1/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"u2@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u2/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"u3@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u3/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"u4@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u4/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}"
+    ]
+  },
   "steps": [
     {
-      "step": "complete: 본문 없음",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -37,14 +68,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "complete: 본문 없음"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
-      }
-    },
-    {
-      "step": "complete: 빈 본문",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -79,14 +110,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "complete: 빈 본문"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
-      }
-    },
-    {
-      "step": "complete: 깨진 JSON",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -121,14 +152,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
-      }
+      "status": 400,
+      "step": "complete: 깨진 JSON"
     },
     {
-      "step": "complete: null",
-      "status": 500,
+      "body": {
+        "errorCode": "INTERNAL_ERROR",
+        "message": "서버에서 요청을 처리하지 못했습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -163,14 +194,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "INTERNAL_ERROR",
-        "message": "서버에서 요청을 처리하지 못했습니다."
-      }
+      "status": 500,
+      "step": "complete: null"
     },
     {
-      "step": "complete: 배열",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -205,14 +236,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "complete: 배열"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
-      }
-    },
-    {
-      "step": "complete: 문자열",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -247,14 +278,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "complete: 문자열"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
-      }
-    },
-    {
-      "step": "complete: 숫자",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -289,14 +320,11 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
-      }
+      "status": 400,
+      "step": "complete: 숫자"
     },
     {
-      "step": "complete: 빈 객체",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -327,11 +355,11 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "complete: 빈 객체"
     },
     {
-      "step": "complete: 알 수 없는 필드는 무시",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -362,11 +390,14 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "complete: 알 수 없는 필드는 무시"
     },
     {
-      "step": "complete: 뒤에 남은 값은 무시",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -401,14 +432,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "complete: 뒤에 남은 값은 무시"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
-      }
-    },
-    {
-      "step": "complete: 뒤에 쓰레기",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -443,14 +474,11 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
-      }
+      "status": 400,
+      "step": "complete: 뒤에 쓰레기"
     },
     {
-      "step": "complete: BOM 접두",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -481,11 +509,14 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "complete: BOM 접두"
     },
     {
-      "step": "complete: width 0",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -520,14 +551,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "complete: width 0"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "complete: width 음수",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -562,14 +593,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "complete: width 음수"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "complete: height 0",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -604,14 +635,11 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "complete: height 0"
     },
     {
-      "step": "complete: width 문자열",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -642,11 +670,11 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "complete: width 문자열"
     },
     {
-      "step": "complete: width 소수",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -677,11 +705,11 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "complete: width 소수"
     },
     {
-      "step": "complete: width 지수",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -712,11 +740,11 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "complete: width 지수"
     },
     {
-      "step": "complete: width 공백 문자열",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -747,11 +775,11 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "complete: width 공백 문자열"
     },
     {
-      "step": "complete: width 빈 문자열",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -782,11 +810,14 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "complete: width 빈 문자열"
     },
     {
-      "step": "complete: width 문자열 아님",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -821,14 +852,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "complete: width 문자열 아님"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
-      }
-    },
-    {
-      "step": "complete: width 불리언",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -863,14 +894,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "complete: width 불리언"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
-      }
-    },
-    {
-      "step": "complete: width 객체",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -905,14 +936,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "complete: width 객체"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
-      }
-    },
-    {
-      "step": "complete: width int 초과",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -947,14 +978,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
-      }
+      "status": 400,
+      "step": "complete: width int 초과"
     },
     {
-      "step": "complete: byteSize 음수",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -989,14 +1020,11 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "complete: byteSize 음수"
     },
     {
-      "step": "complete: byteSize 0",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -1027,11 +1055,11 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "complete: byteSize 0"
     },
     {
-      "step": "complete: byteSize 큰 값",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -1062,11 +1090,14 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "complete: byteSize 큰 값"
     },
     {
-      "step": "complete: byteSize long 초과",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1101,14 +1132,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
-      }
+      "status": 400,
+      "step": "complete: byteSize long 초과"
     },
     {
-      "step": "complete: 위도 91",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1143,14 +1174,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "complete: 위도 91"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "complete: 경도 -181",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -1185,14 +1216,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "complete: 경도 -181"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "complete: 위도만",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -1227,14 +1258,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "complete: 위도만"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "complete: 경도만",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -1269,14 +1300,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "complete: 경도만"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "complete: 빈 위치",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -1311,14 +1342,11 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "complete: 빈 위치"
     },
     {
-      "step": "complete: 위치 null",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -1349,11 +1377,14 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "complete: 위치 null"
     },
     {
-      "step": "complete: 위치 배열",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1388,14 +1419,11 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
-      }
+      "status": 400,
+      "step": "complete: 위치 배열"
     },
     {
-      "step": "complete: 위도 문자열",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -1426,11 +1454,14 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "complete: 위도 문자열"
     },
     {
-      "step": "complete: 위도 NaN 문자열",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1465,14 +1496,11 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "complete: 위도 NaN 문자열"
     },
     {
-      "step": "complete: 위도 경계",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -1503,11 +1531,11 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "complete: 위도 경계"
     },
     {
-      "step": "complete: 정밀한 좌표",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -1538,11 +1566,11 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "complete: 정밀한 좌표"
     },
     {
-      "step": "complete: capturedAt 64자",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -1573,11 +1601,14 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "complete: capturedAt 64자"
     },
     {
-      "step": "complete: capturedAt 65자",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1612,14 +1643,11 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "complete: capturedAt 65자"
     },
     {
-      "step": "complete: capturedAt 숫자",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -1650,11 +1678,14 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "complete: capturedAt 숫자"
     },
     {
-      "step": "complete: capturedAt 배열",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1689,14 +1720,11 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
-      }
+      "status": 400,
+      "step": "complete: capturedAt 배열"
     },
     {
-      "step": "complete: metaAttributes 중첩",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -1727,11 +1755,11 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "complete: metaAttributes 중첩"
     },
     {
-      "step": "complete: metaAttributes 200개",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -1762,11 +1790,14 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "complete: metaAttributes 200개"
     },
     {
-      "step": "complete: metaAttributes 201개",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1801,14 +1832,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "complete: metaAttributes 201개"
     },
     {
-      "step": "complete: metaAttributes 배열",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1843,14 +1874,11 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
-      }
+      "status": 400,
+      "step": "complete: metaAttributes 배열"
     },
     {
-      "step": "complete: metaAttributes 부동소수",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -1881,11 +1909,11 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "complete: metaAttributes 부동소수"
     },
     {
-      "step": "complete: metaAttributes 유니코드",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -1916,11 +1944,14 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "complete: metaAttributes 유니코드"
     },
     {
-      "step": "failed: 본문 없음",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1955,14 +1986,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
-      }
+      "status": 400,
+      "step": "failed: 본문 없음"
     },
     {
-      "step": "failed: 빈 객체",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1997,14 +2028,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "failed: 빈 객체"
     },
     {
-      "step": "failed: null",
-      "status": 500,
+      "body": {
+        "errorCode": "INTERNAL_ERROR",
+        "message": "서버에서 요청을 처리하지 못했습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -2039,14 +2070,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "INTERNAL_ERROR",
-        "message": "서버에서 요청을 처리하지 못했습니다."
-      }
+      "status": 500,
+      "step": "failed: null"
     },
     {
-      "step": "failed: reason null",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -2081,14 +2112,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "failed: reason null"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "failed: 공백",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -2123,14 +2154,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "failed: 공백"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "failed: 빈 문자열",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -2165,14 +2196,11 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "failed: 빈 문자열"
     },
     {
-      "step": "failed: 50자",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -2203,11 +2231,14 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "failed: 50자"
     },
     {
-      "step": "failed: 51자",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -2242,14 +2273,11 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미지 처리 콜백 본문이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "failed: 51자"
     },
     {
-      "step": "failed: 숫자",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -2280,11 +2308,14 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "failed: 숫자"
     },
     {
-      "step": "failed: 배열",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -2319,14 +2350,11 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "이미지 처리 콜백 본문을 읽을 수 없습니다."
-      }
+      "status": 400,
+      "step": "failed: 배열"
     },
     {
-      "step": "failed: 한글 50자",
-      "status": 204,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -2357,36 +2385,8 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 204,
+      "step": "failed: 한글 50자"
     }
-  ],
-  "db": {
-    "photos": [
-      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/$uuid?.webp\",\"thumbnail_storage_key\":null}",
-      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/$uuid?.webp\",\"thumbnail_storage_key\":null}",
-      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/local/original/$uuid?.webp\",\"thumbnail_storage_key\":null}"
-    ],
-    "post_image_uploads": [
-      "{\"id\":\"$uuid?\",\"status\":\"ISSUED\",\"user_id\":\"$uuid?\",\"claimed_at\":\"<t-3600s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"image_metadata\":null,\"rejection_reason\":null}",
-      "{\"id\":\"$uuid?\",\"status\":\"ISSUED\",\"user_id\":\"$uuid?\",\"claimed_at\":\"<t-3600s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"image_metadata\":null,\"rejection_reason\":null}",
-      "{\"id\":\"$uuid?\",\"status\":\"READY\",\"user_id\":\"$uuid?\",\"claimed_at\":\"<t-3600s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"image_metadata\":{\"width\":1},\"rejection_reason\":null}",
-      "{\"id\":\"$uuid?\",\"status\":\"READY\",\"user_id\":\"$uuid?\",\"claimed_at\":null,\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"image_metadata\":{\"width\":null,\"height\":null,\"byteSize\":null,\"location\":null,\"capturedAt\":null,\"metaAttributes\":{}},\"rejection_reason\":null}",
-      "{\"id\":\"$uuid?\",\"status\":\"REJECTED\",\"user_id\":\"$uuid?\",\"claimed_at\":null,\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"image_metadata\":null,\"rejection_reason\":\"OLD\"}",
-      "{\"id\":\"$uuid?\",\"status\":\"REJECTED\",\"user_id\":\"$uuid?\",\"claimed_at\":null,\"created_at\":\"<t+0s db +09:00>\",\"expires_at\":\"<t+86400s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"image_metadata\":null,\"rejection_reason\":\"rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\"}"
-    ],
-    "posts": [
-      "{\"id\":\"$uuid?\",\"title\":\"둘\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-3600s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-3600s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"VALIDATING\",\"post_image_upload_id\":\"$uuid?\"}",
-      "{\"id\":\"$uuid?\",\"title\":\"셋\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-3600s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-3600s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"PENDING\",\"post_image_upload_id\":\"$uuid?\"}",
-      "{\"id\":\"$uuid?\",\"title\":\"하나\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t-3600s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t-3600s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"VALIDATING\",\"post_image_upload_id\":\"$uuid?\"}"
-    ],
-    "topics": [
-      "{\"id\":\"$uuid?\",\"title\":\"오늘\",\"ends_at\":\"<t+54000s db +09:00>\",\"starts_at\":\"<t-32400s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t+0s db +09:00>\"}"
-    ],
-    "users": [
-      "{\"id\":\"$uuid?\",\"email\":\"u1@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u1/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}",
-      "{\"id\":\"$uuid?\",\"email\":\"u2@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u2/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}",
-      "{\"id\":\"$uuid?\",\"email\":\"u3@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u3/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}",
-      "{\"id\":\"$uuid?\",\"email\":\"u4@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/u4/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}"
-    ]
-  }
+  ]
 }

@@ -12,6 +12,8 @@ pub struct RequestInfo {
     pub route: Option<String>,
     /// 로그인 회원 식별자. 회원 토큰일 때만 채운다(관리자 토큰의 `sub`는 회원 식별자가 아니다).
     pub user_id: Option<String>,
+    /// 정상 피드 응답에서 확정한 조회 조건(`FeedQueryLog`): 정렬(소문자), 페이지, 페이지 크기.
+    pub feed_query: Option<(String, i64, i64)>,
 }
 
 thread_local! {
@@ -49,9 +51,19 @@ pub fn set_route(route: &str) {
     CURRENT.with(|c| c.borrow_mut().route = Some(route.to_owned()));
 }
 
+/// 지금까지 기록한 경로 템플릿. 바깥 계층이 응답을 다듬을 때 쓴다.
+pub fn route() -> Option<String> {
+    CURRENT.with(|c| c.borrow().route.clone())
+}
+
 /// 로그인 회원 식별자를 기록한다.
 pub fn set_user_id(user_id: String) {
     CURRENT.with(|c| c.borrow_mut().user_id = Some(user_id));
+}
+
+/// 피드 조회 조건을 기록한다. 접근 로그가 `GET /api/v1/posts`의 200에만 싣는다.
+pub fn set_feed_query(sort: &str, page: i64, page_size: i64) {
+    CURRENT.with(|c| c.borrow_mut().feed_query = Some((sort.to_owned(), page, page_size)));
 }
 
 #[cfg(test)]
@@ -68,7 +80,8 @@ mod tests {
             scope.info(),
             RequestInfo {
                 route: Some("/api/v1/topics".into()),
-                user_id: Some("u".into())
+                user_id: Some("u".into()),
+                feed_query: None,
             }
         );
         drop(scope);

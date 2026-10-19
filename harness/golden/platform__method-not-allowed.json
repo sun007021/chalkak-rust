@@ -1,8 +1,11 @@
 {
+  "db": {},
   "steps": [
     {
-      "step": "토큰 없이 DELETE 공개 경로",
-      "status": 401,
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -41,14 +44,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      }
+      "status": 401,
+      "step": "토큰 없이 DELETE 공개 경로"
     },
     {
-      "step": "회원 토큰으로 DELETE 공개 경로",
-      "status": 405,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "지원하지 않는 요청 방식이거나 형식입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -83,14 +86,11 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      }
+      "status": 405,
+      "step": "회원 토큰으로 DELETE 공개 경로"
     },
     {
-      "step": "HEAD 공개 경로",
-      "status": 401,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -129,11 +129,14 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 401,
+      "step": "HEAD 공개 경로"
     },
     {
-      "step": "OPTIONS 공개 경로(Origin 없음)",
-      "status": 401,
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -172,11 +175,8 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      }
+      "status": 401,
+      "step": "OPTIONS 공개 경로(Origin 없음)"
     }
-  ],
-  "db": {}
+  ]
 }

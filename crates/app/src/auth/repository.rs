@@ -248,6 +248,27 @@ impl RefreshTokenRepository {
         )?)
     }
 
+    /// 로그인(계보) 하나에 연결된 푸시 기기를 지운다(`PushDeviceRepository.deleteBySessionId`).
+    pub fn delete_push_devices_by_session_id(
+        &self,
+        db: &mut impl Db,
+        session_id: Uuid,
+    ) -> Result<u64, DbError> {
+        Ok(db.execute(
+            "DELETE FROM push_devices WHERE session_id = $1",
+            &[&session_id],
+        )?)
+    }
+
+    /// 한 회원의 푸시 기기를 모두 지운다(`PushDeviceRepository.deleteByUserId`).
+    pub fn delete_push_devices_by_user_id(
+        &self,
+        db: &mut impl Db,
+        user_id: Uuid,
+    ) -> Result<u64, DbError> {
+        Ok(db.execute("DELETE FROM push_devices WHERE user_id = $1", &[&user_id])?)
+    }
+
     /// 한 회원의 모든 기기 세션을 폐기한다.
     pub fn revoke_all_by_user_id(
         &self,

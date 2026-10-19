@@ -1,8 +1,21 @@
 {
+  "db": {
+    "topics": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t+54000s db +09:00>\",\"id\":\"$uuid2\",\"starts_at\":\"<t-32400s db +09:00>\",\"title\":\"가을 하늘\",\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t-140400s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-162000s db +09:00>\",\"title\":\"오후에 열리는 주제\",\"topic_date\":\"2026-10-10\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t-32400s db +09:00>\",\"id\":\"$uuid4\",\"starts_at\":\"<t-118800s db +09:00>\",\"title\":\"어제의 주제\",\"topic_date\":\"2026-10-11\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ]
+  },
   "steps": [
     {
-      "step": "오늘(진행 중)",
-      "status": 200,
+      "body": {
+        "endsAt": "<t+54000s iso Z>",
+        "id": "$uuid2",
+        "phase": "OPEN",
+        "startsAt": "<t-32400s iso Z>",
+        "title": "가을 하늘",
+        "topicDate": "2026-10-12"
+      },
       "headers": [
         [
           "cache-control",
@@ -37,18 +50,18 @@
           "0"
         ]
       ],
-      "body": {
-        "id": "$uuid2",
-        "title": "가을 하늘",
-        "topicDate": "2026-10-12",
-        "startsAt": "<t-32400s iso Z>",
-        "endsAt": "<t+54000s iso Z>",
-        "phase": "OPEN"
-      }
+      "status": 200,
+      "step": "오늘(진행 중)"
     },
     {
-      "step": "어제(마감)",
-      "status": 200,
+      "body": {
+        "endsAt": "<t-32400s iso Z>",
+        "id": "$uuid4",
+        "phase": "CLOSED",
+        "startsAt": "<t-118800s iso Z>",
+        "title": "어제의 주제",
+        "topicDate": "2026-10-11"
+      },
       "headers": [
         [
           "cache-control",
@@ -83,18 +96,14 @@
           "0"
         ]
       ],
-      "body": {
-        "id": "$uuid4",
-        "title": "어제의 주제",
-        "topicDate": "2026-10-11",
-        "startsAt": "<t-118800s iso Z>",
-        "endsAt": "<t-32400s iso Z>",
-        "phase": "CLOSED"
-      }
+      "status": 200,
+      "step": "어제(마감)"
     },
     {
-      "step": "주제 없는 날",
-      "status": 404,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "주제를 찾을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -129,14 +138,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "주제를 찾을 수 없습니다."
-      }
+      "status": 404,
+      "step": "주제 없는 날"
     },
     {
-      "step": "미래 날짜",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "미래의 주제는 조회할 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -171,14 +180,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "미래의 주제는 조회할 수 없습니다."
-      }
+      "status": 400,
+      "step": "미래 날짜"
     },
     {
-      "step": "날짜 누락",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "date: 필수 요청 값이 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -213,14 +222,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "date: 필수 요청 값이 없습니다."
-      }
+      "status": 400,
+      "step": "날짜 누락"
     },
     {
-      "step": "잘못된 날짜 형식",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "date: 요청 값의 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -255,14 +264,14 @@
           "0"
         ]
       ],
+      "status": 400,
+      "step": "잘못된 날짜 형식"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "date: 요청 값의 형식이 올바르지 않습니다."
-      }
-    },
-    {
-      "step": "없는 날짜",
-      "status": 400,
+      },
       "headers": [
         [
           "cache-control",
@@ -297,14 +306,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "date: 요청 값의 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "없는 날짜"
     },
     {
-      "step": "빈 날짜",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "date: 필수 요청 값이 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -339,17 +348,8 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "date: 필수 요청 값이 없습니다."
-      }
+      "status": 400,
+      "step": "빈 날짜"
     }
-  ],
-  "db": {
-    "topics": [
-      "{\"id\":\"$uuid2\",\"title\":\"가을 하늘\",\"ends_at\":\"<t+54000s db +09:00>\",\"starts_at\":\"<t-32400s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-12\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"id\":\"$uuid4\",\"title\":\"어제의 주제\",\"ends_at\":\"<t-32400s db +09:00>\",\"starts_at\":\"<t-118800s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-11\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"title\":\"오후에 열리는 주제\",\"ends_at\":\"<t-140400s db +09:00>\",\"starts_at\":\"<t-162000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-10\",\"updated_at\":\"<t+0s db +09:00>\"}"
-    ]
-  }
+  ]
 }

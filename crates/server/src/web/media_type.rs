@@ -402,6 +402,7 @@ mod tests {
             MediaType::new("application", "yaml"),
         ]
     }
+    // XML 타입은 negotiate.rs 쪽 테스트가 다룬다(이 목록은 JSON 계열만 둔다).
 
     /// 헤더 값 하나로 고른 `Content-Type`. 해석 실패는 `Err`, 406은 `Ok(None)`.
     fn pick(accept: &str) -> Result<Option<String>, InvalidAccept> {

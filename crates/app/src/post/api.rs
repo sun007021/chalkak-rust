@@ -18,7 +18,7 @@ use super::support::UserGuard;
 use crate::AppContext;
 use crate::security::login_user;
 use crate::web::json::serialize_instant;
-use crate::web::{ApiError, ApiResult, Routes, binding, created_json, ok_json};
+use crate::web::{ApiError, ApiResult, Routes, binding, context, created_json, ok_json};
 
 // ---------------------------------------------------------------------------------------------
 // 응답
@@ -493,6 +493,16 @@ fn get_posts(query: &PostQueryService, req: &Request) -> ApiResult {
         request.page_size,
         user_id,
     )?;
+    // 접근 로그가 남길 조회 조건. 컨트롤러가 검증과 응답 변환을 마친 값만 쓴다.
+    context::set_feed_query(
+        match request.sort {
+            PostSort::Recent => "recent",
+            PostSort::Popular => "popular",
+            PostSort::Random => "random",
+        },
+        i64::from(result.current_page),
+        i64::from(result.page_size),
+    );
     Ok(ok_json(&PostListResponse::from(result)))
 }
 

@@ -91,6 +91,7 @@ impl Normalizer {
         }
         let s = self.whitelabel_created(s);
         let s = self.yaml_times(&s);
+        let s = self.xml_times(&s);
         let s = self.presigned(s.as_str());
         self.replace_uuids(&s)
     }
@@ -138,6 +139,56 @@ impl Normalizer {
             out.push(rewritten.unwrap_or_else(|| line.to_string()));
         }
         out.join("\n")
+    }
+
+    /// `Accept: application/xml` 응답의 시각 요소. YAML과 같은 숫자 표현이 `<createdAt>1791763201.953659000</createdAt>`,
+    /// `<timestamp>1791763201401</timestamp>`로 나온다. 시나리오 시계 기준 상대 초로 바꾼다.
+    fn xml_times(&self, s: &str) -> String {
+        if !s.starts_with('<') {
+            return s.to_string();
+        }
+        let mut out = String::new();
+        let mut rest = s;
+        while let Some(open) = rest.find('<') {
+            out.push_str(&rest[..open]);
+            rest = &rest[open..];
+            let Some(tag_end) = rest.find('>') else { break };
+            let tag = &rest[1..tag_end];
+            let after = &rest[tag_end + 1..];
+            let close = format!("</{tag}>");
+            let epoch = (!tag.is_empty() && tag.bytes().all(|b| b.is_ascii_alphanumeric()))
+                .then(|| after.find(&close))
+                .flatten()
+                .and_then(|end| {
+                    let value = &after[..end];
+                    if tag == "timestamp" && value.len() == 13 {
+                        value.parse::<f64>().ok().map(|ms| ms / 1000.0)
+                    } else if tag.ends_with("At") {
+                        let (secs, nanos) = value.split_once('.')?;
+                        (secs.len() == 10 && nanos.len() == 9)
+                            .then(|| value.parse::<f64>().ok())
+                            .flatten()
+                    } else {
+                        None
+                    }
+                });
+            match epoch {
+                Some(epoch) => {
+                    let end = after.find(&close).unwrap_or(0);
+                    out.push_str(&format!(
+                        "<{tag}>{}{close}",
+                        self.relative(epoch, "xml-time")
+                    ));
+                    rest = &after[end + close.len()..];
+                }
+                None => {
+                    out.push('<');
+                    rest = &rest[1..];
+                }
+            }
+        }
+        out.push_str(rest);
+        out
     }
 
     /// presigned URL(SigV4 쿼리 서명)의 `X-Amz-Date`와 `X-Amz-Signature`를 바꾼다. 서명 시각은 앱이 응답을 만든 순간이라
@@ -450,6 +501,16 @@ mod tests {
         assert_eq!(
             n.string(doc),
             "---\ntimestamp: <t+0s yaml-time>\nstatus: 400\ncreatedAt: <t+0s yaml-time>\nnote: 1791763201401\n"
+        );
+    }
+
+    #[test]
+    fn xml_시각_요소를_상대_초로_바꾼다() {
+        let mut n = Normalizer::new(CLOCK);
+        let doc = "<Map><timestamp>1791763201401</timestamp><status>400</status><createdAt>1791763201.953659000</createdAt><note>1791763201401</note></Map>";
+        assert_eq!(
+            n.string(doc),
+            "<Map><timestamp><t+0s xml-time></timestamp><status>400</status><createdAt><t+0s xml-time></createdAt><note>1791763201401</note></Map>"
         );
     }
 

@@ -8,13 +8,16 @@
 //! `…At`(Instant)은 `초.나노초(9자리)`, `topicDate`(LocalDate)는 `[연, 월, 일]`, Boot 오류 본문의 `timestamp`(Date)는
 //! 밀리초다. 값이 해당 형식 문자열일 때만 바꾼다.
 
-enum Node {
+pub(super) enum Node {
     Null,
     Bool(bool),
     /// JSON에 적힌 그대로의 숫자.
     Number(String),
     Text(String),
     List(Vec<Node>),
+    /// `LocalDate`처럼 값 하나가 배열 토큰으로 나가는 것(`[연, 월, 일]`). YAML에서는 목록과 같고, XML에서는 감싸는 요소
+    /// 없이 같은 이름의 요소가 반복된다.
+    Flat(Vec<Node>),
     Map(Vec<(String, Node)>),
 }
 
@@ -175,7 +178,7 @@ fn scalar(node: &Node) -> Option<String> {
         Node::Bool(b) => b.to_string(),
         Node::Number(n) => n.clone(),
         Node::Text(s) => quote(s),
-        Node::List(items) if items.is_empty() => "[]".to_owned(),
+        Node::List(items) | Node::Flat(items) if items.is_empty() => "[]".to_owned(),
         Node::Map(pairs) if pairs.is_empty() => "{}".to_owned(),
         _ => return None,
     })
@@ -191,7 +194,7 @@ fn write_map(pairs: &[(String, Node)], indent: usize, out: &mut Vec<String>) {
                 out.push(format!("{pad}{key}:"));
                 match node {
                     Node::Map(inner) => write_map(inner, indent + 2, out),
-                    Node::List(items) => write_list(items, indent, out),
+                    Node::List(items) | Node::Flat(items) => write_list(items, indent, out),
                     _ => {}
                 }
             }
@@ -209,7 +212,7 @@ fn write_list(items: &[Node], indent: usize, out: &mut Vec<String>) {
                 let start = out.len();
                 match node {
                     Node::Map(inner) => write_map(inner, indent + 2, out),
-                    Node::List(inner) => write_list(inner, indent + 2, out),
+                    Node::List(inner) | Node::Flat(inner) => write_list(inner, indent + 2, out),
                     _ => {}
                 }
                 // 첫 줄의 들여쓰기 두 칸을 `- `로 바꾼다.
@@ -284,7 +287,7 @@ fn retype(key: &str, node: Node) -> Node {
     if key == "topicDate"
         && let Some((y, m, d)) = parse_date(text)
     {
-        return Node::List(vec![
+        return Node::Flat(vec![
             Node::Number(y.to_string()),
             Node::Number(m.to_string()),
             Node::Number(d.to_string()),
@@ -293,13 +296,20 @@ fn retype(key: &str, node: Node) -> Node {
     node
 }
 
+/// 값이 그대로 문자열인 자유 형식 객체(감사 로그의 변경 전후 상태). 안의 시각 문자열은 `Instant`가 아니라 문자열이다.
+const RAW_OBJECTS: [&str; 2] = ["beforeState", "afterState"];
+
 fn retype_all(node: Node) -> Node {
     match node {
         Node::Map(pairs) => Node::Map(
             pairs
                 .into_iter()
                 .map(|(k, v)| {
-                    let v = retype(&k, retype_all(v));
+                    let v = if RAW_OBJECTS.contains(&k.as_str()) {
+                        v
+                    } else {
+                        retype(&k, retype_all(v))
+                    };
                     (k, v)
                 })
                 .collect(),
@@ -309,21 +319,26 @@ fn retype_all(node: Node) -> Node {
     }
 }
 
-/// JSON 본문을 YAML 문서로 바꾼다. JSON으로 읽을 수 없으면 `None`.
-pub fn from_json(json: &[u8]) -> Option<Vec<u8>> {
+/// JSON 본문을 읽어 날짜·시각 필드를 원본 기본 매퍼(YAML·XML)의 숫자 표현으로 바꾼 나무로 만든다. JSON이 아니면 `None`.
+pub(super) fn parse_retyped(json: &[u8]) -> Option<Node> {
     let mut parser = Parser {
         bytes: json,
         pos: 0,
     };
     let root = retype_all(parser.value()?);
     parser.skip_ws();
-    if parser.pos != json.len() {
-        return None;
-    }
+    (parser.pos == json.len()).then_some(root)
+}
+
+/// JSON 본문을 YAML 문서로 바꾼다. JSON으로 읽을 수 없으면 `None`.
+pub fn from_json(json: &[u8]) -> Option<Vec<u8>> {
+    let root = parse_retyped(json)?;
     let mut lines = vec!["---".to_owned()];
     match &root {
         Node::Map(pairs) if !pairs.is_empty() => write_map(pairs, 0, &mut lines),
-        Node::List(items) if !items.is_empty() => write_list(items, 0, &mut lines),
+        Node::List(items) | Node::Flat(items) if !items.is_empty() => {
+            write_list(items, 0, &mut lines);
+        }
         other => lines.push(scalar(other)?),
     }
     let mut text = lines.join("\n");

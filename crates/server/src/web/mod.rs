@@ -28,4 +28,5 @@ pub mod security_headers;
 pub mod springdoc;
 pub mod tomcat;
 pub mod whitelabel;
+pub mod xml;
 pub mod yaml;

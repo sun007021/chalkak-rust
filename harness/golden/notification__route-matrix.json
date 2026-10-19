@@ -1,8 +1,54 @@
 {
+  "db": {
+    "admin_audit_logs": [
+      "{\"action\":\"POST_APPROVED\",\"actor_admin_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"before_state\":{\"status\":\"PENDING\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-165600s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid?\",\"target_id\":\"$uuid?\",\"target_type\":\"POST\"}",
+      "{\"action\":\"POST_APPROVED\",\"actor_admin_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"before_state\":{\"status\":\"PENDING\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-169200s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid?\",\"target_id\":\"$uuid?\",\"target_type\":\"POST\"}",
+      "{\"action\":\"POST_APPROVED\",\"actor_admin_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"before_state\":{\"status\":\"PENDING\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-259200s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid?\",\"target_id\":\"$uuid?\",\"target_type\":\"POST\"}",
+      "{\"action\":\"POST_APPROVED\",\"actor_admin_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"before_state\":{\"status\":\"PENDING\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-41105s db +09:00>\",\"reason\":null,\"request_id\":\"$uuid?\",\"target_id\":\"$uuid?\",\"target_type\":\"POST\"}",
+      "{\"action\":\"POST_REJECTED\",\"actor_admin_id\":\"$uuid?\",\"after_state\":{\"status\":\"REJECTED\"},\"before_state\":{\"status\":\"PENDING\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t-41105s db +09:00>\",\"reason\":\"사진 품질\",\"request_id\":\"$uuid?\",\"target_id\":\"$uuid?\",\"target_type\":\"POST\"}"
+    ],
+    "admins": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"id\":\"$uuid?\",\"password\":\"hash-not-used\",\"updated_at\":\"<t+0s db +09:00>\",\"username\":\"operator\"}"
+    ],
+    "notifications": [
+      "{\"body\":\"내 사진이 피드에 공개되었습니다.\",\"created_at\":\"<t-165600s db +09:00>\",\"event_key\":\"$uuid?\",\"id\":\"$uuid?\",\"next_attempt_at\":null,\"payload\":null,\"read_at\":null,\"source_id\":\"$uuid?\",\"source_type\":\"POST\",\"sqs_publish_status\":\"NOT_REQUIRED\",\"sqs_published_at\":null,\"title\":\"게시물이 승인되었습니다.\",\"type\":\"POST_APPROVED\",\"user_id\":\"$uuid?\"}",
+      "{\"body\":\"내 사진이 피드에 공개되었습니다.\",\"created_at\":\"<t-169200s db +09:00>\",\"event_key\":\"$uuid?\",\"id\":\"$uuid?\",\"next_attempt_at\":null,\"payload\":null,\"read_at\":\"<t-154800s db +09:00>\",\"source_id\":\"$uuid?\",\"source_type\":\"POST\",\"sqs_publish_status\":\"NOT_REQUIRED\",\"sqs_published_at\":null,\"title\":\"게시물이 승인되었습니다.\",\"type\":\"POST_APPROVED\",\"user_id\":\"$uuid?\"}",
+      "{\"body\":\"내 사진이 피드에 공개되었습니다.\",\"created_at\":\"<t-259200s db +09:00>\",\"event_key\":\"$uuid?\",\"id\":\"$uuid?\",\"next_attempt_at\":null,\"payload\":null,\"read_at\":null,\"source_id\":\"$uuid?\",\"source_type\":\"POST\",\"sqs_publish_status\":\"NOT_REQUIRED\",\"sqs_published_at\":null,\"title\":\"게시물이 승인되었습니다.\",\"type\":\"POST_APPROVED\",\"user_id\":\"$uuid?\"}",
+      "{\"body\":\"내 사진이 피드에 공개되었습니다.\",\"created_at\":\"<t-41105s db +09:00>\",\"event_key\":\"$uuid?\",\"id\":\"$uuid?\",\"next_attempt_at\":null,\"payload\":null,\"read_at\":null,\"source_id\":\"$uuid?\",\"source_type\":\"POST\",\"sqs_publish_status\":\"NOT_REQUIRED\",\"sqs_published_at\":null,\"title\":\"게시물이 승인되었습니다.\",\"type\":\"POST_APPROVED\",\"user_id\":\"$uuid?\"}",
+      "{\"body\":\"반려 사유를 확인해 주세요.\",\"created_at\":\"<t-41105s db +09:00>\",\"event_key\":\"$uuid?\",\"id\":\"$uuid?\",\"next_attempt_at\":null,\"payload\":{\"rejectionReason\":\"사진 품질\"},\"read_at\":null,\"source_id\":\"$uuid?\",\"source_type\":\"POST\",\"sqs_publish_status\":\"NOT_REQUIRED\",\"sqs_published_at\":null,\"title\":\"게시물이 반려되었습니다.\",\"type\":\"POST_REJECTED\",\"user_id\":\"$uuid?\"}"
+    ],
+    "photos": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/p1/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p1/thumbnail.webp\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/p2/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p2/thumbnail.webp\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/p3/original.webp\",\"thumbnail_storage_key\":null,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/p4/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p4/thumbnail.webp\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"metadata\":{},\"original_storage_key\":\"chalkak/posts/한글 공백/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/한글 공백/thumbnail.webp\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ],
+    "posts": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t-637200s db +09:00>\",\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"지움\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"남의것\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"셋째\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"첫 사진\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"id\":\"$uuid?\",\"moderated_at\":null,\"moderation_status\":\"REJECTED\",\"photo_id\":\"$uuid?\",\"post_image_upload_id\":null,\"title\":\"둘째\",\"topic_id\":\"$uuid?\",\"updated_at\":\"<t+0s db +09:00>\",\"user_id\":\"$uuid?\"}"
+    ],
+    "topics": [
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t-637200s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-723600s db +09:00>\",\"title\":\"주제4\",\"topic_date\":\"2026-10-04\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t-723600s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-810000s db +09:00>\",\"title\":\"주제3\",\"topic_date\":\"2026-10-03\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t-810000s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-896400s db +09:00>\",\"title\":\"주제2\",\"topic_date\":\"2026-10-02\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"ends_at\":\"<t-896400s db +09:00>\",\"id\":\"$uuid?\",\"starts_at\":\"<t-982800s db +09:00>\",\"title\":\"주제1\",\"topic_date\":\"2026-10-01\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ],
+    "users": [
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t-982800s db +09:00>\",\"email\":\"gone@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/user3/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"user1@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/user1/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"app_version\":null,\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"email\":\"user2@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/user2/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t+0s db +09:00>\"}"
+    ]
+  },
   "steps": [
     {
-      "step": "POST /api/v1/notifications",
-      "status": 405,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "지원하지 않는 요청 방식이거나 형식입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -37,14 +83,14 @@
           "0"
         ]
       ],
+      "status": 405,
+      "step": "POST /api/v1/notifications"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      }
-    },
-    {
-      "step": "PUT /api/v1/notifications",
-      "status": 405,
+      },
       "headers": [
         [
           "cache-control",
@@ -79,14 +125,14 @@
           "0"
         ]
       ],
+      "status": 405,
+      "step": "PUT /api/v1/notifications"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      }
-    },
-    {
-      "step": "DELETE /api/v1/notifications",
-      "status": 405,
+      },
       "headers": [
         [
           "cache-control",
@@ -121,14 +167,14 @@
           "0"
         ]
       ],
+      "status": 405,
+      "step": "DELETE /api/v1/notifications"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      }
-    },
-    {
-      "step": "PATCH /api/v1/notifications",
-      "status": 405,
+      },
       "headers": [
         [
           "cache-control",
@@ -163,14 +209,14 @@
           "0"
         ]
       ],
+      "status": 405,
+      "step": "PATCH /api/v1/notifications"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      }
-    },
-    {
-      "step": "POST /api/v1/notifications/unread-status",
-      "status": 405,
+      },
       "headers": [
         [
           "cache-control",
@@ -205,14 +251,14 @@
           "0"
         ]
       ],
+      "status": 405,
+      "step": "POST /api/v1/notifications/unread-status"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      }
-    },
-    {
-      "step": "PATCH /api/v1/notifications/unread-status",
-      "status": 405,
+      },
       "headers": [
         [
           "cache-control",
@@ -247,14 +293,14 @@
           "0"
         ]
       ],
+      "status": 405,
+      "step": "PATCH /api/v1/notifications/unread-status"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      }
-    },
-    {
-      "step": "DELETE /api/v1/notifications/unread-status",
-      "status": 405,
+      },
       "headers": [
         [
           "cache-control",
@@ -289,14 +335,14 @@
           "0"
         ]
       ],
+      "status": 405,
+      "step": "DELETE /api/v1/notifications/unread-status"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      }
-    },
-    {
-      "step": "POST /api/v1/notifications/01990000-0000-7000-8000-000000000102",
-      "status": 405,
+      },
       "headers": [
         [
           "cache-control",
@@ -331,14 +377,14 @@
           "0"
         ]
       ],
+      "status": 405,
+      "step": "POST /api/v1/notifications/01990000-0000-7000-8000-000000000102"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      }
-    },
-    {
-      "step": "PATCH /api/v1/notifications/01990000-0000-7000-8000-000000000102",
-      "status": 405,
+      },
       "headers": [
         [
           "cache-control",
@@ -373,14 +419,14 @@
           "0"
         ]
       ],
+      "status": 405,
+      "step": "PATCH /api/v1/notifications/01990000-0000-7000-8000-000000000102"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      }
-    },
-    {
-      "step": "DELETE /api/v1/notifications/01990000-0000-7000-8000-000000000102",
-      "status": 405,
+      },
       "headers": [
         [
           "cache-control",
@@ -415,14 +461,14 @@
           "0"
         ]
       ],
+      "status": 405,
+      "step": "DELETE /api/v1/notifications/01990000-0000-7000-8000-000000000102"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      }
-    },
-    {
-      "step": "GET /api/v1/notifications/01990000-0000-7000-8000-000000000102/read",
-      "status": 405,
+      },
       "headers": [
         [
           "cache-control",
@@ -457,14 +503,14 @@
           "0"
         ]
       ],
+      "status": 405,
+      "step": "GET /api/v1/notifications/01990000-0000-7000-8000-000000000102/read"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      }
-    },
-    {
-      "step": "POST /api/v1/notifications/01990000-0000-7000-8000-000000000102/read",
-      "status": 405,
+      },
       "headers": [
         [
           "cache-control",
@@ -499,14 +545,14 @@
           "0"
         ]
       ],
+      "status": 405,
+      "step": "POST /api/v1/notifications/01990000-0000-7000-8000-000000000102/read"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      }
-    },
-    {
-      "step": "PUT /api/v1/notifications/01990000-0000-7000-8000-000000000102/read",
-      "status": 405,
+      },
       "headers": [
         [
           "cache-control",
@@ -541,14 +587,14 @@
           "0"
         ]
       ],
+      "status": 405,
+      "step": "PUT /api/v1/notifications/01990000-0000-7000-8000-000000000102/read"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      }
-    },
-    {
-      "step": "DELETE /api/v1/notifications/01990000-0000-7000-8000-000000000102/read",
-      "status": 405,
+      },
       "headers": [
         [
           "cache-control",
@@ -583,14 +629,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      }
+      "status": 405,
+      "step": "DELETE /api/v1/notifications/01990000-0000-7000-8000-000000000102/read"
     },
     {
-      "step": "GET /api/v1/notifications/read-all",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "ID 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -625,14 +671,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "ID 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "GET /api/v1/notifications/read-all"
     },
     {
-      "step": "POST /api/v1/notifications/read-all",
-      "status": 405,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "지원하지 않는 요청 방식이거나 형식입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -667,14 +713,14 @@
           "0"
         ]
       ],
+      "status": 405,
+      "step": "POST /api/v1/notifications/read-all"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      }
-    },
-    {
-      "step": "PUT /api/v1/notifications/read-all",
-      "status": 405,
+      },
       "headers": [
         [
           "cache-control",
@@ -709,14 +755,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      }
+      "status": 405,
+      "step": "PUT /api/v1/notifications/read-all"
     },
     {
-      "step": "GET /api/v1/notifications/",
-      "status": 404,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "요청한 API를 찾을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -751,14 +797,14 @@
           "0"
         ]
       ],
+      "status": 404,
+      "step": "GET /api/v1/notifications/"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "요청한 API를 찾을 수 없습니다."
-      }
-    },
-    {
-      "step": "PATCH /api/v1/notifications/read-all/",
-      "status": 404,
+      },
       "headers": [
         [
           "cache-control",
@@ -793,14 +839,14 @@
           "0"
         ]
       ],
+      "status": 404,
+      "step": "PATCH /api/v1/notifications/read-all/"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "요청한 API를 찾을 수 없습니다."
-      }
-    },
-    {
-      "step": "GET /api/v1/notifications/unread-status/",
-      "status": 404,
+      },
       "headers": [
         [
           "cache-control",
@@ -835,14 +881,14 @@
           "0"
         ]
       ],
+      "status": 404,
+      "step": "GET /api/v1/notifications/unread-status/"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "요청한 API를 찾을 수 없습니다."
-      }
-    },
-    {
-      "step": "GET /api/v1/notifications/01990000-0000-7000-8000-000000000102/",
-      "status": 404,
+      },
       "headers": [
         [
           "cache-control",
@@ -877,14 +923,14 @@
           "0"
         ]
       ],
+      "status": 404,
+      "step": "GET /api/v1/notifications/01990000-0000-7000-8000-000000000102/"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "요청한 API를 찾을 수 없습니다."
-      }
-    },
-    {
-      "step": "GET /api/v1/notifications/unread-status/x",
-      "status": 404,
+      },
       "headers": [
         [
           "cache-control",
@@ -919,14 +965,14 @@
           "0"
         ]
       ],
+      "status": 404,
+      "step": "GET /api/v1/notifications/unread-status/x"
+    },
+    {
       "body": {
         "errorCode": "BUSINESS_ERROR",
         "message": "요청한 API를 찾을 수 없습니다."
-      }
-    },
-    {
-      "step": "GET /api/v1/Notifications",
-      "status": 404,
+      },
       "headers": [
         [
           "cache-control",
@@ -961,14 +1007,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "요청한 API를 찾을 수 없습니다."
-      }
+      "status": 404,
+      "step": "GET /api/v1/Notifications"
     },
     {
-      "step": "GET /api/v1/notifications/READ-ALL",
-      "status": 400,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "ID 형식이 올바르지 않습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1003,14 +1049,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "ID 형식이 올바르지 않습니다."
-      }
+      "status": 400,
+      "step": "GET /api/v1/notifications/READ-ALL"
     },
     {
-      "step": "PATCH /api/v1/notifications/READ-ALL",
-      "status": 405,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "지원하지 않는 요청 방식이거나 형식입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1045,14 +1091,11 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      }
+      "status": 405,
+      "step": "PATCH /api/v1/notifications/READ-ALL"
     },
     {
-      "step": "OPTIONS /api/v1/notifications",
-      "status": 200,
+      "body": "",
       "headers": [
         [
           "accept-patch",
@@ -1091,11 +1134,11 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 200,
+      "step": "OPTIONS /api/v1/notifications"
     },
     {
-      "step": "OPTIONS /api/v1/notifications/read-all",
-      "status": 200,
+      "body": "",
       "headers": [
         [
           "accept-patch",
@@ -1103,7 +1146,7 @@
         ],
         [
           "allow",
-          "GET,HEAD,PATCH,OPTIONS"
+          "GET,HEAD,OPTIONS,PATCH"
         ],
         [
           "cache-control",
@@ -1134,11 +1177,11 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 200,
+      "step": "OPTIONS /api/v1/notifications/read-all"
     },
     {
-      "step": "OPTIONS /api/v1/notifications/01990000-0000-7000-8000-000000000102/read",
-      "status": 200,
+      "body": "",
       "headers": [
         [
           "accept-patch",
@@ -1146,7 +1189,7 @@
         ],
         [
           "allow",
-          "PATCH,OPTIONS"
+          "OPTIONS,PATCH"
         ],
         [
           "cache-control",
@@ -1177,11 +1220,11 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 200,
+      "step": "OPTIONS /api/v1/notifications/01990000-0000-7000-8000-000000000102/read"
     },
     {
-      "step": "HEAD /api/v1/notifications/unread-status",
-      "status": 200,
+      "body": "",
       "headers": [
         [
           "cache-control",
@@ -1216,11 +1259,14 @@
           "0"
         ]
       ],
-      "body": ""
+      "status": 200,
+      "step": "HEAD /api/v1/notifications/unread-status"
     },
     {
-      "step": "PATCH /api/v1/notifications/read",
-      "status": 405,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "지원하지 않는 요청 방식이거나 형식입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1255,14 +1301,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "지원하지 않는 요청 방식이거나 형식입니다."
-      }
+      "status": 405,
+      "step": "PATCH /api/v1/notifications/read"
     },
     {
-      "step": "PATCH /api/v1/notifications/01990000-0000-7000-8000-000000000102/read/x",
-      "status": 404,
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "요청한 API를 찾을 수 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1297,14 +1343,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "BUSINESS_ERROR",
-        "message": "요청한 API를 찾을 수 없습니다."
-      }
+      "status": 404,
+      "step": "PATCH /api/v1/notifications/01990000-0000-7000-8000-000000000102/read/x"
     },
     {
-      "step": "메서드 오류는 인가보다 뒤: 토큰 없이 POST",
-      "status": 401,
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1343,14 +1389,14 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "UNAUTHORIZED",
-        "message": "유효하지 않은 인증 정보입니다."
-      }
+      "status": 401,
+      "step": "메서드 오류는 인가보다 뒤: 토큰 없이 POST"
     },
     {
-      "step": "메서드 오류, 관리자 토큰 PATCH",
-      "status": 403,
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "접근 권한이 없습니다."
+      },
       "headers": [
         [
           "cache-control",
@@ -1385,54 +1431,8 @@
           "0"
         ]
       ],
-      "body": {
-        "errorCode": "FORBIDDEN",
-        "message": "접근 권한이 없습니다."
-      }
+      "status": 403,
+      "step": "메서드 오류, 관리자 토큰 PATCH"
     }
-  ],
-  "db": {
-    "admin_audit_logs": [
-      "{\"id\":\"$uuid?\",\"action\":\"POST_APPROVED\",\"reason\":null,\"target_id\":\"$uuid?\",\"request_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"occurred_at\":\"<t-165600s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"status\":\"PENDING\"},\"actor_admin_id\":\"$uuid?\"}",
-      "{\"id\":\"$uuid?\",\"action\":\"POST_APPROVED\",\"reason\":null,\"target_id\":\"$uuid?\",\"request_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"occurred_at\":\"<t-169200s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"status\":\"PENDING\"},\"actor_admin_id\":\"$uuid?\"}",
-      "{\"id\":\"$uuid?\",\"action\":\"POST_APPROVED\",\"reason\":null,\"target_id\":\"$uuid?\",\"request_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"occurred_at\":\"<t-259200s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"status\":\"PENDING\"},\"actor_admin_id\":\"$uuid?\"}",
-      "{\"id\":\"$uuid?\",\"action\":\"POST_APPROVED\",\"reason\":null,\"target_id\":\"$uuid?\",\"request_id\":\"$uuid?\",\"after_state\":{\"status\":\"APPROVED\"},\"occurred_at\":\"<t-41105s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"status\":\"PENDING\"},\"actor_admin_id\":\"$uuid?\"}",
-      "{\"id\":\"$uuid?\",\"action\":\"POST_REJECTED\",\"reason\":\"사진 품질\",\"target_id\":\"$uuid?\",\"request_id\":\"$uuid?\",\"after_state\":{\"status\":\"REJECTED\"},\"occurred_at\":\"<t-41105s db +09:00>\",\"target_type\":\"POST\",\"before_state\":{\"status\":\"PENDING\"},\"actor_admin_id\":\"$uuid?\"}"
-    ],
-    "admins": [
-      "{\"id\":\"$uuid?\",\"password\":\"hash-not-used\",\"username\":\"operator\",\"created_at\":\"<t+0s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\"}"
-    ],
-    "notifications": [
-      "{\"id\":\"$uuid?\",\"body\":\"내 사진이 피드에 공개되었습니다.\",\"type\":\"POST_APPROVED\",\"title\":\"게시물이 승인되었습니다.\",\"post_id\":\"$uuid?\",\"read_at\":\"<t-154800s db +09:00>\",\"user_id\":\"$uuid?\",\"event_key\":\"$uuid?\",\"created_at\":\"<t-169200s db +09:00>\",\"rejection_reason\":null}",
-      "{\"id\":\"$uuid?\",\"body\":\"내 사진이 피드에 공개되었습니다.\",\"type\":\"POST_APPROVED\",\"title\":\"게시물이 승인되었습니다.\",\"post_id\":\"$uuid?\",\"read_at\":null,\"user_id\":\"$uuid?\",\"event_key\":\"$uuid?\",\"created_at\":\"<t-165600s db +09:00>\",\"rejection_reason\":null}",
-      "{\"id\":\"$uuid?\",\"body\":\"내 사진이 피드에 공개되었습니다.\",\"type\":\"POST_APPROVED\",\"title\":\"게시물이 승인되었습니다.\",\"post_id\":\"$uuid?\",\"read_at\":null,\"user_id\":\"$uuid?\",\"event_key\":\"$uuid?\",\"created_at\":\"<t-259200s db +09:00>\",\"rejection_reason\":null}",
-      "{\"id\":\"$uuid?\",\"body\":\"내 사진이 피드에 공개되었습니다.\",\"type\":\"POST_APPROVED\",\"title\":\"게시물이 승인되었습니다.\",\"post_id\":\"$uuid?\",\"read_at\":null,\"user_id\":\"$uuid?\",\"event_key\":\"$uuid?\",\"created_at\":\"<t-41105s db +09:00>\",\"rejection_reason\":null}",
-      "{\"id\":\"$uuid?\",\"body\":\"반려 사유를 확인해 주세요.\",\"type\":\"POST_REJECTED\",\"title\":\"게시물이 반려되었습니다.\",\"post_id\":\"$uuid?\",\"read_at\":null,\"user_id\":\"$uuid?\",\"event_key\":\"$uuid?\",\"created_at\":\"<t-41105s db +09:00>\",\"rejection_reason\":\"사진 품질\"}"
-    ],
-    "photos": [
-      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p1/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p1/thumbnail.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p2/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p2/thumbnail.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p3/original.webp\",\"thumbnail_storage_key\":null}",
-      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/p4/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/p4/thumbnail.webp\"}",
-      "{\"id\":\"$uuid?\",\"metadata\":{},\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"original_storage_key\":\"chalkak/posts/한글 공백/original.webp\",\"thumbnail_storage_key\":\"chalkak/posts/한글 공백/thumbnail.webp\"}"
-    ],
-    "posts": [
-      "{\"id\":\"$uuid?\",\"title\":\"남의것\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid?\",\"title\":\"둘째\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"REJECTED\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid?\",\"title\":\"셋째\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid?\",\"title\":\"지움\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t-637200s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}",
-      "{\"id\":\"$uuid?\",\"title\":\"첫 사진\",\"user_id\":\"$uuid?\",\"photo_id\":\"$uuid?\",\"topic_id\":\"$uuid?\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"moderated_at\":null,\"moderation_status\":\"APPROVED\",\"post_image_upload_id\":null}"
-    ],
-    "topics": [
-      "{\"id\":\"$uuid?\",\"title\":\"주제1\",\"ends_at\":\"<t-896400s db +09:00>\",\"starts_at\":\"<t-982800s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-01\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"title\":\"주제2\",\"ends_at\":\"<t-810000s db +09:00>\",\"starts_at\":\"<t-896400s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-02\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"title\":\"주제3\",\"ends_at\":\"<t-723600s db +09:00>\",\"starts_at\":\"<t-810000s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-03\",\"updated_at\":\"<t+0s db +09:00>\"}",
-      "{\"id\":\"$uuid?\",\"title\":\"주제4\",\"ends_at\":\"<t-637200s db +09:00>\",\"starts_at\":\"<t-723600s db +09:00>\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"topic_date\":\"2026-10-04\",\"updated_at\":\"<t+0s db +09:00>\"}"
-    ],
-    "users": [
-      "{\"id\":\"$uuid?\",\"email\":\"gone@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":\"<t-982800s db +09:00>\",\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/user3/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}",
-      "{\"id\":\"$uuid?\",\"email\":\"user1@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/user1/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}",
-      "{\"id\":\"$uuid?\",\"email\":\"user2@test.chalkak\",\"status\":\"ACTIVE\",\"created_at\":\"<t+0s db +09:00>\",\"deleted_at\":null,\"updated_at\":\"<t+0s db +09:00>\",\"app_version\":null,\"pending_signature_upload_id\":null,\"signature_processing_status\":null,\"signature_original_storage_key\":\"chalkak/signatures/user2/original.png\",\"signature_processing_started_at\":null,\"signature_thumbnail_storage_key\":null}"
-    ]
-  }
+  ]
 }

@@ -75,6 +75,8 @@ pub struct IssuedAccessToken {
 pub struct IssuedRefreshToken {
     pub value: String,
     pub expires_in_seconds: i64,
+    /// 이 토큰이 속한 로그인(계보) 식별자. 액세스 토큰의 `session_id` 클레임이 된다.
+    pub session_id: Uuid,
 }
 
 /// 평문 리프레시 토큰과 저장용 해시(`GeneratedRefreshToken`).

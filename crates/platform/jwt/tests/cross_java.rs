@@ -49,6 +49,7 @@ fn access_claims(oracle: &Value, sub: &str, scope: &str, iat: i64, exp: i64) -> 
         expires_at: exp,
         jti: "00000000-0000-4000-8000-000000000001",
         scope,
+        session_id: None,
     }
     .to_value()
 }

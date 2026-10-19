@@ -107,9 +107,11 @@ fn insert_notification(
     created_at: &str,
 ) {
     c.batch_execute(&format!(
-        "INSERT INTO notifications (id, user_id, post_id, event_key, type, title, body, rejection_reason, created_at) \
-         VALUES ('{notification_id}', '{user_id}', '{POST_ID}', '{event_id}', 'POST_REJECTED', \
-         '게시물이 반려되었습니다.', '반려 사유를 확인해 주세요.', '사진 품질', '{created_at}')"
+        "INSERT INTO notifications (id, user_id, source_type, source_id, event_key, type, title, body, payload, \
+         created_at, sqs_publish_status) \
+         VALUES ('{notification_id}', '{user_id}', 'POST', '{POST_ID}', '{event_id}', 'POST_REJECTED', \
+         '게시물이 반려되었습니다.', '반려 사유를 확인해 주세요.', '{{\"rejectionReason\":\"사진 품질\"}}', \
+         '{created_at}', 'NOT_REQUIRED')"
     ))
     .unwrap();
 }
@@ -243,7 +245,7 @@ fn author_deleted_approved_post_hides_notification_but_keeps_record() {
         .batch_execute(&format!(
             "UPDATE posts SET moderation_status = 'APPROVED', deleted_at = CURRENT_TIMESTAMP WHERE id = '{POST_ID}'; \
              UPDATE notifications SET type = 'POST_APPROVED', title = '게시물이 승인되었습니다.', \
-             body = '내 사진이 피드에 공개되었습니다.', rejection_reason = NULL WHERE id = '{NOTIFICATION_ID}'"
+             body = '내 사진이 피드에 공개되었습니다.', payload = NULL WHERE id = '{NOTIFICATION_ID}'"
         ))
         .unwrap();
 
@@ -407,8 +409,9 @@ fn insert_cleanup_notification(db: &TestDb, user: &str, created_at: &str) -> Uui
     )
     .unwrap();
     c.execute(
-        "INSERT INTO notifications (id, user_id, post_id, event_key, type, title, body, created_at) \
-         VALUES ($1, $2, $3, $4, 'POST_APPROVED', '승인', '피드에 공개', $5)",
+        "INSERT INTO notifications (id, user_id, source_type, source_id, event_key, type, title, body, \
+         created_at, sqs_publish_status) \
+         VALUES ($1, $2, 'POST', $3, $4, 'POST_APPROVED', '승인', '피드에 공개', $5, 'NOT_REQUIRED')",
         &[&notification_id, &id(user), &id(POST_ID), &event_id, &ts(created_at)],
     )
     .unwrap();
@@ -501,7 +504,9 @@ fn moderation_fixture() -> Option<Moderation> {
 fn row_of(db: &TestDb, event_id: &str) -> postgres::Row {
     db.client()
         .query_one(
-            "SELECT user_id, post_id, type, title, body, rejection_reason, read_at, created_at \
+            "SELECT user_id, source_type, source_id, type, title, body, \
+             payload ->> 'rejectionReason' AS rejection_reason, read_at, created_at, \
+             sqs_publish_status, next_attempt_at, sqs_published_at \
              FROM notifications WHERE event_key = $1",
             &[&id(event_id)],
         )
@@ -531,7 +536,8 @@ fn create_for_moderation_approved_saves_the_inbox_item() {
 
     let row = row_of(&m.db, EVENT_ID);
     assert_eq!(row.get::<_, Uuid>("user_id"), id(USER_ID));
-    assert_eq!(row.get::<_, Uuid>("post_id"), id(POST_ID));
+    assert_eq!(row.get::<_, String>("source_type"), "POST");
+    assert_eq!(row.get::<_, Uuid>("source_id"), id(POST_ID));
     assert_eq!(row.get::<_, String>("type"), "POST_APPROVED");
     assert_eq!(row.get::<_, String>("title"), "게시물이 승인되었습니다.");
     assert_eq!(
@@ -544,6 +550,13 @@ fn create_for_moderation_approved_saves_the_inbox_item() {
         row.get::<_, Timestamp>("created_at"),
         ts("2026-09-29T09:30:00.123456Z")
     );
+    // 푸시를 받는 작성자(기본값)면 만든 시각에 곧바로 발행 대상이 된다.
+    assert_eq!(row.get::<_, String>("sqs_publish_status"), "PENDING");
+    assert_eq!(
+        row.get::<_, Option<Timestamp>>("next_attempt_at"),
+        Some(ts("2026-09-29T09:30:00.123456Z"))
+    );
+    assert_eq!(row.get::<_, Option<Timestamp>>("sqs_published_at"), None);
 }
 
 // 승인 알림에는 사유를 넘겨도 저장하지 않는다(Notification.approved는 사유를 받지 않는다).
@@ -686,4 +699,219 @@ fn create_for_moderation_is_rolled_back_with_the_transaction() {
     tx.rollback().unwrap();
 
     assert_eq!(count(&m.db, "SELECT COUNT(*) FROM notifications"), 0);
+}
+
+// NotificationServiceTest#createForModeration: 푸시 수신 설정과 탈퇴 여부가 발행 상태를 정한다.
+#[test]
+fn create_for_moderation_skips_publication_for_users_who_opted_out_or_withdrew() {
+    let Some(m) = moderation_fixture() else {
+        return;
+    };
+    m.db.client()
+        .batch_execute(&format!(
+            "UPDATE users SET moderation_push_enabled = FALSE WHERE id = '{USER_ID}'; \
+             UPDATE users SET deleted_at = '2026-09-29T00:00:00Z' WHERE id = '{OTHER_USER_ID}'"
+        ))
+        .unwrap();
+    let mut client = m.db.client();
+    for (user, event) in [(USER_ID, EVENT_ID), (OTHER_USER_ID, SECOND_EVENT_ID)] {
+        if event == SECOND_EVENT_ID {
+            insert_event(&mut client, SECOND_EVENT_ID, CREATED_AT);
+        }
+        let mut tx = client.transaction().unwrap();
+        create_for_moderation(
+            &mut tx,
+            id(user),
+            id(POST_ID),
+            id(event),
+            ModerationDecision::Approved,
+            None,
+            ts(CREATED_AT),
+        )
+        .unwrap();
+        tx.commit().unwrap();
+        let row = row_of(&m.db, event);
+        assert_eq!(row.get::<_, String>("sqs_publish_status"), "NOT_REQUIRED");
+        assert_eq!(row.get::<_, Option<Timestamp>>("next_attempt_at"), None);
+    }
+}
+
+fn insert_sourced_notification(
+    db: &TestDb,
+    notification_id: &str,
+    kind: &str,
+    source: Option<(&str, &str)>,
+    created_at: &str,
+) {
+    let (source_type, source_id) = match source {
+        Some((t, i)) => (format!("'{t}'"), format!("'{i}'")),
+        None => ("NULL".to_owned(), "NULL".to_owned()),
+    };
+    let event_id = Uuid::new_v4();
+    db.client()
+        .batch_execute(&format!(
+            "INSERT INTO notifications (id, user_id, source_type, source_id, event_key, type, title, body, \
+             created_at, sqs_publish_status) VALUES ('{notification_id}', '{USER_ID}', {source_type}, \
+             {source_id}, '{event_id}', '{kind}', '제목', '본문', '{created_at}', 'NOT_REQUIRED')"
+        ))
+        .unwrap();
+}
+
+const NOTICE_ID: &str = "0198f6c1-62ba-7d30-8b12-0f733b6572a9";
+const TOPIC_NOTIFICATION_ID: &str = "0198f6c1-62ba-7d30-8b12-0f733b6572f4";
+const NOTICE_NOTIFICATION_ID: &str = "0198f6c1-62ba-7d30-8b12-0f733b6572f5";
+
+// NotificationServiceTest#getNotifications_topicAndNotice: 주제 알림은 항상, 공지 알림은 삭제되지 않은 공지일 때만 보인다.
+#[test]
+fn topic_and_notice_notifications_follow_their_own_visibility() {
+    let Some(f) = fixture() else { return };
+    f.db.client()
+        .batch_execute(&format!(
+            "INSERT INTO notices (id, title, body, scheduled_at, created_at, updated_at) \
+             VALUES ('{NOTICE_ID}', '점검 안내', '본문', '2026-09-29T09:00:00Z', '2026-09-29T08:00:00Z', '2026-09-29T08:00:00Z')"
+        ))
+        .unwrap();
+    insert_sourced_notification(
+        &f.db,
+        TOPIC_NOTIFICATION_ID,
+        "TOPIC",
+        Some(("TOPIC", TOPIC_ID)),
+        "2026-09-29T09:00:02Z",
+    );
+    insert_sourced_notification(
+        &f.db,
+        NOTICE_NOTIFICATION_ID,
+        "NOTICE",
+        Some(("NOTICE", NOTICE_ID)),
+        "2026-09-29T09:00:03Z",
+    );
+
+    let list = f.service.get_notifications(id(USER_ID), 1, 20).unwrap();
+    let kinds: Vec<_> = list.notifications.iter().map(|n| n.kind.as_str()).collect();
+    assert_eq!(kinds, ["NOTICE", "TOPIC", "POST_REJECTED"]);
+    let notice = &list.notifications[0];
+    assert_eq!(notice.source_id, Some(id(NOTICE_ID)));
+    assert_eq!(notice.thumbnail_image_url, None);
+    let detail = f
+        .service
+        .get_notification(id(USER_ID), id(NOTICE_NOTIFICATION_ID))
+        .unwrap();
+    assert_eq!(detail.original_image_url, None);
+    assert_eq!(detail.rejection_reason, None);
+
+    // 공지를 삭제하면 알림 행은 남지만 알림함에서 사라진다.
+    f.db.client()
+        .batch_execute(&format!(
+            "UPDATE notices SET deleted_at = '2026-09-29T09:30:00Z' WHERE id = '{NOTICE_ID}'"
+        ))
+        .unwrap();
+    let kinds: Vec<_> = f
+        .service
+        .get_notifications(id(USER_ID), 1, 20)
+        .unwrap()
+        .notifications
+        .iter()
+        .map(|n| n.kind.as_str())
+        .collect();
+    assert_eq!(kinds, ["TOPIC", "POST_REJECTED"]);
+    assert_eq!(
+        f.service
+            .get_notification(id(USER_ID), id(NOTICE_NOTIFICATION_ID))
+            .unwrap_err()
+            .status(),
+        404
+    );
+    assert_eq!(
+        f.service
+            .mark_read(id(USER_ID), id(NOTICE_NOTIFICATION_ID))
+            .unwrap_err()
+            .status(),
+        404
+    );
+    f.service.mark_all_read(id(USER_ID)).unwrap();
+    assert_eq!(
+        count(
+            &f.db,
+            &format!(
+                "SELECT COUNT(*) FROM notifications WHERE id = '{NOTICE_NOTIFICATION_ID}' AND read_at IS NULL"
+            )
+        ),
+        1
+    );
+}
+
+// NotificationServiceTest#getNotifications_withoutSource: 대상이 없는 알림도 보인다.
+#[test]
+fn notification_without_source_is_visible() {
+    let Some(f) = fixture() else { return };
+    insert_sourced_notification(
+        &f.db,
+        TOPIC_NOTIFICATION_ID,
+        "TOPIC",
+        None,
+        "2026-09-29T09:00:02Z",
+    );
+    let list = f.service.get_notifications(id(USER_ID), 1, 20).unwrap();
+    assert_eq!(list.notifications[0].source_type, None);
+    assert_eq!(list.notifications[0].source_id, None);
+}
+
+// NotificationServiceTest#getNotifications_retention: 사건 발생 시각부터 30일이 지난 알림은 숨기고, 정확히 30일째는 보인다.
+#[test]
+fn notifications_older_than_thirty_days_are_hidden_but_the_boundary_is_visible() {
+    let Some(f) = fixture() else { return };
+    // 시계는 2026-09-29T10:00:00Z. 30일 전은 2026-08-30T10:00:00Z다.
+    f.db.client()
+        .batch_execute(&format!(
+            "UPDATE notifications SET created_at = '2026-08-30T10:00:00Z' WHERE id = '{NOTIFICATION_ID}'"
+        ))
+        .unwrap();
+    assert_eq!(
+        f.service
+            .get_notifications(id(USER_ID), 1, 20)
+            .unwrap()
+            .notifications
+            .len(),
+        1
+    );
+    assert!(f.service.has_unread_notification(id(USER_ID)).unwrap());
+    f.service
+        .get_notification(id(USER_ID), id(NOTIFICATION_ID))
+        .unwrap();
+
+    f.db.client()
+        .batch_execute(&format!(
+            "UPDATE notifications SET created_at = '2026-08-30T09:59:59.999999Z' WHERE id = '{NOTIFICATION_ID}'"
+        ))
+        .unwrap();
+    assert!(
+        f.service
+            .get_notifications(id(USER_ID), 1, 20)
+            .unwrap()
+            .notifications
+            .is_empty()
+    );
+    assert!(!f.service.has_unread_notification(id(USER_ID)).unwrap());
+    assert_eq!(
+        f.service
+            .get_notification(id(USER_ID), id(NOTIFICATION_ID))
+            .unwrap_err()
+            .status(),
+        404
+    );
+    assert_eq!(
+        f.service
+            .mark_read(id(USER_ID), id(NOTIFICATION_ID))
+            .unwrap_err()
+            .status(),
+        404
+    );
+    f.service.mark_all_read(id(USER_ID)).unwrap();
+    assert_eq!(
+        count(
+            &f.db,
+            "SELECT COUNT(*) FROM notifications WHERE read_at IS NULL"
+        ),
+        1
+    );
 }

@@ -25,7 +25,8 @@ impl AccessLog {
         AccessLog { logger }
     }
 
-    fn log(&self, method: &str, scope: &context::RequestScope, status: u16, started: Instant) {
+    fn log(&self, request: &Logged, scope: &context::RequestScope, status: u16, started: Instant) {
+        let method = request.method.as_str();
         let info = scope.info();
         let duration_ms = i64::try_from(started.elapsed().as_millis()).unwrap_or(i64::MAX);
         let mut event = self
@@ -42,8 +43,26 @@ impl AccessLog {
         if let Some(user_id) = info.user_id {
             event = event.field(fields::USER_ID, user_id);
         }
+        // 정상 피드 조회(`GET /api/v1/posts` 200)는 주제 날짜와 확정한 조회 조건을 남긴다.
+        if method == "GET" && status == 200 && info.route.as_deref() == Some("/api/v1/posts") {
+            if let Some(topic_date) = &request.topic_date {
+                event = event.field(fields::TOPIC_DATE, topic_date.as_str());
+            }
+            if let Some((sort, page, page_size)) = info.feed_query {
+                event = event
+                    .field(fields::SORT, sort)
+                    .field(fields::PAGE, page)
+                    .field(fields::PAGE_SIZE, page_size);
+            }
+        }
         event.log("access");
     }
+}
+
+/// 접근 로그가 요청에서 미리 챙겨 두는 값.
+struct Logged {
+    method: String,
+    topic_date: Option<String>,
 }
 
 fn is_actuator_path(path: &str) -> bool {
@@ -56,7 +75,10 @@ impl Middleware for AccessLog {
         let id = request_id::generate();
         let _request_id = request_id::enter(id);
         let scope = context::begin();
-        let method = req.method.as_str().to_owned();
+        let logged = Logged {
+            method: req.method.as_str().to_owned(),
+            topic_date: req.query_param("topicDate").map(str::to_owned),
+        };
         let log_it = !is_actuator_path(&req.path);
 
         let outcome = panic::catch_unwind(AssertUnwindSafe(|| next.handle(req)));
@@ -64,14 +86,14 @@ impl Middleware for AccessLog {
             Ok(mut response) => {
                 response.headers.set(request_id::HEADER, id.to_string());
                 if log_it {
-                    self.log(&method, &scope, response.status, started);
+                    self.log(&logged, &scope, response.status, started);
                 }
                 response
             }
             Err(payload) => {
                 // 체인 밖으로 예외가 새면 컨테이너가 500으로 응답한다. 서버가 패닉을 500으로 바꾸므로 같은 상태로 남긴다.
                 if log_it {
-                    self.log(&method, &scope, 500, started);
+                    self.log(&logged, &scope, 500, started);
                 }
                 panic::resume_unwind(payload)
             }
@@ -117,6 +139,38 @@ mod tests {
             .lines()
             .map(str::to_owned)
             .collect()
+    }
+
+    // 원본 RequestIdFilter: 정상 피드 조회만 topicDate·sort·page·pageSize를 남긴다.
+    #[test]
+    fn access_log_successful_feed_query_logs_conditions() {
+        let (mw, buf) = setup();
+        let endpoint = |status: u16| {
+            move |_: Request| {
+                context::set_route("/api/v1/posts");
+                context::set_feed_query("popular", 2, 10);
+                Response::new(status)
+            }
+        };
+        let mut req = Request::new(Method::Get, "/api/v1/posts");
+        req.query
+            .push(("topicDate".to_owned(), "2026-10-12".to_owned()));
+        mw.handle(req.clone(), &endpoint(200));
+        mw.handle(req, &endpoint(400));
+        let out = lines(&buf);
+        assert!(
+            out[0].contains("\"topicDate\":\"2026-10-12\""),
+            "{}",
+            out[0]
+        );
+        assert!(out[0].contains("\"sort\":\"popular\""), "{}", out[0]);
+        assert!(out[0].contains("\"page\":2"), "{}", out[0]);
+        assert!(out[0].contains("\"pageSize\":10"), "{}", out[0]);
+        assert!(
+            !out[1].contains("topicDate") && !out[1].contains("pageSize"),
+            "{}",
+            out[1]
+        );
     }
 
     // AccessLogTest#accessLog_matchedRoute_logsTemplateWithRequestId
