@@ -46,6 +46,10 @@ pub mod fields {
     pub const EXCEPTION: &str = "exception";
     pub const EVENT: &str = "event";
     pub const POST_ID: &str = "postId";
+    pub const TOPIC_DATE: &str = "topicDate";
+    pub const SORT: &str = "sort";
+    pub const PAGE: &str = "page";
+    pub const PAGE_SIZE: &str = "pageSize";
     pub const WAIT_SECONDS: &str = "waitSeconds";
     pub const HEAP_USED_BYTES: &str = "heapUsedBytes";
     pub const HEAP_MAX_BYTES: &str = "heapMaxBytes";
