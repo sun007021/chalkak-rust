@@ -1,8 +1,9 @@
 //! 관리자 도메인(원본 `admin` 패키지).
 //!
-//! 하위 구성: `auth`(로그인·토큰), `audit`(감사 로그), `user`·`post`·`topic`·`feedback`(관리 API),
+//! 하위 구성: `analytics`(사용자 지표 수동 집계), `auth`(로그인·토큰), `audit`(감사 로그), `user`·`post`·`topic`·`feedback`(관리 API),
 //! `bootstrap`(시작 시 계정 보장).
 
+pub mod analytics;
 pub mod audit;
 pub mod auth;
 pub mod binding;
@@ -37,7 +38,8 @@ pub fn register(routes: Routes, ctx: &AppContext) -> Routes {
         config: Arc::new(ctx.admin.clone()),
         image_urls: ctx.post.image_urls(),
     };
-    register_with(routes, &deps)
+    let routes = register_with(routes, &deps);
+    analytics::register(routes, &deps, Arc::clone(&ctx.analytics))
 }
 
 /// 의존성을 직접 받아 등록한다(엔드포인트 테스트가 쓴다).

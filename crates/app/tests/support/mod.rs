@@ -131,12 +131,18 @@ impl Fx {
         let ctx = AppContext {
             pool: db.pool(8),
             clock: clock.clone(),
-            logger,
+            logger: logger.clone(),
             admin: chalkak_app::admin::AdminConfig::for_tests(
                 b"0123456789abcdef0123456789abcdef".to_vec(),
             ),
             settings: Arc::new(chalkak_app::config::test_settings(&settings())),
             post: wiring.clone(),
+            analytics: chalkak_app::analytics::build_runner_without_access_logs(
+                Vec::new(),
+                db.pool(2),
+                clock.clone(),
+                logger.clone(),
+            ),
         };
         let command = wiring.command_service(&ctx);
         let query = wiring.query_service(&ctx);

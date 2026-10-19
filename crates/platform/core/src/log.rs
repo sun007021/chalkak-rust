@@ -37,6 +37,7 @@ use crate::request_id;
 pub mod fields {
     pub const REQUEST_ID: &str = "requestId";
     pub const USER_ID: &str = "userId";
+    pub const ADMIN_ID: &str = "adminId";
     pub const TYPE: &str = "type";
     pub const METHOD: &str = "method";
     pub const ROUTE: &str = "route";
@@ -57,11 +58,13 @@ pub mod fields {
     pub const THREADS: &str = "threads";
     pub const HIKARI_ACTIVE: &str = "hikariActive";
     pub const HIKARI_PENDING: &str = "hikariPending";
+    pub const METRIC_DATE: &str = "metricDate";
 
     pub const TYPE_ACCESS: &str = "access";
     pub const TYPE_ERROR: &str = "error";
     pub const TYPE_RUNTIME: &str = "runtime";
     pub const TYPE_MODERATION: &str = "moderation";
+    pub const TYPE_AGGREGATION: &str = "aggregation";
     /// 라우트가 매칭되지 않은 요청의 `route` 값.
     pub const UNMATCHED_ROUTE: &str = "UNMATCHED";
 }

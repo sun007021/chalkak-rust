@@ -11,6 +11,7 @@
 use std::path::PathBuf;
 use std::time::Duration;
 
+use chalkak_app::analytics::AnalyticsSettings;
 use chalkak_app::config::AppSettings;
 use chalkak_app::jobs::JobsSettings;
 use chalkak_app::notification::slack::settings::AdminNotificationSettings;
@@ -83,6 +84,8 @@ pub struct Settings {
     pub admin_notification: Option<AdminNotificationSettings>,
     /// 주기 작업 켜기·끄기.
     pub jobs: JobsSettings,
+    /// 사용자 지표 집계 설정(팀 계정 제외 목록, 접근 로그 그룹).
+    pub analytics: AnalyticsSettings,
 }
 
 impl Settings {
@@ -116,7 +119,10 @@ impl Settings {
             AdminNotificationSettings::from_env(env, profile == Profile::Local)?;
 
         // 런타임 상태 로그는 dev·prod에서만 기본으로 켠다(`application-dev.yml`, `application-prod.yml`).
-        let jobs = JobsSettings::from_env(env, profile != Profile::Local)?;
+        let jobs =
+            JobsSettings::from_env(env, profile != Profile::Local, profile == Profile::Prod)?;
+        let analytics =
+            AnalyticsSettings::from_env(env, profile == Profile::Prod, &post.image.region)?;
 
         Ok(Settings {
             profile,
@@ -137,6 +143,7 @@ impl Settings {
             post,
             admin_notification,
             jobs,
+            analytics,
         })
     }
 }
