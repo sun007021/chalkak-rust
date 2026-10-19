@@ -1,0 +1,3 @@
+원본: woowacourse-teams/2026-Chalkak  backend/lambda/image-processor/{handler.py,image_processor/,tests/,requirements.txt}
+기준 커밋: ae1a2c1 (docs: .vercelignore 파일 수정)
+function/ 아래는 원본 그대로의 사본이다. 수정하지 않는다. 원본이 바뀌면 scripts/sync-lambda.sh <원본 저장소 경로> 로 다시 맞춘다.
