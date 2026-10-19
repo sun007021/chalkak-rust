@@ -1,0 +1,272 @@
+# 로컬 AWS 재현 환경(L1·L2). 원본의 "S3 → SQS → 이미지 처리 Lambda → 백엔드 HMAC 콜백" 흐름을 한 벌에 올린다.
+#
+#   scripts/fetch-tools.sh                  # 한 번: imds-mock·toxiproxy 바이너리를 .state/bin 에 받는다(GitHub 릴리스)
+#   scripts/prepare-lambda.sh               # 한 번: Lambda 의존성(boto3·Pillow)을 .state/lambda-deps 에 설치한다
+#   docker compose --profile java up -d     # 또는 --profile rust
+#   scripts/e2e-image.sh                    # 사인·게시물 이미지 업로드가 콜백까지 도는지 확인
+#
+# 자세한 설명은 README.md. 모든 이름은 sslip.io 형식이고 IP는 HOST_IP(기본 127.0.0.1)다.
+# 컨테이너끼리도 같은 이름으로 edge에 닿도록 edge에 네트워크 별칭을 준다(sslip.io 해석 없이도 동작한다).
+#
+# 이미지는 공개 이미지에 호스트 파일(바이너리·JAR·Lambda 코드)을 마운트한다. 컨테이너 안 docker build가 막힌 환경
+# (클라우드 세션: apt·git 차단, public.ecr.aws 차단)에서도 뜨게 하려는 것이다.
+
+name: chalkak-local-aws
+
+x-host-ip: &host-ip ${HOST_IP:-127.0.0.1}
+
+x-http-health: &http-health
+  interval: 2s
+  timeout: 5s
+  retries: 120
+
+# 로컬 CA 루트(Caddy internal CA가 만든다). 이 CA를 믿어야 edge의 HTTPS 이름에 닿는다.
+x-ca-volume: &ca-volume
+  - ./.state/caddy/data/caddy/pki/authorities/local:/ca:ro
+
+services:
+  # ---- edge: TLS 종료 ------------------------------------------------------------------------
+  edge:
+    image: caddy:2.11
+    restart: unless-stopped
+    environment:
+      HOST_IP: *host-ip
+      S3_BUCKET: techcourse-project-2026
+      S3_PREFIX: chalkak
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./.state/caddy/data:/data
+      - ./.state/caddy/config:/config
+    ports:
+      - "${EDGE_BIND:-0.0.0.0}:443:443"
+    networks:
+      default:
+        # 컨테이너(Lambda·백엔드)가 휴대폰과 같은 이름으로 edge에 닿는다. 와일드카드 별칭은 없어서 버킷 이름을 적는다.
+        aliases:
+          - api.${HOST_IP:-127.0.0.1}.sslip.io
+          - s3.${HOST_IP:-127.0.0.1}.sslip.io
+          - techcourse-project-2026.s3.${HOST_IP:-127.0.0.1}.sslip.io
+          - cdn.${HOST_IP:-127.0.0.1}.sslip.io
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /data/caddy/pki/authorities/local/root.crt"]
+      <<: *http-health
+
+  # ---- aws: S3·SQS(·SNS) 에뮬레이터 ------------------------------------------------------------
+  # LocalStack 4.9.2는 인증 토큰 없이 뜬다(4.9.x가 무료로 받을 수 있는 마지막 계열. latest·2026.x는 토큰 필요). README 참고.
+  aws:
+    image: localstack/localstack:4.9.2
+    restart: unless-stopped
+    environment:
+      SERVICES: s3,sqs,sns
+      DEBUG: "0"
+      DISABLE_EVENTS: "1"
+      # 이 환경에서 LocalStack DNS 서버는 쓰지 않는다(이름 해석은 compose 네트워크와 edge 별칭이 한다).
+      DNS_ADDRESS: "0"
+      AWS_DEFAULT_REGION: ap-northeast-2
+      S3_BUCKET: techcourse-project-2026
+      S3_PREFIX: chalkak
+    volumes:
+      - ./localstack/init:/etc/localstack/init/ready.d:ro
+    ports:
+      # 디버깅용(awslocal, curl). 앱은 edge를 거친다.
+      - "127.0.0.1:${AWS_DEBUG_PORT:-4566}:4566"
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /tmp/local-aws-init.done && curl -fs localhost:4566/_localstack/health >/dev/null"]
+      <<: *http-health
+
+  # ---- postgres ------------------------------------------------------------------------------
+  postgres:
+    image: postgres:18.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: chalkak
+      POSTGRES_USER: chalkak
+      POSTGRES_PASSWORD: local-aws-password
+      TZ: Asia/Seoul
+    command:
+      - postgres
+      - -c
+      - shared_preload_libraries=pg_stat_statements
+      - -c
+      - pg_stat_statements.track=all
+    volumes:
+      - pgdata:/var/lib/postgresql
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-15440}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chalkak -d chalkak"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+
+  # ---- imds-mock: EC2 인스턴스 메타데이터(IMDSv2) ----------------------------------------------
+  # amazon-ec2-metadata-mock. 백엔드가 인스턴스 역할 자격증명을 환경변수가 아니라 IMDS로 받는다.
+  imds-mock:
+    image: debian:trixie-slim
+    restart: unless-stopped
+    entrypoint: ["/usr/local/bin/ec2-metadata-mock", "--imdsv2", "-p", "1338", "-n", "0.0.0.0"]
+    volumes:
+      - ./.state/bin/ec2-metadata-mock:/usr/local/bin/ec2-metadata-mock:ro
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/1338"]
+      <<: *http-health
+
+  # ---- fakes: 소셜 로그인 JWKS 등 외부 서버 ----------------------------------------------------
+  # 하네스의 가짜 서버. 하네스가 서명한 가짜 ID Token(harness/keys)을 받아들이게 JWKS를 내놓는다.
+  fakes:
+    image: debian:trixie-slim
+    restart: unless-stopped
+    entrypoint: ["/usr/local/bin/chalkak-fakes"]
+    environment:
+      FAKES_ADDR: 0.0.0.0:9000
+      FAKES_S3_BUCKET: unused
+    volumes:
+      - ${CHALKAK_FAKES_BIN:-../target/release/chalkak-fakes}:/usr/local/bin/chalkak-fakes:ro
+    ports:
+      - "127.0.0.1:${FAKES_PORT:-19000}:9000"
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /__admin/health HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q UP <&3"]
+      <<: *http-health
+
+  # ---- lambda-image: 원본 이미지 처리 Lambda ---------------------------------------------------
+  # AWS Lambda Python 기본 이미지(Runtime Interface Emulator 내장). 코드는 원본 그대로 마운트한다.
+  # 메모리 1024MB·타임아웃 60초는 컨테이너 제한(mem_limit)과 poller의 invoke 제한으로 흉내 낸다.
+  lambda-image:
+    image: ${LAMBDA_IMAGE:-amazon/aws-lambda-python:3.13}
+    restart: unless-stopped
+    mem_limit: 1024m
+    # 동시 실행 수. RIE 한 컨테이너는 한 번에 하나만 처리하므로 컨테이너를 늘린다(esm-poller 의 ESM_CONCURRENCY 와 같은 값).
+    deploy:
+      replicas: ${ESM_CONCURRENCY:-1}
+    command: ["handler.lambda_handler"]
+    environment:
+      AWS_REGION: ap-northeast-2
+      AWS_DEFAULT_REGION: ap-northeast-2
+      AWS_LAMBDA_FUNCTION_NAME: chalkak-image-processor
+      AWS_LAMBDA_FUNCTION_MEMORY_SIZE: "1024"
+      AWS_LAMBDA_FUNCTION_TIMEOUT: "60"
+      # 실제 Lambda는 실행 역할 자격증명을 주입한다. 에뮬레이터는 아무 값이나 받는다.
+      AWS_ACCESS_KEY_ID: lambda-local
+      AWS_SECRET_ACCESS_KEY: lambda-local-secret
+      # boto3는 이 주소로 S3를 부른다(S3 이벤트·객체 읽기). 서버가 준 presigned URL은 URL의 이름 그대로 부른다.
+      AWS_ENDPOINT_URL: https://s3.${HOST_IP:-127.0.0.1}.sslip.io
+      # 로컬 CA를 믿는다(callback.py의 urllib, presigned PUT, boto3 모두).
+      SSL_CERT_FILE: /ca/root.crt
+      AWS_CA_BUNDLE: /ca/root.crt
+      PYTHONPATH: /opt/deps
+      S3_BUCKET: techcourse-project-2026
+      S3_PREFIX: chalkak
+      DEV_BACKEND_IMAGE_PROCESSING_API_BASE_URL: https://api.${HOST_IP:-127.0.0.1}.sslip.io/internal/v1
+      PROD_BACKEND_IMAGE_PROCESSING_API_BASE_URL: https://api.${HOST_IP:-127.0.0.1}.sslip.io/internal/v1
+      IMAGE_PROCESSING_API_SECRET: local-aws-callback-secret-with-enough-length
+      IMAGE_PROCESSING_API_TIMEOUT_SECONDS: "3"
+      SQS_PARTIAL_BATCH_RESPONSE: ${SQS_PARTIAL_BATCH_RESPONSE:-true}
+      SQS_MAX_RECEIVE_COUNT: "${SQS_MAX_RECEIVE_COUNT:-5}"
+    volumes:
+      - ./lambda-image/function:/var/task:ro
+      - ./.state/lambda-deps:/opt/deps:ro
+      - ./.state/caddy/data/caddy/pki/authorities/local:/ca:ro
+    depends_on:
+      edge: { condition: service_healthy }
+
+  # ---- esm-poller: Lambda SQS 이벤트 소스 매핑 흉내 --------------------------------------------
+  esm-poller:
+    image: ${LAMBDA_IMAGE:-amazon/aws-lambda-python:3.13}
+    restart: unless-stopped
+    entrypoint: ["python", "-u", "/poller/poller.py"]
+    environment:
+      AWS_REGION: ap-northeast-2
+      AWS_ACCESS_KEY_ID: poller-local
+      AWS_SECRET_ACCESS_KEY: poller-local-secret
+      SQS_ENDPOINT_URL: http://aws:4566
+      QUEUE_NAME: chalkak-image-processing
+      LAMBDA_INVOKE_URL: http://lambda-image:8080/2015-03-31/functions/function/invocations
+      # 동시성(워커 스레드 수 = lambda-image 컨테이너 수). 업로드 몰림(S2) 시험에서 올린다. 기본 1 은 순차.
+      ESM_CONCURRENCY: "${ESM_CONCURRENCY:-1}"
+      # 이벤트 소스 매핑 설정(원본 README: batch size 1, batch window 0, ReportBatchItemFailures는 Lambda 환경변수와 짝).
+      BATCH_SIZE: "1"
+      REPORT_BATCH_ITEM_FAILURES: ${SQS_PARTIAL_BATCH_RESPONSE:-true}
+      INVOKE_TIMEOUT_SECONDS: "60"
+    volumes:
+      - ./esm-poller:/poller:ro
+    depends_on:
+      aws: { condition: service_healthy }
+      lambda-image: { condition: service_started }
+
+  # ---- backend: rust | java (프로필로 교체) ----------------------------------------------------
+  # 둘 다 별칭 backend 로 edge 뒤에 선다. 같은 env 파일(원본 application.env 키 이름 그대로)을 읽는다.
+  rust:
+    image: debian:trixie-slim
+    profiles: [rust]
+    restart: unless-stopped
+    entrypoint: ["/app/chalkak-server"]
+    working_dir: /app
+    env_file: ./env/local-aws.env
+    environment:
+      DB_HOST: postgres
+    volumes:
+      - ${CHALKAK_SERVER_BIN:-../target/release/chalkak-server}:/app/chalkak-server:ro
+      - ../migrations:/app/migrations:ro
+      - ./.state/caddy/data/caddy/pki/authorities/local:/ca:ro
+    ports:
+      - "127.0.0.1:${BACKEND_DEBUG_PORT:-18080}:8080"
+    networks:
+      default:
+        aliases: [backend]
+    depends_on: &backend-depends
+      postgres: { condition: service_healthy }
+      aws: { condition: service_healthy }
+      edge: { condition: service_healthy }
+      imds-mock: { condition: service_healthy }
+      fakes: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /actuator/health HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q UP <&3"]
+      <<: *http-health
+
+  java:
+    image: eclipse-temurin:25-jre
+    profiles: [java]
+    restart: unless-stopped
+    # JVM은 시스템 인증서 저장소만 믿는다. 로컬 CA를 더한 사본을 만들어 쓴다.
+    entrypoint:
+      - bash
+      - -c
+      - |
+        set -e
+        cp "$$JAVA_HOME/lib/security/cacerts" /tmp/cacerts
+        keytool -importcert -noprompt -alias chalkak-local-ca -file /ca/root.crt -keystore /tmp/cacerts -storepass changeit >/dev/null
+        exec java -XX:MaxRAMPercentage=70 -Djavax.net.ssl.trustStore=/tmp/cacerts -Djavax.net.ssl.trustStorePassword=changeit -jar /app/app.jar
+    env_file: ./env/local-aws.env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/chalkak
+      SPRING_DATASOURCE_USERNAME: chalkak
+      SPRING_DATASOURCE_PASSWORD: local-aws-password
+      DB_HOST: postgres
+    volumes:
+      - ${ORACLE_JAR:-/tmp/chalkak-lanes/oracle/app.jar}:/app/app.jar:ro
+      - ./.state/caddy/data/caddy/pki/authorities/local:/ca:ro
+    ports:
+      - "127.0.0.1:${BACKEND_DEBUG_PORT:-18080}:8080"
+    networks:
+      default:
+        aliases: [backend]
+    depends_on: *backend-depends
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /actuator/health HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q UP <&3"]
+      <<: *http-health
+
+  # ---- toxiproxy: 장애 주입(선택, --profile chaos) ---------------------------------------------
+  # 기본 구성에서는 쓰지 않는다. L5 시험에서 DB_HOST=toxiproxy, DB_PORT=15432 처럼 경로를 끼워 넣는다.
+  toxiproxy:
+    image: debian:trixie-slim
+    profiles: [chaos]
+    restart: unless-stopped
+    entrypoint: ["/usr/local/bin/toxiproxy-server", "-host", "0.0.0.0", "-config", "/etc/toxiproxy.json"]
+    volumes:
+      - ./.state/bin/toxiproxy-server:/usr/local/bin/toxiproxy-server:ro
+      - ./toxiproxy.json:/etc/toxiproxy.json:ro
+    ports:
+      - "127.0.0.1:${TOXIPROXY_API_PORT:-8474}:8474"
+
+volumes:
+  pgdata:

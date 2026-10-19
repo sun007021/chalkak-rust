@@ -124,7 +124,12 @@ impl HttpClientBuilder {
     pub fn build(self) -> Result<HttpClient, ClientError> {
         let tls = match self.tls_config {
             Some(c) => c,
-            None => Arc::new(tls_config(&self.extra_roots)?),
+            None => {
+                // 사설 CA(로컬 AWS 재현 환경의 Caddy 로컬 CA 등)는 `SSL_CERT_FILE`로도 더할 수 있다.
+                let mut roots = self.extra_roots;
+                roots.extend(env_root_certificates(&|name| std::env::var(name).ok())?);
+                Arc::new(tls_config(&roots)?)
+            }
         };
         Ok(HttpClient {
             tls,
@@ -133,6 +138,34 @@ impl HttpClientBuilder {
             max_response_bytes: self.max_response_bytes,
         })
     }
+}
+
+/// `SSL_CERT_FILE`이 가리키는 PEM 파일의 인증서 전부. 없거나 비어 있으면 빈 목록이다.
+/// 파일을 읽을 수 없거나 인증서가 없으면 오류다(잘못된 설정이 조용히 무시되면 TLS 실패 원인을 찾기 어렵다).
+fn env_root_certificates(
+    lookup: &dyn Fn(&str) -> Option<String>,
+) -> Result<Vec<CertificateDer<'static>>, ClientError> {
+    let Some(path) = lookup("SSL_CERT_FILE")
+        .map(|v| v.trim().to_owned())
+        .filter(|v| !v.is_empty())
+    else {
+        return Ok(Vec::new());
+    };
+    let pem = std::fs::read(&path)
+        .map_err(|e| ClientError::Tls(format!("SSL_CERT_FILE을 읽을 수 없다({path}): {e}")))?;
+    let mut certs = Vec::new();
+    for cert in CertificateDer::pem_slice_iter(&pem) {
+        let cert = cert.map_err(|e| {
+            ClientError::Tls(format!("SSL_CERT_FILE 인증서 해석 실패({path}): {e}"))
+        })?;
+        certs.push(cert.into_owned());
+    }
+    if certs.is_empty() {
+        return Err(ClientError::Tls(format!(
+            "SSL_CERT_FILE에 인증서가 없다: {path}"
+        )));
+    }
+    Ok(certs)
 }
 
 /// webpki-roots(Mozilla 루트)에 `extra`를 더한 rustls 클라이언트 설정. TLS 1.2·1.3, ring provider.
@@ -429,6 +462,39 @@ mod tests {
                 .build()
                 .is_err()
         );
+    }
+
+    #[test]
+    fn ssl_cert_file이_가리키는_인증서를_루트로_더한다() {
+        let ca = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures/ca.pem");
+        let lookup = |name: &str| (name == "SSL_CERT_FILE").then(|| ca.to_owned());
+        let certs = env_root_certificates(&lookup).unwrap();
+        assert!(!certs.is_empty());
+        tls_config(&certs).unwrap();
+    }
+
+    #[test]
+    fn ssl_cert_file이_없거나_비면_추가_루트가_없다() {
+        assert!(env_root_certificates(&|_| None).unwrap().is_empty());
+        assert!(
+            env_root_certificates(&|_| Some("  ".into()))
+                .unwrap()
+                .is_empty()
+        );
+    }
+
+    #[test]
+    fn 잘못된_ssl_cert_file은_오류다() {
+        let missing = |_: &str| Some("/nonexistent/ca.pem".to_owned());
+        assert!(matches!(
+            env_root_certificates(&missing),
+            Err(ClientError::Tls(_))
+        ));
+        let not_pem = |_: &str| Some(concat!(env!("CARGO_MANIFEST_DIR"), "/Cargo.toml").to_owned());
+        assert!(matches!(
+            env_root_certificates(&not_pem),
+            Err(ClientError::Tls(_))
+        ));
     }
 
     #[test]

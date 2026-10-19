@@ -117,6 +117,7 @@ impl CredentialsProvider for EnvCredentialsProvider {
 // ---- IMDSv2 ----
 
 const IMDS_DEFAULT_ENDPOINT: &str = "http://169.254.169.254";
+const IMDS_ENDPOINT_ENV: &str = "AWS_EC2_METADATA_SERVICE_ENDPOINT";
 const IMDS_TOKEN_TTL_SECS: &str = "21600";
 /// 만료 5분 전부터 새로 가져온다(SDK의 prefetch 구간과 같은 값).
 const REFRESH_BEFORE_EXPIRY: SignedDuration = SignedDuration::from_secs(300);
@@ -148,6 +149,18 @@ impl ImdsCredentialsProvider {
     pub fn with_endpoint(mut self, endpoint: &str) -> Self {
         self.endpoint = endpoint.trim_end_matches('/').to_owned();
         self
+    }
+
+    /// `AWS_EC2_METADATA_SERVICE_ENDPOINT`가 있으면(비어 있지 않으면) 그 주소로 바꾼다. SDK의 같은 이름 설정과 같다.
+    /// 로컬 AWS 재현 환경의 IMDS 모의 서버나 하네스의 가짜 IMDS를 가리키는 데 쓴다.
+    pub fn with_endpoint_from_env(self, lookup: &dyn Fn(&str) -> Option<String>) -> Self {
+        match lookup(IMDS_ENDPOINT_ENV)
+            .map(|v| v.trim().to_owned())
+            .filter(|v| !v.is_empty())
+        {
+            Some(endpoint) => self.with_endpoint(&endpoint),
+            None => self,
+        }
     }
 
     fn call(
@@ -269,10 +282,14 @@ impl ChainCredentialsProvider {
     }
 
     /// 환경변수(프로세스 환경) → IMDSv2. 원본 배포(EC2 인스턴스 역할)와 로컬(환경변수)이 모두 걸린다.
+    /// IMDS 주소는 `AWS_EC2_METADATA_SERVICE_ENDPOINT`로 바꿀 수 있다.
     pub fn default_chain(transport: Arc<dyn HttpTransport>, now: NowFn) -> Self {
         Self::new(vec![
             Box::new(EnvCredentialsProvider::from_process_env()),
-            Box::new(ImdsCredentialsProvider::new(transport, now)),
+            Box::new(
+                ImdsCredentialsProvider::new(transport, now)
+                    .with_endpoint_from_env(&|name| std::env::var(name).ok()),
+            ),
         ])
     }
 }
