@@ -126,6 +126,19 @@ impl TopicPushScheduleRepository {
         db.query(&sql, &[])?.iter().map(from_row).collect()
     }
 
+    /// `findById`
+    pub fn find_by_id(
+        &self,
+        db: &mut impl Db,
+        schedule_id: Uuid,
+    ) -> Result<Option<TopicPushSchedule>, DbError> {
+        let sql = format!("SELECT {COLUMNS} FROM topic_push_schedules WHERE id = $1");
+        db.query_opt(&sql, &[&schedule_id])?
+            .as_ref()
+            .map(from_row)
+            .transpose()
+    }
+
     /// `findByIdForUpdate`: 비관적 쓰기 락(`for no key update`). 트랜잭션 안에서 불러야 한다.
     pub fn find_by_id_for_update(
         &self,

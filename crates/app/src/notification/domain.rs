@@ -13,6 +13,22 @@ const REJECTED_BODY: &str = "반려 사유를 확인해 주세요.";
 const MAX_REJECTION_REASON_LENGTH: usize = 500;
 /// 알림함에 보이는 기간(`Notification.RETENTION`, 30일).
 const RETENTION: SignedDuration = SignedDuration::from_hours(30 * 24);
+/// 발행 실패 뒤 다시 시도하기까지의 간격(`Notification.PUBLISH_RETRY_DELAY`).
+const PUBLISH_RETRY_DELAY: SignedDuration = SignedDuration::from_mins(1);
+/// 푸시를 보낼 수 있는 기간(`PushDeadlinePolicy.LIFETIME`).
+const PUSH_LIFETIME: SignedDuration = SignedDuration::from_mins(30);
+
+/// `PushDeadlinePolicy.calculateExpiresAt`: 사건 발생 시각에서 30분 뒤.
+pub fn push_expires_at(occurred_at: Timestamp) -> Timestamp {
+    occurred_at
+        .checked_add(PUSH_LIFETIME)
+        .unwrap_or(Timestamp::MAX)
+}
+
+/// `PushDeadlinePolicy.isExpiredAt`: 기한 정각부터 만료다.
+pub fn is_push_expired_at(expires_at: Timestamp, now: Timestamp) -> bool {
+    now >= expires_at
+}
 
 /// 알림 종류. DB 문자열이자 JSON 값(Java enum 이름).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -190,6 +206,69 @@ impl Notification {
         ))
     }
 
+    /// `getPushExpiresAt`
+    pub fn push_expires_at(&self) -> Timestamp {
+        push_expires_at(self.created_at)
+    }
+
+    /// `isPushExpired`
+    pub fn is_push_expired(&self, now: Timestamp) -> bool {
+        is_push_expired_at(self.push_expires_at(), now)
+    }
+
+    /// `markPublished`: SQS가 수락했다.
+    pub fn mark_published(&mut self, accepted_at: Timestamp) -> Result<(), AppError> {
+        self.validate_pending_publication()?;
+        self.publish_status = PublishStatus::Published;
+        self.published_at = Some(accepted_at);
+        self.next_attempt_at = None;
+        Ok(())
+    }
+
+    /// `retryPublication`: 1분 뒤 다시 시도한다. 기한을 넘기지 않으며, 이미 기한이 지났으면 만료 처리한다.
+    pub fn retry_publication(&mut self, attempted_at: Timestamp) -> Result<(), AppError> {
+        self.validate_pending_publication()?;
+        if self.is_push_expired(attempted_at) {
+            return self.expire_publication();
+        }
+        let expires_at = self.push_expires_at();
+        let retry_at = attempted_at
+            .checked_add(PUBLISH_RETRY_DELAY)
+            .unwrap_or(Timestamp::MAX);
+        self.next_attempt_at = Some(if retry_at < expires_at {
+            retry_at
+        } else {
+            expires_at
+        });
+        Ok(())
+    }
+
+    /// `expirePublication`
+    pub fn expire_publication(&mut self) -> Result<(), AppError> {
+        self.validate_pending_publication()?;
+        self.publish_status = PublishStatus::Expired;
+        self.next_attempt_at = None;
+        Ok(())
+    }
+
+    /// `failPublication`
+    pub fn fail_publication(&mut self) -> Result<(), AppError> {
+        self.validate_pending_publication()?;
+        self.publish_status = PublishStatus::Failed;
+        self.next_attempt_at = None;
+        Ok(())
+    }
+
+    fn validate_pending_publication(&self) -> Result<(), AppError> {
+        if self.publish_status != PublishStatus::Pending {
+            return Err(AppError::business(
+                ErrorCode::BUSINESS_ERROR,
+                "발행 대기 중인 알림만 처리할 수 있습니다.",
+            ));
+        }
+        Ok(())
+    }
+
     #[allow(clippy::too_many_arguments)]
     fn new(
         user_id: Uuid,
@@ -338,5 +417,99 @@ mod tests {
             assert_eq!(PublishStatus::parse(status.as_str()), Some(status));
         }
         assert_eq!(PublishStatus::parse("DONE"), None);
+    }
+
+    fn pending() -> Notification {
+        Notification::approved(USER, POST, EVENT, at(), true)
+    }
+
+    // Notification#markPublished
+    #[test]
+    fn 수락되면_발행됨으로_바뀌고_다음_시도_시각을_지운다() {
+        let mut n = pending();
+        let accepted = at().checked_add(SignedDuration::from_secs(1)).unwrap();
+        n.mark_published(accepted).unwrap();
+        assert_eq!(n.publish_status, PublishStatus::Published);
+        assert_eq!(n.published_at, Some(accepted));
+        assert_eq!(n.next_attempt_at, None);
+    }
+
+    // Notification#retryPublication
+    #[test]
+    fn 재시도는_1분_뒤이고_기한을_넘기지_않는다() {
+        let mut n = pending();
+        n.retry_publication(at()).unwrap();
+        assert_eq!(
+            n.next_attempt_at,
+            Some(at().checked_add(SignedDuration::from_secs(60)).unwrap())
+        );
+        // 기한 30초 전에 실패하면 다음 시도는 기한 정각이다.
+        let mut late = pending();
+        let attempted = at().checked_add(SignedDuration::from_secs(1770)).unwrap();
+        late.retry_publication(attempted).unwrap();
+        assert_eq!(late.publish_status, PublishStatus::Pending);
+        assert_eq!(late.next_attempt_at, Some(late.push_expires_at()));
+        // 기한 59초 전이면 1분 뒤가 기한을 넘으므로 기한 정각.
+        let mut near = pending();
+        let attempted = at().checked_add(SignedDuration::from_secs(1741)).unwrap();
+        near.retry_publication(attempted).unwrap();
+        assert_eq!(near.next_attempt_at, Some(near.push_expires_at()));
+    }
+
+    #[test]
+    fn 기한이_지난_뒤_재시도하면_만료_처리한다() {
+        let mut n = pending();
+        n.retry_publication(at().checked_add(SignedDuration::from_secs(1800)).unwrap())
+            .unwrap();
+        assert_eq!(n.publish_status, PublishStatus::Expired);
+        assert_eq!(n.next_attempt_at, None);
+    }
+
+    #[test]
+    fn 만료와_영구_실패는_다음_시도_시각을_지운다() {
+        let mut expired = pending();
+        expired.expire_publication().unwrap();
+        assert_eq!(expired.publish_status, PublishStatus::Expired);
+        assert_eq!(expired.next_attempt_at, None);
+        let mut failed = pending();
+        failed.fail_publication().unwrap();
+        assert_eq!(failed.publish_status, PublishStatus::Failed);
+        assert_eq!(failed.next_attempt_at, None);
+        assert_eq!(failed.published_at, None);
+    }
+
+    #[test]
+    fn 발행_대기가_아닌_알림은_발행_상태를_바꿀_수_없다() {
+        let message = "발행 대기 중인 알림만 처리할 수 있습니다.";
+        let mut skipped = Notification::approved(USER, POST, EVENT, at(), false);
+        assert_eq!(skipped.mark_published(at()).unwrap_err().message, message);
+        assert_eq!(
+            skipped.retry_publication(at()).unwrap_err().message,
+            message
+        );
+        assert_eq!(skipped.expire_publication().unwrap_err().message, message);
+        assert_eq!(skipped.fail_publication().unwrap_err().message, message);
+        let mut done = pending();
+        done.mark_published(at()).unwrap();
+        assert_eq!(done.fail_publication().unwrap_err().message, message);
+    }
+
+    // PushDeadlinePolicyTest
+    #[test]
+    fn 푸시_기한은_사건_30분_뒤이고_정각부터_만료다() {
+        let expires = push_expires_at(at());
+        assert_eq!(
+            expires,
+            at().checked_add(SignedDuration::from_mins(30)).unwrap()
+        );
+        assert!(!is_push_expired_at(
+            expires,
+            expires.checked_sub(SignedDuration::from_secs(1)).unwrap()
+        ));
+        assert!(is_push_expired_at(expires, expires));
+        assert!(is_push_expired_at(
+            expires,
+            expires.checked_add(SignedDuration::from_secs(1)).unwrap()
+        ));
     }
 }

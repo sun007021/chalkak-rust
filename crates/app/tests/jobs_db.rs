@@ -533,6 +533,7 @@ fn deps(p: &Pending) -> JobDeps {
         pool: p.pool.clone(),
         clock: p.clock.clone(),
         logger: p.logger(),
+        publisher: None,
         apple: Some(AppleRevocation {
             cipher: p.cipher.clone(),
             client: p.apple.clone(),
