@@ -1,0 +1,12 @@
+# S9 선택 겹침: 백엔드에 정적 자격증명을 줘 IMDS 경로를 건너뛴다(scripts/s9.sh ... --static-credentials).
+# imds-mock 은 자격증명 Expiration 이 2020년이라 SQS·S3 호출마다 IMDS 를 다시 부르고, 가끔 연결을 거부한다(README 한계 절).
+# 그 거부가 SQS 호출 실패로 번져 긴 시험의 주제 푸시 수락 수를 흐리므로, 하네스 잡음을 빼고 싶을 때만 쓴다. 기본은 IMDS(원래 구성).
+services:
+  rust:
+    environment:
+      AWS_ACCESS_KEY_ID: s9-static
+      AWS_SECRET_ACCESS_KEY: s9-static-secret
+  java:
+    environment:
+      AWS_ACCESS_KEY_ID: s9-static
+      AWS_SECRET_ACCESS_KEY: s9-static-secret
