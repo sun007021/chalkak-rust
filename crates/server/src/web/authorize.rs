@@ -7,8 +7,9 @@
 //! 5. `/error` 공개.
 //! 6. 개발 관리자 우회가 켜져 있으면 `/api/v1/admin/**` 공개.
 //! 7. `/api/v1/admin/**`은 `SCOPE_ADMIN`.
-//! 8. GET `/api/v1/topics`, `/api/v1/posts`(정확히 이 경로)는 익명이거나 `SCOPE_USER`.
-//! 9. 나머지는 모두 `SCOPE_USER`. 새 API에 인증을 붙이는 것을 잊어도 기본값이 차단이 되도록.
+//! 8. GET `/api/v1/banners`(정확히 이 경로)는 익명, `SCOPE_USER`, `SCOPE_ADMIN` 모두 허용(회원 식별자를 해석하지 않는 공통 공개 조회).
+//! 9. GET `/api/v1/topics`, `/api/v1/posts`(정확히 이 경로)는 익명이거나 `SCOPE_USER`.
+//! 10. 나머지는 모두 `SCOPE_USER`. 새 API에 인증을 붙이는 것을 잊어도 기본값이 차단이 되도록.
 //!
 //! 거부하면 익명은 401(`WWW-Authenticate: Bearer`), 인증된 주체는 403이다. 경로 규칙은 끝 슬래시와 대소문자를 구분한다.
 
@@ -30,6 +31,8 @@ const PUBLIC_ADMIN_AUTH_PATHS: [&str; 3] = [
     "/api/v1/admin/auth/refresh",
     "/api/v1/admin/auth/logout",
 ];
+/// 익명·회원·관리자 모두 읽는 공개 조회(`SecurityConfig`의 배너 규칙).
+const COMMON_PUBLIC_GET_PATHS: [&str; 1] = ["/api/v1/banners"];
 const PUBLIC_GET_PATHS: [&str; 2] = ["/api/v1/topics", "/api/v1/posts"];
 
 #[derive(Debug, PartialEq, Eq)]
@@ -66,6 +69,9 @@ pub fn decide(
     }
     if under(path, "/api/v1/admin") {
         return allow_if(admin_development_bypass || has(AUTHORITY_ADMIN));
+    }
+    if *method == Method::Get && COMMON_PUBLIC_GET_PATHS.contains(&path) {
+        return allow_if(principal.is_none() || has(AUTHORITY_USER) || has(AUTHORITY_ADMIN));
     }
     if *method == Method::Get && PUBLIC_GET_PATHS.contains(&path) {
         return allow_if(principal.is_none() || has(AUTHORITY_USER));
@@ -204,6 +210,18 @@ mod tests {
                 assert_eq!(check(method, path, Some(&user())), Access::Allow);
             }
         }
+    }
+
+    // SecurityFilterChainTest: 배너 조회는 익명·회원·관리자 모두 통과한다.
+    #[test]
+    fn 배너_조회는_익명_회원_관리자_모두_통과한다() {
+        let path = "/api/v1/banners";
+        assert_eq!(check(Method::Get, path, None), Access::Allow);
+        assert_eq!(check(Method::Get, path, Some(&user())), Access::Allow);
+        assert_eq!(check(Method::Get, path, Some(&admin())), Access::Allow);
+        assert_eq!(check(Method::Get, path, Some(&no_scope())), Access::Deny);
+        assert_eq!(check(Method::Post, path, None), Access::Deny);
+        assert_eq!(check(Method::Get, "/api/v1/banners/", None), Access::Deny);
     }
 
     #[test]
