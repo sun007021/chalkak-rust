@@ -662,7 +662,7 @@ fn get_post_unauthenticated_returns_unauthorized() {
 #[test]
 fn get_posts_valid_topic_date_returns_post_list() {
     let Some(h) = http() else { return };
-    let (_, _, post) = approved_post(&h);
+    let (author, _, post) = approved_post(&h);
     let (response, json) = h.get("/api/v1/posts", &[("topicDate", "2026-10-12")], None);
     assert_eq!(response.status, 200);
     assert_eq!(json["currentPage"], 1);
@@ -670,8 +670,27 @@ fn get_posts_valid_topic_date_returns_post_list() {
     assert_eq!(json["hasNext"], false);
     assert_eq!(json["randomSeed"], Value::Null);
     assert_eq!(json["posts"][0]["id"], post.to_string());
-    // 비로그인 응답에도 authorId가 있다
-    assert!(json["posts"][0]["authorId"].is_string());
+    // 비로그인 응답에도 작성자 ID가 있다(1fb74d9 PostListResponse.authorId)
+    assert_eq!(json["posts"][0]["authorId"], author.to_string());
+    assert_eq!(json["posts"][0]["isMine"], false);
+}
+
+// 1fb74d9 authorId는 작성자 ID이고 조회자 ID가 아니다: 다른 회원이 조회해도 같다.
+#[test]
+fn get_post_and_posts_by_other_viewer_return_author_id_not_viewer_id() {
+    let Some(h) = http() else { return };
+    let (author, _, post) = approved_post(&h);
+    let viewer = h.fx.user();
+    let (response, json) = h.get(&format!("/api/v1/posts/{post}"), &[], Some(viewer));
+    assert_eq!(response.status, 200);
+    assert_eq!(json["authorId"], author.to_string());
+    assert_ne!(json["authorId"], viewer.to_string());
+    let (_, json) = h.get(
+        "/api/v1/posts",
+        &[("topicDate", "2026-10-12")],
+        Some(viewer),
+    );
+    assert_eq!(json["posts"][0]["authorId"], author.to_string());
     assert_eq!(json["posts"][0]["isMine"], false);
 }
 

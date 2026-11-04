@@ -322,7 +322,12 @@ mod tests {
             Ok(20)
         }
         fn count_ai_reviews(&self, _: Timestamp, _: Timestamp) -> Result<AiReviewCounts, ApiError> {
-            Ok(AiReviewCounts::default())
+            Ok(AiReviewCounts {
+                users: 3,
+                requests: 5,
+                completed: 2,
+                failed: 1,
+            })
         }
     }
 
@@ -416,6 +421,20 @@ mod tests {
         assert_eq!(metrics.access_log_metrics, None);
         let events = lines.events();
         assert_eq!(events.len(), 1);
+        // 원본 UserMetricsAggregationServiceTest#aggregate_success_logsOneAggregationLine: 0이 아닌 값이 그대로 실린다.
+        assert_eq!(
+            metrics.ai_reviews,
+            AiReviewCounts {
+                users: 3,
+                requests: 5,
+                completed: 2,
+                failed: 1
+            }
+        );
+        assert_eq!(events[0]["aiReviewUsers"], 3);
+        assert_eq!(events[0]["aiReviewRequests"], 5);
+        assert_eq!(events[0]["aiReviewCompleted"], 2);
+        assert_eq!(events[0]["aiReviewFailed"], 1);
         assert_eq!(
             lines.keys(0),
             [
