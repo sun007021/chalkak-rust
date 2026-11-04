@@ -12,6 +12,10 @@ use chalkak_http::{Handler, Method, Middleware, Request, Response};
 
 const ADMIN_API_PATH: &str = "/api/v1/admin";
 
+/// 배너 조회(`GET /api/v1/banners`)만 관리자 웹에 열어 두는 CORS 경로. 메서드는 GET만 허용한다(`configureBannerCors`).
+const BANNER_API_PATH: &str = "/api/v1/banners";
+const BANNER_ALLOWED_METHODS: [&str; 1] = ["GET"];
+
 const ALLOWED_METHODS: [&str; 6] = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"];
 const ALLOWED_HEADERS: [&str; 3] = ["Authorization", "Content-Type", "Accept"];
 const EXPOSED_HEADERS: &str = "X-Request-Id";
@@ -50,7 +54,7 @@ impl AdminCors {
             .then_some(origin)
     }
 
-    fn process(&self, req: &Request, origin: &str) -> Decision {
+    fn process(&self, req: &Request, origin: &str, allowed_methods: &[&str]) -> Decision {
         let preflight =
             req.method == Method::Options && req.headers.contains("access-control-request-method");
         let Some(allow_origin) = self.check_origin(origin) else {
@@ -64,7 +68,7 @@ impl AdminCors {
         } else {
             req.method.as_str().to_owned()
         };
-        if !ALLOWED_METHODS.contains(&method.as_str()) {
+        if !allowed_methods.contains(&method.as_str()) {
             return Decision::Reject;
         }
 
@@ -98,11 +102,19 @@ fn trim_trailing_slash(s: &str) -> &str {
     s.strip_suffix('/').unwrap_or(s)
 }
 
-fn applies_to(path: &str) -> bool {
-    path == ADMIN_API_PATH
+/// 이 경로에 적용할 허용 메서드. CORS 처리 대상이 아니면 `None`.
+fn allowed_methods_for(path: &str) -> Option<&'static [&'static str]> {
+    let admin = path == ADMIN_API_PATH
         || path
             .strip_prefix(ADMIN_API_PATH)
-            .is_some_and(|r| r.starts_with('/'))
+            .is_some_and(|r| r.starts_with('/'));
+    if admin {
+        Some(&ALLOWED_METHODS)
+    } else if path == BANNER_API_PATH {
+        Some(&BANNER_ALLOWED_METHODS)
+    } else {
+        None
+    }
 }
 
 /// 사전 요청의 `Access-Control-Request-Headers`를 허용 목록과 맞춘다. 없으면 빈 목록(허용),
@@ -202,9 +214,9 @@ fn reject() -> Response {
 
 impl Middleware for AdminCors {
     fn handle(&self, req: Request, next: &dyn Handler) -> Response {
-        if !applies_to(&req.path) {
+        let Some(allowed_methods) = allowed_methods_for(&req.path) else {
             return next.handle(req);
-        }
+        };
         let origin = req.header("origin").map(str::to_owned);
         let cors_origin = origin.filter(|o| is_cors_request(&req, o));
         let Some(origin) = cors_origin else {
@@ -213,7 +225,7 @@ impl Middleware for AdminCors {
             return response;
         };
 
-        match self.process(&req, &origin) {
+        match self.process(&req, &origin, allowed_methods) {
             Decision::Reject => {
                 let mut response = reject();
                 add_vary(&mut response);
@@ -236,7 +248,7 @@ impl Middleware for AdminCors {
                 if preflight {
                     response
                         .headers
-                        .set("Access-Control-Allow-Methods", ALLOWED_METHODS.join(","));
+                        .set("Access-Control-Allow-Methods", allowed_methods.join(","));
                     if !allow_headers.is_empty() {
                         response
                             .headers
@@ -438,6 +450,67 @@ mod tests {
             assert_eq!(r.status, 204, "{path}");
             assert!(r.headers.is_empty(), "{path}");
         }
+    }
+
+    // BannerCorsTest: 배너 GET만 관리자 웹 Origin에 연다.
+    #[test]
+    fn 배너_조회_사전_요청은_get만_허용한다() {
+        let mut req = Request::new(Method::Options, "/api/v1/banners");
+        req.headers.append("Origin", "http://localhost:3000");
+        req.headers.append("Access-Control-Request-Method", "GET");
+        req.headers
+            .append("Access-Control-Request-Headers", "Authorization");
+        let r = call(req);
+        assert_eq!(r.status, 200);
+        assert_eq!(
+            r.headers.get("access-control-allow-origin"),
+            Some("http://localhost:3000")
+        );
+        assert_eq!(r.headers.get("access-control-allow-methods"), Some("GET"));
+        assert_eq!(
+            r.headers.get("access-control-allow-headers"),
+            Some("Authorization")
+        );
+    }
+
+    #[test]
+    fn 배너_조회_이외_메서드의_사전_요청과_미허용_origin은_403이다() {
+        for method in ["POST", "PUT", "DELETE"] {
+            let mut req = Request::new(Method::Options, "/api/v1/banners");
+            req.headers.append("Origin", "http://localhost:3000");
+            req.headers.append("Access-Control-Request-Method", method);
+            let r = call(req);
+            assert_eq!(r.status, 403, "{method}");
+            assert!(!r.headers.contains("access-control-allow-origin"));
+        }
+        let mut req = Request::new(Method::Options, "/api/v1/banners");
+        req.headers.append("Origin", "http://evil.example");
+        req.headers.append("Access-Control-Request-Method", "GET");
+        assert_eq!(call(req).status, 403);
+        let mut req = Request::new(Method::Get, "/api/v1/banners");
+        req.headers.append("Origin", "http://evil.example");
+        assert_eq!(call(req).status, 403);
+    }
+
+    #[test]
+    fn 배너_실제_조회는_허용_헤더와_노출_헤더를_싣고_자격_증명을_허용하지_않는다() {
+        let mut req = Request::new(Method::Get, "/api/v1/banners");
+        req.headers.append("Origin", "http://localhost:3000");
+        let r = call(req);
+        assert_eq!(r.status, 204);
+        assert_eq!(
+            r.headers.get("access-control-allow-origin"),
+            Some("http://localhost:3000")
+        );
+        assert_eq!(
+            r.headers.get("access-control-expose-headers"),
+            Some("X-Request-Id")
+        );
+        assert!(!r.headers.contains("access-control-allow-credentials"));
+        // 하위 경로는 대상이 아니다.
+        let mut req = Request::new(Method::Get, "/api/v1/banners/x");
+        req.headers.append("Origin", "http://localhost:3000");
+        assert!(call(req).headers.is_empty());
     }
 
     #[test]
