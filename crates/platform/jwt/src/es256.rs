@@ -99,8 +99,8 @@ impl Es256PublicKey {
                 .ok_or_else(|| invalid_key("EC coordinate must be 32 bytes of base64url"))
         };
         let (x, y) = (decode(x)?, decode(y)?);
-        let point = p256::EncodedPoint::from_affine_coordinates(&x.into(), &y.into(), false);
-        let key = VerifyingKey::from_encoded_point(&point)
+        let point = p256::Sec1Point::from_affine_coordinates(&x.into(), &y.into(), false);
+        let key = VerifyingKey::from_sec1_point(&point)
             .map_err(|_| invalid_key("point is not on the P-256 curve"))?;
         Ok(Es256PublicKey { key })
     }
