@@ -10,6 +10,7 @@
 //! | 공지 알림함 배포 | 매분 0초 | `chalkak.notification.notice.distribution-enabled`(기본 꺼짐) |
 //! | 알림 SQS 발행(Relay) | 앞 실행이 끝난 뒤 1초(시작 즉시 한 번) | `chalkak.notification.sqs.relay-enabled`(기본 꺼짐) |
 //! | 주제 푸시 발행 | 매분 0초 | `chalkak.notification.sqs.topic-push-enabled`(기본 꺼짐) |
+//! | 리마인더 푸시 발행 | 매분 0초 | `chalkak.notification.sqs.reminder-enabled`(기본 꺼짐) |
 //! | 푸시 Worker 폴링(2개) | 앞 실행이 끝난 뒤 1ms(시작 즉시 한 번) | `chalkak.notification.fcm.worker-enabled`(기본 꺼짐) |
 //! | 알림 발행 대기 모니터 | 60초마다(시작 즉시 한 번) | dev·prod 프로필에서만(끄는 키 없음) |
 //! | AI 리뷰 워커 폴링 | 앞 실행이 끝난 뒤 1초(시작 즉시 한 번) | `chalkak.ai-review.worker.enabled`(기본 켜짐) |
@@ -18,7 +19,7 @@
 //! 스케줄링 기능 전체를 끄는 키는 `chalkak.scheduling.enabled`(기본 켜짐)이고 작업별 키와 서로 독립이다. 환경변수
 //! 이름은 Spring 느슨한 바인딩을 따라 하이픈을 없애 `CHALKAK_AUTH_REFRESHTOKEN_CLEANUP_ENABLED`처럼 쓴다.
 //! SQS 발행 설정은 `application.yml`의 환경변수 이름 그대로 `NOTIFICATION_RELAY_ENABLED`, `NOTIFICATION_TOPIC_PUSH_ENABLED`,
-//! `NOTIFICATION_SQS_QUEUE_URL`, `AWS_REGION`을 쓴다.
+//! `NOTIFICATION_REMINDER_ENABLED`, `NOTIFICATION_SQS_QUEUE_URL`, `AWS_REGION`을 쓴다.
 //! 런타임 상태 로그는 원본처럼 기본 꺼짐이고 dev·prod 프로필에서만 켠다(`application-dev.yml`, `application-prod.yml`).
 //! 공지 배포도 기본 꺼짐이다(`NOTIFICATION_NOTICE_DISTRIBUTION_ENABLED`, `application.yml`). 원본은 이 작업만 전용 단일 스레드
 //! 스케줄러로 돌려 다른 예약 작업과 섞이지 않게 하는데, 여기서는 작업마다 스레드 하나라 같은 효과다.
@@ -50,6 +51,7 @@ use crate::notification;
 use crate::notification::publication_monitor::NotificationPublicationMonitor;
 use crate::notification::push_worker_config::{FcmSettings, PushWorker};
 use crate::notification::relay::NotificationRelayService;
+use crate::notification::reminder_push::ReminderPushService;
 use crate::notification::sqs_push::{PushMessagePublisher, SqsPushSettings};
 use crate::notification::topic_push::TopicPushService;
 
@@ -64,6 +66,10 @@ const NOTICE_SCHEDULER_LOGGER: &str =
 /// 주제 푸시 작업이 실패했을 때 남기는 로거(원본 `TopicPushScheduler`의 `@Slf4j`).
 const TOPIC_SCHEDULER_LOGGER: &str =
     "com.chalkak.backend.notification.infrastructure.infra.TopicPushScheduler";
+
+/// 리마인더 푸시 작업이 실패했을 때 남기는 로거(원본 `ReminderScheduler`의 `@Slf4j`).
+const REMINDER_SCHEDULER_LOGGER: &str =
+    "com.chalkak.backend.notification.infrastructure.infra.ReminderScheduler";
 
 /// Relay가 앞 실행을 마친 뒤 다음 실행까지 쉬는 시간(`@Scheduled(fixedDelay = 1000)`).
 pub const RELAY_DELAY: Duration = Duration::from_secs(1);
@@ -86,6 +92,7 @@ pub enum Job {
     NoticeDistribution,
     NotificationRelay,
     TopicPush,
+    ReminderPush,
     /// 푸시 Worker 폴링. 원본은 같은 `SqsPollingScheduler` 빈 둘을 등록해 두 스레드가 동시에 수신한다.
     NotificationWorkerFirst,
     NotificationWorkerSecond,
@@ -107,7 +114,7 @@ pub enum Schedule {
 }
 
 impl Job {
-    pub const ALL: [Job; 13] = [
+    pub const ALL: [Job; 14] = [
         Job::RefreshTokenCleanup,
         Job::ConsumedSignupTokenCleanup,
         Job::NotificationCleanup,
@@ -116,6 +123,7 @@ impl Job {
         Job::NoticeDistribution,
         Job::NotificationRelay,
         Job::TopicPush,
+        Job::ReminderPush,
         Job::NotificationWorkerFirst,
         Job::NotificationWorkerSecond,
         Job::PublicationMonitor,
@@ -134,6 +142,7 @@ impl Job {
             Job::NoticeDistribution => "distributeNotices",
             Job::NotificationRelay => "publishPendingNotifications",
             Job::TopicPush => "publishDueTopics",
+            Job::ReminderPush => "publishDueReminders",
             Job::NotificationWorkerFirst | Job::NotificationWorkerSecond => "poll",
             Job::PublicationMonitor => "logBacklog",
             Job::RuntimeSnapshot => "logSnapshot",
@@ -151,6 +160,7 @@ impl Job {
             Job::NoticeDistribution => Schedule::Cron("0 * * * * *"),
             Job::NotificationRelay => Schedule::FixedDelay(RELAY_DELAY),
             Job::TopicPush => Schedule::Cron("0 * * * * *"),
+            Job::ReminderPush => Schedule::Cron("0 * * * * *"),
             Job::NotificationWorkerFirst | Job::NotificationWorkerSecond => {
                 Schedule::FixedDelay(WORKER_POLL_DELAY)
             }
@@ -240,6 +250,7 @@ impl JobsSettings {
             Job::NoticeDistribution => self.notice_distribution,
             Job::NotificationRelay => self.sqs.relay_enabled,
             Job::TopicPush => self.sqs.topic_push_enabled,
+            Job::ReminderPush => self.sqs.reminder_enabled,
             Job::NotificationWorkerFirst | Job::NotificationWorkerSecond => self.sqs.worker_enabled,
             Job::PublicationMonitor => self.publication_monitor,
             Job::RuntimeSnapshot => self.runtime_log,
@@ -445,6 +456,25 @@ fn body(
                         .field("stage", "topic_scheduler_failed")
                         .field("errorCode", error.exception_name())
                         .log("주제 푸시 설정 조회 실패");
+                }
+            })
+        }
+        Job::ReminderPush => {
+            let service = ReminderPushService::new(
+                pool,
+                clock,
+                publisher_for(deps, "리마인더 푸시 발행")?,
+                Arc::clone(&logger),
+            );
+            Box::new(move || {
+                // `ReminderScheduler`: 목록 조회가 실패해도 예외를 밖으로 내지 않고 다음 분에 다시 시도한다.
+                if let Err(error) = service.publish_due_reminders() {
+                    logger
+                        .error(REMINDER_SCHEDULER_LOGGER)
+                        .field("type", "notification")
+                        .field("stage", "reminder_scheduler_failed")
+                        .field("errorCode", error.exception_name())
+                        .log("리마인더 목록 조회 실패");
                 }
             })
         }
@@ -934,5 +964,33 @@ mod tests {
             Some(ts("2026-10-12T00:01:00Z"))
         );
         assert_eq!(Job::TopicPush.name(), "publishDueTopics");
+    }
+
+    // ReminderConfigurationTest: 리마인더 발행은 켤 때만 등록되고 매분 0초(KST)에 돈다.
+    #[test]
+    fn reminder_push_is_off_by_default_and_polls_every_kst_minute() {
+        assert!(!settings(&[], false).planned().contains(&Job::ReminderPush));
+        let on = settings(
+            &[
+                ("NOTIFICATION_REMINDER_ENABLED", "true"),
+                ("NOTIFICATION_SQS_QUEUE_URL", QUEUE),
+            ],
+            false,
+        );
+        assert!(on.planned().contains(&Job::ReminderPush));
+        assert!(!on.planned().contains(&Job::TopicPush));
+        assert!(!on.planned().contains(&Job::NotificationRelay));
+        let cron = Job::ReminderPush.cron().unwrap();
+        assert_eq!(
+            cron.next_after(ts("2026-10-12T00:00:30Z")),
+            Some(ts("2026-10-12T00:01:00Z"))
+        );
+        assert_eq!(Job::ReminderPush.name(), "publishDueReminders");
+    }
+
+    #[test]
+    fn reminder_push_requires_a_standard_queue_url() {
+        let env = Env::from_pairs([("NOTIFICATION_REMINDER_ENABLED", "true")]);
+        assert!(JobsSettings::from_env(&env, false, false).is_err());
     }
 }

@@ -12,6 +12,7 @@ use uuid::Uuid;
 use super::sensitive::contains_sensitive_value;
 use crate::appversion::domain::{AppPlatform, MinimumSupportedVersion, StoreUrl};
 use crate::notification::notice::Notice;
+use crate::notification::reminder::{Reminder, ReminderRepeat, ReminderTarget};
 use crate::web::binding::is_java_whitespace;
 use crate::web::json::format_instant;
 
@@ -303,10 +304,13 @@ impl AdminAction {
                     && after.value("revision").and_then(Value::as_i64) == Some(0)
             }
             AdminAction::AppVersionUpdated => is_app_version_updated(before, after),
-            // 아래 작업의 상태 전이 규칙은 해당 기능을 옮기는 이슈에서 채운다. 그때까지 감사 로그로 기록할 수 없다.
-            AdminAction::ReminderCreated
-            | AdminAction::ReminderUpdated
-            | AdminAction::ReminderDeleted => false,
+            AdminAction::ReminderCreated => before.is_empty() && is_valid_reminder_state(after),
+            AdminAction::ReminderUpdated => {
+                is_valid_reminder_state(before)
+                    && is_valid_reminder_state(after)
+                    && before.values != after.values
+            }
+            AdminAction::ReminderDeleted => is_reminder_deleted(before, after),
         }
     }
 }
@@ -497,6 +501,15 @@ const NOTICE_STATE_FIELDS: [&str; 3] = ["title", "scheduledAt", "bodySha256"];
 const DELETED_NOTICE_STATE_FIELDS: [&str; 4] = ["title", "scheduledAt", "bodySha256", "deletedAt"];
 const BANNER_STATE_FIELDS: [&str; 2] = ["titleSha256", "subtitleSha256"];
 const DELETED_BANNER_STATE_FIELDS: [&str; 3] = ["titleSha256", "subtitleSha256", "deletedAt"];
+const REMINDER_STATE_FIELDS: [&str; 5] = ["title", "bodySha256", "repeat", "target", "scheduledAt"];
+const DELETED_REMINDER_STATE_FIELDS: [&str; 6] = [
+    "title",
+    "bodySha256",
+    "repeat",
+    "target",
+    "scheduledAt",
+    "deletedAt",
+];
 /// 게시물 `ModerationStatus`의 이름들.
 const MODERATION_STATUSES: [&str; 4] = ["VALIDATING", "PENDING", "APPROVED", "REJECTED"];
 
@@ -676,6 +689,41 @@ fn is_app_version_updated(before: &AuditSnapshot, after: &AuditSnapshot) -> bool
             (Some(b), Some(a)) if b < i64::MAX && a == b + 1)
         && (before.value("minimumSupportedVersion") != after.value("minimumSupportedVersion")
             || before.value("storeUrl") != after.value("storeUrl"))
+}
+
+fn is_valid_reminder_state(state: &AuditSnapshot) -> bool {
+    is_valid_reminder_fields(state, &REMINDER_STATE_FIELDS)
+}
+
+fn is_valid_reminder_fields(state: &AuditSnapshot, expected_fields: &[&str]) -> bool {
+    state.has_exactly_fields(expected_fields)
+        && state
+            .value("title")
+            .and_then(Value::as_str)
+            .is_some_and(Reminder::is_valid_title)
+        && state
+            .value("bodySha256")
+            .and_then(Value::as_str)
+            .is_some_and(is_sha256_hex)
+        && state
+            .value("repeat")
+            .and_then(Value::as_str)
+            .is_some_and(|name| ReminderRepeat::parse(name).is_some())
+        && state
+            .value("target")
+            .and_then(Value::as_str)
+            .is_some_and(|name| ReminderTarget::parse(name).is_some())
+        && is_instant(state.value("scheduledAt"))
+}
+
+fn is_reminder_deleted(before: &AuditSnapshot, after: &AuditSnapshot) -> bool {
+    is_valid_reminder_fields(before, &DELETED_REMINDER_STATE_FIELDS)
+        && is_valid_reminder_fields(after, &DELETED_REMINDER_STATE_FIELDS)
+        && matches!(before.value("deletedAt"), Some(Value::Null))
+        && is_instant(after.value("deletedAt"))
+        && REMINDER_STATE_FIELDS
+            .iter()
+            .all(|field| before.value(field) == after.value(field))
 }
 
 fn is_valid_title(value: Option<&Value>) -> bool {
@@ -1724,5 +1772,121 @@ mod tests {
             )
             .is_err()
         );
+    }
+
+    // ----- 리마인더 감사 상태 전이(AdminAuditLogTest의 리마인더 항목) -----
+
+    fn reminder_state(title: &str) -> Value {
+        json!({
+            "title": title,
+            "bodySha256": "a".repeat(64),
+            "repeat": "DAILY",
+            "target": "TOPIC_PARTICIPANTS",
+            "scheduledAt": "2026-10-21T12:00:00Z",
+        })
+    }
+
+    fn reminder_log(
+        action: AdminAction,
+        before: &AuditSnapshot,
+        after: &AuditSnapshot,
+    ) -> Result<AdminAuditLog, AppError> {
+        AdminAuditLog::create(
+            id(),
+            action,
+            AdminTargetType::Reminder,
+            id(),
+            None,
+            before,
+            after,
+            occurred_at(),
+            id(),
+        )
+    }
+
+    #[test]
+    fn 리마인더_등록은_빈_이전_상태와_올바른_이후_상태만_허용한다() {
+        let after = snap(reminder_state("제목"));
+        assert!(
+            reminder_log(
+                AdminAction::ReminderCreated,
+                &AuditSnapshot::empty(),
+                &after
+            )
+            .is_ok()
+        );
+        assert!(reminder_log(AdminAction::ReminderCreated, &after, &after).is_err());
+        for (field, value) in [
+            ("bodySha256", json!("ABC")),
+            ("repeat", json!("WEEKLY")),
+            ("target", json!("NOBODY")),
+            ("scheduledAt", json!("tomorrow")),
+            ("title", json!("   ")),
+        ] {
+            let mut state = reminder_state("제목");
+            state[field] = value;
+            assert!(
+                reminder_log(
+                    AdminAction::ReminderCreated,
+                    &AuditSnapshot::empty(),
+                    &snap(state)
+                )
+                .is_err(),
+                "{field}"
+            );
+        }
+        let mut extra = reminder_state("제목");
+        extra["extra"] = json!("x");
+        assert!(
+            reminder_log(
+                AdminAction::ReminderCreated,
+                &AuditSnapshot::empty(),
+                &snap(extra)
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn 리마인더_수정은_바뀐_상태만_허용한다() {
+        let before = snap(reminder_state("제목"));
+        let after = snap(reminder_state("바뀐 제목"));
+        assert!(reminder_log(AdminAction::ReminderUpdated, &before, &after).is_ok());
+        assert!(reminder_log(AdminAction::ReminderUpdated, &before, &before).is_err());
+    }
+
+    #[test]
+    fn 리마인더_삭제는_삭제_시각만_채워지고_나머지가_같을_때만_허용한다() {
+        let mut before = reminder_state("제목");
+        before["deletedAt"] = Value::Null;
+        let mut after = reminder_state("제목");
+        after["deletedAt"] = json!("2026-10-21T13:00:00.123456Z");
+        assert!(
+            reminder_log(
+                AdminAction::ReminderDeleted,
+                &snap(before.clone()),
+                &snap(after.clone())
+            )
+            .is_ok()
+        );
+        let mut changed = after.clone();
+        changed["title"] = json!("다른 제목");
+        assert!(
+            reminder_log(
+                AdminAction::ReminderDeleted,
+                &snap(before.clone()),
+                &snap(changed)
+            )
+            .is_err()
+        );
+        assert!(
+            reminder_log(
+                AdminAction::ReminderDeleted,
+                &snap(after.clone()),
+                &snap(after)
+            )
+            .is_err()
+        );
+        assert!(!AdminAction::ReminderDeleted.reason_required());
     }
 }

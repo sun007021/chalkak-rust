@@ -103,6 +103,7 @@ fn assign(message: &mut RawPushMessage, name: &str, value: &Json) -> Result<(), 
                     ("AI_REVIEW_COMPLETED", NotificationType::AiReviewCompleted),
                     ("AI_REVIEW_FAILED", NotificationType::AiReviewFailed),
                     ("NOTICE", NotificationType::Notice),
+                    ("REMINDER", NotificationType::Reminder),
                 ],
             )?;
         }
@@ -113,6 +114,7 @@ fn assign(message: &mut RawPushMessage, name: &str, value: &Json) -> Result<(), 
                     ("POST", NotificationSourceType::Post),
                     ("TOPIC", NotificationSourceType::Topic),
                     ("NOTICE", NotificationSourceType::Notice),
+                    ("REMINDER", NotificationSourceType::Reminder),
                 ],
             )?;
         }

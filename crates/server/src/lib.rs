@@ -275,13 +275,13 @@ fn start_jobs(
     } else {
         None
     };
-    // Relay·주제 푸시가 켜져 있을 때만 SQS 클라이언트를 만든다(원본은 항상 만들지만 자격증명은 첫 호출 때 읽는다).
-    let publisher = if settings
-        .jobs
-        .planned()
-        .iter()
-        .any(|job| matches!(job, Job::NotificationRelay | Job::TopicPush))
-    {
+    // Relay·주제·리마인더 푸시가 켜져 있을 때만 SQS 클라이언트를 만든다(원본은 항상 만들지만 자격증명은 첫 호출 때 읽는다).
+    let publisher = if settings.jobs.planned().iter().any(|job| {
+        matches!(
+            job,
+            Job::NotificationRelay | Job::TopicPush | Job::ReminderPush
+        )
+    }) {
         Some(build_publisher(&settings.jobs.sqs, Arc::clone(clock))?)
     } else {
         None

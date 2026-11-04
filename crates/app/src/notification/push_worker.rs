@@ -21,6 +21,7 @@ use super::push_message::RawPushMessage;
 use super::push_sender::{
     DevicePushRequest, DevicePushResult, DevicePushSender, DeviceStatus, PushProcessingResult,
 };
+use super::reminder::{ReminderRepository, ReminderTarget};
 use super::repository::NotificationRepository;
 use super::sqs_push::PushMessage;
 use crate::common::transact;
@@ -118,7 +119,8 @@ impl PushWorkerService {
         if kind.source_type() != source_type {
             return None;
         }
-        if kind == NotificationType::Topic {
+        // 주제·리마인더는 알림함 없이 SQS로 직접 발행하므로 알림 ID가 없고 원래 예정 시각의 수명을 지닌다.
+        if matches!(kind, NotificationType::Topic | NotificationType::Reminder) {
             if raw.notification_id.is_some()
                 || occurred_at > self.clock.now()
                 || !is_valid_push_lifetime(occurred_at, expires_at)
@@ -221,10 +223,10 @@ impl PushWorkerService {
         else {
             return Ok(self.skip(message, device_id, "LOGIN_UNUSABLE"));
         };
-        if message.kind == NotificationType::Topic {
-            self.find_topic_request(db, message, &device, &user)
-        } else {
-            self.find_notification_request(db, message, &device, &user)
+        match message.kind {
+            NotificationType::Topic => self.find_topic_request(db, message, &device, &user),
+            NotificationType::Reminder => self.find_reminder_request(db, message, &device, &user),
+            _ => self.find_notification_request(db, message, &device, &user),
         }
     }
 
@@ -261,6 +263,56 @@ impl PushWorkerService {
             body: topic.title,
             expires_at: message.expires_at,
         }))
+    }
+
+    /// `findReminderRequest`: 발행 뒤 바뀐 회원 상태·수신 설정·리마인더 삭제·참여 여부를 기기별 발송 직전에 다시 확인하고,
+    /// 문구는 이때의 리마인더에서 읽는다. 오늘 주제는 발행과 같이 회차의 KST 날짜로 찾는다.
+    fn find_reminder_request(
+        &self,
+        db: &mut impl Db,
+        message: &PushMessage,
+        device: &PushDevice,
+        user: &User,
+    ) -> Result<Option<DevicePushRequest>, ApiError> {
+        let device_id = device.id.expect("읽어 온 기기는 식별자가 있다");
+        if !user.is_active() {
+            return Ok(self.skip(message, device_id, "USER_INACTIVE"));
+        }
+        if !message.kind.is_push_enabled_for(user) {
+            return Ok(self.skip(message, device_id, "PUSH_DISABLED"));
+        }
+        let source_id = message
+            .source_id
+            .expect("검증한 리마인더 메시지는 대상 ID가 있다");
+        let Some(reminder) = ReminderRepository.find_active_by_id(db, source_id)? else {
+            return Ok(self.skip(message, device_id, "REMINDER_UNAVAILABLE"));
+        };
+        let request = DevicePushRequest {
+            message: message.clone(),
+            token: device.fcm_token.clone(),
+            title: reminder.title.clone(),
+            body: reminder.body.clone(),
+            expires_at: message.expires_at,
+        };
+        if reminder.target == ReminderTarget::All {
+            return Ok(Some(request));
+        }
+        let Some(topic_id) = TopicRepository
+            .find_active_by_topic_date(db, kst_date(message.occurred_at))?
+            .and_then(|topic| topic.id)
+        else {
+            return Ok(self.skip(message, device_id, "TOPIC_UNAVAILABLE"));
+        };
+        let participated = PostRepository::default()
+            .find_active_by_author_and_topic(db, user.id, topic_id, false)?
+            .is_some();
+        if reminder.target == ReminderTarget::TopicParticipants && !participated {
+            return Ok(self.skip(message, device_id, "NOT_PARTICIPATED"));
+        }
+        if reminder.target == ReminderTarget::TopicNonParticipants && participated {
+            return Ok(self.skip(message, device_id, "ALREADY_PARTICIPATED"));
+        }
+        Ok(Some(request))
     }
 
     fn find_notification_request(

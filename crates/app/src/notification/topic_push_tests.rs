@@ -20,7 +20,7 @@ use super::*;
 use crate::notification::push_test_support::{
     FakePublisher, Lines, failure, insert_user, logger, plus, ts,
 };
-use crate::notification::sqs_push::{PushMessage, SqsPushMessagePublisher};
+use crate::notification::sqs_push::{PushMessage, PushPublicationResult, SqsPushMessagePublisher};
 use crate::testing::TestDb;
 
 const NOW: &str = "2026-10-12T00:00:00Z";
@@ -495,12 +495,12 @@ fn 한_회원의_실패가_다른_회원을_중단시키지_않고_실패_결과
     assert_eq!(unknown[0]["result"], "UNKNOWN");
     assert_eq!(f.lines.at_stage("topic_publication_summary").len(), 1);
     assert_eq!(
-        f.lines.levels_of("주제 푸시 SQS 발행 결과"),
+        f.lines.levels_of("푸시 SQS 직접 발행 결과"),
         ["WARN", "WARN"]
     );
     assert_eq!(f.lines.levels_of("주제 푸시 SQS 발행 집계"), ["INFO"]);
     assert_eq!(
-        f.lines.levels_of("주제 푸시 SQS 발행 결과 확인 실패"),
+        f.lines.levels_of("푸시 SQS 직접 발행 결과 확인 실패"),
         ["ERROR"]
     );
 }
@@ -625,5 +625,20 @@ fn 실행_중단_후_같은_인스턴스는_재발행하지_않고_재시작하�
     assert_eq!(messages.len(), 5);
     assert_eq!(messages[2].user_id, messages[0].user_id);
     assert_eq!(messages[2].occurred_at, messages[0].occurred_at);
-    assert_ne!(messages[2].event_id, messages[0].event_id);
+    // 원본 TopicPushServiceTest: 재시작해도 같은 회차는 같은 사건 ID로 다시 발행한다.
+    assert_eq!(messages[2].event_id, messages[0].event_id);
+}
+
+// publishDueTopics_restartedService_preservesEventIdAndDeadline
+#[test]
+fn 서비스를_다시_만들어_발행해도_같은_회차는_원래_사건_id와_기한을_유지한다() {
+    let Some(f) = fixture() else { return };
+    f.service().publish_due_topics().unwrap();
+    f.service().publish_due_topics().unwrap();
+
+    let messages = f.messages();
+    assert_eq!(messages.len(), 2);
+    assert_eq!(messages[1].event_id, messages[0].event_id);
+    assert_eq!(messages[1].expires_at, messages[0].expires_at);
+    assert_eq!(messages[0].expires_at, plus(ts(NOW), 1800));
 }
