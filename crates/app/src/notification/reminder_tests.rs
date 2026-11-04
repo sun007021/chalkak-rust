@@ -22,7 +22,15 @@ const TITLE: &str = "오늘이 얼마 남지 않았어요";
 const BODY: &str = "사진을 자랑해 주세요!";
 
 fn create_at(repeat: ReminderRepeat, scheduled_at: Timestamp) -> Reminder {
-    Reminder::create(TITLE, BODY, repeat, ReminderTarget::All, scheduled_at, now()).unwrap()
+    Reminder::create(
+        TITLE,
+        BODY,
+        repeat,
+        ReminderTarget::All,
+        scheduled_at,
+        now(),
+    )
+    .unwrap()
 }
 
 fn create_text(title: &str, body: &str) -> Result<Reminder, AppError> {
@@ -80,7 +88,10 @@ fn 생성하면_앞뒤_공백을_제거하고_일정을_저장한다() {
 #[test]
 fn 제목은_50자까지_허용하고_51자는_거절한다() {
     let fifty = "가".repeat(50);
-    assert_eq!(create_text(&format!(" {fifty} "), BODY).unwrap().title, fifty);
+    assert_eq!(
+        create_text(&format!(" {fifty} "), BODY).unwrap().title,
+        fifty
+    );
     assert_eq!(
         create_text(&"가".repeat(51), BODY).unwrap_err().message,
         "리마인더 제목은 1자 이상 50자 이하여야 합니다."
@@ -129,8 +140,8 @@ fn 반복_방식과_관계없이_현재_시각부터는_허용하고_과거는_�
         );
         assert_eq!(create_at(repeat, now()).scheduled_at, now());
         let past = now().checked_sub(SignedDuration::from_nanos(1)).unwrap();
-        let error = Reminder::create(TITLE, BODY, repeat, ReminderTarget::All, past, now())
-            .unwrap_err();
+        let error =
+            Reminder::create(TITLE, BODY, repeat, ReminderTarget::All, past, now()).unwrap_err();
         assert_eq!(
             error.message,
             "리마인더 발송 시각은 현재 시각보다 과거일 수 없습니다."
@@ -379,7 +390,10 @@ fn 매일_반복은_오늘_kst_날짜의_같은_시각을_회차로_돌려준다
 #[test]
 fn 매일_반복은_시작일_전에는_회차가_없고_시작일_당일부터_있다() {
     let reminder = create_at(ReminderRepeat::Daily, ts("2026-10-22T12:00:00Z"));
-    assert_eq!(reminder.find_due_occurrence(ts("2026-10-21T12:10:00Z")), None);
+    assert_eq!(
+        reminder.find_due_occurrence(ts("2026-10-21T12:10:00Z")),
+        None
+    );
     assert_eq!(
         reminder.find_due_occurrence(ts("2026-10-22T12:10:00Z")),
         Some(ts("2026-10-22T12:00:00Z"))
@@ -413,7 +427,10 @@ fn 매일_반복은_kst_자정이_지나면_전날_회차를_돌려주지_않는
         reminder.find_due_occurrence(ts("2026-10-22T14:55:00Z")),
         Some(ts("2026-10-22T14:50:00Z"))
     );
-    assert_eq!(reminder.find_due_occurrence(ts("2026-10-22T15:05:00Z")), None);
+    assert_eq!(
+        reminder.find_due_occurrence(ts("2026-10-22T15:05:00Z")),
+        None
+    );
 }
 
 #[test]
@@ -463,7 +480,10 @@ fn 저장소는_등록_수정_삭제_조회를_왕복한다() {
     first.title = "바뀐 제목".to_owned();
     repo.save_and_flush(&mut client, &mut first, plus(now(), 5))
         .unwrap();
-    let read = repo.find_active_by_id(&mut client, first_id).unwrap().unwrap();
+    let read = repo
+        .find_active_by_id(&mut client, first_id)
+        .unwrap()
+        .unwrap();
     assert_eq!(read.title, "바뀐 제목");
     assert_eq!(read.updated_at, Some(plus(now(), 5)));
     assert_eq!(read.created_at, Some(now()));
@@ -472,9 +492,19 @@ fn 저장소는_등록_수정_삭제_조회를_왕복한다() {
     first.delete(plus(now(), 6)).unwrap();
     repo.save_and_flush(&mut client, &mut first, plus(now(), 6))
         .unwrap();
-    assert!(repo.find_active_by_id(&mut client, first_id).unwrap().is_none());
+    assert!(
+        repo.find_active_by_id(&mut client, first_id)
+            .unwrap()
+            .is_none()
+    );
     assert_eq!(repo.find_active_reminders(&mut client).unwrap().len(), 1);
-    assert_eq!(repo.find_reminders(&mut client, 1, 20).unwrap().reminders.len(), 1);
+    assert_eq!(
+        repo.find_reminders(&mut client, 1, 20)
+            .unwrap()
+            .reminders
+            .len(),
+        1
+    );
     let locked = repo
         .find_by_id_for_update(&mut client, first_id)
         .unwrap()

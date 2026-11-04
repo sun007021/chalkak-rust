@@ -226,6 +226,8 @@ pub struct SqsPushSettings {
     pub relay_enabled: bool,
     /// `NOTIFICATION_TOPIC_PUSH_ENABLED`(기본 꺼짐)
     pub topic_push_enabled: bool,
+    /// `NOTIFICATION_REMINDER_ENABLED`(기본 꺼짐)
+    pub reminder_enabled: bool,
     /// `NOTIFICATION_WORKER_ENABLED`(기본 꺼짐). 켜면 이 서버가 큐에서 메시지를 받아 FCM으로 보낸다.
     pub worker_enabled: bool,
     /// `NOTIFICATION_SQS_QUEUE_URL`
@@ -241,6 +243,7 @@ impl SqsPushSettings {
         let settings = SqsPushSettings {
             relay_enabled: env.bool_or("NOTIFICATION_RELAY_ENABLED", false)?,
             topic_push_enabled: env.bool_or("NOTIFICATION_TOPIC_PUSH_ENABLED", false)?,
+            reminder_enabled: env.bool_or("NOTIFICATION_REMINDER_ENABLED", false)?,
             worker_enabled: env.bool_or("NOTIFICATION_WORKER_ENABLED", false)?,
             queue_url: env.string_or("NOTIFICATION_SQS_QUEUE_URL", "").to_owned(),
             region: env.string_or("AWS_REGION", "ap-northeast-2").to_owned(),
@@ -269,7 +272,7 @@ impl SqsPushSettings {
 
     /// 어느 쪽이든 발행이 켜져 있으면 SQS 발행기가 필요하다.
     pub fn publishing_enabled(&self) -> bool {
-        self.relay_enabled || self.topic_push_enabled
+        self.relay_enabled || self.topic_push_enabled || self.reminder_enabled
     }
 
     /// 발행이나 수신 중 하나라도 켜져 있으면 올바른 큐 URL이 필요하다.

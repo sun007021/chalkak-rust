@@ -31,6 +31,7 @@ pub mod push_worker_config;
 mod push_worker_config_tests;
 pub mod relay;
 pub mod reminder;
+pub mod reminder_push;
 pub mod repository;
 pub mod service;
 pub mod settings;

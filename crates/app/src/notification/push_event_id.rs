@@ -17,8 +17,8 @@ fn name_uuid_from_bytes(bytes: &[u8]) -> Uuid {
     let hex = md5_hex(bytes);
     let mut digest = [0u8; 16];
     for (i, byte) in digest.iter_mut().enumerate() {
-        *byte = u8::from_str_radix(&hex[i * 2..i * 2 + 2], 16)
-            .expect("md5_hex는 소문자 16진수 32자다");
+        *byte =
+            u8::from_str_radix(&hex[i * 2..i * 2 + 2], 16).expect("md5_hex는 소문자 16진수 32자다");
     }
     digest[6] = (digest[6] & 0x0f) | 0x30;
     digest[8] = (digest[8] & 0x3f) | 0x80;

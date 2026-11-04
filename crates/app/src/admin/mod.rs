@@ -22,6 +22,9 @@ mod notice_tests;
 pub mod post;
 #[cfg(test)]
 mod push_schedule_tests;
+pub mod reminder;
+#[cfg(test)]
+mod reminder_tests;
 pub mod support;
 #[cfg(test)]
 mod testing;
@@ -58,5 +61,6 @@ pub fn register_with(routes: Routes, deps: &support::AdminDeps) -> Routes {
     let routes = topic::register(routes, &deps);
     let routes = notice::register(routes, &deps);
     let routes = topic_push_schedule::register(routes, &deps);
+    let routes = reminder::register(routes, &deps);
     feedback::register(routes, &deps)
 }

@@ -150,7 +150,8 @@ impl TopicPushService {
         else {
             return Ok(None);
         };
-        let user_ids = NotificationRepository.find_topic_push_enabled_non_participant_ids(&mut conn, topic_id)?;
+        let user_ids = NotificationRepository
+            .find_topic_push_enabled_non_participant_ids(&mut conn, topic_id)?;
         Ok(Some(Targets { topic_id, user_ids }))
     }
 

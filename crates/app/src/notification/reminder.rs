@@ -172,7 +172,9 @@ impl Reminder {
             return Err(business("삭제된 리마인더는 수정할 수 없습니다."));
         }
         if !self.repeat.can_update(self.scheduled_at, now) {
-            return Err(business("발송 시각이 지난 일회성 리마인더는 수정할 수 없습니다."));
+            return Err(business(
+                "발송 시각이 지난 일회성 리마인더는 수정할 수 없습니다.",
+            ));
         }
         if self.is_schedule_changed(repeat, scheduled_at) {
             validate_not_past(scheduled_at, now)?;
