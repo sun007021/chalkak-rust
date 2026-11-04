@@ -51,6 +51,7 @@
 //! ```
 //!
 //! [[fakes.fcm]] / [[fakes.oauth]]      # FCM 발송·OAuth 토큰 교환 응답 규칙(sqs와 같은 형식, op는 쓰지 않는다). 없으면 성공
+//! [[fakes.openai]]                    # OpenAI Responses 응답 규칙(같은 형식). 없으면 정상 출력
 //! # sqs_seed = ["본문", ...]           # (단계) 요청 전에 가짜 큐에 미리 넣을 메시지 본문
 //!
 //! [[fakes.sqs]]                       # SQS 응답 규칙(위에서부터 처음 맞는 것). 없으면 모든 SendMessage가 정상 응답
@@ -215,6 +216,8 @@ pub struct FakesSpec {
     pub oauth: Option<Vec<SqsRuleSpec>>,
     /// FCM HTTP v1 발송(`POST /v1/projects/<프로젝트>/messages:send`) 응답 규칙. 규칙이 없으면 성공 응답이다.
     pub fcm: Option<Vec<SqsRuleSpec>>,
+    /// OpenAI Responses(`POST /v1/responses`) 응답 규칙. `op`는 쓰지 않는다. 규칙이 없으면 정상 출력이다.
+    pub openai: Option<Vec<SqsRuleSpec>>,
 }
 
 #[derive(Debug, Clone, Deserialize, PartialEq)]
@@ -277,6 +280,9 @@ impl FakesSpec {
         }
         if over.fcm.is_some() {
             self.fcm.clone_from(&over.fcm);
+        }
+        if over.openai.is_some() {
+            self.openai.clone_from(&over.openai);
         }
         if over.logs.is_some() {
             self.logs.clone_from(&over.logs);

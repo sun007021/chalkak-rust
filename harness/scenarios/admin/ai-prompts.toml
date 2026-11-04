@@ -1,0 +1,381 @@
+name = "관리자 AI 프롬프트: 버전 등록·조회, 미리보기, 리뷰 조회"
+tags = ["admin-api", "ai-prompt"]
+clock = "2026-10-12T09:00:00+09:00"
+
+# 근거: AdminAiPromptVersionControllerTest, AdminAiPromptPreviewControllerTest, AdminAiReviewControllerTest,
+# AdminAiPromptVersionServiceTest, AdminAiPromptPreviewServiceTest, AdminAiReviewQueryRepositoryTest.
+# OpenAI 호출은 가짜 서버(POST /v1/responses)가 받는다. 시스템 프롬프트에 든 표식으로 응답을 고른다.
+
+[[fakes.openai]]
+contains = "rate-limit-me"
+status = 429
+headers = { "retry-after" = "7" }
+body = '''{"error":{"code":"rate_limit_exceeded","type":"requests"}}'''
+
+[[fakes.openai]]
+contains = "server-error-me"
+status = 500
+body = '''{"error":{"code":"server_error","type":"server_error"}}'''
+
+[[fakes.openai]]
+contains = "bad-output-me"
+status = 200
+body = '''{"id":"resp_bad","status":"completed","output":[{"type":"message","content":[{"type":"output_text","text":"not json"}]}],"usage":{"input_tokens":10,"output_tokens":2}}'''
+
+[setup]
+sql = ["""
+INSERT INTO admins (id, username, password, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000000a1', 'operator', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-01T00:00:00Z', '2026-09-01T00:00:00Z');
+INSERT INTO users (id, email, status, signature_original_storage_key, signature_thumbnail_storage_key, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-000000000001', 'alice@test.chalkak', 'ACTIVE', 'chalkak/signatures/u1/original.png', 'chalkak/signatures/u1/thumbnail.png', '2026-10-01T00:00:00Z', '2026-10-01T00:00:00Z'),
+  ('01990000-0000-7000-8000-000000000002', 'bob@test.chalkak', 'BANNED', 'chalkak/signatures/u2/original.png', NULL, '2026-10-02T00:00:00Z', '2026-10-02T00:00:00Z');
+INSERT INTO topics (id, title, topic_date, starts_at, ends_at, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000000f1', '가을 하늘', '2026-10-12', '2026-10-11T15:00:00Z', '2026-10-12T15:00:00Z', '2026-10-01T00:00:00Z', '2026-10-01T00:00:00Z'),
+  ('01990000-0000-7000-8000-0000000000f2', '어제의 주제', '2026-10-11', '2026-10-10T15:00:00Z', '2026-10-11T15:00:00Z', '2026-10-02T00:00:00Z', '2026-10-02T00:00:00Z');
+INSERT INTO photos (id, original_storage_key, thumbnail_storage_key, metadata, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000002a1', 'chalkak/posts/p1/original.webp', 'chalkak/posts/p1/thumbnail.webp', '{"width": 4000, "height": 3000, "byteSize": 2048}', '2026-10-11T20:00:00Z', '2026-10-11T20:00:00Z'),
+  ('01990000-0000-7000-8000-0000000002a2', 'chalkak/posts/p2/original.webp', 'chalkak/posts/p2/thumbnail.webp', '{"width": 1000, "height": 800, "byteSize": 99}', '2026-10-10T16:00:00Z', '2026-10-10T16:00:00Z'),
+  ('01990000-0000-7000-8000-0000000002a3', 'chalkak/posts/p3/original.webp', NULL, '{}', '2026-10-10T17:00:00Z', '2026-10-10T17:00:00Z');
+INSERT INTO posts (id, user_id, topic_id, photo_id, title, moderation_status, moderated_at, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000004a1', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-0000000002a1', '하늘', 'APPROVED', '2026-10-11T21:00:00Z', '2026-10-11T20:00:00Z', '2026-10-11T21:00:00Z'),
+  ('01990000-0000-7000-8000-0000000004a2', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000000f2', '01990000-0000-7000-8000-0000000002a2', '대기', 'PENDING', NULL, '2026-10-10T16:00:00Z', '2026-10-10T16:00:00Z'),
+  ('01990000-0000-7000-8000-0000000004a3', '01990000-0000-7000-8000-000000000002', '01990000-0000-7000-8000-0000000000f2', '01990000-0000-7000-8000-0000000002a3', '거절', 'REJECTED', '2026-10-11T11:00:00Z', '2026-10-10T17:00:00Z', '2026-10-11T11:00:00Z');
+INSERT INTO ai_prompt_versions (id, type, version, system_prompt, user_prompt_template, model, parameters, output_schema_version, memo, created_by_admin_id, created_at) VALUES
+  ('01990000-0000-7000-8000-0000000009a1', 'PHOTO_REVIEW', 1, '기존 시스템 프롬프트', '{{topicTitle}}', 'gpt-6.1-sol', '{"imageDetail": "HIGH", "maxOutputTokens": 8000, "reasoningEffort": null, "distinctivePerspectiveThreshold": 7.0}', '2', '첫 버전', '01990000-0000-7000-8000-0000000000a1', '2026-10-10T00:00:00Z'),
+  ('01990000-0000-7000-8000-0000000009a2', 'PHOTO_REVIEW', 2, '두 번째 시스템 프롬프트', '{{topicTitle}}', 'gpt-6-luna', '{"imageDetail": "LOW", "maxOutputTokens": 600, "reasoningEffort": "LOW", "distinctivePerspectiveThreshold": 8.5}', '2', NULL, '01990000-0000-7000-8000-0000000000a1', '2026-10-11T00:00:00Z');
+INSERT INTO ai_reviews (id, post_id, user_id, prompt_version_id, status, attempt, round_attempt, request_count, result, output, input_tokens, cached_input_tokens, output_tokens, reasoning_tokens, latency_ms, openai_response_id, request_id, requested_at, last_requested_at, started_at, completed_at) VALUES
+  ('01990000-0000-7000-8000-0000000010a1', '01990000-0000-7000-8000-0000000004a1', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000009a1', 'COMPLETED', 1, 1, 2,
+   '{"overallScore": 7.5, "criteria": [{"key": "COMPOSITION", "label": "구도", "score": 7.5}], "distinctivePerspective": true, "feedback": {"summary": "요약", "strength": "좋은 점", "weakness": "아쉬운 점", "suggestion": "제안"}}',
+   '{"composition": 7.46, "theme_expression": 8, "feedback": {"summary": "요약", "strength": "좋은 점", "weakness": "아쉬운 점", "suggestion": "제안"}}',
+   1200, 200, 300, 100, 21000, 'resp_abc', '11111111-1111-4111-8111-111111111111', '2026-10-11T22:00:00Z', '2026-10-12T00:00:00Z', '2026-10-12T00:00:01Z', '2026-10-12T00:00:21Z');
+INSERT INTO ai_reviews (id, post_id, user_id, prompt_version_id, status, attempt, round_attempt, request_count, error_code, latency_ms, request_id, requested_at, last_requested_at, started_at, completed_at) VALUES
+  ('01990000-0000-7000-8000-0000000010a2', '01990000-0000-7000-8000-0000000004a3', '01990000-0000-7000-8000-000000000002', '01990000-0000-7000-8000-0000000009a2', 'FAILED', 3, 3, 1, 'TIMEOUT', 60000, '22222222-2222-4222-8222-222222222222', '2026-10-11T23:00:00Z', '2026-10-11T23:00:00Z', '2026-10-11T23:00:01Z', '2026-10-11T23:05:00Z');
+INSERT INTO ai_reviews (id, post_id, user_id, prompt_version_id, status, request_id, requested_at, last_requested_at) VALUES
+  ('01990000-0000-7000-8000-0000000010a3', '01990000-0000-7000-8000-0000000004a2', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000009a2', 'QUEUED', '33333333-3333-4333-8333-333333333333', '2026-10-12T00:10:00Z', '2026-10-12T00:10:00Z');
+"""]
+
+[[step]]
+name = "버전 등록 옵션 생략"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"type":"PHOTO_REVIEW","systemPrompt":"사진을 평가하세요.","userPromptTemplate":"{\"주제\": \"{{topicTitle}}\"}","model":"gpt-6.1-sol"}'''
+
+[[step]]
+name = "버전 등록 옵션 전부"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"type":"PHOTO_REVIEW","systemPrompt":"사진을 평가하세요.","userPromptTemplate":"{\"주제\": \"{{topicTitle}}\"}","model":"gpt-6.1-sol","parameters":{"imageDetail":"LOW","maxOutputTokens":700,"reasoningEffort":"HIGH","distinctivePerspectiveThreshold":6.5},"memo":"  튜닝 메모  "}'''
+
+[[step]]
+name = "버전 등록 허용되지 않은 모델"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"type":"PHOTO_REVIEW","systemPrompt":"사진을 평가하세요.","userPromptTemplate":"{\"주제\": \"{{topicTitle}}\"}","model":"gpt-x"}'''
+
+[[step]]
+name = "버전 등록 type 없음"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"systemPrompt":"s","userPromptTemplate":"t","model":"gpt-6.1-sol"}'''
+
+[[step]]
+name = "버전 등록 systemPrompt 공백"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"type":"PHOTO_REVIEW","systemPrompt":" ","userPromptTemplate":"{\"주제\": \"{{topicTitle}}\"}","model":"gpt-6.1-sol"}'''
+
+[[step]]
+name = "버전 등록 알 수 없는 type"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"type":"OTHER","systemPrompt":"사진을 평가하세요.","userPromptTemplate":"{\"주제\": \"{{topicTitle}}\"}","model":"gpt-6.1-sol"}'''
+
+[[step]]
+name = "버전 등록 알 수 없는 변수"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"type":"PHOTO_REVIEW","systemPrompt":"사진을 평가하세요.","userPromptTemplate":"{\"주제\": \"{{unknown}}\"}","model":"gpt-6.1-sol"}'''
+
+[[step]]
+name = "버전 등록 토큰 범위 밖"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"type":"PHOTO_REVIEW","systemPrompt":"사진을 평가하세요.","userPromptTemplate":"{\"주제\": \"{{topicTitle}}\"}","model":"gpt-6.1-sol","parameters":{"maxOutputTokens":16001}}'''
+
+[[step]]
+name = "버전 등록 기준 범위 밖"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"type":"PHOTO_REVIEW","systemPrompt":"사진을 평가하세요.","userPromptTemplate":"{\"주제\": \"{{topicTitle}}\"}","model":"gpt-6.1-sol","parameters":{"distinctivePerspectiveThreshold":11}}'''
+
+[[step]]
+name = "버전 등록 imageDetail 잘못됨"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"type":"PHOTO_REVIEW","systemPrompt":"사진을 평가하세요.","userPromptTemplate":"{\"주제\": \"{{topicTitle}}\"}","model":"gpt-6.1-sol","parameters":{"imageDetail":"MEDIUM"}}'''
+
+[[step]]
+name = "버전 등록 메모 501자"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"type":"PHOTO_REVIEW","systemPrompt":"사진을 평가하세요.","userPromptTemplate":"{\"주제\": \"{{topicTitle}}\"}","model":"gpt-6.1-sol","memo":"가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가"}'''
+
+[[step]]
+name = "버전 등록 JSON 깨짐"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{'''
+
+[[step]]
+name = "버전 목록 기본"
+method = "GET"
+path = "/api/v1/admin/ai-prompt-versions?type=PHOTO_REVIEW"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "버전 목록 크기 2"
+method = "GET"
+path = "/api/v1/admin/ai-prompt-versions?type=PHOTO_REVIEW&pageSize=2"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "버전 목록 2쪽"
+method = "GET"
+path = "/api/v1/admin/ai-prompt-versions?type=PHOTO_REVIEW&pageSize=2&page=2"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "버전 목록 type 없음"
+method = "GET"
+path = "/api/v1/admin/ai-prompt-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "버전 목록 type 잘못됨"
+method = "GET"
+path = "/api/v1/admin/ai-prompt-versions?type=OTHER"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "버전 목록 page 0"
+method = "GET"
+path = "/api/v1/admin/ai-prompt-versions?type=PHOTO_REVIEW&page=0"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "버전 목록 pageSize 101"
+method = "GET"
+path = "/api/v1/admin/ai-prompt-versions?type=PHOTO_REVIEW&pageSize=101"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "버전 목록 page 문자"
+method = "GET"
+path = "/api/v1/admin/ai-prompt-versions?type=PHOTO_REVIEW&page=x"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "버전 상세"
+method = "GET"
+path = "/api/v1/admin/ai-prompt-versions/01990000-0000-7000-8000-0000000009a1"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "버전 상세 없음"
+method = "GET"
+path = "/api/v1/admin/ai-prompt-versions/01990000-0000-7000-8000-0000000009ff"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "버전 상세 ID 형식 오류"
+method = "GET"
+path = "/api/v1/admin/ai-prompt-versions/abc"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "미리보기 성공"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-previews"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"type":"PHOTO_REVIEW","systemPrompt":"사진을 평가하세요.","userPromptTemplate":"{\"주제\": \"{{topicTitle}}\"}","model":"gpt-6.1-sol","postId":"01990000-0000-7000-8000-0000000004a1"}'''
+
+[[step]]
+name = "미리보기 옵션 전부"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-previews"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"type":"PHOTO_REVIEW","systemPrompt":"사진을 평가하세요.","userPromptTemplate":"{\"주제\": \"{{topicTitle}}\"}","model":"gpt-6.1-sol","parameters":{"imageDetail":"AUTO","maxOutputTokens":900,"reasoningEffort":"LOW","distinctivePerspectiveThreshold":9},"postId":"01990000-0000-7000-8000-0000000004a1"}'''
+
+[[step]]
+name = "미리보기 허용되지 않은 모델"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-previews"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"type":"PHOTO_REVIEW","systemPrompt":"사진을 평가하세요.","userPromptTemplate":"{\"주제\": \"{{topicTitle}}\"}","model":"gpt-x","postId":"01990000-0000-7000-8000-0000000004a1"}'''
+
+[[step]]
+name = "미리보기 게시물 없음"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-previews"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"type":"PHOTO_REVIEW","systemPrompt":"사진을 평가하세요.","userPromptTemplate":"{\"주제\": \"{{topicTitle}}\"}","model":"gpt-6.1-sol","postId":"01990000-0000-7000-8000-0000000004ff"}'''
+
+[[step]]
+name = "미리보기 대기 게시물"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-previews"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"type":"PHOTO_REVIEW","systemPrompt":"사진을 평가하세요.","userPromptTemplate":"{\"주제\": \"{{topicTitle}}\"}","model":"gpt-6.1-sol","postId":"01990000-0000-7000-8000-0000000004a2"}'''
+
+[[step]]
+name = "미리보기 postId 형식 오류"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-previews"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"type":"PHOTO_REVIEW","systemPrompt":"사진을 평가하세요.","userPromptTemplate":"{\"주제\": \"{{topicTitle}}\"}","model":"gpt-6.1-sol","postId":"abc"}'''
+
+[[step]]
+name = "미리보기 postId 없음"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-previews"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"type":"PHOTO_REVIEW","systemPrompt":"사진을 평가하세요.","userPromptTemplate":"{\"주제\": \"{{topicTitle}}\"}","model":"gpt-6.1-sol"}'''
+
+[[step]]
+name = "미리보기 OpenAI 속도 제한"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-previews"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"type":"PHOTO_REVIEW","systemPrompt":"rate-limit-me","userPromptTemplate":"{\"주제\": \"{{topicTitle}}\"}","model":"gpt-6.1-sol","postId":"01990000-0000-7000-8000-0000000004a1"}'''
+
+[[step]]
+name = "미리보기 OpenAI 서버 오류"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-previews"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"type":"PHOTO_REVIEW","systemPrompt":"server-error-me","userPromptTemplate":"{\"주제\": \"{{topicTitle}}\"}","model":"gpt-6.1-sol","postId":"01990000-0000-7000-8000-0000000004a1"}'''
+
+[[step]]
+name = "미리보기 OpenAI 잘못된 출력"
+method = "POST"
+path = "/api/v1/admin/ai-prompt-previews"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"type":"PHOTO_REVIEW","systemPrompt":"bad-output-me","userPromptTemplate":"{\"주제\": \"{{topicTitle}}\"}","model":"gpt-6.1-sol","postId":"01990000-0000-7000-8000-0000000004a1"}'''
+
+[[step]]
+name = "리뷰 목록 기본"
+method = "GET"
+path = "/api/v1/admin/ai-reviews"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "리뷰 목록 상태 필터"
+method = "GET"
+path = "/api/v1/admin/ai-reviews?status=QUEUED"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "리뷰 목록 버전 필터"
+method = "GET"
+path = "/api/v1/admin/ai-reviews?promptVersionId=01990000-0000-7000-8000-0000000009a2"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "리뷰 목록 없는 버전"
+method = "GET"
+path = "/api/v1/admin/ai-reviews?promptVersionId=01990000-0000-7000-8000-0000000009ff"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "리뷰 목록 크기 1"
+method = "GET"
+path = "/api/v1/admin/ai-reviews?pageSize=1"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "리뷰 목록 2쪽"
+method = "GET"
+path = "/api/v1/admin/ai-reviews?pageSize=1&page=2"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "리뷰 목록 상태 잘못됨"
+method = "GET"
+path = "/api/v1/admin/ai-reviews?status=DONE"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "리뷰 목록 버전 ID 잘못됨"
+method = "GET"
+path = "/api/v1/admin/ai-reviews?promptVersionId=x"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "리뷰 목록 pageSize 0"
+method = "GET"
+path = "/api/v1/admin/ai-reviews?pageSize=0"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "리뷰 상세 완료"
+method = "GET"
+path = "/api/v1/admin/ai-reviews/01990000-0000-7000-8000-0000000010a1"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "리뷰 상세 실패"
+method = "GET"
+path = "/api/v1/admin/ai-reviews/01990000-0000-7000-8000-0000000010a2"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "리뷰 상세 대기"
+method = "GET"
+path = "/api/v1/admin/ai-reviews/01990000-0000-7000-8000-0000000010a3"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "리뷰 상세 없음"
+method = "GET"
+path = "/api/v1/admin/ai-reviews/01990000-0000-7000-8000-0000000010ff"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "리뷰 상세 ID 형식 오류"
+method = "GET"
+path = "/api/v1/admin/ai-reviews/abc"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }

@@ -11,6 +11,7 @@
 use std::path::PathBuf;
 use std::time::Duration;
 
+use chalkak_app::aireview::openai::OpenAiSettings;
 use chalkak_app::analytics::AnalyticsSettings;
 use chalkak_app::config::AppSettings;
 use chalkak_app::jobs::JobsSettings;
@@ -86,6 +87,8 @@ pub struct Settings {
     pub jobs: JobsSettings,
     /// 사용자 지표 집계 설정(팀 계정 제외 목록, 접근 로그 그룹).
     pub analytics: AnalyticsSettings,
+    /// OpenAI 호출 설정(AI 리뷰 생성기). `OPENAI_API_KEY`는 필수다.
+    pub openai: OpenAiSettings,
 }
 
 impl Settings {
@@ -123,6 +126,7 @@ impl Settings {
             JobsSettings::from_env(env, profile != Profile::Local, profile == Profile::Prod)?;
         let analytics =
             AnalyticsSettings::from_env(env, profile == Profile::Prod, &post.image.region)?;
+        let openai = OpenAiSettings::from_env(env)?;
 
         Ok(Settings {
             profile,
@@ -144,6 +148,7 @@ impl Settings {
             admin_notification,
             jobs,
             analytics,
+            openai,
         })
     }
 }

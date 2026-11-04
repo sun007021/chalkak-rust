@@ -168,8 +168,10 @@ impl AiPromptParameters {
         }
         let threshold = distinctive_perspective_threshold.unwrap_or(DEFAULT_THRESHOLD);
         // NaN은 어느 비교도 참이 아니므로 함께 걸러진다.
-        if !(threshold >= MIN_THRESHOLD && threshold <= MAX_THRESHOLD) {
-            return Err(business("독특한 시각 판정 기준은 0 이상 10 이하여야 합니다."));
+        if !(MIN_THRESHOLD..=MAX_THRESHOLD).contains(&threshold) {
+            return Err(business(
+                "독특한 시각 판정 기준은 0 이상 10 이하여야 합니다.",
+            ));
         }
         Ok(AiPromptParameters {
             image_detail: image_detail.unwrap_or(ImageDetail::High),
@@ -543,7 +545,8 @@ fn round_half_up_one_decimal(score: f64) -> f64 {
     let digits: Vec<u8> = fraction.bytes().map(|b| b - b'0').collect();
     let first = digits.first().copied().unwrap_or(0);
     let round_up = digits.get(1).copied().unwrap_or(0) >= 5;
-    let scaled = integer.parse::<i64>().unwrap_or(0).abs() * 10 + i64::from(first) + i64::from(round_up);
+    let scaled =
+        integer.parse::<i64>().unwrap_or(0).abs() * 10 + i64::from(first) + i64::from(round_up);
     let rounded = scaled as f64 / 10.0;
     if score < 0.0 { -rounded } else { rounded }
 }
@@ -597,7 +600,10 @@ mod tests {
         }
         for bad in [-0.1, 10.1, f64::NAN, f64::INFINITY] {
             let e = AiPromptParameters::new(None, None, None, Some(bad)).unwrap_err();
-            assert_eq!(e.message, "독특한 시각 판정 기준은 0 이상 10 이하여야 합니다.");
+            assert_eq!(
+                e.message,
+                "독특한 시각 판정 기준은 0 이상 10 이하여야 합니다."
+            );
         }
     }
 
@@ -653,7 +659,12 @@ mod tests {
     #[test]
     fn 템플릿은_허용한_변수만_쓸_수_있다() {
         assert!(draft("s", "{{topicTitle}} {{topicTitle}}", "m").is_ok());
-        for bad in ["{{title}}", "{{ topicTitle }}", "{{}}", "{{topicTitle}}{{x}}"] {
+        for bad in [
+            "{{title}}",
+            "{{ topicTitle }}",
+            "{{}}",
+            "{{topicTitle}}{{x}}",
+        ] {
             assert_eq!(
                 draft("s", bad, "m").unwrap_err().message,
                 "사용할 수 없는 프롬프트 변수가 있습니다. 사용 가능: [topicTitle]",
@@ -664,7 +675,12 @@ mod tests {
 
     #[test]
     fn 변수를_한_번에_치환하고_json_문자열로_이스케이프한다() {
-        let d = draft("s", r#"{"주제": "{{topicTitle}}", "다시": "{{topicTitle}}"}"#, "m").unwrap();
+        let d = draft(
+            "s",
+            r#"{"주제": "{{topicTitle}}", "다시": "{{topicTitle}}"}"#,
+            "m",
+        )
+        .unwrap();
         assert_eq!(
             d.render_user_prompt("노을 \"{{topicTitle}}\"\n\\").unwrap(),
             r#"{"주제": "노을 \"{{topicTitle}}\"\n\\", "다시": "노을 \"{{topicTitle}}\"\n\\"}"#
@@ -689,7 +705,10 @@ mod tests {
         assert_eq!(v.memo.as_deref(), Some("메모"));
         assert_eq!(v.created_by_admin_id, admin);
         for blank in [None, Some(""), Some("  \n")] {
-            assert_eq!(AiPromptVersion::create(&d, 1, blank, admin).unwrap().memo, None);
+            assert_eq!(
+                AiPromptVersion::create(&d, 1, blank, admin).unwrap().memo,
+                None
+            );
         }
         assert!(AiPromptVersion::create(&d, 0, None, admin).is_err());
     }
@@ -720,7 +739,13 @@ mod tests {
     #[test]
     fn 점수와_피드백이_범위를_벗어나면_거절한다() {
         assert!(PhotoReviewOutput::new(0.0, 10.0, feedback()).is_ok());
-        for (c, t) in [(-0.1, 5.0), (10.1, 5.0), (5.0, -1.0), (5.0, 11.0), (f64::NAN, 5.0)] {
+        for (c, t) in [
+            (-0.1, 5.0),
+            (10.1, 5.0),
+            (5.0, -1.0),
+            (5.0, 11.0),
+            (f64::NAN, 5.0),
+        ] {
             assert!(PhotoReviewOutput::new(c, t, feedback()).is_err(), "{c} {t}");
         }
         let mut f = feedback();
@@ -750,25 +775,41 @@ mod tests {
             }]
         );
         assert!(result.distinctive_perspective);
-        for (raw, expected) in [(8.75, 8.8), (0.05, 0.1), (9.95, 10.0), (7.0, 7.0), (0.0, 0.0), (6.04, 6.0)] {
-            let r = PhotoReviewOutput::new(raw, 0.0, feedback()).unwrap().to_result(7.0);
+        for (raw, expected) in [
+            (8.75, 8.8),
+            (0.05, 0.1),
+            (9.95, 10.0),
+            (7.0, 7.0),
+            (0.0, 0.0),
+            (6.04, 6.0),
+        ] {
+            let r = PhotoReviewOutput::new(raw, 0.0, feedback())
+                .unwrap()
+                .to_result(7.0);
             assert_eq!(r.overall_score, expected, "{raw}");
         }
     }
 
     #[test]
     fn 독특한_시각은_주제_표현_점수가_기준_이상일_때다() {
-        for (theme, threshold, expected) in
-            [(6.0, 7.0, false), (6.0, 6.0, true), (7.5, 7.5, true), (7.4, 7.5, false)]
-        {
-            let r = PhotoReviewOutput::new(8.0, theme, feedback()).unwrap().to_result(threshold);
+        for (theme, threshold, expected) in [
+            (6.0, 7.0, false),
+            (6.0, 6.0, true),
+            (7.5, 7.5, true),
+            (7.4, 7.5, false),
+        ] {
+            let r = PhotoReviewOutput::new(8.0, theme, feedback())
+                .unwrap()
+                .to_result(threshold);
             assert_eq!(r.distinctive_perspective, expected, "{theme} {threshold}");
         }
     }
 
     #[test]
     fn 결과_json은_레코드_순서다() {
-        let r = PhotoReviewOutput::new(8.0, 8.0, feedback()).unwrap().to_result(7.0);
+        let r = PhotoReviewOutput::new(8.0, 8.0, feedback())
+            .unwrap()
+            .to_result(7.0);
         assert_eq!(
             crate::web::json::to_json(&r),
             r#"{"overallScore":8.0,"criteria":[{"key":"COMPOSITION","label":"구도","score":8.0}],"distinctivePerspective":true,"feedback":{"summary":"요약","strength":"좋음","weakness":"아쉬움","suggestion":"제안"}}"#

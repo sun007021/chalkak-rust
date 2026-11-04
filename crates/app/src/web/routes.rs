@@ -14,11 +14,13 @@ use super::{ApiError, ApiResult, context, marker, unreadable_query_response};
 /// 쿼리에 잘못된 퍼센트 인코딩이 있으면 Tomcat이 파라미터를 읽는 순간 `IllegalStateException`을 던지고,
 /// 처리되지 않은 예외로 500이 된다. 파라미터를 읽지 않는 핸들러(본문만 받는 POST 등)는 영향이 없다.
 /// 원본 컨트롤러에서 해당 인자를 가진 메서드만 모았다(`harness/inventory/endpoints.csv`의 핸들러 기준).
-const PARAM_READERS: [&str; 9] = [
+const PARAM_READERS: [&str; 11] = [
     "/api/v1/topics",
     "/api/v1/notifications",
     "/api/v1/posts",
     "/api/v1/posts/calendar",
+    "/api/v1/admin/ai-prompt-versions",
+    "/api/v1/admin/ai-reviews",
     "/api/v1/admin/audit-logs",
     "/api/v1/admin/feedbacks",
     "/api/v1/admin/posts",

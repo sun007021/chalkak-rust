@@ -49,6 +49,8 @@ pub struct AppContext {
     pub post: post::PostWiring,
     /// 사용자 지표 집계 러너. 스케줄러와 관리자 수동 집계가 같은 러너(같은 진행 중 표시)를 써야 한다.
     pub analytics: Arc<analytics::UserMetricsAggregationRunner>,
+    /// AI 리뷰 생성기(OpenAI 어댑터 또는 시험용 대역).
+    pub ai_review: aireview::AiReviewWiring,
 }
 
 /// 모든 도메인의 라우트를 등록한다.

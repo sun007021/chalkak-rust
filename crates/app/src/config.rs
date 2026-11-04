@@ -214,7 +214,7 @@ impl AppSettings {
 
 /// 테스트가 `Settings::from_env`에 넘길 수 있는 최소 환경변수(auth·user 도메인 필수 값). 실제 비밀값이 아니다.
 #[doc(hidden)]
-pub const TEST_ENV: [(&str, &str); 19] = [
+pub const TEST_ENV: [(&str, &str); 20] = [
     (
         "SOCIAL_SIGNUP_TOKEN_SECRET",
         "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
@@ -249,6 +249,7 @@ pub const TEST_ENV: [(&str, &str); 19] = [
     ("POST_IMAGE_PROCESSING_TIMEOUT", "7m"),
     ("SIGNATURE_PROCESSING_TIMEOUT", "7m"),
     ("CHALKAK_IMAGE_ANONYMOUSACCESS", "false"),
+    ("OPENAI_API_KEY", "test-openai-api-key"),
 ];
 
 /// 통합 시험용: [`TEST_ENV`]로 만든 설정. 게시물 설정은 호출자가 이미 가진 것을 쓴다.

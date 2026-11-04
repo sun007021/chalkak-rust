@@ -234,8 +234,8 @@ impl OpenAiResponsesReviewGenerator {
         let draft = &request.draft;
         let parameters = &draft.parameters;
         let user_text = draft.render_user_prompt(&request.topic_title)?;
-        let schema = RawValue::from_string(PHOTO_REVIEW_SCHEMA.to_owned())
-            .map_err(|e| e.to_string())?;
+        let schema =
+            RawValue::from_string(PHOTO_REVIEW_SCHEMA.to_owned()).map_err(|e| e.to_string())?;
         let body = ResponsesRequest {
             model: &draft.model,
             instructions: &draft.system_prompt,
@@ -263,9 +263,9 @@ impl OpenAiResponsesReviewGenerator {
             },
             store: false,
             max_output_tokens: parameters.max_output_tokens,
-            reasoning: parameters.reasoning_effort.map(|e| Reasoning {
-                effort: e.lower(),
-            }),
+            reasoning: parameters
+                .reasoning_effort
+                .map(|e| Reasoning { effort: e.lower() }),
         };
         Ok(to_json(&body))
     }
@@ -639,8 +639,7 @@ fn parse(
         .filter(|part| part.kind.as_deref() == Some(OUTPUT_TEXT_TYPE))
         .find_map(|part| part.text.clone())
         .ok_or_else(|| fail(FailureType::InvalidOutput))?;
-    let output =
-        read_output(&output_text).ok_or_else(|| fail(FailureType::InvalidOutput))?;
+    let output = read_output(&output_text).ok_or_else(|| fail(FailureType::InvalidOutput))?;
     Ok(AiReviewGeneration {
         result: output.to_result(threshold),
         output,

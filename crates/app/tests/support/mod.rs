@@ -143,6 +143,9 @@ impl Fx {
                 clock.clone(),
                 logger.clone(),
             ),
+            ai_review: chalkak_app::aireview::AiReviewWiring {
+                generator: Arc::new(chalkak_app::aireview::testing::StubGenerator::idle()),
+            },
         };
         let command = wiring.command_service(&ctx);
         let query = wiring.query_service(&ctx);

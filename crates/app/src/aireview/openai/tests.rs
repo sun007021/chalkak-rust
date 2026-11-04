@@ -313,8 +313,16 @@ fn generate_요청을_보내면_responses_계약대로_본문과_인증_헤더�
     });
     assert_eq!(captured.json(), expected);
     // 필드 순서는 원본 레코드 순서다.
-    assert!(captured.body.starts_with(r#"{"model":"gpt-5-mini","instructions":"#));
-    assert!(captured.body.ends_with(r#""store":false,"max_output_tokens":700}"#));
+    assert!(
+        captured
+            .body
+            .starts_with(r#"{"model":"gpt-5-mini","instructions":"#)
+    );
+    assert!(
+        captured
+            .body
+            .ends_with(r#""store":false,"max_output_tokens":700}"#)
+    );
 }
 
 #[test]
@@ -324,9 +332,15 @@ fn generate_reasoning_effort가_있으면_reasoning을_보내고_없으면_생�
         http(200, &success_body(&ok_output())),
     ]);
     let g = generator_with(&server, clock(&[0]), Duration::from_secs(60));
-    g.generate(&request(ImageDetail::Auto, 500, None, None)).unwrap();
-    g.generate(&request(ImageDetail::Auto, 500, Some(ReasoningEffort::Medium), None))
+    g.generate(&request(ImageDetail::Auto, 500, None, None))
         .unwrap();
+    g.generate(&request(
+        ImageDetail::Auto,
+        500,
+        Some(ReasoningEffort::Medium),
+        None,
+    ))
+    .unwrap();
     let requests = server.requests();
     assert!(requests[0].json().get("reasoning").is_none());
     assert_eq!(requests[1].json()["reasoning"]["effort"], "medium");
@@ -409,7 +423,10 @@ fn generate_소수_기준_7_5와_소수_주제_표현_점수를_그대로_비교
         let generation = generator(&server)
             .generate(&request(ImageDetail::Auto, 500, None, Some(7.5)))
             .unwrap();
-        assert_eq!(generation.result.distinctive_perspective, expected, "{theme}");
+        assert_eq!(
+            generation.result.distinctive_perspective, expected,
+            "{theme}"
+        );
         assert_eq!(
             generation.output.theme_expression_score,
             theme.parse::<f64>().unwrap()
@@ -471,7 +488,11 @@ fn generate_거절과_출력_텍스트가_함께_오면_refused로_실패한다(
             {"type": "refusal", "refusal": "거절"}
         ]}]),
     );
-    assert_failure(&failure(vec![http(200, &body)]), FailureType::Refused, false);
+    assert_failure(
+        &failure(vec![http(200, &body)]),
+        FailureType::Refused,
+        false,
+    );
 }
 
 #[test]
@@ -497,13 +518,21 @@ fn generate_모델이_거절하면_refused로_실패한다() {
         "completed",
         json!([{"type": "message", "content": [{"type": "refusal", "refusal": "도와드릴 수 없습니다."}]}]),
     );
-    assert_failure(&failure(vec![http(200, &body)]), FailureType::Refused, false);
+    assert_failure(
+        &failure(vec![http(200, &body)]),
+        FailureType::Refused,
+        false,
+    );
 }
 
 #[test]
 fn generate_status가_incomplete이면_incomplete로_실패한다() {
     let body = r#"{"id":"resp_1","status":"incomplete","incomplete_details":{"reason":"max_output_tokens"},"output":[]}"#;
-    assert_failure(&failure(vec![http(200, body)]), FailureType::Incomplete, false);
+    assert_failure(
+        &failure(vec![http(200, body)]),
+        FailureType::Incomplete,
+        false,
+    );
 }
 
 #[test]
@@ -538,10 +567,18 @@ fn generate_status가_failed이면_error_code로_실패_유형을_가르고_시�
         ("image_parse_error", FailureType::BadRequest, false),
         ("invalid_image_mode", FailureType::BadRequest, false),
         ("image_file_too_large", FailureType::BadRequest, false),
-        ("unsupported_image_media_type", FailureType::BadRequest, false),
+        (
+            "unsupported_image_media_type",
+            FailureType::BadRequest,
+            false,
+        ),
         ("empty_image_file", FailureType::BadRequest, false),
         ("image_file_not_found", FailureType::BadRequest, false),
-        ("image_content_policy_violation", FailureType::Refused, false),
+        (
+            "image_content_policy_violation",
+            FailureType::Refused,
+            false,
+        ),
         ("bio_policy", FailureType::Refused, false),
         ("misalignment_policy_violation", FailureType::Refused, false),
         ("rate_limit_exceeded", FailureType::RateLimited, true),
@@ -641,8 +678,7 @@ fn generate_요약이_61자면_invalid_output으로_실패한다() {
 
 #[test]
 fn generate_필드가_없거나_범위를_벗어나면_invalid_output으로_실패한다() {
-    let feedback_missing_last =
-        r#"{"summary":"요약","strength":"좋음","weakness":"아쉬움"}"#;
+    let feedback_missing_last = r#"{"summary":"요약","strength":"좋음","weakness":"아쉬움"}"#;
     let cases = [
         r#"{"composition":8,"theme_expression":8}"#.to_owned(),
         format!(r#"{{"theme_expression":8,"feedback":{FEEDBACK}}}"#),
@@ -674,7 +710,8 @@ fn generate_필드가_없거나_범위를_벗어나면_invalid_output으로_실�
 // ---- HTTP 오류 ----
 
 #[test]
-fn generate_일시적_한도이거나_원인을_알_수_없는_429_응답이면_rate_limited로_실패하고_사용량은_없다() {
+fn generate_일시적_한도이거나_원인을_알_수_없는_429_응답이면_rate_limited로_실패하고_사용량은_없다()
+{
     for body in [
         r#"{"error":{"message":"Rate limit reached for requests","type":"requests","code":"rate_limit_exceeded"}}"#,
         r#"{"error":{"message":"Slow down","type":"rate_limit_error","code":"slow_down"}}"#,
@@ -752,7 +789,10 @@ fn generate_상태_코드별_분류() {
 
 #[test]
 fn generate_400_응답이면_메시지에_본문을_담지_않는다() {
-    let e = failure(vec![http(400, r#"{"error":{"message":"secret prompt text"}}"#)]);
+    let e = failure(vec![http(
+        400,
+        r#"{"error":{"message":"secret prompt text"}}"#,
+    )]);
     assert_failure(&e, FailureType::BadRequest, false);
     assert!(!e.to_string().contains("secret prompt text"));
 }
@@ -796,13 +836,17 @@ fn generate_연결_거절이면_upstream_error이고_제한_시간_이상_지난
         read_timeout,
         allowed_models: vec!["m".into()],
     };
-    let before = OpenAiResponsesReviewGenerator::new(&settings(Duration::from_secs(60)), clock(&[0, 1000]))
-        .unwrap();
+    let before =
+        OpenAiResponsesReviewGenerator::new(&settings(Duration::from_secs(60)), clock(&[0, 1000]))
+            .unwrap();
     let e = before.generate(&default_request()).unwrap_err();
     assert_failure(&e, FailureType::UpstreamError, true);
     // 경과 시간이 읽기 제한 이상이면 시간 초과로 본다(`generate_연결 오류가 제한 시간 이상 지난 뒤 나면`).
-    let after = OpenAiResponsesReviewGenerator::new(&settings(Duration::from_secs(60)), clock(&[0, 61_000]))
-        .unwrap();
+    let after = OpenAiResponsesReviewGenerator::new(
+        &settings(Duration::from_secs(60)),
+        clock(&[0, 61_000]),
+    )
+    .unwrap();
     let e = after.generate(&default_request()).unwrap_err();
     assert_failure(&e, FailureType::Timeout, true);
 }
@@ -842,7 +886,11 @@ fn generate_retry_after_ms를_읽을_수_없으면_retry_after로_대신한다()
 fn generate_대기_시간_헤더가_없거나_읽을_수_없으면_힌트는_비어_있다() {
     assert_eq!(rate_limited(&[]).retry_after, None);
     for value in ["abc", "", "-1", "1.5", "Wed, 21 Oct 2026 07:28:00 GMT"] {
-        assert_eq!(rate_limited(&[("retry-after", value)]).retry_after, None, "{value}");
+        assert_eq!(
+            rate_limited(&[("retry-after", value)]).retry_after,
+            None,
+            "{value}"
+        );
     }
     assert_eq!(rate_limited(&[("retry-after-ms", "-5")]).retry_after, None);
 }
@@ -875,10 +923,17 @@ fn generate_시간_초과나_status가_failed인_200_응답이면_힌트는_비�
     let e = generator_with(&server, clock(&[0]), Duration::from_millis(200))
         .generate(&default_request())
         .unwrap_err();
-    assert_eq!((e.failure_type, e.retry_after), (FailureType::Timeout, None));
-    let body = r#"{"id":"resp_1","status":"failed","error":{"code":"rate_limit_exceeded"},"output":[]}"#;
+    assert_eq!(
+        (e.failure_type, e.retry_after),
+        (FailureType::Timeout, None)
+    );
+    let body =
+        r#"{"id":"resp_1","status":"failed","error":{"code":"rate_limit_exceeded"},"output":[]}"#;
     let e = failure(vec![http(200, body)]);
-    assert_eq!((e.failure_type, e.retry_after), (FailureType::RateLimited, None));
+    assert_eq!(
+        (e.failure_type, e.retry_after),
+        (FailureType::RateLimited, None)
+    );
 }
 
 // ---- 설정 ----
@@ -903,7 +958,10 @@ fn 설정은_환경변수로_덮어쓰고_잘못된_값은_거절한다() {
     use chalkak_core::config::Env;
     let s = OpenAiSettings::from_env(&Env::from_pairs([
         ("OPENAI_API_KEY", "sk"),
-        ("CHALKAK_AIREVIEW_OPENAI_BASEURL", "http://fakes:9000/openai/v1"),
+        (
+            "CHALKAK_AIREVIEW_OPENAI_BASEURL",
+            "http://fakes:9000/openai/v1",
+        ),
         ("CHALKAK_AIREVIEW_OPENAI_READTIMEOUT", "30s"),
         ("CHALKAK_AIREVIEW_OPENAI_ALLOWEDMODELS", "a, b"),
     ]))

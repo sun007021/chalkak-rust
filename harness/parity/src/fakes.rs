@@ -152,6 +152,7 @@ pub fn admin_json(spec: &FakesSpec, subst: &dyn Fn(&str) -> String) -> Value {
         ("sqs", &spec.sqs),
         ("oauth", &spec.oauth),
         ("fcm", &spec.fcm),
+        ("openai", &spec.openai),
     ] {
         if let Some(rules) = rules {
             o.insert(name.into(), sqs_json(rules, subst));
@@ -194,7 +195,7 @@ pub fn normalize(records: &[Value], norm: &mut Normalizer) -> Value {
             let v = match service {
                 "apple_token" | "apple_revoke" | "oauth_token" => form_value(body, norm),
                 "sqs" => sqs_body(body, norm),
-                "slack" | "cloudwatch_logs" | "fcm_send" => {
+                "slack" | "cloudwatch_logs" | "fcm_send" | "openai_responses" => {
                     match serde_json::from_str::<Value>(body) {
                         Ok(v) => norm.value(&v, &[], ""),
                         Err(_) => json!(norm.string(body)),

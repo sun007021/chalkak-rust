@@ -1153,12 +1153,8 @@ mod tests {
     #[test]
     fn 프롬프트_버전_생성은_빈_이전_상태와_유형_버전만_있는_이후_상태를_허용한다() {
         let after = json!({"type": "PHOTO_REVIEW", "version": 1});
-        let log = prompt_version_audit(
-            json!({}),
-            after.clone(),
-            AdminTargetType::AiPromptVersion,
-        )
-        .unwrap();
+        let log = prompt_version_audit(json!({}), after.clone(), AdminTargetType::AiPromptVersion)
+            .unwrap();
         assert!(log.before_state.is_empty());
         assert_eq!(Value::Object(log.after_state), after);
     }
@@ -1167,21 +1163,57 @@ mod tests {
     fn 프롬프트_버전_생성은_잘못된_대상_이전_상태_필드_값을_거절한다() {
         let valid = json!({"type": "PHOTO_REVIEW", "version": 1});
         let cases = [
-            (valid.clone(), valid.clone(), AdminTargetType::AiPromptVersion),
+            (
+                valid.clone(),
+                valid.clone(),
+                AdminTargetType::AiPromptVersion,
+            ),
             (json!({}), valid.clone(), AdminTargetType::Topic),
-            (json!({}), json!({"type": "PHOTO_REVIEW"}), AdminTargetType::AiPromptVersion),
-            (json!({}), json!({"version": 1}), AdminTargetType::AiPromptVersion),
+            (
+                json!({}),
+                json!({"type": "PHOTO_REVIEW"}),
+                AdminTargetType::AiPromptVersion,
+            ),
+            (
+                json!({}),
+                json!({"version": 1}),
+                AdminTargetType::AiPromptVersion,
+            ),
             (
                 json!({}),
                 json!({"type": "PHOTO_REVIEW", "version": 1, "model": "gpt-6.1-sol"}),
                 AdminTargetType::AiPromptVersion,
             ),
-            (json!({}), json!({"type": "UNKNOWN", "version": 1}), AdminTargetType::AiPromptVersion),
-            (json!({}), json!({"type": 1, "version": 1}), AdminTargetType::AiPromptVersion),
-            (json!({}), json!({"type": "PHOTO_REVIEW", "version": 0}), AdminTargetType::AiPromptVersion),
-            (json!({}), json!({"type": "PHOTO_REVIEW", "version": -1}), AdminTargetType::AiPromptVersion),
-            (json!({}), json!({"type": "PHOTO_REVIEW", "version": "1"}), AdminTargetType::AiPromptVersion),
-            (json!({}), json!({"type": "PHOTO_REVIEW", "version": 1.5}), AdminTargetType::AiPromptVersion),
+            (
+                json!({}),
+                json!({"type": "UNKNOWN", "version": 1}),
+                AdminTargetType::AiPromptVersion,
+            ),
+            (
+                json!({}),
+                json!({"type": 1, "version": 1}),
+                AdminTargetType::AiPromptVersion,
+            ),
+            (
+                json!({}),
+                json!({"type": "PHOTO_REVIEW", "version": 0}),
+                AdminTargetType::AiPromptVersion,
+            ),
+            (
+                json!({}),
+                json!({"type": "PHOTO_REVIEW", "version": -1}),
+                AdminTargetType::AiPromptVersion,
+            ),
+            (
+                json!({}),
+                json!({"type": "PHOTO_REVIEW", "version": "1"}),
+                AdminTargetType::AiPromptVersion,
+            ),
+            (
+                json!({}),
+                json!({"type": "PHOTO_REVIEW", "version": 1.5}),
+                AdminTargetType::AiPromptVersion,
+            ),
         ];
         for (before, after, target) in cases {
             assert!(

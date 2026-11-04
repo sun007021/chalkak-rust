@@ -128,7 +128,10 @@ impl PromptVersionRepository {
         id: Uuid,
     ) -> Result<Option<AiPromptVersion>, DbError> {
         let sql = format!("SELECT {COLUMNS} FROM ai_prompt_versions WHERE id = $1");
-        db.query_opt(&sql, &[&id])?.as_ref().map(from_row).transpose()
+        db.query_opt(&sql, &[&id])?
+            .as_ref()
+            .map(from_row)
+            .transpose()
     }
 
     /// `findByType`: 큰 번호부터 페이지 단위로. `page`는 1부터 시작한다.
