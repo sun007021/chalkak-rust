@@ -496,9 +496,11 @@ fn user_api_docs_exposes_settings_query_contract() {
         ],
     )
     .unwrap();
-    assert_eq!(props.as_object().unwrap().len(), 2);
+    // 1fb74d9 NotificationSettingsOpenApiTest: aiReviewPushEnabled가 늘어 세 필드다.
+    assert_eq!(props.as_object().unwrap().len(), 3);
     assert_eq!(props["topicPushEnabled"]["type"], "boolean");
     assert_eq!(props["moderationPushEnabled"]["type"], "boolean");
+    assert_eq!(props["aiReviewPushEnabled"]["type"], "boolean");
 }
 
 // NotificationSettingsOpenApiTest#userApiDocs_exposesSettingsUpdateContract
@@ -527,8 +529,12 @@ fn user_api_docs_exposes_settings_update_contract() {
     )
     .unwrap();
     assert!(request.get("required").is_none());
-    assert_eq!(request["properties"].as_object().unwrap().len(), 2);
-    for name in ["topicPushEnabled", "moderationPushEnabled"] {
+    assert_eq!(request["properties"].as_object().unwrap().len(), 3);
+    for name in [
+        "topicPushEnabled",
+        "moderationPushEnabled",
+        "aiReviewPushEnabled",
+    ] {
         let mut types: Vec<&str> = request["properties"][name]["type"]
             .as_array()
             .unwrap()
