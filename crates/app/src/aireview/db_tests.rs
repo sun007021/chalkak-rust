@@ -142,11 +142,32 @@ fn failure(kind: FailureType) -> Result<AiReviewGeneration, AiReviewGenerationEr
     Err(AiReviewGenerationError::of(kind))
 }
 
+fn call_router(router: &Router, method: Method, user: Uuid, post: &str) -> Reply {
+    let _guard = security::enter(Principal {
+        subject: user.hyphenated().to_string(),
+        authorities: vec![AUTHORITY_USER.to_owned()],
+    });
+    let response = router.handle(Request::new(
+        method,
+        format!("/api/v1/posts/{post}/ai-review"),
+    ));
+    let text = String::from_utf8_lossy(&response.body).into_owned();
+    Reply {
+        status: response.status,
+        body: serde_json::from_str(&text).unwrap_or(Value::Null),
+        text,
+    }
+}
+
 impl Fx {
     fn service(&self) -> AiReviewWorkerService {
+        self.service_with(self.stub.clone())
+    }
+
+    fn service_with(&self, generator: Arc<dyn AiReviewGenerator>) -> AiReviewWorkerService {
         AiReviewWorkerService::new(
             self.pool.clone(),
-            self.stub.clone(),
+            generator,
             Arc::new(CloudFrontUrlProvider::new(
                 "https://cdn.test.chalkak",
                 "/chalkak",
@@ -164,20 +185,7 @@ impl Fx {
     }
 
     fn call(&self, method: Method, user: Uuid, post: &str) -> Reply {
-        let _guard = security::enter(Principal {
-            subject: user.hyphenated().to_string(),
-            authorities: vec![AUTHORITY_USER.to_owned()],
-        });
-        let response = self.router.handle(Request::new(
-            method,
-            format!("/api/v1/posts/{post}/ai-review"),
-        ));
-        let text = String::from_utf8_lossy(&response.body).into_owned();
-        Reply {
-            status: response.status,
-            body: serde_json::from_str(&text).unwrap_or(Value::Null),
-            text,
-        }
+        call_router(&self.router, method, user, post)
     }
 
     fn request(&self) -> Reply {
@@ -797,4 +805,355 @@ fn 사용자_지표는_최초_요청_시각_기준으로_ai_리뷰를_세고_제
     // 제외 회원
     let excluded = PgUserMetricsRepository::new(fx.db.pool(2), vec![fx.author]);
     assert_eq!(counts(&excluded), AiReviewCounts::default());
+}
+
+const CONCURRENT_REQUESTS: usize = 5;
+
+impl Fx {
+    /// 같은 사용자가 같은 게시물에 동시에 요청한다. 모두 준비되면 한꺼번에 시작한다.
+    fn request_concurrently(&self) -> Vec<Reply> {
+        let barrier = std::sync::Barrier::new(CONCURRENT_REQUESTS);
+        let (router, author, post) = (&self.router, self.author, self.post.to_string());
+        std::thread::scope(|scope| {
+            let handles: Vec<_> = (0..CONCURRENT_REQUESTS)
+                .map(|_| {
+                    scope.spawn(|| {
+                        barrier.wait();
+                        call_router(router, Method::Post, author, &post)
+                    })
+                })
+                .collect();
+            handles.into_iter().map(|h| h.join().unwrap()).collect()
+        })
+    }
+
+    fn review_count(&self) -> i64 {
+        self.db
+            .client()
+            .query_one("SELECT COUNT(*) FROM ai_reviews", &[])
+            .unwrap()
+            .get(0)
+    }
+}
+
+// PostAiReviewConcurrencyTest#request_concurrent_createsSingleRow
+#[test]
+fn 같은_게시물에_동시에_요청해도_행은_하나이고_모두_처리_중으로_응답받는다() {
+    let Some(fx) = fx(vec![]) else { return };
+    let replies = fx.request_concurrently();
+    for reply in &replies {
+        assert_eq!(reply.status, 202, "{}", reply.text);
+        assert_eq!(reply.body["status"], "PROCESSING");
+    }
+    assert_eq!(fx.review_count(), 1);
+    assert_eq!(fx.events("review_requested").len(), 1);
+}
+
+// PostAiReviewConcurrencyTest#request_concurrentOnFailedReview_requeuesOnce
+#[test]
+fn 실패한_리뷰에_동시에_다시_요청해도_요청_횟수는_한_번만_늘고_재요청_로그도_한_건이다() {
+    let Some(fx) = fx(vec![failure(FailureType::InvalidOutput)]) else {
+        return;
+    };
+    assert_eq!(fx.request().status, 202);
+    fx.run_worker_once();
+    assert_eq!(fx.get().body["status"], "FAILED");
+    insert_version(&fx.db, fx.admin, 2);
+    fx.advance(60);
+
+    let replies = fx.request_concurrently();
+    for reply in &replies {
+        assert_eq!(reply.status, 202, "{}", reply.text);
+        assert_eq!(reply.body["status"], "PROCESSING");
+    }
+    assert_eq!(fx.review_count(), 1);
+    let review = fx.review();
+    assert_eq!(review.status, Status::Queued);
+    assert_eq!(review.request_count, 2);
+    let logs = fx.events("review_requested");
+    assert_eq!(logs.len(), 2);
+    assert_eq!(logs[1]["created"], false);
+}
+
+// ---------------------------------------------------------------------------------------------
+// AiReviewWorkerTest: 폴러의 동시 처리 한도, 자리 반납, 종료
+// ---------------------------------------------------------------------------------------------
+
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use std::sync::{Condvar, Mutex};
+
+use super::worker::AiReviewWorker;
+
+/// 열릴 때까지 생성을 붙잡아 두고 동시에 도는 호출 수를 센다.
+struct Gate {
+    open: Mutex<bool>,
+    changed: Condvar,
+    running: AtomicUsize,
+    max_running: AtomicUsize,
+    started: AtomicUsize,
+    panics: bool,
+    fails: AtomicBool,
+}
+
+impl Gate {
+    fn new(panics: bool) -> Arc<Gate> {
+        Arc::new(Gate {
+            open: Mutex::new(false),
+            changed: Condvar::new(),
+            running: AtomicUsize::new(0),
+            max_running: AtomicUsize::new(0),
+            started: AtomicUsize::new(0),
+            panics,
+            fails: AtomicBool::new(false),
+        })
+    }
+
+    fn release(&self) {
+        *self.open.lock().unwrap() = true;
+        self.changed.notify_all();
+    }
+}
+
+impl AiReviewGenerator for Gate {
+    fn generate(
+        &self,
+        _request: &super::generator::AiReviewGenerationRequest,
+    ) -> Result<AiReviewGeneration, AiReviewGenerationError> {
+        if self.panics {
+            self.started.fetch_add(1, Ordering::SeqCst);
+            panic!("boom");
+        }
+        let now = self.running.fetch_add(1, Ordering::SeqCst) + 1;
+        self.max_running.fetch_max(now, Ordering::SeqCst);
+        self.started.fetch_add(1, Ordering::SeqCst);
+        let mut open = self.open.lock().unwrap();
+        while !*open {
+            open = self.changed.wait(open).unwrap();
+        }
+        drop(open);
+        self.running.fetch_sub(1, Ordering::SeqCst);
+        if self.fails.load(Ordering::SeqCst) {
+            return Err(AiReviewGenerationError::of(FailureType::UpstreamError));
+        }
+        Ok(success())
+    }
+
+    fn supports_model(&self, _model: &str) -> bool {
+        true
+    }
+}
+
+fn wait_until(what: &str, condition: impl Fn() -> bool) {
+    for _ in 0..500 {
+        if condition() {
+            return;
+        }
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    panic!("시간 안에 {what} 조건이 맞지 않았다");
+}
+
+impl Fx {
+    /// 요청 없이 대기 행을 직접 넣는다. 게시물마다 한 행이므로 작성자와 게시물을 새로 만든다.
+    fn queue_more(&self, count: usize) {
+        let mut client = self.db.client();
+        let topic: Uuid = client
+            .query_one("SELECT topic_id FROM posts WHERE id = $1", &[&self.post])
+            .unwrap()
+            .get(0);
+        for index in 0..count {
+            let user = insert_user(&mut client, &format!("extra{index}@example.com"), "ACTIVE");
+            let post = insert_post(&mut client, user, topic, "APPROVED");
+            client
+                .execute(
+                    "INSERT INTO ai_reviews (post_id, user_id, prompt_version_id, status, request_id, \
+                     requested_at, last_requested_at) VALUES ($1, $2, $3, 'QUEUED', gen_random_uuid(), \
+                     now(), now())",
+                    &[&post, &user, &self.version],
+                )
+                .unwrap();
+        }
+    }
+
+    fn queued_count(&self) -> i64 {
+        self.db
+            .client()
+            .query_one(
+                "SELECT COUNT(*) FROM ai_reviews WHERE status = 'QUEUED'",
+                &[],
+            )
+            .unwrap()
+            .get(0)
+    }
+}
+
+// AiReviewWorkerTest#poll_manyClaimable_neverExceedsConcurrency
+#[test]
+fn 폴링은_동시_처리_수를_넘지_않고_끝나면_다음_건을_가져간다() {
+    let Some(fx) = fx(vec![]) else { return };
+    fx.queue_more(3);
+    assert_eq!(fx.queued_count(), 3);
+    assert_eq!(fx.request().status, 202);
+    let gate = Gate::new(false);
+    let worker = AiReviewWorker::new(Arc::new(fx.service_with(gate.clone())), 2);
+
+    worker.poll();
+    wait_until("두 건이 시작", || {
+        gate.started.load(Ordering::SeqCst) == 2
+    });
+    std::thread::sleep(Duration::from_millis(100));
+    // 자리가 없으면 더 가져가지 않는다: 대기 행이 두 건 남아 있다.
+    assert_eq!(gate.started.load(Ordering::SeqCst), 2);
+    assert_eq!(gate.max_running.load(Ordering::SeqCst), 2);
+    assert_eq!(fx.queued_count(), 2);
+
+    gate.release();
+    wait_until("자리 반납", || {
+        worker.poll();
+        gate.started.load(Ordering::SeqCst) == 4
+    });
+    assert!(gate.max_running.load(Ordering::SeqCst) <= 2);
+    assert!(worker.stop(Duration::from_secs(5)));
+    assert_eq!(fx.queued_count(), 0);
+}
+
+// AiReviewWorkerTest#poll_noClaimable_releasesPermitAndStops
+#[test]
+fn 가져갈_행이_없으면_자리를_돌려주고_다음_주기에_다시_가져간다() {
+    let Some(fx) = fx(vec![]) else { return };
+    let gate = Gate::new(false);
+    gate.release();
+    let worker = AiReviewWorker::new(Arc::new(fx.service_with(gate.clone())), 1);
+    worker.poll();
+    worker.poll();
+    assert_eq!(gate.started.load(Ordering::SeqCst), 0);
+    // 자리가 남아 있어야 나중에 생긴 행을 가져간다.
+    assert_eq!(fx.request().status, 202);
+    worker.poll();
+    wait_until("처리", || gate.started.load(Ordering::SeqCst) == 1);
+    assert!(worker.stop(Duration::from_secs(5)));
+}
+
+// AiReviewWorkerTest#poll_processThrows_releasesPermit
+#[test]
+fn 처리가_패닉으로_끝나도_자리를_돌려주고_다음_건을_가져간다() {
+    let Some(fx) = fx(vec![]) else { return };
+    assert_eq!(fx.request().status, 202);
+    fx.queue_more(1);
+    let gate = Gate::new(true);
+    let worker = AiReviewWorker::new(Arc::new(fx.service_with(gate.clone())), 1);
+    worker.poll();
+    wait_until("첫 건", || gate.started.load(Ordering::SeqCst) == 1);
+    wait_until("자리 반납", || {
+        worker.poll();
+        gate.started.load(Ordering::SeqCst) == 2
+    });
+    assert!(worker.stop(Duration::from_secs(5)));
+    // 생성기의 패닉은 예상 못 한 실패로 확정되어 두 건 모두 끝난다.
+    let failed: i64 = fx
+        .db
+        .client()
+        .query_one(
+            "SELECT COUNT(*) FROM ai_reviews WHERE status = 'FAILED'",
+            &[],
+        )
+        .unwrap()
+        .get(0);
+    assert_eq!(failed, 2);
+}
+
+// AiReviewWorkerTest#poll_claimFails_logsAndReleasesPermit
+#[test]
+fn 가져오기가_실패해도_예외를_밖으로_던지지_않고_worker_poll_failed를_남긴_뒤_자리를_돌려준다() {
+    let Some(fx) = fx(vec![]) else { return };
+    assert_eq!(fx.request().status, 202);
+    let gate = Gate::new(false);
+    gate.release();
+    let worker = AiReviewWorker::new(Arc::new(fx.service_with(gate.clone())), 1);
+    fx.db
+        .client()
+        .batch_execute("ALTER TABLE ai_reviews RENAME TO ai_reviews_down")
+        .unwrap();
+    worker.poll();
+    fx.db
+        .client()
+        .batch_execute("ALTER TABLE ai_reviews_down RENAME TO ai_reviews")
+        .unwrap();
+    let logs = fx.events("worker_poll_failed");
+    assert_eq!(logs.len(), 1);
+    assert_eq!(logs[0]["level"], "ERROR");
+    assert_eq!(logs[0]["type"], "ai_review");
+    assert!(logs[0]["errorCode"].is_string());
+    assert_eq!(gate.started.load(Ordering::SeqCst), 0);
+    // 자리를 돌려줬으므로 다음 주기에 가져간다.
+    worker.poll();
+    wait_until("처리", || gate.started.load(Ordering::SeqCst) == 1);
+    assert!(worker.stop(Duration::from_secs(5)));
+}
+
+// AiReviewWorkerTest#poll_afterStop_doesNotClaim
+#[test]
+fn 종료가_시작되면_새_건을_가져가지_않는다() {
+    let Some(fx) = fx(vec![]) else { return };
+    assert_eq!(fx.request().status, 202);
+    let gate = Gate::new(false);
+    gate.release();
+    let worker = AiReviewWorker::new(Arc::new(fx.service_with(gate.clone())), 2);
+    assert!(worker.stop(Duration::from_millis(200)));
+    worker.poll();
+    assert_eq!(gate.started.load(Ordering::SeqCst), 0);
+    assert_eq!(fx.queued_count(), 1);
+}
+
+// AiReviewWorkerTest#stop_processFinishesWithinGrace_doesNotInterrupt / stop_inFlightProcess_signalsStoppingThenInterrupts
+// 원본은 유예가 지나면 스레드를 interrupt하지만 블로킹 호출은 끊을 수 없어 기다림만 멈추고, 처리는 종료 신호를 보고 행을 그대로 둔다.
+#[test]
+fn 종료하면_유예_안에_끝난_처리는_기다리고_끝나지_못하면_기다림만_멈춘다() {
+    let Some(fx) = fx(vec![]) else { return };
+    assert_eq!(fx.request().status, 202);
+    let gate = Gate::new(false);
+    gate.fails.store(true, Ordering::SeqCst);
+    let worker = AiReviewWorker::new(Arc::new(fx.service_with(gate.clone())), 1);
+    worker.poll();
+    wait_until("시작", || gate.started.load(Ordering::SeqCst) == 1);
+
+    // 유예 안에 끝나지 못하면 false.
+    assert!(!worker.stop(Duration::from_millis(200)));
+    // 끝나면 종료로 끊긴 호출은 실패를 쓰지 않고 처리 중으로 남기고 중단 로그를 남긴다.
+    gate.release();
+    assert!(worker.stop(Duration::from_secs(5)));
+    assert_eq!(fx.review().status, Status::Processing);
+    assert_eq!(fx.events("review_abandoned").len(), 1);
+}
+
+// NotificationServiceTest#createForAiReview_userState_decidesPublishStatus: 탈퇴 회원의 알림은 발행 불필요로 저장한다
+// (탈퇴하면 게시물이 보이지 않아 워커 경로로는 닿지 않으므로 알림 생성 함수를 직접 부른다.)
+#[test]
+fn 탈퇴한_회원의_ai_리뷰_알림은_발행_불필요로_저장한다() {
+    use crate::notification::ai_review::{AiReviewOutcome, create_for_ai_review};
+    let Some(fx) = fx(vec![]) else { return };
+    fx.db
+        .client()
+        .execute(
+            "UPDATE users SET deleted_at = now() WHERE id = $1",
+            &[&fx.author],
+        )
+        .unwrap();
+    let (author, post) = (fx.author, fx.post);
+    crate::post::support::in_transaction(&fx.pool, |tx| {
+        create_for_ai_review(
+            tx,
+            author,
+            post,
+            Uuid::new_v4(),
+            1,
+            AiReviewOutcome::Completed,
+            START.parse().unwrap(),
+        )
+        .map_err(Into::into)
+    })
+    .unwrap();
+    let notes = fx.notifications();
+    assert_eq!(notes.len(), 1);
+    assert_eq!(notes[0].3, "NOT_REQUIRED");
 }

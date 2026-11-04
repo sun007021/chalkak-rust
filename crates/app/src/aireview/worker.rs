@@ -224,3 +224,62 @@ fn run(service: &AiReviewWorkerService, permits: &Permits, stopping: &AtomicBool
     }
     permits.release();
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn openai() -> OpenAiSettings {
+        OpenAiSettings {
+            api_key: "test-key".to_owned(),
+            base_url: "https://api.openai.test/v1".to_owned(),
+            connect_timeout: Duration::from_secs(5),
+            read_timeout: Duration::from_secs(60),
+            allowed_models: vec!["gpt-6.1-sol".to_owned()],
+        }
+    }
+
+    fn settings(pairs: &[(&str, &str)]) -> Result<AiReviewWorkerSettings, ConfigError> {
+        AiReviewWorkerSettings::from_env(&Env::from_pairs(pairs.iter().copied()))
+    }
+
+    // AiReviewWorkerConfigurationTest#configuration_enabled_createsWorker (application.yml 값)
+    #[test]
+    fn 기본값은_동시_10_임대_120초_가져가기_3회다() {
+        let s = settings(&[]).unwrap();
+        assert!(s.enabled);
+        assert_eq!(s.concurrency, 10);
+        assert_eq!(s.lease_duration, Duration::from_secs(120));
+        assert_eq!(s.max_claims, 3);
+        assert_eq!(POLL_DELAY, Duration::from_secs(1));
+        assert!(s.validate_lease(&openai()).is_ok());
+    }
+
+    // AiReviewWorkerConfigurationTest#configuration_leaseShorterThanCallTimeouts_failsFast: 84초는 거절, 85초는 통과
+    #[test]
+    fn 임대_시간이_연결_응답_제한_시간_더하기_20초보다_짧으면_거절한다() {
+        let short = settings(&[("CHALKAK_AIREVIEW_WORKER_LEASEDURATION", "84s")]).unwrap();
+        let error = short.validate_lease(&openai()).unwrap_err();
+        assert!(error.to_string().contains("임대 시간"), "{error}");
+        let enough = settings(&[("CHALKAK_AIREVIEW_WORKER_LEASEDURATION", "85s")]).unwrap();
+        assert!(enough.validate_lease(&openai()).is_ok());
+    }
+
+    // 워커를 켜지 않으면 임대를 검사하지 않는다.
+    #[test]
+    fn 워커를_끄면_임대를_검사하지_않는다() {
+        let off = settings(&[
+            ("CHALKAK_AIREVIEW_WORKER_ENABLED", "false"),
+            ("CHALKAK_AIREVIEW_WORKER_LEASEDURATION", "1s"),
+        ])
+        .unwrap();
+        assert!(off.validate_lease(&openai()).is_ok());
+    }
+
+    // AiReviewWorkerConfigurationTest#configuration_nonPositiveLimits_failsFast
+    #[test]
+    fn 동시_처리_수와_가져가기_상한이_1보다_작으면_거절한다() {
+        assert!(settings(&[("CHALKAK_AIREVIEW_WORKER_CONCURRENCY", "0")]).is_err());
+        assert!(settings(&[("CHALKAK_AIREVIEW_WORKER_MAXCLAIMS", "0")]).is_err());
+    }
+}
