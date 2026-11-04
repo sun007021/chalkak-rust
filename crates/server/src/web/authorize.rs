@@ -7,7 +7,8 @@
 //! 5. `/error` 공개.
 //! 6. 개발 관리자 우회가 켜져 있으면 `/api/v1/admin/**` 공개.
 //! 7. `/api/v1/admin/**`은 `SCOPE_ADMIN`.
-//! 8. GET `/api/v1/banners`(정확히 이 경로)는 익명, `SCOPE_USER`, `SCOPE_ADMIN` 모두 허용(회원 식별자를 해석하지 않는 공통 공개 조회).
+//! 8. GET `/api/v1/banners`, `/api/v1/app-version`(정확히 이 경로)은 회원 식별자를 해석하지 않는 공통 공개 조회라 익명,
+//!    `SCOPE_USER`, `SCOPE_ADMIN` 모두 통과한다.
 //! 9. GET `/api/v1/topics`, `/api/v1/posts`(정확히 이 경로)는 익명이거나 `SCOPE_USER`.
 //! 10. 나머지는 모두 `SCOPE_USER`. 새 API에 인증을 붙이는 것을 잊어도 기본값이 차단이 되도록.
 //!
@@ -31,9 +32,9 @@ const PUBLIC_ADMIN_AUTH_PATHS: [&str; 3] = [
     "/api/v1/admin/auth/refresh",
     "/api/v1/admin/auth/logout",
 ];
-/// 익명·회원·관리자 모두 읽는 공개 조회(`SecurityConfig`의 배너 규칙).
-const COMMON_PUBLIC_GET_PATHS: [&str; 1] = ["/api/v1/banners"];
 const PUBLIC_GET_PATHS: [&str; 2] = ["/api/v1/topics", "/api/v1/posts"];
+/// 익명, 회원, 관리자 토큰이 모두 통과하는 공개 조회.
+const COMMON_PUBLIC_GET_PATHS: [&str; 2] = ["/api/v1/banners", "/api/v1/app-version"];
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Access {
@@ -222,6 +223,26 @@ mod tests {
         assert_eq!(check(Method::Get, path, Some(&no_scope())), Access::Deny);
         assert_eq!(check(Method::Post, path, None), Access::Deny);
         assert_eq!(check(Method::Get, "/api/v1/banners/", None), Access::Deny);
+    }
+
+    // SecurityConfig: 앱 버전 설정은 회원 식별자를 해석하지 않는 공통 공개 조회(익명, 회원, 관리자)
+    #[test]
+    fn 앱_버전_조회는_익명_회원_관리자가_통과한다() {
+        let path = "/api/v1/app-version";
+        assert_eq!(check(Method::Get, path, None), Access::Allow);
+        assert_eq!(check(Method::Get, path, Some(&user())), Access::Allow);
+        assert_eq!(check(Method::Get, path, Some(&admin())), Access::Allow);
+        // 권한 없는 토큰, GET이 아닌 요청, 끝 슬래시·대소문자·하위 경로는 공개가 아니다.
+        assert_eq!(check(Method::Get, path, Some(&no_scope())), Access::Deny);
+        assert_eq!(check(Method::Post, path, None), Access::Deny);
+        assert_eq!(check(Method::Head, path, None), Access::Deny);
+        for other in [
+            "/api/v1/app-version/",
+            "/api/v1/App-Version",
+            "/api/v1/app-version/x",
+        ] {
+            assert_eq!(check(Method::Get, other, None), Access::Deny, "{other}");
+        }
     }
 
     #[test]

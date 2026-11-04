@@ -10,6 +10,7 @@ use serde_json::{Map, Value};
 use uuid::Uuid;
 
 use super::sensitive::contains_sensitive_value;
+use crate::appversion::domain::{AppPlatform, MinimumSupportedVersion, StoreUrl};
 use crate::notification::notice::Notice;
 use crate::web::binding::is_java_whitespace;
 use crate::web::json::format_instant;
@@ -293,13 +294,17 @@ impl AdminAction {
                 before.is_empty() && is_valid_banner_state(after, &BANNER_STATE_FIELDS)
             }
             AdminAction::BannerDeleted => is_banner_deleted(before, after),
+            AdminAction::AppVersionCreated => {
+                before.is_empty()
+                    && is_valid_app_version_state(after)
+                    && after.value("revision").and_then(Value::as_i64) == Some(0)
+            }
+            AdminAction::AppVersionUpdated => is_app_version_updated(before, after),
             // 아래 작업의 상태 전이 규칙은 해당 기능을 옮기는 이슈에서 채운다. 그때까지 감사 로그로 기록할 수 없다.
             AdminAction::AiPromptVersionCreated
             | AdminAction::ReminderCreated
             | AdminAction::ReminderUpdated
-            | AdminAction::ReminderDeleted
-            | AdminAction::AppVersionCreated
-            | AdminAction::AppVersionUpdated => false,
+            | AdminAction::ReminderDeleted => false,
         }
     }
 }
@@ -339,6 +344,33 @@ impl AuditSnapshot {
             normalized.insert(key.clone(), normalize_scalar(value)?);
         }
         Ok(AuditSnapshot { values: normalized })
+    }
+
+    /// `fromAppVersion`: 일반 URL 허용으로 넓히지 않고, 검증된 플랫폼별 스토어 주소만 키 `storeUrl`로 원문을 기록한다.
+    /// 값 검사(길이·민감정보)는 다른 값과 같이 적용한다.
+    pub fn from_app_version(
+        platform: AppPlatform,
+        version: &MinimumSupportedVersion,
+        store_url: &StoreUrl,
+        revision: i64,
+    ) -> Result<AuditSnapshot, AppError> {
+        if revision < 0 {
+            return Err(invalid_state());
+        }
+        store_url.validate_platform(platform)?;
+        let mut source = Map::new();
+        source.insert("platform".to_owned(), text_value(platform.as_str()));
+        source.insert(
+            "minimumSupportedVersion".to_owned(),
+            text_value(version.value()),
+        );
+        source.insert("revision".to_owned(), Value::from(revision));
+        let mut state = AuditSnapshot::from_map(&source)?;
+        state.values.insert(
+            "storeUrl".to_owned(),
+            normalize_scalar(&text_value(store_url.value()))?,
+        );
+        Ok(state)
     }
 
     pub fn values(&self) -> &Map<String, Value> {
@@ -450,6 +482,12 @@ const TOPIC_STATE_FIELDS: [&str; 4] = ["title", "topicDate", "startsAt", "endsAt
 const DELETED_TOPIC_STATE_FIELDS: [&str; 5] =
     ["title", "topicDate", "startsAt", "endsAt", "deletedAt"];
 const PUSH_SCHEDULE_FIELDS: [&str; 1] = ["sendTime"];
+const APP_VERSION_FIELDS: [&str; 4] = [
+    "platform",
+    "minimumSupportedVersion",
+    "storeUrl",
+    "revision",
+];
 const NOTICE_STATE_FIELDS: [&str; 3] = ["title", "scheduledAt", "bodySha256"];
 const DELETED_NOTICE_STATE_FIELDS: [&str; 4] = ["title", "scheduledAt", "bodySha256", "deletedAt"];
 const BANNER_STATE_FIELDS: [&str; 2] = ["titleSha256", "subtitleSha256"];
@@ -590,6 +628,36 @@ fn is_notice_deleted(before: &AuditSnapshot, after: &AuditSnapshot) -> bool {
         && NOTICE_STATE_FIELDS
             .iter()
             .all(|field| before.value(field) == after.value(field))
+}
+
+/// `isValidAppVersionState`
+fn is_valid_app_version_state(state: &AuditSnapshot) -> bool {
+    state.has_exactly_fields(&APP_VERSION_FIELDS)
+        && state
+            .value("platform")
+            .and_then(Value::as_str)
+            .is_some_and(|name| AppPlatform::parse(name).is_some())
+        && state
+            .value("minimumSupportedVersion")
+            .is_some_and(Value::is_string)
+        && state.value("storeUrl").is_some_and(Value::is_string)
+        && state
+            .value("revision")
+            .is_some_and(|v| v.as_i64().is_some_and(|r| r >= 0))
+}
+
+/// `isAppVersionUpdated`: 같은 플랫폼에서 revision이 정확히 1 늘고(상한에서 순환 금지) 버전이나 주소가 바뀌어야 한다.
+fn is_app_version_updated(before: &AuditSnapshot, after: &AuditSnapshot) -> bool {
+    if !(is_valid_app_version_state(before) && is_valid_app_version_state(after)) {
+        return false;
+    }
+    let before_revision = before.value("revision").and_then(Value::as_i64);
+    let after_revision = after.value("revision").and_then(Value::as_i64);
+    before.value("platform") == after.value("platform")
+        && matches!((before_revision, after_revision),
+            (Some(b), Some(a)) if b < i64::MAX && a == b + 1)
+        && (before.value("minimumSupportedVersion") != after.value("minimumSupportedVersion")
+            || before.value("storeUrl") != after.value("storeUrl"))
 }
 
 fn is_valid_title(value: Option<&Value>) -> bool {
@@ -1279,6 +1347,35 @@ mod tests {
         )
     }
 
+    // ----- AdminAppVersionAuditTest -----
+
+    const STORE_URL: &str = "https://apps.apple.com/app/id123";
+
+    fn app_state(version: &str, revision: i64) -> AuditSnapshot {
+        AuditSnapshot::from_app_version(
+            AppPlatform::Ios,
+            &MinimumSupportedVersion::new(version).unwrap(),
+            &StoreUrl::new(STORE_URL).unwrap(),
+            revision,
+        )
+        .unwrap()
+    }
+
+    fn create_app(
+        action: AdminAction,
+        before: &AuditSnapshot,
+        after: &AuditSnapshot,
+    ) -> Result<AdminAuditLog, AppError> {
+        create(
+            action,
+            AdminTargetType::AppVersion,
+            Some("출시 확인"),
+            before,
+            after,
+            id(),
+        )
+    }
+
     #[test]
     fn 배너_생성은_빈_이전_상태와_제목_부제목_해시만_있는_이후_상태를_허용한다() {
         let after = json!({"titleSha256": sha('a'), "subtitleSha256": sha('b')});
@@ -1381,6 +1478,133 @@ mod tests {
         assert_eq!(
             AdminTargetType::parse("BANNER"),
             Some(AdminTargetType::Banner)
+        );
+    }
+
+    #[test]
+    fn 앱_버전_스냅샷은_검증된_스토어_주소만_원문으로_허용한다() {
+        let snapshot = app_state("1.0.0", 0);
+        assert_eq!(snapshot.values()["storeUrl"], json!(STORE_URL));
+        assert_eq!(snapshot.values()["revision"], json!(0));
+        // 일반 map 경로로는 url 키를 계속 거절한다.
+        let general = json!({ "storeUrl": STORE_URL });
+        assert!(AuditSnapshot::from_map(general.as_object().unwrap()).is_err());
+        // 음수 revision, 플랫폼과 맞지 않는 주소
+        let version = MinimumSupportedVersion::new("1.0.0").unwrap();
+        let url = StoreUrl::new(STORE_URL).unwrap();
+        assert!(AuditSnapshot::from_app_version(AppPlatform::Ios, &version, &url, -1).is_err());
+        assert!(AuditSnapshot::from_app_version(AppPlatform::Android, &version, &url, 0).is_err());
+    }
+
+    #[test]
+    fn 앱_버전_최초_생성과_하향_변경_감사는_허용한다() {
+        let empty = AuditSnapshot::empty();
+        let initial = app_state("2.0.0", 0);
+        let created = create_app(AdminAction::AppVersionCreated, &empty, &initial).unwrap();
+        assert_eq!(created.after_state["storeUrl"], json!(STORE_URL));
+        let lowered = create_app(
+            AdminAction::AppVersionUpdated,
+            &initial,
+            &app_state("1.0.0", 1),
+        )
+        .unwrap();
+        assert_eq!(lowered.reason.as_deref(), Some("출시 확인"));
+    }
+
+    #[test]
+    fn 앱_버전_잘못된_revision_플랫폼_변경_없는_전이는_거절한다() {
+        let empty = AuditSnapshot::empty();
+        let initial = app_state("2.0.0", 0);
+        let invalid = |action, before: &AuditSnapshot, after: &AuditSnapshot| {
+            assert_eq!(
+                err_message(create_app(action, before, after)),
+                "관리자 감사 로그 정보가 올바르지 않습니다."
+            );
+        };
+        invalid(AdminAction::AppVersionCreated, &initial, &initial);
+        invalid(
+            AdminAction::AppVersionCreated,
+            &empty,
+            &app_state("1.0.0", 1),
+        );
+        invalid(
+            AdminAction::AppVersionUpdated,
+            &empty,
+            &app_state("1.0.0", 1),
+        );
+        invalid(
+            AdminAction::AppVersionUpdated,
+            &initial,
+            &app_state("1.0.0", 0),
+        );
+        invalid(
+            AdminAction::AppVersionUpdated,
+            &initial,
+            &app_state("1.0.0", 2),
+        );
+        invalid(
+            AdminAction::AppVersionUpdated,
+            &initial,
+            &app_state("2.0.0", 1),
+        );
+        let android = AuditSnapshot::from_app_version(
+            AppPlatform::Android,
+            &MinimumSupportedVersion::new("1.0.0").unwrap(),
+            &StoreUrl::new("https://play.google.com/store/apps/details?id=com.example.app")
+                .unwrap(),
+            1,
+        )
+        .unwrap();
+        invalid(AdminAction::AppVersionUpdated, &initial, &android);
+    }
+
+    #[test]
+    fn 앱_버전_감사의_빈_사유는_거절한다() {
+        let result = create(
+            AdminAction::AppVersionCreated,
+            AdminTargetType::AppVersion,
+            Some(" "),
+            &AuditSnapshot::empty(),
+            &app_state("2.0.0", 0),
+            id(),
+        );
+        assert_eq!(
+            err_message(result),
+            "관리자 감사 로그 정보가 올바르지 않습니다."
+        );
+    }
+
+    #[test]
+    fn 검증된_스토어_주소라도_민감한_값이_포함되면_스냅샷을_거절한다() {
+        let url = StoreUrl::new("https://apps.apple.com/app/token=example-secret/id123").unwrap();
+        let result = AuditSnapshot::from_app_version(
+            AppPlatform::Ios,
+            &MinimumSupportedVersion::new("1.0.0").unwrap(),
+            &url,
+            0,
+        );
+        assert_eq!(
+            err_message(result),
+            "민감한 정보는 관리자 감사 로그에 저장할 수 없습니다."
+        );
+    }
+
+    #[test]
+    fn revision_상한_직전_변경은_허용하고_상한에서_순환하는_전이는_거절한다() {
+        let updated = create_app(
+            AdminAction::AppVersionUpdated,
+            &app_state("1.0.0", i64::MAX - 1),
+            &app_state("2.0.0", i64::MAX),
+        )
+        .unwrap();
+        assert_eq!(updated.after_state["revision"], json!(i64::MAX));
+        assert!(
+            create_app(
+                AdminAction::AppVersionUpdated,
+                &app_state("1.0.0", i64::MAX),
+                &app_state("2.0.0", 0),
+            )
+            .is_err()
         );
     }
 }

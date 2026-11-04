@@ -1,0 +1,40 @@
+name = "앱 버전 공개 조회: 직접 입력한 기존 설정과 관리자 목록"
+tags = ["app-version", "app-version-public"]
+clock = "2026-10-29T10:00:00+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO admins (id, username, password, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000000a1', 'operator', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-01T00:00:00Z', '2026-09-01T00:00:00Z'),
+  ('01990000-0000-7000-8000-0000000000a2', 'reviewer', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-02T00:00:00Z', '2026-09-02T00:00:00Z');
+INSERT INTO users (id, email, status, signature_original_storage_key, signature_thumbnail_storage_key, app_version, created_at, updated_at, deleted_at) VALUES
+  ('01990000-0000-7000-8000-000000000001', 'alice@test.chalkak', 'ACTIVE', 'chalkak/signatures/u1/original.png', 'chalkak/signatures/u1/thumbnail.png', '1.2.0', '2026-10-01T00:00:00Z', '2026-10-01T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-000000000002', 'bob@test.chalkak', 'BANNED', 'chalkak/signatures/u2/original.png', NULL, NULL, '2026-10-02T00:00:00Z', '2026-10-02T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-000000000003', 'withdrawn+01990000-0000-7000-8000-000000000003@chalkak.invalid', 'ACTIVE', 'withdrawn/01990000-0000-7000-8000-000000000003', NULL, '1.0.0', '2026-10-03T00:00:00Z', '2026-10-05T00:00:00Z', '2026-10-05T00:00:00Z');
+INSERT INTO app_versions (id, platform, minimum_supported_version, store_url, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000a0001', 'ANDROID', '1.2.0', 'https://play.google.com/store/apps/details?id=com.example.chalkak', '2026-10-28T01:00:00Z', '2026-10-28T01:00:00Z'),
+  ('01990000-0000-7000-8000-0000000a0002', 'IOS', '2147483647.0.10', 'https://apps.apple.com/kr/app/chalkak/id1234567890?l=ko&mt=8', '2026-10-28T02:00:00Z', '2026-10-28T03:00:00Z');
+"""]
+
+[[step]]
+name = "ANDROID 기존 설정"
+method = "GET"
+path = "/api/v1/app-version?platform=ANDROID"
+
+[[step]]
+name = "IOS 기존 설정"
+method = "GET"
+path = "/api/v1/app-version?platform=IOS"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "기존 설정 캐시 헤더는 관리자 토큰도 같다"
+method = "GET"
+path = "/api/v1/app-version?platform=IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "관리자 목록은 변경자·사유 null"
+method = "GET"
+path = "/api/v1/admin/app-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
