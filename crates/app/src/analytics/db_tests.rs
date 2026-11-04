@@ -310,6 +310,76 @@ fn likes_total은_삭제된_게시물에_달린_좋아요를_세지_않는다() 
     assert_eq!(metrics.likes_total - before, 1);
 }
 
+// 1fb74d9 UserMetricsRepositoryImpl.countAiReviews: 최초 요청 시각이 그날인 AI 리뷰의 회원 수·요청 수와 집계 시점 상태별 수
+#[test]
+fn ai_리뷰_지표는_그날_요청된_리뷰의_회원_수와_요청_완료_실패_수를_센다() {
+    let Some(mut e) = env() else { return };
+    let before = e
+        .service(&[])
+        .aggregate(date(METRIC_DATE))
+        .unwrap()
+        .ai_reviews;
+    let admin: Uuid = e
+        .client
+        .query_one(
+            "INSERT INTO admins (username, password) VALUES ($1, 'x') RETURNING id",
+            &[&format!("ai-{}", Uuid::new_v4())],
+        )
+        .unwrap()
+        .get(0);
+    let version: Uuid = e
+        .client
+        .query_one(
+            "INSERT INTO ai_prompt_versions (type, version, system_prompt, user_prompt_template, model, \
+             parameters, output_schema_version, created_by_admin_id, created_at) \
+             VALUES ('PHOTO_REVIEW', (SELECT COALESCE(MAX(version), 0) + 1 FROM ai_prompt_versions), \
+             's', 'u', 'm', '{}'::jsonb, 'v1', $1, CURRENT_TIMESTAMP) RETURNING id",
+            &[&admin],
+        )
+        .unwrap()
+        .get(0);
+    let (a, b) = (e.user("ai-a"), e.user("ai-b"));
+    let rows = [
+        (a, "10:00:00", METRIC_DATE, "COMPLETED"),
+        (a, "11:00:00", METRIC_DATE, "FAILED"),
+        (b, "12:00:00", METRIC_DATE, "QUEUED"),
+        (b, "12:00:00", "2030-03-16", "COMPLETED"),
+    ];
+    for (user, time, day, status) in rows {
+        let post = e.post(user, &kst(day, time), "APPROVED", false);
+        e.client
+            .execute(
+                "INSERT INTO ai_reviews (post_id, user_id, prompt_version_id, status, attempt, round_attempt, result, output, \
+                 error_code, request_id, requested_at, last_requested_at, completed_at) \
+                 VALUES ($1, $2, $3, $4::text, CASE WHEN $4::text = 'QUEUED' THEN 0 ELSE 1 END, \
+                 CASE WHEN $4::text = 'QUEUED' THEN 0 ELSE 1 END, \
+                 CASE WHEN $4::text = 'COMPLETED' THEN '{}'::jsonb END, CASE WHEN $4::text = 'COMPLETED' THEN '{}'::jsonb END, \
+                 CASE WHEN $4::text = 'FAILED' THEN 'E' END, $5, $6::text::timestamptz, $6::text::timestamptz, \
+                 CASE WHEN $4::text IN ('COMPLETED', 'FAILED') THEN CURRENT_TIMESTAMP END)",
+                &[
+                    &post,
+                    &user,
+                    &version,
+                    &status,
+                    &Uuid::new_v4(),
+                    &kst(day, time),
+                ],
+            )
+            .unwrap();
+    }
+
+    let after = e
+        .service(&[])
+        .aggregate(date(METRIC_DATE))
+        .unwrap()
+        .ai_reviews;
+
+    assert_eq!(after.users - before.users, 2);
+    assert_eq!(after.requests - before.requests, 3);
+    assert_eq!(after.completed - before.completed, 1);
+    assert_eq!(after.failed - before.failed, 1);
+}
+
 // aggregate_success_logsOneAggregationLine
 #[test]
 fn 집계_결과를_aggregation_로그_한_줄에_type과_metric_date와_지표_값으로_남긴다() {
@@ -331,6 +401,10 @@ fn 집계_결과를_aggregation_로그_한_줄에_type과_metric_date와_지표_
     assert_eq!(event["wau"], 1);
     assert_eq!(event["eligibleUsers"], metrics.eligible_users);
     assert_eq!(event["likesTotal"], metrics.likes_total);
+    assert_eq!(event["aiReviewUsers"], metrics.ai_reviews.users);
+    assert_eq!(event["aiReviewRequests"], metrics.ai_reviews.requests);
+    assert_eq!(event["aiReviewCompleted"], metrics.ai_reviews.completed);
+    assert_eq!(event["aiReviewFailed"], metrics.ai_reviews.failed);
 }
 
 // aggregate_sameDateTwice_returnsSameDbDerivedValues

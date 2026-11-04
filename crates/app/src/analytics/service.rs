@@ -85,6 +85,7 @@ pub struct DailyUserMetrics {
     pub wau: i64,
     pub eligible_users: i64,
     pub likes_total: i64,
+    pub ai_reviews: AiReviewCounts,
     pub access_log_metrics: Option<AccessLogMetrics>,
     pub weekly_retentions: Vec<WeeklyRetention>,
 }
@@ -111,6 +112,19 @@ pub trait UserMetricsRepository: Send + Sync {
 
     /// 삭제되지 않은 게시물에 달린 좋아요 수.
     fn count_likes_on_live_posts(&self) -> Result<i64, ApiError>;
+
+    /// 구간에 처음 요청된 AI 리뷰의 요청 회원 수, 요청 수, 집계 시점의 완료·실패 수.
+    /// 재요청은 `requested_at`을 바꾸지 않으므로 최초 요청만 센다.
+    fn count_ai_reviews(&self, from: Timestamp, to: Timestamp) -> Result<AiReviewCounts, ApiError>;
+}
+
+/// `AiReviewCounts`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct AiReviewCounts {
+    pub users: i64,
+    pub requests: i64,
+    pub completed: i64,
+    pub failed: i64,
 }
 
 /// 접근 로그 집계 조회. 지표에서 제외할 회원은 구현체가 걸러낸다. 조회에 실패하면 오류를 돌려준다.
@@ -159,6 +173,7 @@ impl UserMetricsAggregationService {
         let wau = self.repository.count_post_authors(week_start, day_end)?;
         let eligible_users = self.repository.count_eligible_users()?;
         let likes_total = self.repository.count_likes_on_live_posts()?;
+        let ai_reviews = self.repository.count_ai_reviews(day_start, day_end)?;
         let weekly_retentions = self.weekly_retentions(metric_date)?;
         let access_log_metrics = self.access_log_reader.read(metric_date)?;
 
@@ -169,6 +184,7 @@ impl UserMetricsAggregationService {
             wau,
             eligible_users,
             likes_total,
+            ai_reviews,
             access_log_metrics,
             weekly_retentions,
         };
@@ -235,7 +251,11 @@ impl UserMetricsAggregationService {
             .field("posts", metrics.posts)
             .field("wau", metrics.wau)
             .field("eligibleUsers", metrics.eligible_users)
-            .field("likesTotal", metrics.likes_total);
+            .field("likesTotal", metrics.likes_total)
+            .field("aiReviewUsers", metrics.ai_reviews.users)
+            .field("aiReviewRequests", metrics.ai_reviews.requests)
+            .field("aiReviewCompleted", metrics.ai_reviews.completed)
+            .field("aiReviewFailed", metrics.ai_reviews.failed);
         if let Some(access) = &metrics.access_log_metrics {
             event = event
                 .field("visitors", access.visitors)
@@ -300,6 +320,9 @@ mod tests {
         }
         fn count_likes_on_live_posts(&self) -> Result<i64, ApiError> {
             Ok(20)
+        }
+        fn count_ai_reviews(&self, _: Timestamp, _: Timestamp) -> Result<AiReviewCounts, ApiError> {
+            Ok(AiReviewCounts::default())
         }
     }
 
@@ -402,7 +425,11 @@ mod tests {
                 "posts",
                 "wau",
                 "eligibleUsers",
-                "likesTotal"
+                "likesTotal",
+                "aiReviewUsers",
+                "aiReviewRequests",
+                "aiReviewCompleted",
+                "aiReviewFailed"
             ]
         );
         assert_eq!(events[0]["message"], "사용자 지표 집계");
@@ -430,6 +457,10 @@ mod tests {
                 "wau",
                 "eligibleUsers",
                 "likesTotal",
+                "aiReviewUsers",
+                "aiReviewRequests",
+                "aiReviewCompleted",
+                "aiReviewFailed",
                 "visitors",
                 "topicViewers",
                 "requests",
@@ -512,6 +543,10 @@ mod tests {
                 "wau",
                 "eligibleUsers",
                 "likesTotal",
+                "aiReviewUsers",
+                "aiReviewRequests",
+                "aiReviewCompleted",
+                "aiReviewFailed",
                 "retentionW1Cohort",
                 "retentionW1Retained",
                 "retentionW1Rate",
