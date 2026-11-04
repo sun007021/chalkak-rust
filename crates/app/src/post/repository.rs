@@ -82,6 +82,7 @@ pub(crate) fn parse_metadata(text: &str) -> Result<Map<String, Value>, DbError> 
 #[derive(Clone, Debug, PartialEq)]
 pub struct VisiblePost {
     pub id: Uuid,
+    pub author_id: Uuid,
     pub title: Option<String>,
     pub topic_id: Uuid,
     pub topic_title: String,
@@ -341,7 +342,7 @@ impl PostRepository {
     ) -> Result<Option<VisiblePost>, DbError> {
         let lock = if for_share { " FOR SHARE OF p" } else { "" };
         let sql = format!(
-            "SELECT p.id, p.title, t.id AS topic_id, t.title AS topic_title, t.topic_date, \
+            "SELECT p.id, p.user_id, p.title, t.id AS topic_id, t.title AS topic_title, t.topic_date, \
              ph.original_storage_key, ph.thumbnail_storage_key, u.signature_original_storage_key \
              FROM posts p JOIN topics t ON t.id = p.topic_id JOIN photos ph ON ph.id = p.photo_id \
              JOIN users u ON u.id = p.user_id \
@@ -351,6 +352,7 @@ impl PostRepository {
             .map(|row| {
                 Ok(VisiblePost {
                     id: row.try_get("id")?,
+                    author_id: row.try_get("user_id")?,
                     title: row.try_get("title")?,
                     topic_id: row.try_get("topic_id")?,
                     topic_title: row.try_get("topic_title")?,

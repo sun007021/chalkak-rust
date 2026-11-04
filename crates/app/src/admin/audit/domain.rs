@@ -87,6 +87,9 @@ pub enum AdminTargetType {
     TopicPushSchedule,
     Notice,
     Banner,
+    AiPromptVersion,
+    Reminder,
+    AppVersion,
 }
 
 impl AdminTargetType {
@@ -98,6 +101,9 @@ impl AdminTargetType {
             AdminTargetType::TopicPushSchedule => "TOPIC_PUSH_SCHEDULE",
             AdminTargetType::Notice => "NOTICE",
             AdminTargetType::Banner => "BANNER",
+            AdminTargetType::AiPromptVersion => "AI_PROMPT_VERSION",
+            AdminTargetType::Reminder => "REMINDER",
+            AdminTargetType::AppVersion => "APP_VERSION",
         }
     }
 
@@ -109,6 +115,9 @@ impl AdminTargetType {
             "TOPIC_PUSH_SCHEDULE" => AdminTargetType::TopicPushSchedule,
             "NOTICE" => AdminTargetType::Notice,
             "BANNER" => AdminTargetType::Banner,
+            "AI_PROMPT_VERSION" => AdminTargetType::AiPromptVersion,
+            "REMINDER" => AdminTargetType::Reminder,
+            "APP_VERSION" => AdminTargetType::AppVersion,
             _ => return None,
         })
     }
@@ -132,10 +141,16 @@ pub enum AdminAction {
     NoticeDeleted,
     BannerCreated,
     BannerDeleted,
+    AiPromptVersionCreated,
+    ReminderCreated,
+    ReminderUpdated,
+    ReminderDeleted,
+    AppVersionCreated,
+    AppVersionUpdated,
 }
 
 impl AdminAction {
-    pub const ALL: [AdminAction; 16] = [
+    pub const ALL: [AdminAction; 22] = [
         AdminAction::PostApproved,
         AdminAction::PostRejected,
         AdminAction::PostDeleted,
@@ -152,6 +167,12 @@ impl AdminAction {
         AdminAction::NoticeDeleted,
         AdminAction::BannerCreated,
         AdminAction::BannerDeleted,
+        AdminAction::AiPromptVersionCreated,
+        AdminAction::ReminderCreated,
+        AdminAction::ReminderUpdated,
+        AdminAction::ReminderDeleted,
+        AdminAction::AppVersionCreated,
+        AdminAction::AppVersionUpdated,
     ];
 
     pub const fn as_str(self) -> &'static str {
@@ -172,6 +193,12 @@ impl AdminAction {
             AdminAction::NoticeDeleted => "NOTICE_DELETED",
             AdminAction::BannerCreated => "BANNER_CREATED",
             AdminAction::BannerDeleted => "BANNER_DELETED",
+            AdminAction::AiPromptVersionCreated => "AI_PROMPT_VERSION_CREATED",
+            AdminAction::ReminderCreated => "REMINDER_CREATED",
+            AdminAction::ReminderUpdated => "REMINDER_UPDATED",
+            AdminAction::ReminderDeleted => "REMINDER_DELETED",
+            AdminAction::AppVersionCreated => "APP_VERSION_CREATED",
+            AdminAction::AppVersionUpdated => "APP_VERSION_UPDATED",
         }
     }
 
@@ -195,6 +222,13 @@ impl AdminAction {
             | AdminAction::NoticeUpdated
             | AdminAction::NoticeDeleted => AdminTargetType::Notice,
             AdminAction::BannerCreated | AdminAction::BannerDeleted => AdminTargetType::Banner,
+            AdminAction::AiPromptVersionCreated => AdminTargetType::AiPromptVersion,
+            AdminAction::ReminderCreated
+            | AdminAction::ReminderUpdated
+            | AdminAction::ReminderDeleted => AdminTargetType::Reminder,
+            AdminAction::AppVersionCreated | AdminAction::AppVersionUpdated => {
+                AdminTargetType::AppVersion
+            }
         }
     }
 
@@ -207,6 +241,8 @@ impl AdminAction {
                 | AdminAction::UserUnbanned
                 | AdminAction::TopicDeleted
                 | AdminAction::NoticeDeleted
+                | AdminAction::AppVersionCreated
+                | AdminAction::AppVersionUpdated
         )
     }
 
@@ -257,6 +293,13 @@ impl AdminAction {
                 before.is_empty() && is_valid_banner_state(after, &BANNER_STATE_FIELDS)
             }
             AdminAction::BannerDeleted => is_banner_deleted(before, after),
+            // 아래 작업의 상태 전이 규칙은 해당 기능을 옮기는 이슈에서 채운다. 그때까지 감사 로그로 기록할 수 없다.
+            AdminAction::AiPromptVersionCreated
+            | AdminAction::ReminderCreated
+            | AdminAction::ReminderUpdated
+            | AdminAction::ReminderDeleted
+            | AdminAction::AppVersionCreated
+            | AdminAction::AppVersionUpdated => false,
         }
     }
 }
@@ -1159,9 +1202,32 @@ mod tests {
                 "USER_BANNED",
                 "USER_UNBANNED",
                 "TOPIC_DELETED",
-                "NOTICE_DELETED"
+                "NOTICE_DELETED",
+                "APP_VERSION_CREATED",
+                "APP_VERSION_UPDATED"
             ]
         );
+        // 1fb74d9 AdminAction/AdminTargetType: 배너·AI 프롬프트·리마인더·앱 버전 항목이 늘었다.
+        for (name, target) in [
+            ("BANNER_CREATED", AdminTargetType::Banner),
+            ("BANNER_DELETED", AdminTargetType::Banner),
+            (
+                "AI_PROMPT_VERSION_CREATED",
+                AdminTargetType::AiPromptVersion,
+            ),
+            ("REMINDER_CREATED", AdminTargetType::Reminder),
+            ("REMINDER_UPDATED", AdminTargetType::Reminder),
+            ("REMINDER_DELETED", AdminTargetType::Reminder),
+            ("APP_VERSION_CREATED", AdminTargetType::AppVersion),
+            ("APP_VERSION_UPDATED", AdminTargetType::AppVersion),
+        ] {
+            let action = AdminAction::parse(name).expect(name);
+            assert_eq!(action.target_type(), target, "{name}");
+            assert_eq!(
+                target.as_str(),
+                AdminTargetType::parse(target.as_str()).unwrap().as_str()
+            );
+        }
         for action in AdminAction::ALL {
             assert_eq!(AdminAction::parse(action.as_str()), Some(action));
         }
