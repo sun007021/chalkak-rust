@@ -700,3 +700,173 @@ fn 숫자로_바인딩할_수_없는_조회_조건은_400이다() {
         assert_eq!(reply.body["errorCode"], "BUSINESS_ERROR");
     }
 }
+
+// ---------------------------------------------------------------------------------------------
+// 보강: AdminBannerTransactionTest 동시성, BannerRepositoryImplTest, AdminBannerApiTest
+// ---------------------------------------------------------------------------------------------
+
+use std::sync::{Arc, Barrier, mpsc};
+use std::thread;
+use std::time::Duration;
+
+use super::audit::domain::{AdminAction, AdminTargetType, AuditSnapshot};
+use super::audit::service::{AuditLogCommand, create_audit_log};
+use super::banner::{banner_state, deletion_state};
+use super::support::in_transaction;
+use crate::web::ApiError;
+
+// AdminBannerTransactionTest#createBanner_concurrentDuplicateAfterPrecheck_persistsOnlyOne
+#[test]
+fn 두_요청이_사전_검사를_통과한_뒤_경쟁하면_db_중복을_업무_오류로_변환하고_한_건만_저장한다() {
+    let Some(db) = TestDb::create() else { return };
+    let mut client = db.client();
+    let admin = insert_admin(&mut client, "banner-race");
+    let barrier = Arc::new(Barrier::new(2));
+    let handles: Vec<_> = (0..2)
+        .map(|_| {
+            let deps = deps(&db);
+            let barrier = Arc::clone(&barrier);
+            thread::spawn(move || -> Result<(), ApiError> {
+                let now = deps.now();
+                let mut banner =
+                    Banner::create(Some("제목"), Some("부제목"), Some(URL), Some(THUMBNAIL))?;
+                let mut conn = deps.pool.get()?;
+                in_transaction(&mut conn, |tx| {
+                    // 두 요청 모두 사전 검사를 통과한 뒤에 저장한다.
+                    assert!(!BannerRepository.exists_by_web_view_url(tx, URL)?);
+                    barrier.wait();
+                    BannerRepository
+                        .insert(tx, &mut banner, now)
+                        .map_err(|e| match e {
+                            SaveError::DuplicateWebViewUrl => super::support::business(
+                                "동일한 웹뷰 URL의 배너가 이미 존재합니다.",
+                            ),
+                            SaveError::Db(e) => ApiError::from(e),
+                        })?;
+                    create_audit_log(
+                        tx,
+                        AuditLogCommand {
+                            actor_admin_id: admin,
+                            action: AdminAction::BannerCreated,
+                            target_type: AdminTargetType::Banner,
+                            target_id: banner.id.unwrap(),
+                            reason: None,
+                            before_state: AuditSnapshot::empty(),
+                            after_state: banner_state(&banner)?,
+                        },
+                        now,
+                    )?;
+                    Ok(())
+                })
+            })
+        })
+        .collect();
+    let results: Vec<_> = handles.into_iter().map(|h| h.join().unwrap()).collect();
+
+    assert_eq!(results.iter().filter(|r| r.is_ok()).count(), 1);
+    let failure = results.into_iter().find_map(Result::err).unwrap();
+    assert_eq!(failure.status(), 400);
+    assert_eq!(
+        failure.message(),
+        "동일한 웹뷰 URL의 배너가 이미 존재합니다."
+    );
+    assert_eq!(count(&mut client, "banners"), 1);
+    assert_eq!(count(&mut client, "admin_audit_logs"), 1);
+}
+
+// AdminBannerTransactionTest#deleteBanner_concurrent_preservesFirstAudit
+#[test]
+fn 동시_삭제는_같은_행_잠금으로_직렬화하고_최초_시각_감사_한_건을_유지한다() {
+    let Some(db) = TestDb::create() else { return };
+    let mut client = db.client();
+    let admin = insert_admin(&mut client, "banner-race");
+    let id = insert_banner(&mut client, URL, "2026-10-19T00:00:00Z");
+    let first_deps = super::testing::deps_at(&db, "2026-10-19T01:00:00Z");
+    let second_deps = super::testing::deps_at(&db, "2026-10-19T02:00:00Z");
+    let (locked_tx, locked_rx) = mpsc::channel();
+    let (release_tx, release_rx) = mpsc::channel::<()>();
+
+    let first = thread::spawn(move || -> Result<(), ApiError> {
+        let now = first_deps.now();
+        let mut conn = first_deps.pool.get()?;
+        in_transaction(&mut conn, |tx| {
+            let mut banner = BannerRepository
+                .find_by_id_for_update(tx, id)?
+                .expect("배너가 있다");
+            locked_tx.send(()).unwrap();
+            // 두 번째 삭제가 잠금을 기다리는 동안 잠금을 유지한다.
+            release_rx.recv_timeout(Duration::from_secs(10)).unwrap();
+            let before = deletion_state(&banner)?;
+            banner.delete(now);
+            BannerRepository.save_deletion(tx, &mut banner, now)?;
+            create_audit_log(
+                tx,
+                AuditLogCommand {
+                    actor_admin_id: admin,
+                    action: AdminAction::BannerDeleted,
+                    target_type: AdminTargetType::Banner,
+                    target_id: id,
+                    reason: None,
+                    before_state: before,
+                    after_state: deletion_state(&banner)?,
+                },
+                now,
+            )?;
+            Ok(())
+        })
+    });
+    locked_rx.recv_timeout(Duration::from_secs(10)).unwrap();
+    let second =
+        thread::spawn(move || AdminBannerService::new(second_deps).delete_banner(id, admin));
+    thread::sleep(Duration::from_millis(300));
+    assert!(
+        !second.is_finished(),
+        "첫 트랜잭션이 잠금을 유지하는 동안 두 번째 삭제는 끝날 수 없다"
+    );
+    release_tx.send(()).unwrap();
+    first.join().unwrap().unwrap();
+    second.join().unwrap().unwrap();
+
+    assert_eq!(audit_rows(&mut client, id, "BANNER_DELETED").len(), 1);
+    let deleted_at: jiff::Timestamp = client
+        .query_one("SELECT deleted_at FROM banners WHERE id = $1", &[&id])
+        .unwrap()
+        .get(0);
+    assert_eq!(deleted_at, "2026-10-19T01:00:00Z".parse().unwrap());
+}
+
+// BannerRepositoryImplTest#save_unrelatedViolation_preservesException
+#[test]
+fn 다른_제약_위반은_중복_오류로_바꾸지_않고_db_오류로_유지한다() {
+    let Some(db) = TestDb::create() else { return };
+    let mut conn = db.pool(2).get().unwrap();
+    // 도메인 검증을 거치지 않은 빈 제목: ck_banners_title_not_blank 위반.
+    let mut banner =
+        Banner::create(Some("제목"), Some("부제목"), Some(URL), Some(THUMBNAIL)).unwrap();
+    banner.title = " ".to_owned();
+    let error = BannerRepository
+        .insert(&mut conn, &mut banner, deps(&db).now())
+        .unwrap_err();
+    match error {
+        SaveError::Db(e) => assert!(format!("{e:?}").contains("ck_banners_title_not_blank")),
+        SaveError::DuplicateWebViewUrl => panic!("중복 오류로 바뀌면 안 된다"),
+    }
+}
+
+// AdminBannerApiTest#getBanners_invalidPagination_returnsBadRequest (관리자 토큰, "21474838, 100" 포함)
+#[test]
+fn 관리자_토큰으로_조회해도_offset_초과는_400이다() {
+    let Some(api) = api() else { return };
+    for (page, size) in [("0", "20"), ("1", "0"), ("1", "101"), ("21474838", "100")] {
+        let reply = api.call(
+            Some(api.admin_principal()),
+            Method::Get,
+            "/api/v1/banners",
+            &[("page", page), ("pageSize", size)],
+            None,
+        );
+        assert_eq!(reply.status, 400, "{page} {size}");
+        assert_eq!(reply.body["errorCode"], "BUSINESS_ERROR");
+        assert_eq!(reply.body["message"], "조회 조건이 올바르지 않습니다.");
+    }
+}

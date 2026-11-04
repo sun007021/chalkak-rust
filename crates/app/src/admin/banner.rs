@@ -128,11 +128,11 @@ fn banner_pairs(banner: &Banner) -> Vec<(&'static str, serde_json::Value)> {
     ]
 }
 
-fn banner_state(banner: &Banner) -> Result<AuditSnapshot, ApiError> {
+pub(super) fn banner_state(banner: &Banner) -> Result<AuditSnapshot, ApiError> {
     Ok(AuditSnapshot::of(banner_pairs(banner))?)
 }
 
-fn deletion_state(banner: &Banner) -> Result<AuditSnapshot, ApiError> {
+pub(super) fn deletion_state(banner: &Banner) -> Result<AuditSnapshot, ApiError> {
     let mut pairs = banner_pairs(banner);
     pairs.push((
         "deletedAt",
