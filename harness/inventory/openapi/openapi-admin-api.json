@@ -1,6 +1,472 @@
 {
   "components": {
     "schemas": {
+      "AdminAiReviewDetailPost": {
+        "properties": {
+          "deletedAt": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "imageUrl": {
+            "description": "원본 사진 URL",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "moderationStatus": {
+            "enum": [
+              "VALIDATING",
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ],
+            "type": "string"
+          },
+          "postId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "thumbnailUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "AdminAiReviewDetailResponse": {
+        "properties": {
+          "aiReviewId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "attempt": {
+            "description": "워커가 가져간 누적 횟수. 재시도와 임대 회수를 모두 세며 줄지 않습니다.",
+            "format": "int32",
+            "type": "integer"
+          },
+          "author": {
+            "$ref": "#/components/schemas/AdminAiReviewListAuthor"
+          },
+          "completedAt": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "errorCode": {
+            "description": "마지막 실패 오류 코드. 재시도 대기 중인 대기 상태에도 남습니다.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lastRequestedAt": {
+            "description": "이번 회차의 요청 시각",
+            "format": "date-time",
+            "type": "string"
+          },
+          "latencyMs": {
+            "description": "마지막 호출 지연시간(ms)",
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "openaiResponseId": {
+            "description": "마지막 OpenAI 응답 ID. 응답을 받지 못했으면 null입니다.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "output": {
+            "$ref": "#/components/schemas/JsonNode",
+            "description": "모델이 돌려준 원출력(구도 점수, 주제 표현 점수, 피드백 등)을 JSON 객체로 그대로 담습니다. 없으면 null입니다.",
+            "type": "object"
+          },
+          "overallScore": {
+            "description": "종합 점수. 완료된 리뷰만 값이 있고 그 밖에는 null입니다.",
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "post": {
+            "$ref": "#/components/schemas/AdminAiReviewDetailPost"
+          },
+          "promptVersion": {
+            "$ref": "#/components/schemas/AdminAiReviewListPromptVersion"
+          },
+          "requestCount": {
+            "description": "사용자 요청 횟수(처음 요청 포함)",
+            "format": "int32",
+            "type": "integer"
+          },
+          "requestedAt": {
+            "description": "처음 요청 시각",
+            "format": "date-time",
+            "type": "string"
+          },
+          "result": {
+            "$ref": "#/components/schemas/AiReviewResult",
+            "description": "서비스 규칙으로 변환한 리뷰 결과. 완료된 리뷰만 값이 있습니다.",
+            "type": "null"
+          },
+          "startedAt": {
+            "description": "워커가 처음 가져간 시각. 아직 가져가지 않았으면 null입니다.",
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "enum": [
+              "QUEUED",
+              "PROCESSING",
+              "COMPLETED",
+              "FAILED"
+            ],
+            "type": "string"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/AdminAiReviewListUsage",
+            "description": "마지막 호출의 토큰 사용량. 호출 기록이 없으면 각 값이 null입니다."
+          },
+          "visibleToAuthor": {
+            "description": "작성자 앱에서 이 리뷰가 보이는지. 게시물이 승인됐고 게시물·주제·사진·작성자가 모두 삭제되지 않았을 때만 true입니다. 정지된 작성자는 영향을 주지 않습니다.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "AdminAiReviewListAuthor": {
+        "properties": {
+          "deletedAt": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "enum": [
+              "ACTIVE",
+              "BANNED"
+            ],
+            "type": "string"
+          },
+          "userId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "AdminAiReviewListItem": {
+        "properties": {
+          "aiReviewId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "author": {
+            "$ref": "#/components/schemas/AdminAiReviewListAuthor"
+          },
+          "completedAt": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "errorCode": {
+            "description": "마지막 실패 오류 코드. 재시도 대기 중인 대기 상태에도 남습니다.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lastRequestedAt": {
+            "description": "이번 회차의 요청 시각. 목록 정렬 기준입니다.",
+            "format": "date-time",
+            "type": "string"
+          },
+          "latencyMs": {
+            "description": "마지막 호출 지연시간(ms)",
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "overallScore": {
+            "description": "종합 점수. 완료된 리뷰만 값이 있고 그 밖에는 null입니다.",
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "post": {
+            "$ref": "#/components/schemas/AdminAiReviewListPost"
+          },
+          "promptVersion": {
+            "$ref": "#/components/schemas/AdminAiReviewListPromptVersion"
+          },
+          "requestCount": {
+            "description": "사용자 요청 횟수(처음 요청 포함)",
+            "format": "int32",
+            "type": "integer"
+          },
+          "requestedAt": {
+            "description": "처음 요청 시각",
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "QUEUED",
+              "PROCESSING",
+              "COMPLETED",
+              "FAILED"
+            ],
+            "type": "string"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/AdminAiReviewListUsage",
+            "description": "마지막 호출의 토큰 사용량. 호출 기록이 없으면 각 값이 null입니다."
+          },
+          "visibleToAuthor": {
+            "description": "작성자 앱에서 이 리뷰가 보이는지. 게시물이 승인됐고 게시물·주제·사진·작성자가 모두 삭제되지 않았을 때만 true입니다. 정지된 작성자는 영향을 주지 않습니다.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "AdminAiReviewListPost": {
+        "properties": {
+          "deletedAt": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "moderationStatus": {
+            "enum": [
+              "VALIDATING",
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ],
+            "type": "string"
+          },
+          "postId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "thumbnailUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "AdminAiReviewListPromptVersion": {
+        "properties": {
+          "model": {
+            "type": "string"
+          },
+          "promptVersionId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "version": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "AdminAiReviewListResponse": {
+        "properties": {
+          "aiReviews": {
+            "description": "마지막 요청 시각 내림차순(같으면 ID 내림차순)",
+            "items": {
+              "$ref": "#/components/schemas/AdminAiReviewListItem"
+            },
+            "type": "array"
+          },
+          "currentPage": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "hasNext": {
+            "type": "boolean"
+          },
+          "pageSize": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "AdminAiReviewListUsage": {
+        "properties": {
+          "cachedInputTokens": {
+            "format": "int32",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "inputTokens": {
+            "format": "int32",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "outputTokens": {
+            "format": "int32",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "reasoningTokens": {
+            "format": "int32",
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "AdminAppVersionListResponse": {
+        "properties": {
+          "appVersions": {
+            "items": {
+              "$ref": "#/components/schemas/AdminAppVersionResponse"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "AdminAppVersionRequest": {
+        "properties": {
+          "minimumSupportedVersion": {
+            "description": "각 숫자 0~2147483647, 앞자리 0 금지의 major.minor.patch",
+            "example": "1.10.0",
+            "minLength": 1,
+            "type": "string"
+          },
+          "reason": {
+            "description": "앞뒤 공백 제거 후 1~500 Unicode code point",
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          },
+          "revision": {
+            "description": "관리자 조회에서 받은 revision. 미설정 플랫폼의 최초 저장은 null입니다.",
+            "format": "int64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "storeUrl": {
+            "description": "플랫폼별 공식 HTTPS 앱 상세 주소. 실제 자사 앱과 출시 여부는 관리자가 확인합니다.",
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "minimumSupportedVersion",
+          "reason",
+          "storeUrl"
+        ],
+        "type": "object"
+      },
+      "AdminAppVersionResponse": {
+        "properties": {
+          "changeReason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lastChangedBy": {
+            "format": "uuid",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "minimumSupportedVersion": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "platform": {
+            "enum": [
+              "ANDROID",
+              "IOS"
+            ],
+            "type": "string"
+          },
+          "revision": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "storeUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
       "AdminAuditLogListResponse": {
         "properties": {
           "auditLogs": {
@@ -21,6 +487,39 @@
             "type": "integer"
           }
         },
+        "type": "object"
+      },
+      "AdminBannerRequest": {
+        "properties": {
+          "subtitle": {
+            "description": "앞뒤 공백 제거 후 1~100자",
+            "minLength": 1,
+            "type": "string"
+          },
+          "thumbnailUrl": {
+            "description": "앞뒤 공백 제거 후 최대 2,000자의 HTTPS 절대 주소. 명시한 포트는 65535 이하여야 합니다.",
+            "example": "https://cdn.example.com/banner.png",
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": {
+            "description": "앞뒤 공백 제거 후 1~50자",
+            "minLength": 1,
+            "type": "string"
+          },
+          "webViewUrl": {
+            "description": "앞뒤 공백 제거 후 최대 2,000자의 HTTPS 절대 주소. 명시한 포트는 65535 이하여야 하며 전체 문자열로 중복을 판단합니다.",
+            "example": "https://chalkak.vercel.app/event",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "subtitle",
+          "thumbnailUrl",
+          "title",
+          "webViewUrl"
+        ],
         "type": "object"
       },
       "AdminFeedbackListAuthor": {
@@ -139,6 +638,125 @@
             "type": "integer"
           },
           "username": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "AdminNoticeDeletionRequest": {
+        "description": "관리자 공지 삭제 요청",
+        "properties": {
+          "reason": {
+            "description": "삭제 사유",
+            "example": "점검 일정 취소",
+            "maxLength": 500,
+            "minLength": 0,
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "type": "object"
+      },
+      "AdminNoticeListResponse": {
+        "description": "관리자 공지 목록. 등록 최신순으로 정렬합니다.",
+        "properties": {
+          "currentPage": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "hasNext": {
+            "type": "boolean"
+          },
+          "notices": {
+            "items": {
+              "$ref": "#/components/schemas/AdminNoticeResponse"
+            },
+            "type": "array"
+          },
+          "pageSize": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "AdminNoticeRequest": {
+        "description": "관리자 공지 등록 요청",
+        "properties": {
+          "body": {
+            "description": "공지 본문. 앞뒤 공백을 제거한 뒤 1~500자",
+            "example": "10월 20일 02:00부터 04:00까지 서비스 점검이 진행됩니다.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "scheduledAt": {
+            "description": "발송 예약 시각. 즉시 발송은 현재 시각을 전달하며, 현재보다 5분 넘게 과거인 시각은 거절합니다.",
+            "example": "2026-10-19T09:00:00Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "title": {
+            "description": "공지 제목. 앞뒤 공백을 제거한 뒤 1~50자",
+            "example": "서비스 점검 안내",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "body",
+          "scheduledAt",
+          "title"
+        ],
+        "type": "object"
+      },
+      "AdminNoticeResponse": {
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deletedAt": {
+            "description": "공지를 삭제한 시각. 삭제하지 않았으면 null. 배포 전 삭제는 발송 취소, 배포 후 삭제는 회원 알림함에서 숨김",
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "distributedAt": {
+            "description": "회원 알림함에 배포한 시각. 배포 전이면 null",
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "noticeId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "scheduledAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "description": "회원 알림함 배포 상태. 예약 시각이 지나 알림함에 배포되면 DISTRIBUTED",
+            "enum": [
+              "SCHEDULED",
+              "DISTRIBUTED"
+            ],
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
             "type": "string"
           }
         },
@@ -604,6 +1222,120 @@
         ],
         "type": "object"
       },
+      "AdminReminderListResponse": {
+        "description": "관리자 리마인더 목록. 등록 최신순으로 정렬합니다.",
+        "properties": {
+          "currentPage": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "hasNext": {
+            "type": "boolean"
+          },
+          "pageSize": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "reminders": {
+            "items": {
+              "$ref": "#/components/schemas/AdminReminderResponse"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "AdminReminderRequest": {
+        "description": "관리자 리마인더 등록 요청",
+        "properties": {
+          "body": {
+            "description": "푸시 본문. 앞뒤 공백을 제거한 뒤 1~500자",
+            "example": "사진을 자랑해 주세요!",
+            "minLength": 1,
+            "type": "string"
+          },
+          "repeat": {
+            "description": "반복 방식. ONCE는 발송 시각에 한 번, DAILY는 발송 시각의 날짜부터 매일 같은 KST 시각에 보냅니다.",
+            "enum": [
+              "ONCE",
+              "DAILY"
+            ],
+            "type": "string"
+          },
+          "scheduledAt": {
+            "description": "발송 시각. 매일 반복이면 첫 발송 날짜와 매일 보낼 시각입니다. 현재보다 과거인 시각은 거절합니다.",
+            "example": "2026-10-25T12:00:00Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "target": {
+            "description": "발송 대상. 전체(ALL), 오늘 주제 참여자(TOPIC_PARTICIPANTS), 오늘 주제 미참여자(TOPIC_NON_PARTICIPANTS)",
+            "enum": [
+              "ALL",
+              "TOPIC_PARTICIPANTS",
+              "TOPIC_NON_PARTICIPANTS"
+            ],
+            "type": "string"
+          },
+          "title": {
+            "description": "푸시 제목. 앞뒤 공백을 제거한 뒤 1~50자",
+            "example": "오늘이 얼마 남지 않았어요",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "body",
+          "repeat",
+          "scheduledAt",
+          "target",
+          "title"
+        ],
+        "type": "object"
+      },
+      "AdminReminderResponse": {
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "reminderId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "repeat": {
+            "enum": [
+              "ONCE",
+              "DAILY"
+            ],
+            "type": "string"
+          },
+          "scheduledAt": {
+            "description": "발송 시각. 매일 반복이면 첫 발송 날짜와 매일 보낼 시각",
+            "format": "date-time",
+            "type": "string"
+          },
+          "target": {
+            "enum": [
+              "ALL",
+              "TOPIC_PARTICIPANTS",
+              "TOPIC_NON_PARTICIPANTS"
+            ],
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "AdminTokenRefreshResponse": {
         "properties": {
           "accessToken": {
@@ -908,6 +1640,21 @@
         },
         "type": "object"
       },
+      "AdminUserMetricsAggregationRequest": {
+        "description": "사용자 지표 수동 집계 요청",
+        "properties": {
+          "metricDate": {
+            "description": "집계할 KST 날짜. 오늘 이후는 집계할 수 없다",
+            "example": "2026-10-12",
+            "format": "date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "metricDate"
+        ],
+        "type": "object"
+      },
       "AdminUserPostCounts": {
         "properties": {
           "approved": {
@@ -987,6 +1734,299 @@
         ],
         "type": "object"
       },
+      "AiPromptParametersRequest": {
+        "properties": {
+          "distinctivePerspectiveThreshold": {
+            "description": "주제 표현 점수가 이 값 이상이면 독특한 시각으로 판정하는 기준(0~10). 생략하면 7.0.",
+            "format": "double",
+            "type": "number"
+          },
+          "imageDetail": {
+            "description": "이미지 상세도. 생략하면 HIGH.",
+            "enum": [
+              "LOW",
+              "HIGH",
+              "AUTO"
+            ],
+            "type": "string"
+          },
+          "maxOutputTokens": {
+            "description": "최대 출력 토큰(1~16000). 추론 토큰도 포함됩니다. 생략하면 8000.",
+            "format": "int32",
+            "type": "integer"
+          },
+          "reasoningEffort": {
+            "description": "추론 강도. 생략하면 모델 기본값을 사용합니다.",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "AiPromptPreviewRequest": {
+        "properties": {
+          "model": {
+            "description": "호출할 모델. 서버가 허용한 모델이어야 합니다.",
+            "example": "gpt-6.1-sol",
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string"
+          },
+          "parameters": {
+            "$ref": "#/components/schemas/AiPromptParametersRequest",
+            "description": "모델 호출 옵션. 생략하면 모든 항목이 기본값입니다."
+          },
+          "postId": {
+            "description": "프롬프트를 실행할 공개 게시물 ID. 승인되었고 삭제되지 않은 게시물이어야 합니다.",
+            "format": "uuid",
+            "minLength": 1,
+            "type": "string"
+          },
+          "systemPrompt": {
+            "description": "시스템 프롬프트. 변수({{...}})를 쓸 수 없습니다. 최대 50,000자.",
+            "maxLength": 50000,
+            "minLength": 0,
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "PHOTO_REVIEW"
+            ],
+            "type": "string"
+          },
+          "userPromptTemplate": {
+            "description": "사용자 프롬프트 템플릿. PHOTO_REVIEW는 {{topicTitle}} 변수만 쓸 수 있습니다. 변수 값은 항상 JSON 문자열 규칙으로 이스케이프해 넣으므로 {\"주제\": \"{{topicTitle}}\"} 형태도 유효한 JSON이 됩니다(평문 템플릿에서도 따옴표는 \\\"로 들어갑니다). 최대 2,000자.",
+            "example": {
+              "주제": "{{topicTitle}}"
+            },
+            "maxLength": 2000,
+            "minLength": 0,
+            "type": "string"
+          }
+        },
+        "required": [
+          "model",
+          "postId",
+          "systemPrompt",
+          "type",
+          "userPromptTemplate"
+        ],
+        "type": "object"
+      },
+      "AiPromptPreviewResponse": {
+        "properties": {
+          "failureType": {
+            "description": "실패 유형. 성공하면 null입니다.",
+            "enum": [
+              "TIMEOUT",
+              "RATE_LIMITED",
+              "QUOTA_EXCEEDED",
+              "UPSTREAM_ERROR",
+              "BAD_REQUEST",
+              "REFUSED",
+              "INCOMPLETE",
+              "INVALID_OUTPUT"
+            ],
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "latencyMs": {
+            "description": "OpenAI 호출 지연시간(ms). 응답 본문을 받지 못하면 null입니다.",
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "output": {
+            "$ref": "#/components/schemas/Output",
+            "description": "프롬프트 튜닝용 모델 원점수. 실패하면 null입니다.",
+            "type": "null"
+          },
+          "responseId": {
+            "description": "OpenAI 응답 ID. 응답 본문을 받지 못하면 null입니다.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "result": {
+            "$ref": "#/components/schemas/Result",
+            "description": "서버가 변환한 리뷰 결과. 실패하면 null입니다.",
+            "type": "null"
+          },
+          "retryable": {
+            "description": "같은 요청을 다시 보내면 성공할 수 있는 실패인지. 성공하면 null입니다.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "succeeded": {
+            "description": "생성에 성공했는지. OpenAI 실패도 200으로 돌려주며 이 값이 false입니다.",
+            "type": "boolean"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/UsageResponse",
+            "description": "OpenAI가 응답 본문을 준 경우의 토큰 사용량. HTTP 오류·시간 초과면 null이고, 항목 값이 null이면 OpenAI가 주지 않은 것입니다.",
+            "type": "null"
+          }
+        },
+        "type": "object"
+      },
+      "AiPromptVersionCreateRequest": {
+        "properties": {
+          "memo": {
+            "description": "관리자용 메모. 앞뒤 공백을 제거하며 비어 있으면 저장하지 않습니다. 공백을 제거한 뒤 글자 수로 최대 500자입니다.",
+            "maxLength": 500,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "model": {
+            "description": "호출할 모델. 서버가 허용한 모델이어야 합니다.",
+            "example": "gpt-6.1-sol",
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string"
+          },
+          "parameters": {
+            "$ref": "#/components/schemas/AiPromptParametersRequest",
+            "description": "모델 호출 옵션. 생략하면 모든 항목이 기본값입니다."
+          },
+          "systemPrompt": {
+            "description": "시스템 프롬프트. 변수({{...}})를 쓸 수 없습니다. 최대 50,000자.",
+            "maxLength": 50000,
+            "minLength": 0,
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "PHOTO_REVIEW"
+            ],
+            "type": "string"
+          },
+          "userPromptTemplate": {
+            "description": "사용자 프롬프트 템플릿. PHOTO_REVIEW는 {{topicTitle}} 변수만 쓸 수 있습니다. 최대 2,000자.",
+            "example": {
+              "주제": "{{topicTitle}}"
+            },
+            "maxLength": 2000,
+            "minLength": 0,
+            "type": "string"
+          }
+        },
+        "required": [
+          "model",
+          "systemPrompt",
+          "type",
+          "userPromptTemplate"
+        ],
+        "type": "object"
+      },
+      "AiPromptVersionListResponse": {
+        "properties": {
+          "currentPage": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "hasNext": {
+            "type": "boolean"
+          },
+          "pageSize": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "promptVersions": {
+            "description": "version 내림차순(최신 먼저). 프롬프트 본문은 상세 조회로 확인합니다.",
+            "items": {
+              "$ref": "#/components/schemas/PromptVersionItem"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "AiPromptVersionResponse": {
+        "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "createdByAdminId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "memo": {
+            "description": "관리자용 메모. 없으면 null입니다.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "model": {
+            "type": "string"
+          },
+          "outputSchemaVersion": {
+            "description": "모델이 지켜야 할 출력 스키마 버전",
+            "example": "1",
+            "type": "string"
+          },
+          "parameters": {
+            "$ref": "#/components/schemas/ParametersResponse"
+          },
+          "promptVersionId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "systemPrompt": {
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "PHOTO_REVIEW"
+            ],
+            "type": "string"
+          },
+          "userPromptTemplate": {
+            "type": "string"
+          },
+          "version": {
+            "description": "같은 type 안에서 1부터 하나씩 늘어나는 버전 번호. 가장 큰 번호가 최신입니다.",
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "AiReviewResult": {
+        "properties": {
+          "criteria": {
+            "items": {
+              "$ref": "#/components/schemas/Criterion"
+            },
+            "type": "array"
+          },
+          "distinctivePerspective": {
+            "type": "boolean"
+          },
+          "feedback": {
+            "$ref": "#/components/schemas/Feedback"
+          },
+          "overallScore": {
+            "format": "double",
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
       "AuditLogResponse": {
         "properties": {
           "action": {
@@ -998,7 +2038,21 @@
               "USER_UNBANNED",
               "TOPIC_CREATED",
               "TOPIC_UPDATED",
-              "TOPIC_DELETED"
+              "TOPIC_DELETED",
+              "TOPIC_PUSH_SCHEDULE_CREATED",
+              "TOPIC_PUSH_SCHEDULE_UPDATED",
+              "TOPIC_PUSH_SCHEDULE_DELETED",
+              "NOTICE_CREATED",
+              "NOTICE_UPDATED",
+              "NOTICE_DELETED",
+              "BANNER_CREATED",
+              "BANNER_DELETED",
+              "AI_PROMPT_VERSION_CREATED",
+              "REMINDER_CREATED",
+              "REMINDER_UPDATED",
+              "REMINDER_DELETED",
+              "APP_VERSION_CREATED",
+              "APP_VERSION_UPDATED"
             ],
             "type": "string"
           },
@@ -1042,9 +2096,55 @@
             "enum": [
               "POST",
               "USER",
-              "TOPIC"
+              "TOPIC",
+              "TOPIC_PUSH_SCHEDULE",
+              "NOTICE",
+              "BANNER",
+              "AI_PROMPT_VERSION",
+              "REMINDER",
+              "APP_VERSION"
             ],
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "BannerResponse": {
+        "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "thumbnailUrl": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "webViewUrl": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Criterion": {
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "score": {
+            "format": "double",
+            "type": "number"
           }
         },
         "type": "object"
@@ -1068,6 +2168,291 @@
           },
           "message": {
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Feedback": {
+        "properties": {
+          "strength": {
+            "type": "string"
+          },
+          "suggestion": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "weakness": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "JsonNode": {
+        "properties": {
+          "array": {
+            "type": "boolean"
+          },
+          "bigDecimal": {
+            "type": "boolean"
+          },
+          "bigInteger": {
+            "type": "boolean"
+          },
+          "binary": {
+            "type": "boolean"
+          },
+          "boolean": {
+            "type": "boolean"
+          },
+          "container": {
+            "type": "boolean"
+          },
+          "double": {
+            "type": "boolean"
+          },
+          "embeddedValue": {
+            "type": "boolean"
+          },
+          "empty": {
+            "type": "boolean"
+          },
+          "float": {
+            "type": "boolean"
+          },
+          "floatingPointNumber": {
+            "type": "boolean"
+          },
+          "int": {
+            "type": "boolean"
+          },
+          "integralNumber": {
+            "type": "boolean"
+          },
+          "long": {
+            "type": "boolean"
+          },
+          "missingNode": {
+            "type": "boolean"
+          },
+          "nodeType": {
+            "enum": [
+              "ARRAY",
+              "BINARY",
+              "BOOLEAN",
+              "MISSING",
+              "NULL",
+              "NUMBER",
+              "OBJECT",
+              "POJO",
+              "STRING"
+            ],
+            "type": "string"
+          },
+          "null": {
+            "type": "boolean"
+          },
+          "number": {
+            "type": "boolean"
+          },
+          "object": {
+            "type": "boolean"
+          },
+          "pojo": {
+            "type": "boolean"
+          },
+          "short": {
+            "type": "boolean"
+          },
+          "string": {
+            "type": "boolean"
+          },
+          "textual": {
+            "deprecated": true,
+            "type": "boolean"
+          },
+          "valueNode": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "Output": {
+        "properties": {
+          "compositionScore": {
+            "format": "double",
+            "type": "number"
+          },
+          "themeExpressionScore": {
+            "format": "double",
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "ParametersResponse": {
+        "properties": {
+          "distinctivePerspectiveThreshold": {
+            "format": "double",
+            "type": "number"
+          },
+          "imageDetail": {
+            "enum": [
+              "LOW",
+              "HIGH",
+              "AUTO"
+            ],
+            "type": "string"
+          },
+          "maxOutputTokens": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "reasoningEffort": {
+            "description": "생략했으면 null이며 모델 기본값을 사용합니다.",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH"
+            ],
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "PromptVersionItem": {
+        "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "createdByAdminId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "memo": {
+            "description": "관리자용 메모. 없으면 null입니다.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "model": {
+            "type": "string"
+          },
+          "outputSchemaVersion": {
+            "description": "모델이 지켜야 할 출력 스키마 버전",
+            "example": "1",
+            "type": "string"
+          },
+          "promptVersionId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "PHOTO_REVIEW"
+            ],
+            "type": "string"
+          },
+          "version": {
+            "description": "같은 type 안에서 1부터 하나씩 늘어나는 버전 번호. 가장 큰 번호가 최신입니다.",
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "Result": {
+        "properties": {
+          "criteria": {
+            "items": {
+              "$ref": "#/components/schemas/Criterion"
+            },
+            "type": "array"
+          },
+          "distinctivePerspective": {
+            "type": "boolean"
+          },
+          "feedback": {
+            "$ref": "#/components/schemas/Feedback"
+          },
+          "overallScore": {
+            "format": "double",
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "TopicPushScheduleListResponse": {
+        "properties": {
+          "schedules": {
+            "items": {
+              "$ref": "#/components/schemas/TopicPushScheduleResponse"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "TopicPushScheduleRequest": {
+        "properties": {
+          "sendTime": {
+            "description": "KST 기준 발송 시각. 날짜·시간대 없이 HH:mm:ss 형식으로 전달하며 초는 00이어야 합니다.",
+            "example": "09:00:00",
+            "format": "time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sendTime"
+        ],
+        "type": "object"
+      },
+      "TopicPushScheduleResponse": {
+        "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "scheduleId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "sendTime": {
+            "description": "KST 기준 발송 시각",
+            "example": "09:00:00",
+            "format": "time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "UsageResponse": {
+        "properties": {
+          "cachedInputTokens": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "inputTokens": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "outputTokens": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "reasoningTokens": {
+            "format": "int32",
+            "type": "integer"
           }
         },
         "type": "object"
@@ -1095,6 +2480,698 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/admin/ai-prompt-previews": {
+      "post": {
+        "description": "저장하지 않은 프롬프트 초안을 공개(APPROVED, 삭제되지 않은) 게시물의 원본 이미지와 주제 제목으로 실행해 결과를 돌려줍니다. 결과는 저장하거나 사용자에게 보여주지 않으며 감사 로그도 남기지 않습니다. 요청이 유효하면 OpenAI 호출 실패(시간 초과, 한도 소진, 거절, 출력 오류 등)도 오류가 아닌 200 결과이며 succeeded=false와 failureType으로 구분합니다. 사용량·지연시간·응답 ID는 OpenAI가 응답 본문을 준 경우에만 값이 있습니다. 템플릿 변수 값은 항상 JSON 문자열 규칙으로 이스케이프해 넣습니다(예: {\"주제\": \"{{topicTitle}}\"}가 유효한 JSON으로 유지되며, 평문 템플릿에서도 따옴표는 \\\"로 들어갑니다).",
+        "operationId": "preview",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AiPromptPreviewRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiPromptPreviewResponse"
+                }
+              }
+            },
+            "description": "실행 결과(성공 또는 OpenAI 실패 결과)"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "필수 값 누락·길이 초과, 잘못된 게시물 ID·열거형 값, 프롬프트·옵션 검증 실패(허용되지 않은 변수 포함), 허용되지 않은 모델"
+          },
+          "401": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "인증되지 않음"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          },
+          "404": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "게시물이 없거나 공개 상태가 아님"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "AI 프롬프트 미리보기 실행",
+        "tags": [
+          "Admin AI Prompt Previews"
+        ]
+      }
+    },
+    "/api/v1/admin/ai-prompt-versions": {
+      "get": {
+        "description": "type 하나의 프롬프트 버전을 version 내림차순(최신 먼저)으로 조회합니다. 같은 type에서 가장 큰 버전이 최신이며 사용자 기능이 사용하는 버전입니다. 목록에는 프롬프트 본문과 모델 옵션이 없으므로 본문은 상세 조회로 확인하세요. page는 1부터, pageSize는 1~100이며 생략하면 각각 1, 20입니다.",
+        "operationId": "getVersions",
+        "parameters": [
+          {
+            "description": "조회할 프롬프트 type",
+            "in": "query",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "description": "조회할 프롬프트 type",
+              "enum": [
+                "PHOTO_REVIEW"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "format": "int32",
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pageSize",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiPromptVersionListResponse"
+                }
+              }
+            },
+            "description": "프롬프트 버전 목록과 페이지 정보"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "type 누락·잘못된 값, page·pageSize 형식 오류 또는 범위 초과"
+          },
+          "401": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "인증되지 않음"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "AI 프롬프트 버전 목록 조회",
+        "tags": [
+          "Admin AI Prompt Versions"
+        ]
+      },
+      "post": {
+        "description": "프롬프트 버전을 새로 만듭니다. 버전 번호는 type별로 1부터 서버가 부여하며, 만든 버전은 수정하거나 삭제할 수 없습니다. 같은 type에서 가장 큰 버전이 최신이고 사용자 기능이 이 최신 버전을 사용하므로, 만들면 곧바로 사용자 기능에 적용됩니다. 저장 전에 미리보기 API로 초안을 먼저 확인하세요. 시스템 프롬프트에는 변수를 쓸 수 없고, 사용자 프롬프트 템플릿에는 type이 허용한 변수만 쓸 수 있습니다. 감사 로그에는 프롬프트 원문 없이 type과 version만 남깁니다.",
+        "operationId": "createVersion",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AiPromptVersionCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiPromptVersionResponse"
+                }
+              }
+            },
+            "description": "생성된 프롬프트 버전"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "필수 값 누락·길이 초과, 잘못된 열거형 값, 프롬프트·옵션 검증 실패(허용되지 않은 변수 포함), 허용되지 않은 모델"
+          },
+          "401": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "인증되지 않음"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "AI 프롬프트 버전 생성",
+        "tags": [
+          "Admin AI Prompt Versions"
+        ]
+      }
+    },
+    "/api/v1/admin/ai-prompt-versions/{promptVersionId}": {
+      "get": {
+        "description": "프롬프트 버전 하나를 시스템 프롬프트·사용자 프롬프트 템플릿·모델 옵션까지 전체 조회합니다. 이전 버전의 내용을 바탕으로 새 버전을 만들 때 사용합니다.",
+        "operationId": "getVersion",
+        "parameters": [
+          {
+            "description": "프롬프트 버전 ID",
+            "in": "path",
+            "name": "promptVersionId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiPromptVersionResponse"
+                }
+              }
+            },
+            "description": "프롬프트 버전 전체"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "promptVersionId가 UUID 형식이 아님"
+          },
+          "401": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "인증되지 않음"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          },
+          "404": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "프롬프트 버전을 찾을 수 없음"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "AI 프롬프트 버전 상세 조회",
+        "tags": [
+          "Admin AI Prompt Versions"
+        ]
+      }
+    },
+    "/api/v1/admin/ai-reviews": {
+      "get": {
+        "description": "전체 AI 리뷰를 상태와 프롬프트 버전으로 걸러 마지막 요청 시각 내림차순(같으면 ID 내림차순)으로 조회합니다. 사용자 앱에서 보이지 않는 숨겨진 리뷰(게시물 삭제·미승인, 주제·사진 삭제, 작성자 탈퇴)도 거르지 않고 포함하며, 게시물과 작성자의 원값(deletedAt, status)을 그대로 줍니다. visibleToAuthor는 작성자 앱에서 이 리뷰가 보이는지를 뜻합니다. 게시물이 승인됐고 게시물·주제·사진·작성자가 모두 삭제되지 않았을 때만 true이며, 정지된 작성자는 영향을 주지 않습니다. 한 게시물에 리뷰는 하나이고 다시 요청하면 같은 항목이 새 프롬프트 버전으로 바뀝니다. 목록의 promptVersion은 이번 회차에 쓴 버전입니다. overallScore는 완료된 리뷰만 값이 있고, 사용량과 지연시간은 마지막 호출의 값이라 호출 기록이 없으면 null입니다. 존재하지 않는 promptVersionId로 조회하면 404가 아니라 빈 목록을 돌려줍니다. page는 1부터, pageSize는 1~100이며 생략하면 각각 1, 20입니다.",
+        "operationId": "getAiReviews",
+        "parameters": [
+          {
+            "description": "AI 리뷰 상태. 생략하면 전체",
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "description": "AI 리뷰 상태. 생략하면 전체",
+              "enum": [
+                "QUEUED",
+                "PROCESSING",
+                "COMPLETED",
+                "FAILED"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "프롬프트 버전 ID. 생략하면 전체. 없는 ID는 오류가 아니라 빈 목록",
+            "in": "query",
+            "name": "promptVersionId",
+            "required": false,
+            "schema": {
+              "description": "프롬프트 버전 ID. 생략하면 전체. 없는 ID는 오류가 아니라 빈 목록",
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "format": "int32",
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pageSize",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAiReviewListResponse"
+                }
+              }
+            },
+            "description": "AI 리뷰 목록과 페이지 정보"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "status·promptVersionId 형식 오류, page·pageSize 형식 오류 또는 범위 초과"
+          },
+          "401": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "인증되지 않음"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "AI 리뷰 목록 조회",
+        "tags": [
+          "Admin AI Reviews"
+        ]
+      }
+    },
+    "/api/v1/admin/ai-reviews/{aiReviewId}": {
+      "get": {
+        "description": "AI 리뷰 하나를 목록 항목의 모든 값과 함께 결과(result)·모델 원출력(output)·OpenAI 응답 ID·시도 횟수·시작 시각·원본 사진 URL까지 조회합니다. 사용자 앱에서 보이지 않는 숨겨진 리뷰(게시물 삭제·미승인, 주제·사진 삭제, 작성자 탈퇴)도 거르지 않고 포함하며, 게시물과 작성자의 원값(deletedAt, status)을 그대로 줍니다. visibleToAuthor는 작성자 앱에서 이 리뷰가 보이는지를 뜻합니다. 게시물이 승인됐고 게시물·주제·사진·작성자가 모두 삭제되지 않았을 때만 true이며, 정지된 작성자는 영향을 주지 않습니다. result는 서비스 규칙으로 변환한 결과이며 완료된 리뷰만 값이 있습니다. output은 모델이 돌려준 원출력을 문자열이 아닌 JSON 객체로 그대로 담으며 구도 점수(compositionScore)와 주제 표현 점수(themeExpressionScore)의 원점수와 피드백이 들어 있습니다. 원출력이 없으면 null입니다.",
+        "operationId": "getAiReview",
+        "parameters": [
+          {
+            "description": "AI 리뷰 ID",
+            "in": "path",
+            "name": "aiReviewId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAiReviewDetailResponse"
+                }
+              }
+            },
+            "description": "AI 리뷰 상세"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "aiReviewId가 UUID 형식이 아님"
+          },
+          "401": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "인증되지 않음"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          },
+          "404": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "AI 리뷰를 찾을 수 없음"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "AI 리뷰 상세 조회",
+        "tags": [
+          "Admin AI Reviews"
+        ]
+      }
+    },
+    "/api/v1/admin/analytics/aggregations": {
+      "post": {
+        "description": "집계 로그를 다시 남기는 요청이다. 과거 그래프의 값은 바뀌지 않는다.",
+        "operationId": "startUserMetricsAggregation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminUserMetricsAggregationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "백그라운드 집계 시작"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "날짜 누락·형식 오류, 오늘 이후 날짜 또는 이미 진행 중인 집계(errorCode USER_METRICS_AGGREGATION_IN_PROGRESS)"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 인증 필요"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "사용자 지표 수동 집계",
+        "tags": [
+          "Admin Analytics"
+        ]
+      }
+    },
+    "/api/v1/admin/app-versions": {
+      "get": {
+        "description": "ANDROID·IOS 순서로 두 플랫폼을 반환합니다. 미설정이면 platform 외 필드는 null입니다. 이전에 수동 입력한 설정은 최종 관리자·사유가 null일 수 있습니다.",
+        "operationId": "getAppVersions",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAppVersionListResponse"
+                }
+              }
+            },
+            "description": "플랫폼별 설정 조회"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 인증 필요"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 권한 필요"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "앱 버전 설정 목록 조회",
+        "tags": [
+          "Admin App Versions"
+        ]
+      }
+    },
+    "/api/v1/admin/app-versions/{platform}": {
+      "put": {
+        "description": "최초 입력과 수정 모두 200입니다. 조회한 revision을 전달하며 최초 입력은 null입니다. 같은 버전·주소면 이전 revision의 재시도도 이력 없이 현재 값을 반환합니다. 그 외 오래된 요청은 RESOURCE_STATE_CHANGED로 거절합니다. 버전 하향을 허용합니다. 실제 앱 식별과 출시 여부는 관리자가 확인해야 합니다.",
+        "operationId": "saveAppVersion",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "platform",
+            "required": true,
+            "schema": {
+              "enum": [
+                "ANDROID",
+                "IOS"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminAppVersionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAppVersionResponse"
+                }
+              }
+            },
+            "description": "현재 설정"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 입력·플랫폼 또는 수정 충돌(RESOURCE_STATE_CHANGED)"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 인증 필요"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 권한 필요"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "앱 버전 설정 저장",
+        "tags": [
+          "Admin App Versions"
+        ]
+      }
+    },
     "/api/v1/admin/audit-logs": {
       "get": {
         "description": "관리자·작업·대상·발생 시각으로 변경 이력을 조회합니다. 기간 양 끝값은 포함되고,\n같은 발생 시각은 로그 ID로 안정 정렬합니다. 대상과 로그 사이에 외래 키를 두지 않아\n삭제된 대상의 기록도 유지하며, 관리자 계정은 감사 로그가 있으면 삭제할 수 없습니다.\n변경 전후 JSON은 AdminAction별 허용 필드 규칙을 따르고 비밀번호·토큰·Webhook·FCM 값과\n이미지/스토리지 식별자를 저장하거나 응답하지 않습니다. 수정·삭제 API는 제공하지 않습니다.\n",
@@ -1126,7 +3203,21 @@
                 "USER_UNBANNED",
                 "TOPIC_CREATED",
                 "TOPIC_UPDATED",
-                "TOPIC_DELETED"
+                "TOPIC_DELETED",
+                "TOPIC_PUSH_SCHEDULE_CREATED",
+                "TOPIC_PUSH_SCHEDULE_UPDATED",
+                "TOPIC_PUSH_SCHEDULE_DELETED",
+                "NOTICE_CREATED",
+                "NOTICE_UPDATED",
+                "NOTICE_DELETED",
+                "BANNER_CREATED",
+                "BANNER_DELETED",
+                "AI_PROMPT_VERSION_CREATED",
+                "REMINDER_CREATED",
+                "REMINDER_UPDATED",
+                "REMINDER_DELETED",
+                "APP_VERSION_CREATED",
+                "APP_VERSION_UPDATED"
               ],
               "type": "string"
             }
@@ -1141,7 +3232,13 @@
               "enum": [
                 "POST",
                 "USER",
-                "TOPIC"
+                "TOPIC",
+                "TOPIC_PUSH_SCHEDULE",
+                "NOTICE",
+                "BANNER",
+                "AI_PROMPT_VERSION",
+                "REMINDER",
+                "APP_VERSION"
               ],
               "type": "string"
             }
@@ -1466,6 +3563,145 @@
         ]
       }
     },
+    "/api/v1/admin/banners": {
+      "post": {
+        "description": "외부 페이지의 URL과 배너 정보를 등록합니다. 웹뷰 URL의 앞뒤 공백을 제거한 전체 문자열이 기존 배너와 같으면 거절합니다.",
+        "operationId": "createBanner",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminBannerRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BannerResponse"
+                }
+              }
+            },
+            "description": "등록 성공"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "필수 값 누락·공백, 길이 초과, 잘못된 HTTPS 주소·포트 범위 초과 또는 중복 웹뷰 URL"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 인증 필요"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "배너 등록",
+        "tags": [
+          "Admin Banners"
+        ]
+      }
+    },
+    "/api/v1/admin/banners/{bannerId}": {
+      "delete": {
+        "description": "배너를 논리 삭제합니다. 요청 본문 없이 호출하며 재삭제하면 최초 삭제 결과를 유지하고 감사 기록을 추가하지 않습니다.",
+        "operationId": "deleteBanner",
+        "parameters": [
+          {
+            "description": "배너 ID",
+            "in": "path",
+            "name": "bannerId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "삭제 성공 또는 이미 삭제된 배너"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 ID"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 인증 필요"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          },
+          "404": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "존재하지 않는 배너"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "배너 삭제",
+        "tags": [
+          "Admin Banners"
+        ]
+      }
+    },
     "/api/v1/admin/feedbacks": {
       "get": {
         "description": "접수된 사용자 피드백을 작성자 정보와 함께 최신순으로 조회합니다. 탈퇴한 회원이 남긴 피드백도 함께 조회됩니다.",
@@ -1564,6 +3800,403 @@
         "summary": "관리자 피드백 목록 조회",
         "tags": [
           "Admin Feedbacks"
+        ]
+      }
+    },
+    "/api/v1/admin/notices": {
+      "get": {
+        "description": "등록한 공지를 등록 최신순으로 페이지 단위로 조회합니다. 공지가 없으면 빈 목록을 반환합니다.",
+        "operationId": "getNotices",
+        "parameters": [
+          {
+            "description": "페이지 번호",
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "description": "페이지 번호",
+              "format": "int32",
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "페이지당 공지 수",
+            "in": "query",
+            "name": "pageSize",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "description": "페이지당 공지 수",
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminNoticeListResponse"
+                }
+              }
+            },
+            "description": "조회 성공"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 페이지 조건"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 인증 필요"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "공지 목록 조회",
+        "tags": [
+          "Admin Notices"
+        ]
+      },
+      "post": {
+        "description": "공지를 예약 시각과 함께 등록합니다. 즉시 발송은 현재 시각을 예약 시각으로 전달합니다. 이 요청 자체는 푸시를 발송하지 않습니다.",
+        "operationId": "createNotice",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminNoticeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminNoticeResponse"
+                }
+              }
+            },
+            "description": "등록 성공"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "필수 값 누락, 제목·본문 길이 초과, 5분 넘게 과거인 예약 시각 또는 감사 로그에 저장할 수 없는 민감 정보 포함"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 인증 필요"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "공지 등록",
+        "tags": [
+          "Admin Notices"
+        ]
+      }
+    },
+    "/api/v1/admin/notices/{noticeId}": {
+      "delete": {
+        "description": "사유와 함께 공지를 삭제합니다. 배포 전 공지는 발송이 취소되고, 배포된 공지는 회원 알림함에서 숨기며 아직 보내지 않은 푸시도 보내지 않습니다. 이미 기기에 표시된 푸시는 회수하지 않습니다. 이미 삭제한 공지를 다시 삭제하면 최초 결과를 유지합니다.",
+        "operationId": "deleteNotice",
+        "parameters": [
+          {
+            "description": "공지 ID",
+            "in": "path",
+            "name": "noticeId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminNoticeDeletionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "삭제 성공"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 ID, 사유 누락·공백 또는 500자 초과"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 인증 필요"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          },
+          "404": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "공지 없음"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "공지 삭제",
+        "tags": [
+          "Admin Notices"
+        ]
+      },
+      "get": {
+        "description": "공지 한 건을 조회합니다.",
+        "operationId": "getNotice",
+        "parameters": [
+          {
+            "description": "공지 ID",
+            "in": "path",
+            "name": "noticeId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminNoticeResponse"
+                }
+              }
+            },
+            "description": "조회 성공"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 ID"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 인증 필요"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          },
+          "404": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "공지 없음"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "공지 상세 조회",
+        "tags": [
+          "Admin Notices"
+        ]
+      },
+      "put": {
+        "description": "배포 전 공지의 제목·본문·예약 시각을 수정합니다. 검증 기준은 등록과 같습니다. 배포된 공지는 수정할 수 없으며, 같은 내용으로 수정하면 변경 없이 현재 공지를 반환합니다.",
+        "operationId": "updateNotice",
+        "parameters": [
+          {
+            "description": "공지 ID",
+            "in": "path",
+            "name": "noticeId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminNoticeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminNoticeResponse"
+                }
+              }
+            },
+            "description": "수정 성공"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 ID, 필수 값 누락, 제목·본문 길이 초과, 5분 넘게 과거인 예약 시각, 감사 로그에 저장할 수 없는 민감 정보 포함 또는 배포된 공지"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 인증 필요"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          },
+          "404": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "공지 없음"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "공지 수정",
+        "tags": [
+          "Admin Notices"
         ]
       }
     },
@@ -1996,6 +4629,587 @@
         "summary": "관리자 게시물 승인·거절",
         "tags": [
           "Admin Posts"
+        ]
+      }
+    },
+    "/api/v1/admin/reminders": {
+      "get": {
+        "description": "등록한 리마인더를 등록 최신순으로 페이지 단위로 조회합니다. 리마인더가 없으면 빈 목록을 반환합니다.",
+        "operationId": "getReminders",
+        "parameters": [
+          {
+            "description": "페이지 번호",
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "description": "페이지 번호",
+              "format": "int32",
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "페이지당 리마인더 수",
+            "in": "query",
+            "name": "pageSize",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "description": "페이지당 리마인더 수",
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminReminderListResponse"
+                }
+              }
+            },
+            "description": "조회 성공"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 페이지 조건"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 인증 필요"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "리마인더 목록 조회",
+        "tags": [
+          "Admin Reminders"
+        ]
+      },
+      "post": {
+        "description": "제목·본문·반복 방식·대상·발송 시각으로 리마인더를 등록합니다. 리마인더는 알림함에 남지 않고 푸시로만 보내며, 이 요청 자체는 푸시를 발송하지 않습니다.",
+        "operationId": "createReminder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminReminderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminReminderResponse"
+                }
+              }
+            },
+            "description": "등록 성공"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "필수 값 누락, 제목·본문 길이 초과, 잘못된 반복 방식·대상, 과거인 발송 시각 또는 감사 로그에 저장할 수 없는 민감 정보 포함"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 인증 필요"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "리마인더 등록",
+        "tags": [
+          "Admin Reminders"
+        ]
+      }
+    },
+    "/api/v1/admin/reminders/{reminderId}": {
+      "delete": {
+        "description": "리마인더를 삭제합니다. 삭제한 리마인더는 목록에서 빠지고 아직 실행하지 않은 회차는 보내지 않습니다. 이미 기기에 표시된 푸시는 회수하지 않습니다. 이미 삭제한 리마인더를 다시 삭제하면 최초 결과를 유지합니다.",
+        "operationId": "deleteReminder",
+        "parameters": [
+          {
+            "description": "리마인더 ID",
+            "in": "path",
+            "name": "reminderId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "삭제 성공"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 ID"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 인증 필요"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          },
+          "404": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "리마인더 없음"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "리마인더 삭제",
+        "tags": [
+          "Admin Reminders"
+        ]
+      },
+      "put": {
+        "description": "리마인더의 제목·본문·반복 방식·대상·발송 시각을 수정합니다. 일회성은 발송 시각 전에만 수정할 수 있고, 매일 반복은 언제든 수정할 수 있으며 다음 회차부터 적용됩니다. 발송 시각이나 반복 방식을 바꿀 때만 과거인 시각을 거절합니다. 같은 내용으로 수정하면 변경 없이 현재 리마인더를 반환합니다.",
+        "operationId": "updateReminder",
+        "parameters": [
+          {
+            "description": "리마인더 ID",
+            "in": "path",
+            "name": "reminderId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminReminderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminReminderResponse"
+                }
+              }
+            },
+            "description": "수정 성공"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 ID, 필수 값 누락, 제목·본문 길이 초과, 잘못된 반복 방식·대상, 바꾼 발송 시각이 과거, 발송 시각이 지난 일회성 리마인더 또는 감사 로그에 저장할 수 없는 민감 정보 포함"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 인증 필요"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          },
+          "404": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "리마인더 없음"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "리마인더 수정",
+        "tags": [
+          "Admin Reminders"
+        ]
+      }
+    },
+    "/api/v1/admin/topic-push-schedules": {
+      "get": {
+        "description": "등록된 설정 전체를 KST 발송 시각 오름차순으로 조회합니다. 설정이 없으면 빈 목록을 반환합니다.",
+        "operationId": "getSchedules",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicPushScheduleListResponse"
+                }
+              }
+            },
+            "description": "조회 성공"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 인증 필요"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "주제 푸시 설정 목록 조회",
+        "tags": [
+          "Admin Topic Push Schedules"
+        ]
+      },
+      "post": {
+        "description": "KST 발송 시각 하나를 등록합니다. 같은 시각은 중복 등록할 수 없습니다. 등록된 설정은 등록 이후 도래하는 시각부터 적용하고, 지난 시각은 소급 실행하지 않습니다. 이 요청 자체는 푸시를 발송하지 않습니다.",
+        "operationId": "createSchedule",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TopicPushScheduleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicPushScheduleResponse"
+                }
+              }
+            },
+            "description": "등록 성공"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "필수 값 누락, 잘못된 시각 또는 중복 시각"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 인증 필요"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "주제 푸시 설정 생성",
+        "tags": [
+          "Admin Topic Push Schedules"
+        ]
+      }
+    },
+    "/api/v1/admin/topic-push-schedules/{scheduleId}": {
+      "delete": {
+        "description": "발송 시각 설정을 삭제합니다. 해당 설정의 향후 정시 발송을 중단하며 이미 SQS에 발행한 작업은 취소하지 않습니다. 요청 본문은 없습니다.",
+        "operationId": "deleteSchedule",
+        "parameters": [
+          {
+            "description": "주제 푸시 설정 ID",
+            "in": "path",
+            "name": "scheduleId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "삭제 성공"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 ID"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 인증 필요"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          },
+          "404": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "설정 없음"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "주제 푸시 설정 삭제",
+        "tags": [
+          "Admin Topic Push Schedules"
+        ]
+      },
+      "put": {
+        "description": "기존 설정의 KST 발송 시각을 변경합니다. 다른 설정과 같은 시각으로 변경할 수 없으며 기존 설정과 동일한 시각의 요청은 허용합니다. 변경 이후 도래하는 시각부터 적용하고 지난 시각은 소급 실행하지 않습니다. 이 요청 자체는 푸시를 발송하지 않습니다.",
+        "operationId": "updateSchedule",
+        "parameters": [
+          {
+            "description": "주제 푸시 설정 ID",
+            "in": "path",
+            "name": "scheduleId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TopicPushScheduleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicPushScheduleResponse"
+                }
+              }
+            },
+            "description": "수정 성공"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "잘못된 ID, 필수 값 누락, 잘못된 시각 또는 중복 시각"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 인증 필요"
+          },
+          "403": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "관리자 API 접근 불가"
+          },
+          "404": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "설정 없음"
+          }
+        },
+        "security": [
+          {
+            "adminAccessToken": []
+          }
+        ],
+        "summary": "주제 푸시 설정 수정",
+        "tags": [
+          "Admin Topic Push Schedules"
         ]
       }
     },
@@ -2746,6 +5960,38 @@
   },
   "tags": [
     {
+      "description": "관리자 AI 프롬프트 버전",
+      "name": "Admin AI Prompt Versions"
+    },
+    {
+      "description": "관리자 AI 리뷰 조회",
+      "name": "Admin AI Reviews"
+    },
+    {
+      "description": "관리자 사용자 지표 API",
+      "name": "Admin Analytics"
+    },
+    {
+      "description": "관리자 사용자 조회 API",
+      "name": "Admin Users"
+    },
+    {
+      "description": "관리자 주제 푸시 발송 시각 설정",
+      "name": "Admin Topic Push Schedules"
+    },
+    {
+      "description": "읽기 전용 관리자 감사 로그 API",
+      "name": "Admin Audit Logs"
+    },
+    {
+      "description": "관리자 AI 프롬프트 미리보기",
+      "name": "Admin AI Prompt Previews"
+    },
+    {
+      "description": "관리자 배너 관리",
+      "name": "Admin Banners"
+    },
+    {
       "description": "관리자 주제 생명주기 API",
       "name": "Admin Topics"
     },
@@ -2758,16 +6004,20 @@
       "name": "Admin Feedbacks"
     },
     {
+      "description": "관리자 공지 관리",
+      "name": "Admin Notices"
+    },
+    {
       "description": "관리자 게시물 검수 조회 API",
       "name": "Admin Posts"
     },
     {
-      "description": "관리자 사용자 조회 API",
-      "name": "Admin Users"
+      "description": "플랫폼별 앱 최소 지원 버전 관리",
+      "name": "Admin App Versions"
     },
     {
-      "description": "읽기 전용 관리자 감사 로그 API",
-      "name": "Admin Audit Logs"
+      "description": "관리자 리마인더 관리",
+      "name": "Admin Reminders"
     }
   ]
 }
