@@ -44,6 +44,8 @@ pub enum NotificationType {
     Topic,
     /// 관리자 공지.
     Notice,
+    /// 관리자 리마인더. 알림함 없이 SQS로 직접 보낸다.
+    Reminder,
 }
 
 impl NotificationType {
@@ -53,6 +55,7 @@ impl NotificationType {
             NotificationType::PostRejected => "POST_REJECTED",
             NotificationType::Topic => "TOPIC",
             NotificationType::Notice => "NOTICE",
+            NotificationType::Reminder => "REMINDER",
         }
     }
 
@@ -64,6 +67,7 @@ impl NotificationType {
             }
             NotificationType::Topic => NotificationSourceType::Topic,
             NotificationType::Notice => NotificationSourceType::Notice,
+            NotificationType::Reminder => NotificationSourceType::Reminder,
         }
     }
 
@@ -73,7 +77,8 @@ impl NotificationType {
             NotificationType::PostApproved | NotificationType::PostRejected => {
                 user.moderation_push_enabled
             }
-            NotificationType::Topic => user.topic_push_enabled,
+            // 리마인더는 주제 알림 수신 설정을 따른다.
+            NotificationType::Topic | NotificationType::Reminder => user.topic_push_enabled,
             NotificationType::Notice => true,
         }
     }
@@ -84,6 +89,7 @@ impl NotificationType {
             "POST_REJECTED" => Some(NotificationType::PostRejected),
             "TOPIC" => Some(NotificationType::Topic),
             "NOTICE" => Some(NotificationType::Notice),
+            "REMINDER" => Some(NotificationType::Reminder),
             _ => None,
         }
     }
@@ -95,6 +101,7 @@ pub enum NotificationSourceType {
     Post,
     Topic,
     Notice,
+    Reminder,
 }
 
 impl NotificationSourceType {
@@ -103,6 +110,7 @@ impl NotificationSourceType {
             NotificationSourceType::Post => "POST",
             NotificationSourceType::Topic => "TOPIC",
             NotificationSourceType::Notice => "NOTICE",
+            NotificationSourceType::Reminder => "REMINDER",
         }
     }
 
@@ -111,6 +119,7 @@ impl NotificationSourceType {
             "POST" => Some(NotificationSourceType::Post),
             "TOPIC" => Some(NotificationSourceType::Topic),
             "NOTICE" => Some(NotificationSourceType::Notice),
+            "REMINDER" => Some(NotificationSourceType::Reminder),
             _ => None,
         }
     }

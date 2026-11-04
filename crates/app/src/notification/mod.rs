@@ -10,6 +10,7 @@
 
 pub mod api;
 pub mod cleanup;
+pub mod direct_push;
 pub mod distribution;
 #[cfg(test)]
 mod distribution_tests;
@@ -19,6 +20,7 @@ pub mod notice;
 pub mod publication_monitor;
 pub mod push_api;
 pub mod push_device;
+pub mod push_event_id;
 pub mod push_message;
 pub mod push_sender;
 #[cfg(test)]
@@ -28,6 +30,7 @@ pub mod push_worker_config;
 #[cfg(test)]
 mod push_worker_config_tests;
 pub mod relay;
+pub mod reminder;
 pub mod repository;
 pub mod service;
 pub mod settings;

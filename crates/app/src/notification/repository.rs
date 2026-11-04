@@ -291,9 +291,9 @@ impl NotificationRepository {
         })
     }
 
-    /// `findTopicPushRecipientIds`: 탈퇴하지 않은 ACTIVE 회원 중 주제 푸시를 받고 그 주제에 반려되지 않은 글이 없는 회원
+    /// `findTopicPushEnabledNonParticipantIds`: 탈퇴하지 않은 ACTIVE 회원 중 주제 푸시를 받고 그 주제에 반려되지 않은 글이 없는 회원
     /// (참여한 회원은 제외). 회원 ID 순.
-    pub fn find_topic_push_recipient_ids(
+    pub fn find_topic_push_enabled_non_participant_ids(
         &self,
         db: &mut impl Db,
         topic_id: Uuid,
@@ -302,6 +302,40 @@ impl NotificationRepository {
             "SELECT u.id FROM users u \
              WHERE u.deleted_at IS NULL AND u.status = 'ACTIVE'::user_status AND u.topic_push_enabled = true \
              AND NOT EXISTS (SELECT 1 FROM posts p WHERE p.user_id = u.id AND p.topic_id = $1 \
+                 AND p.deleted_at IS NULL AND p.moderation_status <> 'REJECTED') \
+             ORDER BY u.id",
+            &[&topic_id],
+        )?;
+        rows.iter()
+            .map(|row| row.try_get::<_, Uuid>(0).map_err(DbError::from))
+            .collect()
+    }
+
+    /// `findTopicPushEnabledUserIds`: 주제 알림 수신 설정은 리마인더에도 적용된다(참여 알림). 전체 대상 리마인더는 이 설정을 켠
+    /// 정상 회원(탈퇴하지 않은 ACTIVE)에게 보낸다. 회원 ID 순.
+    pub fn find_topic_push_enabled_user_ids(&self, db: &mut impl Db) -> Result<Vec<Uuid>, DbError> {
+        let rows = db.query(
+            "SELECT u.id FROM users u \
+             WHERE u.deleted_at IS NULL AND u.status = 'ACTIVE'::user_status AND u.topic_push_enabled = true \
+             ORDER BY u.id",
+            &[],
+        )?;
+        rows.iter()
+            .map(|row| row.try_get::<_, Uuid>(0).map_err(DbError::from))
+            .collect()
+    }
+
+    /// `findTopicPushEnabledParticipantIds`: 오늘 주제 참여자 대상 리마인더의 발행 대상이다. 참여 판정은 미참여자 조회와 같다
+    /// (삭제되지 않고 반려되지 않은 게시물이 있으면 참여). 회원 ID 순.
+    pub fn find_topic_push_enabled_participant_ids(
+        &self,
+        db: &mut impl Db,
+        topic_id: Uuid,
+    ) -> Result<Vec<Uuid>, DbError> {
+        let rows = db.query(
+            "SELECT u.id FROM users u \
+             WHERE u.deleted_at IS NULL AND u.status = 'ACTIVE'::user_status AND u.topic_push_enabled = true \
+             AND EXISTS (SELECT 1 FROM posts p WHERE p.user_id = u.id AND p.topic_id = $1 \
                  AND p.deleted_at IS NULL AND p.moderation_status <> 'REJECTED') \
              ORDER BY u.id",
             &[&topic_id],

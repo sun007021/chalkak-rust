@@ -9,17 +9,17 @@ use std::collections::{HashMap, HashSet};
 use std::sync::{Arc, Mutex, PoisonError};
 
 use chalkak_core::Clock;
-use chalkak_core::log::{Level, Logger};
+use chalkak_core::log::Logger;
 use chalkak_db::Pool;
 use jiff::Timestamp;
 use jiff::tz::TimeZone;
 use uuid::Uuid;
 
-use super::domain::{
-    NotificationSourceType, NotificationType, is_push_expired_at, push_expires_at,
-};
+use super::direct_push::{DirectPushOccurrence, DirectPushPublisher};
+use super::domain::{NotificationSourceType, NotificationType};
+use super::push_event_id::create_for_occurrence;
 use super::repository::NotificationRepository;
-use super::sqs_push::{PushMessage, PushMessagePublisher, PushPublicationResult};
+use super::sqs_push::PushMessagePublisher;
 use super::topic_push_schedule::{TopicPushSchedule, TopicPushScheduleRepository};
 use crate::topic::repository::TopicRepository;
 use crate::web::ApiError;
@@ -32,7 +32,7 @@ const TYPE_NOTIFICATION: &str = "notification";
 pub struct TopicPushService {
     pool: Pool,
     clock: Arc<dyn Clock>,
-    publisher: Arc<dyn PushMessagePublisher>,
+    publisher: DirectPushPublisher,
     logger: Arc<Logger>,
     /// 회차 시각까지 시도한 설정. 설정이 사라지면 함께 지운다.
     attempted: Arc<Mutex<HashMap<Uuid, Timestamp>>>,
@@ -53,8 +53,8 @@ impl TopicPushService {
     ) -> Self {
         Self {
             pool,
+            publisher: DirectPushPublisher::new(publisher, Arc::clone(&clock), Arc::clone(&logger)),
             clock,
-            publisher,
             logger,
             attempted: Arc::new(Mutex::new(HashMap::new())),
         }
@@ -98,7 +98,7 @@ impl TopicPushService {
             // 발행 도중 중단되거나 결과가 불명이어도 같은 프로세스에서 다시 발행하지 않는다.
             attempted.insert(schedule_id, scheduled_at);
         }
-        let event_id = Uuid::new_v4();
+        let event_id = create_for_occurrence(NotificationType::Topic, schedule_id, scheduled_at);
         match self.find_targets(schedule_id, scheduled_at) {
             Ok(Some(targets)) => {
                 self.publish_targets(schedule_id, event_id, scheduled_at, &targets)
@@ -150,7 +150,7 @@ impl TopicPushService {
         else {
             return Ok(None);
         };
-        let user_ids = NotificationRepository.find_topic_push_recipient_ids(&mut conn, topic_id)?;
+        let user_ids = NotificationRepository.find_topic_push_enabled_non_participant_ids(&mut conn, topic_id)?;
         Ok(Some(Targets { topic_id, user_ids }))
     }
 
@@ -161,32 +161,17 @@ impl TopicPushService {
         scheduled_at: Timestamp,
         targets: &Targets,
     ) {
-        let expires_at = push_expires_at(scheduled_at);
-        let (mut accepted, mut failed, mut unknown, mut expired) = (0usize, 0usize, 0usize, 0usize);
-        for user_id in &targets.user_ids {
-            if is_push_expired_at(expires_at, self.clock.now()) {
-                expired = targets.user_ids.len() - accepted - failed - unknown;
-                break;
-            }
-            let message = PushMessage {
+        let summary = self.publisher.publish(
+            &DirectPushOccurrence {
                 event_id,
-                notification_id: None,
-                user_id: *user_id,
                 kind: NotificationType::Topic,
-                source_type: Some(NotificationSourceType::Topic),
-                source_id: Some(targets.topic_id),
+                source_type: NotificationSourceType::Topic,
+                source_id: targets.topic_id,
                 occurred_at: scheduled_at,
-                expires_at,
-            };
-            let result = self.publish_message(&message);
-            if result.is_accepted() {
-                accepted += 1;
-            } else if result.is_acceptance_unknown() {
-                unknown += 1;
-            } else {
-                failed += 1;
-            }
-        }
+                stage_prefix: "topic",
+            },
+            &targets.user_ids,
+        );
         let count = |n: usize| i64::try_from(n).unwrap_or(i64::MAX);
         self.logger
             .info(TOPIC_LOGGER)
@@ -196,57 +181,13 @@ impl TopicPushService {
             .field("scheduleId", schedule_id.to_string())
             .field("sourceId", targets.topic_id.to_string())
             .field("occurredAt", format_instant(scheduled_at))
-            .field("expiresAt", format_instant(expires_at))
-            .field("targetCount", count(targets.user_ids.len()))
-            .field("acceptedCount", count(accepted))
-            .field("failedCount", count(failed))
-            .field("unknownCount", count(unknown))
-            .field("expiredCount", count(expired))
+            .field("expiresAt", format_instant(summary.expires_at))
+            .field("targetCount", count(summary.target_count))
+            .field("acceptedCount", count(summary.accepted_count))
+            .field("failedCount", count(summary.failed_count))
+            .field("unknownCount", count(summary.unknown_count))
+            .field("expiredCount", count(summary.expired_count))
             .log("주제 푸시 SQS 발행 집계");
-    }
-
-    fn publish_message(&self, message: &PushMessage) -> PushPublicationResult {
-        match self.publisher.publish(message) {
-            Ok(result) => {
-                if !result.is_accepted() {
-                    self.logger
-                        .event(Level::Warn, TOPIC_LOGGER)
-                        .field("type", TYPE_NOTIFICATION)
-                        .field("stage", "topic_publication_result")
-                        .field("notificationType", message.kind.as_str())
-                        .field("eventId", message.event_id.to_string())
-                        .field("userId", message.user_id.to_string())
-                        .field("sourceId", message.source_id.map(|id| id.to_string()))
-                        .field("occurredAt", format_instant(message.occurred_at))
-                        .field(
-                            "result",
-                            if result.is_acceptance_unknown() {
-                                "UNKNOWN"
-                            } else {
-                                "FAILED"
-                            },
-                        )
-                        .field("errorCode", result.error_code.as_deref())
-                        .log("주제 푸시 SQS 발행 결과");
-                }
-                result
-            }
-            Err(failure) => {
-                self.logger
-                    .error(TOPIC_LOGGER)
-                    .field("type", TYPE_NOTIFICATION)
-                    .field("stage", "topic_publication_unknown")
-                    .field("notificationType", message.kind.as_str())
-                    .field("sourceId", message.source_id.map(|id| id.to_string()))
-                    .field("occurredAt", format_instant(message.occurred_at))
-                    .field("result", "UNKNOWN")
-                    .field("eventId", message.event_id.to_string())
-                    .field("userId", message.user_id.to_string())
-                    .field("errorCode", failure.exception)
-                    .log("주제 푸시 SQS 발행 결과 확인 실패");
-                PushPublicationResult::unknown("SQS_ACCEPTANCE_UNKNOWN")
-            }
-        }
     }
 }
 

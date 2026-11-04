@@ -101,6 +101,7 @@ fn assign(message: &mut RawPushMessage, name: &str, value: &Json) -> Result<(), 
                     ("POST_REJECTED", NotificationType::PostRejected),
                     ("TOPIC", NotificationType::Topic),
                     ("NOTICE", NotificationType::Notice),
+                    ("REMINDER", NotificationType::Reminder),
                 ],
             )?;
         }
@@ -111,6 +112,7 @@ fn assign(message: &mut RawPushMessage, name: &str, value: &Json) -> Result<(), 
                     ("POST", NotificationSourceType::Post),
                     ("TOPIC", NotificationSourceType::Topic),
                     ("NOTICE", NotificationSourceType::Notice),
+                    ("REMINDER", NotificationSourceType::Reminder),
                 ],
             )?;
         }
