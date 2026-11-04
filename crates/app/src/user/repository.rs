@@ -50,6 +50,16 @@ pub fn user_from_row(row: &Row) -> Result<User, DbError> {
 }
 
 impl UserRepository {
+    /// `existsActiveById`: 탈퇴하지 않은 회원이 있는지. 정지 회원도 있는 것으로 본다.
+    pub fn exists_active_by_id(&self, db: &mut impl Db, id: Uuid) -> Result<bool, DbError> {
+        Ok(db
+            .query_opt(
+                "SELECT 1 FROM users WHERE id = $1 AND deleted_at IS NULL",
+                &[&id],
+            )?
+            .is_some())
+    }
+
     fn find_one(
         &self,
         db: &mut impl Db,

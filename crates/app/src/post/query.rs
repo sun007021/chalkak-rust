@@ -12,8 +12,9 @@ use uuid::Uuid;
 
 use super::domain::ModerationStatus;
 use super::policy::PostProcessingPolicy;
-use super::repository::{ListOrder, PostListRow, PostRepository, PostSlice};
+use super::repository::{AuthorPostSlice, ListOrder, PostListRow, PostRepository, PostSlice};
 use super::support::require_active_user;
+use crate::like::domain::PostLikes;
 use crate::like::repository::PostLikeRepository;
 use crate::photo::url::CloudFrontUrlProvider;
 use crate::topic::domain::kst_date;
@@ -100,6 +101,26 @@ pub struct PostSummary {
     pub is_mine: bool,
 }
 
+/// 작성자 공개 사진 목록의 한 장(`AuthorPostListResult.PostSummary`).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct AuthorPostSummary {
+    pub id: Uuid,
+    pub original_image_url: Option<String>,
+    pub thumbnail_image_url: Option<String>,
+    pub topic: TopicBrief,
+    pub like_count: i64,
+    pub is_liked: bool,
+}
+
+/// `AuthorPostListResult`
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct AuthorPostListResult {
+    pub current_page: i32,
+    pub page_size: i32,
+    pub has_next: bool,
+    pub posts: Vec<AuthorPostSummary>,
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct PostListResult {
     pub current_page: i32,
@@ -127,6 +148,7 @@ pub struct PostQueryService {
     posts: PostRepository,
     topics: TopicRepository,
     likes: PostLikeRepository,
+    users: crate::user::UserRepository,
 }
 
 fn not_found(message: &str) -> ApiError {
@@ -152,6 +174,7 @@ impl PostQueryService {
             posts: PostRepository::default(),
             topics: TopicRepository,
             likes: PostLikeRepository,
+            users: crate::user::UserRepository,
         }
     }
 
@@ -186,6 +209,90 @@ impl PostQueryService {
             title: post.title,
             like_count,
             is_liked,
+        })
+    }
+
+    /// `getAuthorPosts`: 작성자의 공개 사진을 주제 날짜 최신순으로 한 쪽 읽는다. 조회자는 탈퇴하지 않은 회원이어야(아니면 401),
+    /// 작성자는 탈퇴하지 않았어야(아니면 404) 한다. 정지 회원은 조회자도 작성자도 허용한다. 좋아요 수는 현재 전체 수이고
+    /// `isLiked`는 조회자 본인의 좋아요 여부다.
+    pub fn get_author_posts(
+        &self,
+        author_id: Uuid,
+        page: i32,
+        page_size: i32,
+        viewer_id: Uuid,
+    ) -> Result<AuthorPostListResult, ApiError> {
+        let mut conn = self.pool.get()?;
+        require_active_user(&mut conn, viewer_id)?;
+        if !self.users.exists_active_by_id(&mut conn, author_id)? {
+            return Err(not_found("작성자를 찾을 수 없습니다."));
+        }
+        // Spring Data는 오프셋을 int로 줄여 쓴다. 넘치면 요청이 실패한다.
+        let offset = i64::from(page - 1) * i64::from(page_size);
+        if offset > i64::from(i32::MAX) {
+            return Err(ApiError::Internal(
+                "Page offset exceeds Integer.MAX_VALUE".to_owned(),
+            ));
+        }
+        let slice = self.posts.find_visible_recent_by_author_id(
+            &mut conn,
+            author_id,
+            i64::from(page - 1),
+            i64::from(page_size),
+        )?;
+        let likes = self.find_post_likes(&mut conn, &slice, Some(viewer_id))?;
+        self.create_author_list_result(slice, page, page_size, &likes)
+    }
+
+    /// `findPostLikes`: 게시물이 없으면 질의하지 않는다.
+    fn find_post_likes(
+        &self,
+        db: &mut impl Db,
+        slice: &AuthorPostSlice,
+        viewer_id: Option<Uuid>,
+    ) -> Result<PostLikes, ApiError> {
+        if slice.posts.is_empty() {
+            return Ok(PostLikes::create_empty());
+        }
+        let post_ids: Vec<Uuid> = slice.posts.iter().map(|p| p.id).collect();
+        let counts = self.likes.count_by_post_ids(db, &post_ids)?;
+        let liked = match viewer_id {
+            Some(viewer_id) => self.likes.find_liked_post_ids(db, &post_ids, viewer_id)?,
+            None => Default::default(),
+        };
+        Ok(PostLikes::new(counts, liked))
+    }
+
+    fn create_author_list_result(
+        &self,
+        slice: AuthorPostSlice,
+        page: i32,
+        page_size: i32,
+        likes: &PostLikes,
+    ) -> Result<AuthorPostListResult, ApiError> {
+        let posts = slice
+            .posts
+            .into_iter()
+            .map(|post| {
+                Ok(AuthorPostSummary {
+                    id: post.id,
+                    original_image_url: self.url(Some(&post.original_storage_key))?,
+                    thumbnail_image_url: self.url(post.thumbnail_storage_key.as_deref())?,
+                    topic: TopicBrief {
+                        id: post.topic_id,
+                        title: post.topic_title,
+                        topic_date: post.topic_date,
+                    },
+                    like_count: likes.like_count(post.id),
+                    is_liked: likes.is_liked(post.id),
+                })
+            })
+            .collect::<Result<Vec<_>, ApiError>>()?;
+        Ok(AuthorPostListResult {
+            current_page: page,
+            page_size,
+            has_next: slice.has_next,
+            posts,
         })
     }
 
