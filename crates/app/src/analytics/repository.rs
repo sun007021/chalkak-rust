@@ -7,7 +7,7 @@ use chalkak_db::{DbError, Pool};
 use jiff::Timestamp;
 use uuid::Uuid;
 
-use super::service::UserMetricsRepository;
+use super::service::{AiReviewCounts, UserMetricsRepository};
 use crate::web::ApiError;
 
 const COUNT_POST_AUTHORS: &str = "\
@@ -57,6 +57,18 @@ FROM post_likes pl
 JOIN posts p ON p.id = pl.post_id
 WHERE p.deleted_at IS NULL
   AND pl.user_id <> ALL (CAST($1 AS uuid[]))
+";
+
+/// 재요청은 `requested_at`을 바꾸지 않으므로 최초 요청만 센다. 완료·실패는 집계 시점 상태다.
+const COUNT_AI_REVIEWS: &str = "\
+SELECT COUNT(DISTINCT r.user_id) AS users,
+       COUNT(*) AS requests,
+       COUNT(*) FILTER (WHERE r.status = 'COMPLETED') AS completed,
+       COUNT(*) FILTER (WHERE r.status = 'FAILED') AS failed
+FROM ai_reviews r
+WHERE r.requested_at >= $1
+  AND r.requested_at < $2
+  AND r.user_id <> ALL (CAST($3 AS uuid[]))
 ";
 
 /// 풀에서 연결을 빌려 쿼리마다 따로 센다(원본 `NamedParameterJdbcTemplate`, 트랜잭션 없음).
@@ -118,5 +130,19 @@ impl UserMetricsRepository for PgUserMetricsRepository {
 
     fn count_likes_on_live_posts(&self) -> Result<i64, ApiError> {
         self.count(COUNT_LIKES_ON_LIVE_POSTS, &[&self.excluded_user_ids])
+    }
+
+    fn count_ai_reviews(&self, from: Timestamp, to: Timestamp) -> Result<AiReviewCounts, ApiError> {
+        let mut conn = self.pool.get()?;
+        let row = conn
+            .query_one(COUNT_AI_REVIEWS, &[&from, &to, &self.excluded_user_ids])
+            .map_err(DbError::from)?;
+        let get = |i: usize| row.try_get::<_, i64>(i).map_err(DbError::from);
+        Ok(AiReviewCounts {
+            users: get(0)?,
+            requests: get(1)?,
+            completed: get(2)?,
+            failed: get(3)?,
+        })
     }
 }

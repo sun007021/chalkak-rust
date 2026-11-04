@@ -149,6 +149,31 @@ method = "GET"
 path = "/api/v1/admin/feedbacks?pageSize=100"
 auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
 
+# 1fb74d9: 작업·대상 종류에 배너, AI 프롬프트 버전, 리마인더, 앱 버전이 늘었다(아직 기록된 행은 없다).
+[[step]]
+name = "audit action 신규 배너 작업 필터"
+method = "GET"
+path = "/api/v1/admin/audit-logs?action=BANNER_CREATED"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "audit action 신규 앱 버전 작업 필터"
+method = "GET"
+path = "/api/v1/admin/audit-logs?action=APP_VERSION_UPDATED&targetType=APP_VERSION"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "audit targetType 신규 리마인더 필터"
+method = "GET"
+path = "/api/v1/admin/audit-logs?targetType=REMINDER"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "audit targetType 신규 AI 프롬프트 버전 필터"
+method = "GET"
+path = "/api/v1/admin/audit-logs?targetType=AI_PROMPT_VERSION"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
 [[step]]
 name = "audit action bogus"
 method = "GET"
