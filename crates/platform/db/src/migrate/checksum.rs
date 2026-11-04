@@ -143,10 +143,10 @@ mod tests {
         );
     }
 
-    /// 근거: Java(Flyway)가 pg-java-a에 적용한 `flyway_schema_history.checksum` 45건.
+    /// 근거: Java(Flyway)가 pg-java-a에 적용한 `flyway_schema_history.checksum` 70건.
     /// `select script, checksum from flyway_schema_history order by installed_rank`의 결과를
     /// 그대로 고정했다. `migrations/` 파일은 원본과 바이트 동일해야 하므로 값이 바뀌면 안 된다.
-    const JAVA_FLYWAY_CHECKSUMS: [(&str, i32); 45] = [
+    const JAVA_FLYWAY_CHECKSUMS: [(&str, i32); 70] = [
         ("V202608191752__create_initial_schema.sql", -62292960),
         ("V202608202034__change_id_default_to_uuidv7.sql", 176110968),
         ("V202608211402__apply_soft_delete.sql", 1877203511),
@@ -255,6 +255,55 @@ mod tests {
             -602325464,
         ),
         ("V202610141702__allow_notice_delete_audit.sql", 827061213),
+        ("V202610191200__add_banner_audit_types.sql", -1247860647),
+        ("V202610191201__create_banners.sql", 951990002),
+        ("V202610191202__add_banner_list_index.sql", -788123353),
+        ("V202610191203__drop_banner_list_index.sql", -1711503487),
+        (
+            "V202610191800__add_banner_deletion_audit_type.sql",
+            927883666,
+        ),
+        ("V202610191801__add_banner_soft_deletion.sql", 38399117),
+        (
+            "V202610192000__remove_banner_deletion_reason_requirement.sql",
+            -202222398,
+        ),
+        (
+            "V202610192300__add_ai_prompt_version_audit_types.sql",
+            1604959447,
+        ),
+        ("V202610192301__create_ai_prompt_versions.sql", -799652016),
+        ("V202610201530__create_ai_reviews.sql", -1615628032),
+        ("V202610211414__add_ai_review_retry.sql", -1106250926),
+        ("V202610211430__create_reminders.sql", -1545792138),
+        ("V202610211431__add_reminder_audit_types.sql", -1012613893),
+        ("V202610211432__allow_reminder_audit_target.sql", 1541153991),
+        (
+            "V202610211630__add_reminder_update_audit_type.sql",
+            295226781,
+        ),
+        (
+            "V202610211631__allow_reminder_update_audit.sql",
+            -1297582277,
+        ),
+        ("V202610211730__add_reminder_deleted_at.sql", -888742343),
+        (
+            "V202610211731__add_reminder_delete_audit_type.sql",
+            906406033,
+        ),
+        (
+            "V202610211732__allow_reminder_delete_audit.sql",
+            -1629183663,
+        ),
+        (
+            "V202610212350__add_ai_review_notification_settings.sql",
+            1906196499,
+        ),
+        ("V202610262100__create_push_deliveries.sql", -599070542),
+        ("V202610282310__create_app_versions.sql", 1278371726),
+        ("V202610291030__add_app_version_timestamps.sql", -622693638),
+        ("V202610291400__add_app_version_audit_types.sql", 1402927772),
+        ("V202610291401__add_app_version_management.sql", -518549073),
     ];
 
     #[test]

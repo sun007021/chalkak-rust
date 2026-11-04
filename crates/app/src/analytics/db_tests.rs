@@ -10,7 +10,8 @@ use uuid::Uuid;
 
 use super::repository::PgUserMetricsRepository;
 use super::service::{
-    AccessLogMetrics, AccessLogMetricsReader, UserMetricsAggregationService, WeeklyRetention,
+    AccessLogMetrics, AccessLogMetricsReader, AiReviewCounts, UserMetricsAggregationService,
+    WeeklyRetention,
 };
 use super::testing::{Lines, logger};
 use crate::testing::TestDb;
@@ -310,6 +311,173 @@ fn likes_total은_삭제된_게시물에_달린_좋아요를_세지_않는다() 
     assert_eq!(metrics.likes_total - before, 1);
 }
 
+impl Env {
+    fn prompt_version(&mut self) -> Uuid {
+        let admin: Uuid = self
+            .client
+            .query_one(
+                "INSERT INTO admins (username, password) VALUES ($1, 'x') RETURNING id",
+                &[&format!("ai-{}", Uuid::new_v4())],
+            )
+            .unwrap()
+            .get(0);
+        self.client
+            .query_one(
+                "INSERT INTO ai_prompt_versions (type, version, system_prompt, user_prompt_template, model, \
+                 parameters, output_schema_version, created_by_admin_id, created_at) \
+                 VALUES ('PHOTO_REVIEW', 1, 's', 'u', 'm', '{}'::jsonb, 'v1', $1, CURRENT_TIMESTAMP) RETURNING id",
+                &[&admin],
+            )
+            .unwrap()
+            .get(0)
+    }
+
+    /// 상태별 CHECK 제약을 맞춰 AI 리뷰 한 건을 넣는다(원본 `insertAiReview`). 게시물은 건마다 새로 만들고, 게시물 지표와
+    /// 섞이지 않게 요청 30일 전에 올린 것으로 한다.
+    fn ai_review(&mut self, user: Uuid, version: Uuid, requested_at: &str, status: &str) -> Uuid {
+        let created = shift_instant(requested_at, -30);
+        let post = self.post(user, &created, "APPROVED", false);
+        self.client
+            .query_one(
+                "INSERT INTO ai_reviews (post_id, user_id, prompt_version_id, status, attempt, round_attempt, \
+                 lease_expires_at, result, output, error_code, request_id, requested_at, last_requested_at, \
+                 completed_at) \
+                 VALUES ($1, $2, $3, $4::text, CASE WHEN $4::text = 'QUEUED' THEN 0 ELSE 1 END, \
+                 CASE WHEN $4::text = 'QUEUED' THEN 0 ELSE 1 END, \
+                 CASE WHEN $4::text = 'PROCESSING' THEN CURRENT_TIMESTAMP END, \
+                 CASE WHEN $4::text = 'COMPLETED' THEN '{}'::jsonb END, \
+                 CASE WHEN $4::text = 'COMPLETED' THEN '{}'::jsonb END, \
+                 CASE WHEN $4::text = 'FAILED' THEN 'TIMEOUT' END, $5, \
+                 $6::text::timestamptz, $6::text::timestamptz, \
+                 CASE WHEN $4::text IN ('COMPLETED', 'FAILED') THEN CURRENT_TIMESTAMP END) RETURNING id",
+                &[
+                    &post,
+                    &user,
+                    &version,
+                    &status,
+                    &Uuid::new_v4(),
+                    &requested_at,
+                ],
+            )
+            .unwrap()
+            .get(0)
+    }
+}
+
+fn shift_instant(instant: &str, days: i64) -> String {
+    let (day, rest) = instant.split_once('T').unwrap();
+    format!("{}T{rest}", shift(day, days))
+}
+
+fn counts(users: i64, requests: i64, completed: i64, failed: i64) -> AiReviewCounts {
+    AiReviewCounts {
+        users,
+        requests,
+        completed,
+        failed,
+    }
+}
+
+// aggregate_aiReviewDayBoundary_countsOnlyRequestsInsideKstDay
+#[test]
+fn ai_리뷰는_최초_요청_시각이_kst_하루_안인_것만_센다() {
+    let Some(mut e) = env() else { return };
+    let version = e.prompt_version();
+    for (slug, day, time) in [
+        ("start", METRIC_DATE.to_owned(), "00:00:00"),
+        ("end", METRIC_DATE.to_owned(), "23:59:59"),
+        ("before", shift(METRIC_DATE, -1), "23:59:59"),
+        ("after", shift(METRIC_DATE, 1), "00:00:00"),
+    ] {
+        let user = e.user(&format!("ai-boundary-{slug}"));
+        e.ai_review(user, version, &kst(&day, time), "QUEUED");
+    }
+
+    let metrics = e.service(&[]).aggregate(date(METRIC_DATE)).unwrap();
+
+    assert_eq!(metrics.ai_reviews, counts(2, 2, 0, 0));
+}
+
+// aggregate_aiReviewReRequested_isCountedOnFirstRequestDayOnly
+#[test]
+fn 전날_최초_요청한_리뷰를_당일_재요청해도_당일_요청에_세지_않는다() {
+    let Some(mut e) = env() else { return };
+    let version = e.prompt_version();
+    let user = e.user("ai-re-request");
+    let review = e.ai_review(
+        user,
+        version,
+        &kst(&shift(METRIC_DATE, -1), "10:00:00"),
+        "COMPLETED",
+    );
+    e.client
+        .execute(
+            "UPDATE ai_reviews SET request_count = 2, last_requested_at = $2::text::timestamptz WHERE id = $1",
+            &[&review, &kst(METRIC_DATE, "09:00:00")],
+        )
+        .unwrap();
+
+    let request_day = e
+        .service(&[])
+        .aggregate(date(&shift(METRIC_DATE, -1)))
+        .unwrap();
+    let re_request_day = e.service(&[]).aggregate(date(METRIC_DATE)).unwrap();
+
+    assert_eq!(request_day.ai_reviews.requests, 1);
+    assert_eq!(re_request_day.ai_reviews, counts(0, 0, 0, 0));
+}
+
+// aggregate_aiReviewStatuses_countsCompletedAndFailedByCurrentStatus
+#[test]
+fn ai_리뷰_완료와_실패는_집계_시점_상태로_세고_대기와_처리_중은_요청에만_센다() {
+    let Some(mut e) = env() else { return };
+    let version = e.prompt_version();
+    for (slug, status) in [
+        ("queued", "QUEUED"),
+        ("processing", "PROCESSING"),
+        ("completed-1", "COMPLETED"),
+        ("completed-2", "COMPLETED"),
+        ("failed", "FAILED"),
+    ] {
+        let user = e.user(&format!("ai-status-{slug}"));
+        e.ai_review(user, version, &kst(METRIC_DATE, "12:00:00"), status);
+    }
+
+    let metrics = e.service(&[]).aggregate(date(METRIC_DATE)).unwrap();
+
+    assert_eq!(metrics.ai_reviews, counts(5, 5, 2, 1));
+}
+
+// aggregate_aiReviewSameUserTwoPosts_countsUserOnce
+#[test]
+fn 한_회원이_여러_게시물에_요청해도_ai_review_users는_1이고_요청은_모두_센다() {
+    let Some(mut e) = env() else { return };
+    let version = e.prompt_version();
+    let user = e.user("ai-same-user");
+    e.ai_review(user, version, &kst(METRIC_DATE, "09:00:00"), "COMPLETED");
+    e.ai_review(user, version, &kst(METRIC_DATE, "21:00:00"), "FAILED");
+
+    let metrics = e.service(&[]).aggregate(date(METRIC_DATE)).unwrap();
+
+    assert_eq!(metrics.ai_reviews, counts(1, 2, 1, 1));
+}
+
+// aggregate_aiReviewExcludedUser_isRemovedFromEveryValue
+#[test]
+fn 제외_회원의_ai_리뷰는_네_값에서_모두_빠진다() {
+    let Some(mut e) = env() else { return };
+    let version = e.prompt_version();
+    let (member, excluded) = (e.user("ai-excluded-member"), e.user("ai-excluded-team"));
+    e.ai_review(member, version, &kst(METRIC_DATE, "10:00:00"), "COMPLETED");
+    e.ai_review(excluded, version, &kst(METRIC_DATE, "11:00:00"), "FAILED");
+
+    let all = e.service(&[]).aggregate(date(METRIC_DATE)).unwrap();
+    let filtered = e.service(&[excluded]).aggregate(date(METRIC_DATE)).unwrap();
+
+    assert_eq!(all.ai_reviews, counts(2, 2, 1, 1));
+    assert_eq!(filtered.ai_reviews, counts(1, 1, 1, 0));
+}
+
 // aggregate_success_logsOneAggregationLine
 #[test]
 fn 집계_결과를_aggregation_로그_한_줄에_type과_metric_date와_지표_값으로_남긴다() {
@@ -317,6 +485,9 @@ fn 집계_결과를_aggregation_로그_한_줄에_type과_metric_date와_지표_
     let user = e.user("log-line");
     let post = e.post(user, &kst(METRIC_DATE, "10:00:00"), "APPROVED", false);
     e.like(post, user);
+    let version = e.prompt_version();
+    let ai_user = e.user("log-line-ai");
+    e.ai_review(ai_user, version, &kst(METRIC_DATE, "11:00:00"), "COMPLETED");
 
     let metrics = e.service(&[]).aggregate(date(METRIC_DATE)).unwrap();
 
@@ -331,6 +502,11 @@ fn 집계_결과를_aggregation_로그_한_줄에_type과_metric_date와_지표_
     assert_eq!(event["wau"], 1);
     assert_eq!(event["eligibleUsers"], metrics.eligible_users);
     assert_eq!(event["likesTotal"], metrics.likes_total);
+    assert_eq!(metrics.ai_reviews, counts(1, 1, 1, 0));
+    assert_eq!(event["aiReviewUsers"], 1);
+    assert_eq!(event["aiReviewRequests"], 1);
+    assert_eq!(event["aiReviewCompleted"], 1);
+    assert_eq!(event["aiReviewFailed"], 0);
 }
 
 // aggregate_sameDateTwice_returnsSameDbDerivedValues

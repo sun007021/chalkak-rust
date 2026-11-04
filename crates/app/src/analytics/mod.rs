@@ -25,8 +25,8 @@ pub(crate) mod testing;
 pub use repository::PgUserMetricsRepository;
 pub use runner::{TaskExecutor, ThreadTaskExecutor, UserMetricsAggregationRunner};
 pub use service::{
-    AccessLogMetrics, AccessLogMetricsReader, DailyUserMetrics, UserMetricsAggregationService,
-    UserMetricsRepository, WeeklyRetention,
+    AccessLogMetrics, AccessLogMetricsReader, AiReviewCounts, DailyUserMetrics,
+    UserMetricsAggregationService, UserMetricsRepository, WeeklyRetention,
 };
 pub use settings::AnalyticsSettings;
 
