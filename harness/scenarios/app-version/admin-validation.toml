@@ -1,0 +1,934 @@
+name = "관리자 앱 버전: 버전·주소·사유 입력 검증"
+tags = ["app-version", "app-version-admin"]
+clock = "2026-10-29T10:00:00+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO admins (id, username, password, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000000a1', 'operator', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-01T00:00:00Z', '2026-09-01T00:00:00Z'),
+  ('01990000-0000-7000-8000-0000000000a2', 'reviewer', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-02T00:00:00Z', '2026-09-02T00:00:00Z');
+"""]
+
+[[step]]
+name = "버전 거절 두 자리"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.2", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 거절 네 자리"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.2.3.4", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 거절 앞자리 0 major"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "01.2.3", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 거절 앞자리 0 minor"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.02.3", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 거절 앞자리 0 patch"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.2.03", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 거절 음수"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "-1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 거절 v 접두"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "v1.2.3", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 거절 프리릴리스"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.2.3-beta", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 거절 빌드 메타"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.2.3+4", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 거절 뒤 공백"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.2.3 ", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 거절 앞 공백"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": " 1.2.3", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 거절 major 상한 초과"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "2147483648.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 거절 minor 상한 초과"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "0.2147483648.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 거절 patch 상한 초과"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "0.0.2147483648", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 거절 11자리"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "11111111111.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 거절 빈 조각"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1..3", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 거절 문자"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "a.b.c", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 거절 아랍 숫자"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "٣.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 거절 개행"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.2.3\n", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 거절 점만"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "..", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 숫자 1.0.0 아님 숫자 타입"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision":null,"minimumSupportedVersion":1.5,"storeUrl":"https://play.google.com/store/apps/details?id=com.example.chalkak","reason":"x"}'''
+
+[[step]]
+name = "버전 정수 타입"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision":null,"minimumSupportedVersion":1,"storeUrl":"https://play.google.com/store/apps/details?id=com.example.chalkak","reason":"x"}'''
+
+[[step]]
+name = "버전 배열"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision":null,"minimumSupportedVersion":["1.0.0"],"storeUrl":"https://play.google.com/store/apps/details?id=com.example.chalkak","reason":"x"}'''
+
+[[step]]
+name = "버전 객체"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision":null,"minimumSupportedVersion":{},"storeUrl":"https://play.google.com/store/apps/details?id=com.example.chalkak","reason":"x"}'''
+
+[[step]]
+name = "버전 불리언"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision":null,"minimumSupportedVersion":true,"storeUrl":"https://play.google.com/store/apps/details?id=com.example.chalkak","reason":"x"}'''
+
+[[step]]
+name = "버전 null"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision":null,"minimumSupportedVersion":null,"storeUrl":"https://play.google.com/store/apps/details?id=com.example.chalkak","reason":"x"}'''
+
+[[step]]
+name = "버전 빈 문자열"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 공백 문자열"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "   ", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "버전 유니코드 공백만"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": " ", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 http"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "http://play.google.com/store/apps/details?id=com.a.b", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 다른 호스트"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://evil.example/store/apps/details?id=com.a.b", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 호스트 접미 속임"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com.evil.example/store/apps/details?id=com.example.app", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 사용자 정보"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://user@play.google.com/store/apps/details?id=com.example.app", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 포트 444"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com:444/store/apps/details?id=com.a.b", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 빈 포트"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com:/store/apps/details?id=com.a.b", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 포트 0443"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com:0443/store/apps/details?id=com.a.b", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 fragment"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.a.b#x", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 경로 없음"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 details 없음"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 id 비어 있음"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 id 점 없음"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=bad", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 id 중복"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.app&id=com.other.app", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 추적 쿼리"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.app&token=secret", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 referrer 쿼리"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.app&referrer=sample", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 hl 비어 있음"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.app&hl=", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 hl 값 없음"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.app&hl", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 hl 한 글자"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.app&hl=k", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 gl 숫자"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.app&gl=12", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 빈 쿼리"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 끝 앰퍼샌드"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.app&", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 경로 대소문자"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/Store/apps/details?id=com.example.app", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 경로 퍼센트 인코딩"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/%64etails?id=com.a.b", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 끝 슬래시"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details/?id=com.a.b", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 이중 슬래시"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com//store/apps/details?id=com.a.b", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 점 경로"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/./details?id=com.a.b", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 iOS 주소"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/id123", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 임의 문자열"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "not a url", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 스킴만"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https:chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 공백 포함"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.a.b&hl=k o", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 꺾쇠"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.a.b&hl=<ko>", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 역슬래시"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps\\details?id=com.a.b", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 잘못된 퍼센트"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.a.b&hl=%zz", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 퍼센트 짧음"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.a.b&hl=%4", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 javascript"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "javascript:alert(1)", "reason": "출시 확인"}'''
+
+[[step]]
+name = "ANDROID 주소 거절 ftp"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "ftp://play.google.com/store/apps/details?id=com.a.b", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 다른 호스트"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://itunes.apple.com/app/id123", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 Android 주소"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 id 0"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/id0", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 id 문자"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/idabc", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 id 앞자리 0"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/id0123", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 id 접두 없음"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/123", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 mt 7"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/id123?mt=7", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 추적 쿼리"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/id123?uo=4", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 l 없는 값"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/id123?l", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 l 숫자"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/id123?l=12", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 국가 코드 3자"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/kor/app/id123", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 국가 코드 숫자"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/12/app/id123", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 app 대소문자"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/App/id123", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 이름 슬래시 두 개"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/kr/app/a/b/id123", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 끝 슬래시"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/id123/", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 점점 경로"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/../id123", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 인코딩된 점점"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/%2e%2e/id123", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 인코딩된 슬래시"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/name%2fid123", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 인코딩된 역슬래시"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/name%5c/id123", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 잘못된 인코딩"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/%ZZ/id123", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 고정 경로 인코딩"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/%61pp/id123", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 id 인코딩"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/%69d123", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 fragment"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/id123#update", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 포트 444"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com:444/app/id123", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 포트 0443"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com:0443/app/id123", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 사용자 정보"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://user:pw@apps.apple.com/app/id123", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 빈 쿼리"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/id123?", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 중복 l"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/id123?l=ko&l=en", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 대괄호 이름"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/na[me]/id123", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 주소 거절 파이프 쿼리"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/id123?l=ko|en", "reason": "출시 확인"}'''
+
+[[step]]
+name = "주소 길이 2001"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/id1", "reason": "출시 확인"}'''
+
+[[step]]
+name = "주소 길이 2000 이상 허용"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/id1", "reason": "길이 상한"}'''
+
+[[step]]
+name = "주소 null"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision":null,"minimumSupportedVersion":"1.0.0","storeUrl":null,"reason":"x"}'''
+
+[[step]]
+name = "주소 빈 문자열"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "", "reason": "출시 확인"}'''
+
+[[step]]
+name = "주소 공백"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "   ", "reason": "출시 확인"}'''
+
+[[step]]
+name = "주소 숫자"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision":null,"minimumSupportedVersion":"1.0.0","storeUrl":123,"reason":"x"}'''
+
+[[step]]
+name = "주소 객체"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision":null,"minimumSupportedVersion":"1.0.0","storeUrl":{"a":1},"reason":"x"}'''
+
+[[step]]
+name = "주소 앞뒤 유니코드 공백 허용"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": " \t https://apps.apple.com/kr/app/%EC%B0%A9%EC%B9%B5/id77?l=ko \n ", "reason": "공백 정규화"}'''
+
+[[step]]
+name = "사유 없음"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision":null,"minimumSupportedVersion":"1.0.0","storeUrl":"https://apps.apple.com/app/id1234567890"}'''
+
+[[step]]
+name = "사유 null"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision":null,"minimumSupportedVersion":"1.0.0","storeUrl":"https://apps.apple.com/app/id1234567890","reason":null}'''
+
+[[step]]
+name = "사유 빈 문자열"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/id1234567890", "reason": ""}'''
+
+[[step]]
+name = "사유 공백"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/id1234567890", "reason": "   \t\n"}'''
+
+[[step]]
+name = "사유 501자"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/id1234567890", "reason": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}'''
+
+[[step]]
+name = "사유 보조 문자 501자"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/id1234567890", "reason": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"}'''
+
+[[step]]
+name = "사유 앞뒤 공백 포함 500자 허용"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/id1234567890", "reason": "  가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가  "}'''
+
+[[step]]
+name = "사유 숫자 타입"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision":null,"minimumSupportedVersion":"1.0.0","storeUrl":"https://apps.apple.com/app/id1234567890","reason":12}'''
+
+[[step]]
+name = "사유 민감 값"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "accessToken=secret-value"}'''
+
+[[step]]
+name = "사유 슬랙 웹훅"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "https://hooks.slack.com/services/T000/B000/SECRET"}'''
+
+[[step]]
+name = "민감 값이 든 주소 이름"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/token=example-secret/id123", "reason": "출시 확인"}'''
+
+[[step]]
+name = "검증 후 목록"
+method = "GET"
+path = "/api/v1/admin/app-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "검증 후 감사 로그"
+method = "GET"
+path = "/api/v1/admin/audit-logs?targetType=APP_VERSION&sort=occurredAtAsc&pageSize=100"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }

@@ -1,0 +1,238 @@
+name = "배너: 공개 목록, 관리자 등록, 삭제"
+tags = ["banner"]
+clock = "2026-10-19T09:00:00+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO admins (id, username, password, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000000a1', 'operator', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-01T00:00:00Z', '2026-09-01T00:00:00Z');
+INSERT INTO banners (id, title, subtitle, web_view_url, thumbnail_url, created_at, updated_at, deleted_at) VALUES
+  ('01990000-0000-7000-8000-000000000b01', '첫 배너', '첫 부제목', 'https://chalkak.vercel.app/a', 'https://cdn.example.com/a.png', '2026-10-10T00:00:00Z', '2026-10-10T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-000000000b02', '둘째 배너', '둘째 부제목', 'https://chalkak.vercel.app/b', 'https://cdn.example.com/b.png', '2026-10-11T00:00:00Z', '2026-10-11T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-000000000b03', '같은 시각 1', '부제목', 'https://chalkak.vercel.app/c', 'https://cdn.example.com/c.png', '2026-10-12T00:00:00Z', '2026-10-12T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-000000000b04', '같은 시각 2', '부제목', 'https://chalkak.vercel.app/d', 'https://cdn.example.com/d.png', '2026-10-12T00:00:00Z', '2026-10-12T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-000000000b05', '삭제된 배너', '부제목', 'https://chalkak.vercel.app/e', 'https://cdn.example.com/e.png', '2026-10-13T00:00:00Z', '2026-10-13T00:00:00Z', '2026-10-14T00:00:00Z');
+"""]
+
+[[step]]
+name = "공개 목록 기본"
+method = "GET"
+path = "/api/v1/banners"
+
+[[step]]
+name = "공개 목록 크기 2"
+method = "GET"
+path = "/api/v1/banners?pageSize=2"
+
+[[step]]
+name = "공개 목록 2쪽 크기 2"
+method = "GET"
+path = "/api/v1/banners?page=2&pageSize=2"
+
+[[step]]
+name = "공개 목록 범위 밖"
+method = "GET"
+path = "/api/v1/banners?page=9&pageSize=2"
+
+[[step]]
+name = "공개 목록 크기 100"
+method = "GET"
+path = "/api/v1/banners?pageSize=100"
+
+[[step]]
+name = "공개 목록 page 0"
+method = "GET"
+path = "/api/v1/banners?page=0"
+
+[[step]]
+name = "공개 목록 pageSize 0"
+method = "GET"
+path = "/api/v1/banners?pageSize=0"
+
+[[step]]
+name = "공개 목록 pageSize 101"
+method = "GET"
+path = "/api/v1/banners?pageSize=101"
+
+[[step]]
+name = "공개 목록 page 문자"
+method = "GET"
+path = "/api/v1/banners?page=abc"
+
+[[step]]
+name = "공개 목록 offset 초과"
+method = "GET"
+path = "/api/v1/banners?page=2147483647&pageSize=100"
+
+[[step]]
+name = "공개 목록 page 공백"
+method = "GET"
+path = "/api/v1/banners?page=%20&pageSize="
+
+[[step]]
+name = "관리자 토큰 목록"
+method = "GET"
+path = "/api/v1/banners"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "등록 성공"
+method = "POST"
+path = "/api/v1/admin/banners"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+body = '''{"title":" 새 배너 ","subtitle":" 새 부제목 ","webViewUrl":" https://chalkak.vercel.app/new?x=1#f ","thumbnailUrl":"https://cdn.example.com/new.png"}'''
+
+[[step]]
+name = "등록 중복 URL"
+method = "POST"
+path = "/api/v1/admin/banners"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+body = '''{"title":"t","subtitle":"s","webViewUrl":"https://chalkak.vercel.app/a","thumbnailUrl":"https://cdn.example.com/x.png"}'''
+
+[[step]]
+name = "등록 쿼리 다른 URL"
+method = "POST"
+path = "/api/v1/admin/banners"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+body = '''{"title":"t","subtitle":"s","webViewUrl":"https://chalkak.vercel.app/a?x=1","thumbnailUrl":"https://cdn.example.com/x.png"}'''
+
+[[step]]
+name = "등록 삭제된 URL 재등록"
+method = "POST"
+path = "/api/v1/admin/banners"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+body = '''{"title":"t","subtitle":"s","webViewUrl":"https://chalkak.vercel.app/e","thumbnailUrl":"https://cdn.example.com/x.png"}'''
+
+[[step]]
+name = "등록 제목 없음"
+method = "POST"
+path = "/api/v1/admin/banners"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+body = '''{"subtitle":"s","webViewUrl":"https://chalkak.vercel.app/z","thumbnailUrl":"https://cdn.example.com/x.png"}'''
+
+[[step]]
+name = "등록 부제목 공백"
+method = "POST"
+path = "/api/v1/admin/banners"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+body = '''{"title":"t","subtitle":" ","webViewUrl":"https://chalkak.vercel.app/z","thumbnailUrl":"https://cdn.example.com/x.png"}'''
+
+[[step]]
+name = "등록 URL null"
+method = "POST"
+path = "/api/v1/admin/banners"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+body = '''{"title":"t","subtitle":"s","webViewUrl":null,"thumbnailUrl":"https://cdn.example.com/x.png"}'''
+
+[[step]]
+name = "등록 제목 51자"
+method = "POST"
+path = "/api/v1/admin/banners"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+body = '''{"title":"가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가","subtitle":"s","webViewUrl":"https://chalkak.vercel.app/z","thumbnailUrl":"https://cdn.example.com/x.png"}'''
+
+[[step]]
+name = "등록 부제목 101자"
+method = "POST"
+path = "/api/v1/admin/banners"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+body = '''{"title":"t","subtitle":"가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가","webViewUrl":"https://chalkak.vercel.app/z","thumbnailUrl":"https://cdn.example.com/x.png"}'''
+
+[[step]]
+name = "등록 http URL"
+method = "POST"
+path = "/api/v1/admin/banners"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+body = '''{"title":"t","subtitle":"s","webViewUrl":"http://chalkak.vercel.app/z","thumbnailUrl":"https://cdn.example.com/x.png"}'''
+
+[[step]]
+name = "등록 썸네일 호스트 없음"
+method = "POST"
+path = "/api/v1/admin/banners"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+body = '''{"title":"t","subtitle":"s","webViewUrl":"https://chalkak.vercel.app/z","thumbnailUrl":"https:///x.png"}'''
+
+[[step]]
+name = "등록 포트 초과"
+method = "POST"
+path = "/api/v1/admin/banners"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+body = '''{"title":"t","subtitle":"s","webViewUrl":"https://chalkak.vercel.app:65536/z","thumbnailUrl":"https://cdn.example.com/x.png"}'''
+
+[[step]]
+name = "등록 포트 최대"
+method = "POST"
+path = "/api/v1/admin/banners"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+body = '''{"title":"t","subtitle":"s","webViewUrl":"https://chalkak.vercel.app:65535/z","thumbnailUrl":"https://cdn.example.com/x.png"}'''
+
+[[step]]
+name = "등록 이모지 제목 50자"
+method = "POST"
+path = "/api/v1/admin/banners"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+body = '''{"title":"📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷📷","subtitle":"s","webViewUrl":"https://chalkak.vercel.app/emoji","thumbnailUrl":"https://cdn.example.com/x.png"}'''
+
+[[step]]
+name = "등록 본문 형식 오류"
+method = "POST"
+path = "/api/v1/admin/banners"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+body = '''{'''
+
+[[step]]
+name = "등록 인증 없음"
+method = "POST"
+path = "/api/v1/admin/banners"
+body = '''{"title":"t","subtitle":"s","webViewUrl":"https://chalkak.vercel.app/z","thumbnailUrl":"https://cdn.example.com/x.png"}'''
+
+[[step]]
+name = "목록 등록 후"
+method = "GET"
+path = "/api/v1/banners?pageSize=100"
+
+[[step]]
+name = "삭제 성공"
+method = "DELETE"
+path = "/api/v1/admin/banners/01990000-0000-7000-8000-000000000b01"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "재삭제"
+method = "DELETE"
+path = "/api/v1/admin/banners/01990000-0000-7000-8000-000000000b01"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "이미 삭제된 배너"
+method = "DELETE"
+path = "/api/v1/admin/banners/01990000-0000-7000-8000-000000000b05"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "없는 배너"
+method = "DELETE"
+path = "/api/v1/admin/banners/01990000-0000-7000-8000-000000000bff"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "잘못된 ID"
+method = "DELETE"
+path = "/api/v1/admin/banners/not-a-uuid"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "대문자 ID"
+method = "DELETE"
+path = "/api/v1/admin/banners/01990000-0000-7000-8000-000000000B02"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "삭제 인증 없음"
+method = "DELETE"
+path = "/api/v1/admin/banners/01990000-0000-7000-8000-000000000b03"
+
+[[step]]
+name = "삭제 후 목록"
+method = "GET"
+path = "/api/v1/banners?pageSize=100"

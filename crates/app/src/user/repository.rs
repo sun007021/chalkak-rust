@@ -51,6 +51,16 @@ pub fn user_from_row(row: &Row) -> Result<User, DbError> {
 }
 
 impl UserRepository {
+    /// `existsActiveById`: 탈퇴하지 않은 회원이 있는지. 정지 회원도 있는 것으로 본다.
+    pub fn exists_active_by_id(&self, db: &mut impl Db, id: Uuid) -> Result<bool, DbError> {
+        Ok(db
+            .query_opt(
+                "SELECT 1 FROM users WHERE id = $1 AND deleted_at IS NULL",
+                &[&id],
+            )?
+            .is_some())
+    }
+
     fn find_one(
         &self,
         db: &mut impl Db,
@@ -160,7 +170,7 @@ impl UserRepository {
              app_version = $6, pending_signature_upload_id = $7, \
              signature_processing_status = CAST($8::text AS signature_processing_status), \
              signature_processing_started_at = $9, deleted_at = $10, updated_at = $11, \
-             topic_push_enabled = $12, moderation_push_enabled = $13 \
+             topic_push_enabled = $12, moderation_push_enabled = $13, ai_review_push_enabled = $14 \
              WHERE id = $1",
             &[
                 &after.id,
@@ -178,6 +188,7 @@ impl UserRepository {
                 &now,
                 &after.topic_push_enabled,
                 &after.moderation_push_enabled,
+                &after.ai_review_push_enabled,
             ],
         )?;
         Ok(true)

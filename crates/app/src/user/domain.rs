@@ -101,7 +101,7 @@ pub struct User {
     pub topic_push_enabled: bool,
     /// 게시물 승인·반려 결과 푸시 수신 여부(기본 수신).
     pub moderation_push_enabled: bool,
-    /// AI 리뷰 결과 푸시 수신 여부(기본 수신). 이 포트에는 변경 경로가 없고 읽기만 한다.
+    /// AI 리뷰 결과 푸시 수신 여부(기본 수신).
     pub ai_review_push_enabled: bool,
     pub created_at: Timestamp,
     pub updated_at: Timestamp,
@@ -155,10 +155,12 @@ impl User {
         &mut self,
         topic_push_enabled: bool,
         moderation_push_enabled: bool,
+        ai_review_push_enabled: bool,
     ) -> Result<(), AppError> {
         self.validate_not_withdrawn()?;
         self.topic_push_enabled = topic_push_enabled;
         self.moderation_push_enabled = moderation_push_enabled;
+        self.ai_review_push_enabled = ai_review_push_enabled;
         Ok(())
     }
 
@@ -336,24 +338,27 @@ mod tests {
         "2026-08-24T10:00:00Z".parse().unwrap()
     }
 
-    // UserPushPreferencesTest#create_newUser_enablesBothPushPreferences
+    // UserPushPreferencesTest#create_newUser_enablesAllPushPreferences
     #[test]
     fn create_new_user_enables_both_push_preferences() {
         let user = fixture(Uuid::new_v4());
         assert!(user.topic_push_enabled);
         assert!(user.moderation_push_enabled);
+        assert!(user.ai_review_push_enabled);
     }
 
-    // UserPushPreferencesTest#updatePushPreferences_activeUser_updatesBothPreferences
+    // UserPushPreferencesTest#updatePushPreferences_activeUser_updatesEachPreference
     #[test]
     fn update_push_preferences_active_user_updates_both_preferences() {
         let mut user = fixture(Uuid::new_v4());
-        user.update_push_preferences(false, true).unwrap();
+        user.update_push_preferences(false, true, true).unwrap();
         assert!(!user.topic_push_enabled);
         assert!(user.moderation_push_enabled);
-        user.update_push_preferences(true, false).unwrap();
+        assert!(user.ai_review_push_enabled);
+        user.update_push_preferences(true, false, false).unwrap();
         assert!(user.topic_push_enabled);
         assert!(!user.moderation_push_enabled);
+        assert!(!user.ai_review_push_enabled);
     }
 
     // UserPushPreferencesTest#updatePushPreferences_withdrawnUser_throwsUnauthorizedException
@@ -361,10 +366,14 @@ mod tests {
     fn update_push_preferences_withdrawn_user_throws_unauthorized_exception() {
         let mut user = fixture(Uuid::new_v4());
         user.withdraw(now()).unwrap();
-        let error = user.update_push_preferences(false, false).unwrap_err();
+        let error = user
+            .update_push_preferences(false, false, false)
+            .unwrap_err();
         assert_eq!(error.kind, chalkak_core::error::ErrorKind::Unauthorized);
         assert_eq!(error.message, "유효하지 않은 인증 정보입니다.");
-        assert!(user.topic_push_enabled && user.moderation_push_enabled);
+        assert!(
+            user.topic_push_enabled && user.moderation_push_enabled && user.ai_review_push_enabled
+        );
     }
 
     // UserTest

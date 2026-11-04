@@ -1,0 +1,503 @@
+{
+  "db": {
+    "admin_audit_logs": [
+      "{\"action\":\"APP_VERSION_UPDATED\",\"actor_admin_id\":\"$uuid5\",\"after_state\":{\"minimumSupportedVersion\":\"1.3.0\",\"platform\":\"ANDROID\",\"revision\":1,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"before_state\":{\"minimumSupportedVersion\":\"1.2.0\",\"platform\":\"ANDROID\",\"revision\":0,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"id\":\"$uuid10\",\"occurred_at\":\"<t+0s db +09:00>\",\"reason\":\"첫 관리자 수정\",\"request_id\":\"$uuid4\",\"target_id\":\"$uuid11\",\"target_type\":\"APP_VERSION\"}",
+      "{\"action\":\"APP_VERSION_UPDATED\",\"actor_admin_id\":\"$uuid7\",\"after_state\":{\"minimumSupportedVersion\":\"1.4.0\",\"platform\":\"IOS\",\"revision\":1,\"storeUrl\":\"https://apps.apple.com/app/id999\"},\"before_state\":{\"minimumSupportedVersion\":\"1.2.0\",\"platform\":\"IOS\",\"revision\":0,\"storeUrl\":\"https://apps.apple.com/app/id999\"},\"id\":\"$uuid12\",\"occurred_at\":\"<t+120s db +09:00>\",\"reason\":\"IOS 정리\",\"request_id\":\"$uuid6\",\"target_id\":\"$uuid13\",\"target_type\":\"APP_VERSION\"}"
+    ],
+    "admins": [
+      "{\"created_at\":\"<t-4928400s db +09:00>\",\"id\":\"$uuid7\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"updated_at\":\"<t-4928400s db +09:00>\",\"username\":\"reviewer\"}",
+      "{\"created_at\":\"<t-5014800s db +09:00>\",\"id\":\"$uuid5\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"updated_at\":\"<t-5014800s db +09:00>\",\"username\":\"operator\"}"
+    ],
+    "app_versions": [
+      "{\"change_reason\":\"IOS 정리\",\"created_at\":\"<t-82800s db +09:00>\",\"id\":\"$uuid13\",\"last_changed_by\":\"$uuid7\",\"minimum_supported_version\":\"1.4.0\",\"platform\":\"IOS\",\"revision\":1,\"store_url\":\"https://apps.apple.com/app/id999\",\"updated_at\":\"<t+120s db +09:00>\"}",
+      "{\"change_reason\":\"첫 관리자 수정\",\"created_at\":\"<t-86400s db +09:00>\",\"id\":\"$uuid11\",\"last_changed_by\":\"$uuid5\",\"minimum_supported_version\":\"1.3.0\",\"platform\":\"ANDROID\",\"revision\":1,\"store_url\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ]
+  },
+  "steps": [
+    {
+      "body": {
+        "appVersions": [
+          {
+            "changeReason": null,
+            "createdAt": "<t-86400s iso Z>",
+            "lastChangedBy": null,
+            "minimumSupportedVersion": "1.2.0",
+            "platform": "ANDROID",
+            "revision": 0,
+            "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+            "updatedAt": "<t-86400s iso Z>"
+          },
+          {
+            "changeReason": null,
+            "createdAt": "<t-82800s iso Z>",
+            "lastChangedBy": null,
+            "minimumSupportedVersion": "1.2.0",
+            "platform": "IOS",
+            "revision": 0,
+            "storeUrl": "https://apps.apple.com/app/id999",
+            "updatedAt": "<t-79200s iso Z>"
+          }
+        ]
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "기존 설정 목록"
+    },
+    {
+      "body": {
+        "errorCode": "RESOURCE_STATE_CHANGED",
+        "message": "설정이 변경되었습니다. 다시 조회한 뒤 저장해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid2"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "기존 설정 revision null은 충돌"
+    },
+    {
+      "body": {
+        "changeReason": null,
+        "createdAt": "<t-82800s iso Z>",
+        "lastChangedBy": null,
+        "minimumSupportedVersion": "1.2.0",
+        "platform": "IOS",
+        "revision": 0,
+        "storeUrl": "https://apps.apple.com/app/id999",
+        "updatedAt": "<t-79200s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid3"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "기존 설정 같은 값은 변경 없음"
+    },
+    {
+      "body": {
+        "changeReason": "첫 관리자 수정",
+        "createdAt": "<t-86400s iso Z>",
+        "lastChangedBy": "$uuid5",
+        "minimumSupportedVersion": "1.3.0",
+        "platform": "ANDROID",
+        "revision": 1,
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid4"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "기존 설정 첫 수정"
+    },
+    {
+      "body": {
+        "changeReason": "IOS 정리",
+        "createdAt": "<t-82800s iso Z>",
+        "lastChangedBy": "$uuid7",
+        "minimumSupportedVersion": "1.4.0",
+        "platform": "IOS",
+        "revision": 1,
+        "storeUrl": "https://apps.apple.com/app/id999",
+        "updatedAt": "<t+120s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid6"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "기존 IOS 첫 수정"
+    },
+    {
+      "body": {
+        "appVersions": [
+          {
+            "changeReason": "첫 관리자 수정",
+            "createdAt": "<t-86400s iso Z>",
+            "lastChangedBy": "$uuid5",
+            "minimumSupportedVersion": "1.3.0",
+            "platform": "ANDROID",
+            "revision": 1,
+            "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+            "updatedAt": "<t+0s iso Z>"
+          },
+          {
+            "changeReason": "IOS 정리",
+            "createdAt": "<t-82800s iso Z>",
+            "lastChangedBy": "$uuid7",
+            "minimumSupportedVersion": "1.4.0",
+            "platform": "IOS",
+            "revision": 1,
+            "storeUrl": "https://apps.apple.com/app/id999",
+            "updatedAt": "<t+120s iso Z>"
+          }
+        ]
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid8"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "수정 후 목록"
+    },
+    {
+      "body": {
+        "auditLogs": [
+          {
+            "action": "APP_VERSION_UPDATED",
+            "actorAdminId": "$uuid5",
+            "actorUsername": "operator",
+            "afterState": {
+              "minimumSupportedVersion": "1.3.0",
+              "platform": "ANDROID",
+              "revision": 1,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak"
+            },
+            "auditLogId": "$uuid10",
+            "beforeState": {
+              "minimumSupportedVersion": "1.2.0",
+              "platform": "ANDROID",
+              "revision": 0,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak"
+            },
+            "occurredAt": "<t+0s iso Z>",
+            "reason": "첫 관리자 수정",
+            "requestId": "$uuid4",
+            "targetId": "$uuid11",
+            "targetType": "APP_VERSION"
+          },
+          {
+            "action": "APP_VERSION_UPDATED",
+            "actorAdminId": "$uuid7",
+            "actorUsername": "reviewer",
+            "afterState": {
+              "minimumSupportedVersion": "1.4.0",
+              "platform": "IOS",
+              "revision": 1,
+              "storeUrl": "https://apps.apple.com/app/id999"
+            },
+            "auditLogId": "$uuid12",
+            "beforeState": {
+              "minimumSupportedVersion": "1.2.0",
+              "platform": "IOS",
+              "revision": 0,
+              "storeUrl": "https://apps.apple.com/app/id999"
+            },
+            "occurredAt": "<t+120s iso Z>",
+            "reason": "IOS 정리",
+            "requestId": "$uuid6",
+            "targetId": "$uuid13",
+            "targetType": "APP_VERSION"
+          }
+        ],
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid9"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "감사 로그"
+    }
+  ]
+}

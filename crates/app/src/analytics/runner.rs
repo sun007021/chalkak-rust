@@ -228,7 +228,7 @@ mod tests {
             &self,
             _: jiff::Timestamp,
             _: jiff::Timestamp,
-        ) -> Result<crate::analytics::service::AiReviewCounts, ApiError> {
+        ) -> Result<crate::analytics::AiReviewCounts, ApiError> {
             Ok(Default::default())
         }
     }

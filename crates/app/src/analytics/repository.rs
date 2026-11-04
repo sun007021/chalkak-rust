@@ -61,10 +61,10 @@ WHERE p.deleted_at IS NULL
 
 /// 재요청은 `requested_at`을 바꾸지 않으므로 최초 요청만 센다. 완료·실패는 집계 시점 상태다.
 const COUNT_AI_REVIEWS: &str = "\
-SELECT COUNT(DISTINCT r.user_id)                      AS users,
-       COUNT(*)                                       AS requests,
+SELECT COUNT(DISTINCT r.user_id) AS users,
+       COUNT(*) AS requests,
        COUNT(*) FILTER (WHERE r.status = 'COMPLETED') AS completed,
-       COUNT(*) FILTER (WHERE r.status = 'FAILED')    AS failed
+       COUNT(*) FILTER (WHERE r.status = 'FAILED') AS failed
 FROM ai_reviews r
 WHERE r.requested_at >= $1
   AND r.requested_at < $2
@@ -137,11 +137,12 @@ impl UserMetricsRepository for PgUserMetricsRepository {
         let row = conn
             .query_one(COUNT_AI_REVIEWS, &[&from, &to, &self.excluded_user_ids])
             .map_err(DbError::from)?;
+        let get = |i: usize| row.try_get::<_, i64>(i).map_err(DbError::from);
         Ok(AiReviewCounts {
-            users: row.try_get("users").map_err(DbError::from)?,
-            requests: row.try_get("requests").map_err(DbError::from)?,
-            completed: row.try_get("completed").map_err(DbError::from)?,
-            failed: row.try_get("failed").map_err(DbError::from)?,
+            users: get(0)?,
+            requests: get(1)?,
+            completed: get(2)?,
+            failed: get(3)?,
         })
     }
 }

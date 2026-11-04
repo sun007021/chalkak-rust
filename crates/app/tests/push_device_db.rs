@@ -1392,6 +1392,7 @@ fn settings_of(topic: bool, moderation: bool) -> NotificationSettingsResult {
     NotificationSettingsResult {
         topic_push_enabled: topic,
         moderation_push_enabled: moderation,
+        ai_review_push_enabled: true,
     }
 }
 
@@ -1399,7 +1400,7 @@ impl Fx {
     fn user_with_preferences(&self, topic: bool, moderation: bool) -> Uuid {
         let user = self.w.save_user();
         self.w.modify_user(user.id, |u| {
-            u.update_push_preferences(topic, moderation).unwrap()
+            u.update_push_preferences(topic, moderation, true).unwrap()
         });
         user.id
     }
@@ -1461,11 +1462,15 @@ fn update_settings_provided_preferences_persists_only_requested_values() {
         let Some(f) = fx() else { return };
         let user = f.user_with_preferences(it, im);
 
-        f.settings.update_settings(user, topic, moderation).unwrap();
+        f.settings
+            .update_settings(user, topic, moderation, None)
+            .unwrap();
         assert_eq!(f.settings.get_settings(user).unwrap(), settings_of(et, em));
 
         // 같은 요청을 반복해도 설정을 유지한다.
-        f.settings.update_settings(user, topic, moderation).unwrap();
+        f.settings
+            .update_settings(user, topic, moderation, None)
+            .unwrap();
         assert_eq!(f.settings.get_settings(user).unwrap(), settings_of(et, em));
     }
 }
@@ -1476,7 +1481,7 @@ fn update_settings_missing_user_throws_unauthorized_exception() {
     let Some(f) = fx() else { return };
     unauthorized(
         f.settings
-            .update_settings(Uuid::new_v4(), Some(false), None),
+            .update_settings(Uuid::new_v4(), Some(false), None, None),
     );
 }
 
@@ -1487,11 +1492,36 @@ fn update_settings_withdrawn_user_throws_unauthorized_exception() {
     let user = f.w.save_user().id;
     f.w.withdraw_directly(user);
 
-    unauthorized(f.settings.update_settings(user, Some(false), None));
+    unauthorized(f.settings.update_settings(user, Some(false), None, None));
 
     let saved = f.w.find_user(user);
     assert!(saved.topic_push_enabled);
     assert!(saved.moderation_push_enabled);
+}
+
+// 1fb74d9 NotificationSettingsService: aiReviewPushEnabled도 null이면 기존 값을 유지하고 따로 바꿀 수 있다.
+#[test]
+fn update_settings_ai_review_preference_is_independent() {
+    let Some(f) = fx() else { return };
+    let user = f.w.save_user().id;
+    assert!(
+        f.settings
+            .get_settings(user)
+            .unwrap()
+            .ai_review_push_enabled
+    );
+
+    f.settings
+        .update_settings(user, None, None, Some(false))
+        .unwrap();
+    let r = f.settings.get_settings(user).unwrap();
+    assert!(r.topic_push_enabled && r.moderation_push_enabled && !r.ai_review_push_enabled);
+
+    f.settings
+        .update_settings(user, Some(false), None, None)
+        .unwrap();
+    let r = f.settings.get_settings(user).unwrap();
+    assert!(!r.topic_push_enabled && !r.ai_review_push_enabled);
 }
 
 // 값이 바뀌지 않으면 UPDATE하지 않으므로 updated_at도 그대로다(Hibernate 더티 체킹).
@@ -1503,11 +1533,13 @@ fn update_settings_unchanged_values_keep_updated_at() {
     f.w.clock.set(f.at(600));
 
     f.settings
-        .update_settings(user, Some(true), Some(true))
+        .update_settings(user, Some(true), Some(true), None)
         .unwrap();
     assert_eq!(f.w.find_user(user).updated_at, before);
 
-    f.settings.update_settings(user, Some(false), None).unwrap();
+    f.settings
+        .update_settings(user, Some(false), None, None)
+        .unwrap();
     assert_eq!(f.w.find_user(user).updated_at, f.at(600));
 }
 
@@ -1545,9 +1577,13 @@ fn update_settings_concurrent_partial_updates_preserves_both_changes() {
             },
             move || {
                 if topic_first {
-                    service.update_settings(user, None, Some(false)).unwrap()
+                    service
+                        .update_settings(user, None, Some(false), None)
+                        .unwrap()
                 } else {
-                    service.update_settings(user, Some(false), None).unwrap()
+                    service
+                        .update_settings(user, Some(false), None, None)
+                        .unwrap()
                 }
             },
         );

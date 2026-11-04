@@ -2,7 +2,7 @@
 //! `WeeklyRetention`, `AccessLogMetricsReader`, `UserMetricsRepository`).
 //!
 //! 집계 결과는 `chalkak.aggregation` 로거의 INFO 로그 한 줄이다. 키 순서는 대시보드·알람이 읽는 모양 그대로다:
-//! `type`, `metricDate`, `dau`, `posts`, `wau`, `eligibleUsers`, `likesTotal`, `aiReviewUsers`, `aiReviewRequests`, `aiReviewCompleted`, `aiReviewFailed`, (접근 로그 지표 6개), (일요일이면 주차별
+//! `type`, `metricDate`, `dau`, `posts`, `wau`, `eligibleUsers`, `likesTotal`, (접근 로그 지표 6개), (일요일이면 주차별
 //! 유지율).
 
 use std::sync::{Arc, LazyLock};
@@ -85,19 +85,9 @@ pub struct DailyUserMetrics {
     pub wau: i64,
     pub eligible_users: i64,
     pub likes_total: i64,
-    /// 최초 요청 시각이 그날인 AI 리뷰. 재요청은 `requested_at`을 바꾸지 않으므로 세지 않는다. 완료·실패는 집계 시점 상태다.
     pub ai_reviews: AiReviewCounts,
     pub access_log_metrics: Option<AccessLogMetrics>,
     pub weekly_retentions: Vec<WeeklyRetention>,
-}
-
-/// 하루 동안 최초 요청된 AI 리뷰의 집계(`AiReviewCounts`).
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
-pub struct AiReviewCounts {
-    pub users: i64,
-    pub requests: i64,
-    pub completed: i64,
-    pub failed: i64,
 }
 
 /// 사용자 지표 집계용 조회. 지표에서 제외할 회원은 구현체가 걸러낸다. 구간은 모두 `[from, to)`이다.
@@ -123,8 +113,18 @@ pub trait UserMetricsRepository: Send + Sync {
     /// 삭제되지 않은 게시물에 달린 좋아요 수.
     fn count_likes_on_live_posts(&self) -> Result<i64, ApiError>;
 
-    /// 구간에 최초 요청된 AI 리뷰의 회원 수·요청 수·완료 수·실패 수.
+    /// 구간에 처음 요청된 AI 리뷰의 요청 회원 수, 요청 수, 집계 시점의 완료·실패 수.
+    /// 재요청은 `requested_at`을 바꾸지 않으므로 최초 요청만 센다.
     fn count_ai_reviews(&self, from: Timestamp, to: Timestamp) -> Result<AiReviewCounts, ApiError>;
+}
+
+/// `AiReviewCounts`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct AiReviewCounts {
+    pub users: i64,
+    pub requests: i64,
+    pub completed: i64,
+    pub failed: i64,
 }
 
 /// 접근 로그 집계 조회. 지표에서 제외할 회원은 구현체가 걸러낸다. 조회에 실패하면 오류를 돌려준다.
@@ -323,9 +323,9 @@ mod tests {
         }
         fn count_ai_reviews(&self, _: Timestamp, _: Timestamp) -> Result<AiReviewCounts, ApiError> {
             Ok(AiReviewCounts {
-                users: 2,
-                requests: 3,
-                completed: 1,
+                users: 3,
+                requests: 5,
+                completed: 2,
                 failed: 1,
             })
         }
@@ -421,6 +421,20 @@ mod tests {
         assert_eq!(metrics.access_log_metrics, None);
         let events = lines.events();
         assert_eq!(events.len(), 1);
+        // 원본 UserMetricsAggregationServiceTest#aggregate_success_logsOneAggregationLine: 0이 아닌 값이 그대로 실린다.
+        assert_eq!(
+            metrics.ai_reviews,
+            AiReviewCounts {
+                users: 3,
+                requests: 5,
+                completed: 2,
+                failed: 1
+            }
+        );
+        assert_eq!(events[0]["aiReviewUsers"], 3);
+        assert_eq!(events[0]["aiReviewRequests"], 5);
+        assert_eq!(events[0]["aiReviewCompleted"], 2);
+        assert_eq!(events[0]["aiReviewFailed"], 1);
         assert_eq!(
             lines.keys(0),
             [

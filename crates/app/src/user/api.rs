@@ -10,7 +10,9 @@ use super::service::{UserService, UserWithdrawalService};
 use crate::AppContext;
 use crate::auth::UsableUserPolicy;
 use crate::common::{base64_std_decode, java_len, parse_canonical_uuid};
+use crate::post::PostQueryService;
 use crate::post::ProcessingCallbackAuthenticator;
+use crate::post::api::{AuthorPostListResponse, bind_author_post_list_request};
 use crate::web::{ApiError, ApiResult, Routes, binding, ok_json};
 use crate::wiring::Components;
 use chalkak_core::error::{AppError, ErrorCode};
@@ -83,7 +85,7 @@ pub fn parse_upload_id_field(value: Option<&Value>) -> Result<Uuid, ApiError> {
 // 라우트
 // ---------------------------------------------------------------------------------------------
 
-pub fn register(routes: Routes, _ctx: &AppContext, components: &Components) -> Routes {
+pub fn register(routes: Routes, ctx: &AppContext, components: &Components) -> Routes {
     let policy = components.policy.clone();
     let withdrawal = components.withdrawal.clone();
     let withdraw_policy = policy.clone();
@@ -91,8 +93,11 @@ pub fn register(routes: Routes, _ctx: &AppContext, components: &Components) -> R
     let upload_users = components.users.clone();
     let get_policy = policy.clone();
     let get_users = components.users.clone();
-    let update_policy = policy;
+    let update_policy = policy.clone();
     let update_users = components.users.clone();
+
+    let author_policy = policy.clone();
+    let author_query = ctx.post.query_service(ctx);
 
     let callback_auth = components.callback_auth.clone();
     let callbacks = components.users.clone();
@@ -104,6 +109,9 @@ pub fn register(routes: Routes, _ctx: &AppContext, components: &Components) -> R
     let fail_users = callbacks;
 
     routes
+        .get("/api/v1/users/{userId}/posts", move |req| {
+            get_author_posts(&author_policy, &author_query, req)
+        })
         .delete("/api/v1/users/me", move |_req| {
             withdraw(&withdraw_policy, &withdrawal)
         })
@@ -131,6 +139,23 @@ pub fn register(routes: Routes, _ctx: &AppContext, components: &Components) -> R
 }
 
 // `@RequiresExistingUser`/`@RequiresUsableUser`는 인자 해석 뒤, 메서드 실행 앞에서 판정한다.
+
+/// `getAuthorPosts`: 인자 해석(쿼리 바인딩·검증) -> `@RequiresExistingUser` -> 경로 변수 `CanonicalUuidParser` -> 서비스.
+fn get_author_posts(
+    policy: &UsableUserPolicy,
+    query: &PostQueryService,
+    req: &Request,
+) -> ApiResult {
+    let (page, page_size) = bind_author_post_list_request(req)?;
+    let viewer = policy.validate_existing()?;
+    let author_id = author_path_id(req)?;
+    let result = query.get_author_posts(author_id, page, page_size, viewer.user_id)?;
+    Ok(ok_json(&AuthorPostListResponse::from(result)))
+}
+
+fn author_path_id(req: &Request) -> Result<Uuid, ApiError> {
+    crate::post::request::parse_canonical_uuid(req.param("userId").unwrap_or_default())
+}
 
 fn withdraw(policy: &UsableUserPolicy, service: &UserWithdrawalService) -> ApiResult {
     let user = policy.validate_existing()?;
