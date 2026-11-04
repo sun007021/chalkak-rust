@@ -90,6 +90,7 @@ struct TopicResponse {
 #[serde(rename_all = "camelCase")]
 struct PostDetailResponse {
     id: String,
+    author_id: String,
     topic: TopicResponse,
     original_image_url: Option<String>,
     thumbnail_image_url: Option<String>,
@@ -103,6 +104,7 @@ impl From<PostDetail> for PostDetailResponse {
     fn from(d: PostDetail) -> Self {
         PostDetailResponse {
             id: d.id.to_string(),
+            author_id: d.author_id.to_string(),
             topic: TopicResponse {
                 id: d.topic.id.to_string(),
                 title: d.topic.title,
@@ -189,6 +191,7 @@ struct PostCalendarMonthsResponse {
 #[serde(rename_all = "camelCase")]
 struct PostListItemResponse {
     id: String,
+    author_id: String,
     original_image_url: Option<String>,
     thumbnail_image_url: Option<String>,
     signature_original_image_url: Option<String>,
@@ -223,6 +226,7 @@ impl From<PostListResult> for PostListResponse {
                 .into_iter()
                 .map(|p| PostListItemResponse {
                     id: p.id.to_string(),
+                    author_id: p.author_id.to_string(),
                     original_image_url: p.original_image_url,
                     thumbnail_image_url: p.thumbnail_image_url,
                     signature_original_image_url: p.signature_original_image_url,

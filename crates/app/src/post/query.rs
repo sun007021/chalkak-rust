@@ -54,6 +54,7 @@ pub struct TopicBrief {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PostDetail {
     pub id: Uuid,
+    pub author_id: Uuid,
     pub topic: TopicBrief,
     pub original_image_url: Option<String>,
     pub thumbnail_image_url: Option<String>,
@@ -89,6 +90,7 @@ pub struct PostCalendarResult {
 #[derive(Clone, Debug, PartialEq)]
 pub struct PostSummary {
     pub id: Uuid,
+    pub author_id: Uuid,
     pub original_image_url: Option<String>,
     pub thumbnail_image_url: Option<String>,
     pub signature_original_image_url: Option<String>,
@@ -175,6 +177,7 @@ impl PostQueryService {
             .exists_by_post_id_and_user_id(&mut conn, post_id, user_id)?;
         Ok(PostDetail {
             id: post.id,
+            author_id: post.author_id,
             topic: TopicBrief {
                 id: post.topic_id,
                 title: post.topic_title,
@@ -362,6 +365,7 @@ impl PostQueryService {
     ) -> Result<PostSummary, ApiError> {
         Ok(PostSummary {
             id: post.id,
+            author_id: post.author_id,
             original_image_url: self.url(Some(&post.original_storage_key))?,
             thumbnail_image_url: self.url(post.thumbnail_storage_key.as_deref())?,
             signature_original_image_url: self.url(Some(&post.signature_original_storage_key))?,

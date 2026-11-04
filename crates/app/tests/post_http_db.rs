@@ -604,6 +604,8 @@ fn get_post_valid_post_id_returns_post_detail() {
     let (response, json) = h.get(&format!("/api/v1/posts/{post}"), &[], Some(user));
     assert_eq!(response.status, 200);
     assert_eq!(json["id"], post.to_string());
+    // 1fb74d9 PostDetailResponse.authorId: 조회자가 아니라 작성자 ID
+    assert_eq!(json["authorId"], user.to_string());
     assert_eq!(json["topic"]["id"], topic.to_string());
     assert_eq!(json["likeCount"], 0);
     assert_eq!(json["isLiked"], false);
@@ -668,6 +670,8 @@ fn get_posts_valid_topic_date_returns_post_list() {
     assert_eq!(json["hasNext"], false);
     assert_eq!(json["randomSeed"], Value::Null);
     assert_eq!(json["posts"][0]["id"], post.to_string());
+    // 비로그인 응답에도 authorId가 있다
+    assert!(json["posts"][0]["authorId"].is_string());
     assert_eq!(json["posts"][0]["isMine"], false);
 }
 
@@ -680,6 +684,7 @@ fn get_posts_authenticated_user_returns_personal_like_status() {
     let (_, json) = h.get("/api/v1/posts", &[("topicDate", "2026-10-12")], Some(user));
     assert_eq!(json["posts"][0]["isLiked"], true);
     assert_eq!(json["posts"][0]["isMine"], true);
+    assert_eq!(json["posts"][0]["authorId"], user.to_string());
     assert_eq!(json["posts"][0]["likeCount"], 1);
 }
 
