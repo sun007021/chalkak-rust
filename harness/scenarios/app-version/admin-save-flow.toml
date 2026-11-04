@@ -1,0 +1,240 @@
+name = "관리자 앱 버전: 최초 저장, 하향·주소 변경, 재시도, revision 충돌, 감사 로그"
+tags = ["app-version", "app-version-admin"]
+clock = "2026-10-29T10:00:00+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO admins (id, username, password, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000000a1', 'operator', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-01T00:00:00Z', '2026-09-01T00:00:00Z'),
+  ('01990000-0000-7000-8000-0000000000a2', 'reviewer', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-02T00:00:00Z', '2026-09-02T00:00:00Z');
+INSERT INTO users (id, email, status, signature_original_storage_key, signature_thumbnail_storage_key, app_version, created_at, updated_at, deleted_at) VALUES
+  ('01990000-0000-7000-8000-000000000001', 'alice@test.chalkak', 'ACTIVE', 'chalkak/signatures/u1/original.png', 'chalkak/signatures/u1/thumbnail.png', '1.2.0', '2026-10-01T00:00:00Z', '2026-10-01T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-000000000002', 'bob@test.chalkak', 'BANNED', 'chalkak/signatures/u2/original.png', NULL, NULL, '2026-10-02T00:00:00Z', '2026-10-02T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-000000000003', 'withdrawn+01990000-0000-7000-8000-000000000003@chalkak.invalid', 'ACTIVE', 'withdrawn/01990000-0000-7000-8000-000000000003', NULL, '1.0.0', '2026-10-03T00:00:00Z', '2026-10-05T00:00:00Z', '2026-10-05T00:00:00Z');
+"""]
+
+[[step]]
+name = "미설정 목록"
+method = "GET"
+path = "/api/v1/admin/app-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "ANDROID 최초 저장"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "2.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+advance_seconds = 60
+
+[[step]]
+name = "공개 ANDROID 즉시 반영"
+method = "GET"
+path = "/api/v1/app-version?platform=ANDROID"
+
+[[step]]
+name = "공개 IOS는 그대로 미설정"
+method = "GET"
+path = "/api/v1/app-version?platform=IOS"
+
+[[step]]
+name = "저장 후 목록"
+method = "GET"
+path = "/api/v1/admin/app-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "버전 하향"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": 0, "minimumSupportedVersion": "1.10.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "  잘못 올린 최소 버전 복구  "}'''
+advance_seconds = 60
+
+[[step]]
+name = "주소 변경"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a2" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": 1, "minimumSupportedVersion": "1.10.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR", "reason": "주소 변경"}'''
+advance_seconds = 60
+
+[[step]]
+name = "같은 값 재시도 오래된 revision 앞뒤 공백 주소"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": 0, "minimumSupportedVersion": "1.10.0", "storeUrl": "  https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR  ", "reason": "다른 사유로 재시도"}'''
+
+[[step]]
+name = "같은 값 재시도 revision null"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.10.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR", "reason": "또 다른 사유"}'''
+
+[[step]]
+name = "같은 값 재시도 존재하지 않는 revision"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": 99, "minimumSupportedVersion": "1.10.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR", "reason": "또 다른 사유"}'''
+
+[[step]]
+name = "같은 값 재시도라도 사유는 검증한다"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": 2, "minimumSupportedVersion": "1.10.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR", "reason": "   "}'''
+
+[[step]]
+name = "같은 값 재시도라도 주소 형식은 검증한다"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": 2, "minimumSupportedVersion": "1.10.0", "storeUrl": "https://example.com/x", "reason": "출시 확인"}'''
+
+[[step]]
+name = "오래된 revision 충돌"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": 0, "minimumSupportedVersion": "3.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "revision null 충돌"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "3.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "미래 revision 충돌"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": 3, "minimumSupportedVersion": "3.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "큰 revision 충돌"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": 9223372036854775807, "minimumSupportedVersion": "3.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 최초 revision 0은 충돌"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": 0, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/id1234567890", "reason": "출시 확인"}'''
+
+[[step]]
+name = "IOS 최초 저장"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a2" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/kr/app/chalkak/id1234567890?l=ko&mt=8", "reason": "iOS 출시 확인"}'''
+advance_seconds = 30
+
+[[step]]
+name = "IOS 주소만 변경"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": 0, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://apps.apple.com/app/id1234567890", "reason": "주소 정리"}'''
+advance_seconds = 30
+
+[[step]]
+name = "ANDROID 버전을 올려 복구 이력"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": 2, "minimumSupportedVersion": "2.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR", "reason": "다시 상향"}'''
+advance_seconds = 30
+
+[[step]]
+name = "0.0.0으로 제한 해제"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": 3, "minimumSupportedVersion": "0.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "제한 해제"}'''
+advance_seconds = 30
+
+[[step]]
+name = "정수 상한 버전"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": 4, "minimumSupportedVersion": "2147483647.2147483647.2147483647", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "상한 확인"}'''
+
+[[step]]
+name = "최종 목록"
+method = "GET"
+path = "/api/v1/admin/app-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "공개 ANDROID 최종"
+method = "GET"
+path = "/api/v1/app-version?platform=ANDROID"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "공개 IOS 최종"
+method = "GET"
+path = "/api/v1/app-version?platform=IOS"
+
+[[step]]
+name = "감사 로그 전체 오름차순"
+method = "GET"
+path = "/api/v1/admin/audit-logs?targetType=APP_VERSION&sort=occurredAtAsc&pageSize=100"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "감사 로그 생성만"
+method = "GET"
+path = "/api/v1/admin/audit-logs?action=APP_VERSION_CREATED&sort=occurredAtAsc"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "감사 로그 수정만 내림차순"
+method = "GET"
+path = "/api/v1/admin/audit-logs?action=APP_VERSION_UPDATED"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "감사 로그 관리자 A2"
+method = "GET"
+path = "/api/v1/admin/audit-logs?targetType=APP_VERSION&adminId=01990000-0000-7000-8000-0000000000a2&sort=occurredAtAsc"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "감사 로그 페이지"
+method = "GET"
+path = "/api/v1/admin/audit-logs?targetType=APP_VERSION&sort=occurredAtAsc&page=2&pageSize=3"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "감사 로그 대상 종류 소문자는 거절"
+method = "GET"
+path = "/api/v1/admin/audit-logs?targetType=app_version"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }

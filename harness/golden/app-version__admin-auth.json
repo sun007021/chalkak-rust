@@ -1,0 +1,1048 @@
+{
+  "db": {
+    "admin_audit_logs": [
+      "{\"action\":\"APP_VERSION_CREATED\",\"actor_admin_id\":\"$uuid18\",\"after_state\":{\"minimumSupportedVersion\":\"1.0.0\",\"platform\":\"ANDROID\",\"revision\":0,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"before_state\":{},\"id\":\"$uuid?\",\"occurred_at\":\"<t+0s db +09:00>\",\"reason\":\"출시 확인\",\"request_id\":\"$uuid17\",\"target_id\":\"$uuid?\",\"target_type\":\"APP_VERSION\"}"
+    ],
+    "admins": [
+      "{\"created_at\":\"<t-4928400s db +09:00>\",\"id\":\"$uuid?\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"updated_at\":\"<t-4928400s db +09:00>\",\"username\":\"reviewer\"}",
+      "{\"created_at\":\"<t-5014800s db +09:00>\",\"id\":\"$uuid18\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"updated_at\":\"<t-5014800s db +09:00>\",\"username\":\"operator\"}"
+    ],
+    "app_versions": [
+      "{\"change_reason\":\"출시 확인\",\"created_at\":\"<t+0s db +09:00>\",\"id\":\"$uuid?\",\"last_changed_by\":\"$uuid18\",\"minimum_supported_version\":\"1.0.0\",\"platform\":\"ANDROID\",\"revision\":0,\"store_url\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ],
+    "users": [
+      "{\"ai_review_push_enabled\":true,\"app_version\":\"1.0.0\",\"created_at\":\"<t-2250000s db +09:00>\",\"deleted_at\":\"<t-2077200s db +09:00>\",\"email\":\"withdrawn+$uuid?@chalkak.invalid\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"withdrawn/$uuid?\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t-2077200s db +09:00>\"}",
+      "{\"ai_review_push_enabled\":true,\"app_version\":\"1.2.0\",\"created_at\":\"<t-2422800s db +09:00>\",\"deleted_at\":null,\"email\":\"alice@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u1/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u1/thumbnail.png\",\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t-2422800s db +09:00>\"}",
+      "{\"ai_review_push_enabled\":true,\"app_version\":null,\"created_at\":\"<t-2336400s db +09:00>\",\"deleted_at\":null,\"email\":\"bob@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u2/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"BANNED\",\"topic_push_enabled\":true,\"updated_at\":\"<t-2336400s db +09:00>\"}"
+    ]
+  },
+  "steps": [
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "www-authenticate",
+          "Bearer"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "목록 익명"
+    },
+    {
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "접근 권한이 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid2"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 403,
+      "step": "목록 회원"
+    },
+    {
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "접근 권한이 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid3"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 403,
+      "step": "목록 정지 회원"
+    },
+    {
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "접근 권한이 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid4"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 403,
+      "step": "목록 없는 회원"
+    },
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "www-authenticate",
+          "Bearer"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid5"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "목록 만료 관리자"
+    },
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "www-authenticate",
+          "Bearer"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid6"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "목록 형식 오류 토큰"
+    },
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "www-authenticate",
+          "Bearer"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid7"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "목록 Bearer 아닌 스킴"
+    },
+    {
+      "body": {
+        "appVersions": [
+          {
+            "changeReason": null,
+            "createdAt": null,
+            "lastChangedBy": null,
+            "minimumSupportedVersion": null,
+            "platform": "ANDROID",
+            "revision": null,
+            "storeUrl": null,
+            "updatedAt": null
+          },
+          {
+            "changeReason": null,
+            "createdAt": null,
+            "lastChangedBy": null,
+            "minimumSupportedVersion": null,
+            "platform": "IOS",
+            "revision": null,
+            "storeUrl": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid8"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "목록 없는 관리자"
+    },
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "www-authenticate",
+          "Bearer"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid9"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "저장 익명"
+    },
+    {
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "접근 권한이 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid10"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 403,
+      "step": "저장 회원"
+    },
+    {
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "접근 권한이 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid11"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 403,
+      "step": "저장 정지 회원"
+    },
+    {
+      "body": {
+        "errorCode": "FORBIDDEN",
+        "message": "접근 권한이 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid12"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 403,
+      "step": "저장 회원 잘못된 플랫폼은 권한이 먼저"
+    },
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "www-authenticate",
+          "Bearer"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid13"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "저장 익명 잘못된 본문"
+    },
+    {
+      "body": {
+        "errorCode": "UNAUTHORIZED",
+        "message": "유효하지 않은 인증 정보입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json;charset=UTF-8"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "www-authenticate",
+          "Bearer"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid14"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 401,
+      "step": "저장 형식 오류 토큰"
+    },
+    {
+      "body": {
+        "errorCode": "INTERNAL_ERROR",
+        "message": "서버에서 요청을 처리하지 못했습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid15"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 500,
+      "step": "저장 없는 관리자는 감사 로그 외래 키 때문에 서버 오류"
+    },
+    {
+      "body": {
+        "appVersions": [
+          {
+            "changeReason": null,
+            "createdAt": null,
+            "lastChangedBy": null,
+            "minimumSupportedVersion": null,
+            "platform": "ANDROID",
+            "revision": null,
+            "storeUrl": null,
+            "updatedAt": null
+          },
+          {
+            "changeReason": null,
+            "createdAt": null,
+            "lastChangedBy": null,
+            "minimumSupportedVersion": null,
+            "platform": "IOS",
+            "revision": null,
+            "storeUrl": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid16"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "권한 거절 뒤에도 미설정"
+    },
+    {
+      "body": {
+        "changeReason": "출시 확인",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid18",
+        "minimumSupportedVersion": "1.0.0",
+        "platform": "ANDROID",
+        "revision": 0,
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid17"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "관리자 저장"
+    },
+    {
+      "body": {
+        "minimumSupportedVersion": "1.0.0",
+        "platform": "ANDROID",
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-store"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid19"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "공개 조회 익명"
+    }
+  ]
+}

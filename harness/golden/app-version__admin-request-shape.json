@@ -1,0 +1,1603 @@
+{
+  "db": {
+    "admin_audit_logs": [
+      "{\"action\":\"APP_VERSION_CREATED\",\"actor_admin_id\":\"$uuid9\",\"after_state\":{\"minimumSupportedVersion\":\"1.0.0\",\"platform\":\"ANDROID\",\"revision\":0,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"before_state\":{},\"id\":\"$uuid?\",\"occurred_at\":\"<t+0s db +09:00>\",\"reason\":\"출시 확인\",\"request_id\":\"$uuid8\",\"target_id\":\"$uuid?\",\"target_type\":\"APP_VERSION\"}",
+      "{\"action\":\"APP_VERSION_CREATED\",\"actor_admin_id\":\"$uuid9\",\"after_state\":{\"minimumSupportedVersion\":\"1.0.0\",\"platform\":\"IOS\",\"revision\":0,\"storeUrl\":\"https://apps.apple.com/app/id1234567890\"},\"before_state\":{},\"id\":\"$uuid?\",\"occurred_at\":\"<t+0s db +09:00>\",\"reason\":\"출시 확인\",\"request_id\":\"$uuid14\",\"target_id\":\"$uuid?\",\"target_type\":\"APP_VERSION\"}"
+    ],
+    "admins": [
+      "{\"created_at\":\"<t-4928400s db +09:00>\",\"id\":\"$uuid?\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"updated_at\":\"<t-4928400s db +09:00>\",\"username\":\"reviewer\"}",
+      "{\"created_at\":\"<t-5014800s db +09:00>\",\"id\":\"$uuid9\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"updated_at\":\"<t-5014800s db +09:00>\",\"username\":\"operator\"}"
+    ],
+    "app_versions": [
+      "{\"change_reason\":\"출시 확인\",\"created_at\":\"<t+0s db +09:00>\",\"id\":\"$uuid?\",\"last_changed_by\":\"$uuid9\",\"minimum_supported_version\":\"1.0.0\",\"platform\":\"ANDROID\",\"revision\":0,\"store_url\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"change_reason\":\"출시 확인\",\"created_at\":\"<t+0s db +09:00>\",\"id\":\"$uuid?\",\"last_changed_by\":\"$uuid9\",\"minimum_supported_version\":\"1.0.0\",\"platform\":\"IOS\",\"revision\":0,\"store_url\":\"https://apps.apple.com/app/id1234567890\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ]
+  },
+  "steps": [
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "본문 없음"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid2"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "본문 빈 문자열"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be blank"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid3"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "본문 빈 객체"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid4"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "본문 배열"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid5"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "본문 깨진 JSON"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid6"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "본문 문자열"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "지원하지 않는 요청 방식이거나 형식입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid7"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 415,
+      "step": "Content-Type 텍스트"
+    },
+    {
+      "body": {
+        "changeReason": "출시 확인",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid9",
+        "minimumSupportedVersion": "1.0.0",
+        "platform": "ANDROID",
+        "revision": 0,
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid8"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "알 수 없는 필드는 무시"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "platform: 요청 값의 형식이 올바르지 않습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid10"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "경로 플랫폼 소문자"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "platform: 요청 값의 형식이 올바르지 않습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid11"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "경로 플랫폼 혼합"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "platform: 요청 값의 형식이 올바르지 않습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid12"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "경로 플랫폼 WEB"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "platform: 요청 값의 형식이 올바르지 않습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid13"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "경로 플랫폼 숫자"
+    },
+    {
+      "body": {
+        "changeReason": "출시 확인",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid9",
+        "minimumSupportedVersion": "1.0.0",
+        "platform": "IOS",
+        "revision": 0,
+        "storeUrl": "https://apps.apple.com/app/id1234567890",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid14"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "경로 플랫폼 공백 포함 허용"
+    },
+    {
+      "body": {
+        "changeReason": "출시 확인",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid9",
+        "minimumSupportedVersion": "1.0.0",
+        "platform": "IOS",
+        "revision": 0,
+        "storeUrl": "https://apps.apple.com/app/id1234567890",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid15"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "경로 플랫폼 탭 포함 허용"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "platform: 요청 값의 형식이 올바르지 않습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid16"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "경로 플랫폼 한글"
+    },
+    {
+      "body": {
+        "error": "Bad Request",
+        "path": "/api/v1/admin/app-versions/.",
+        "status": 400,
+        "timestamp": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "x-request-id",
+          "$uuid17"
+        ]
+      ],
+      "status": 400,
+      "step": "경로 플랫폼 점"
+    },
+    {
+      "body": "<!doctype html><html lang=\"en\"><head><title>HTTP Status 400 – Bad Request</title><style type=\"text/css\">body {font-family:Tahoma,Arial,sans-serif;} h1, h2, h3, b {color:white;background-color:#525D76;} h1 {font-size:22px;} h2 {font-size:16px;} h3 {font-size:14px;} p {font-size:12px;} a {color:black;} .line {height:1px;background-color:#525D76;border:none;}</style></head><body><h1>HTTP Status 400 – Bad Request</h1></body></html>",
+      "headers": [
+        [
+          "content-language",
+          "en"
+        ],
+        [
+          "content-type",
+          "text/html;charset=utf-8"
+        ]
+      ],
+      "status": 400,
+      "step": "경로 플랫폼 널"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "platform: 요청 값의 형식이 올바르지 않습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid18"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "경로 플랫폼 잘못이면 본문보다 먼저"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "지원하지 않는 요청 방식이거나 형식입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid19"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "경로 플랫폼 공백만"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "지원하지 않는 요청 방식이거나 형식입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid20"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 405,
+      "step": "경로 플랫폼 없음"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "요청한 API를 찾을 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid21"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 404,
+      "step": "경로 플랫폼 없음 슬래시"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "요청한 API를 찾을 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid22"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 404,
+      "step": "경로 하위 경로"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "지원하지 않는 요청 방식이거나 형식입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid23"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 405,
+      "step": "목록 POST"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "지원하지 않는 요청 방식이거나 형식입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid24"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 405,
+      "step": "목록 DELETE"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "지원하지 않는 요청 방식이거나 형식입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid25"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 405,
+      "step": "플랫폼 GET"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "지원하지 않는 요청 방식이거나 형식입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid26"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 405,
+      "step": "플랫폼 DELETE"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "지원하지 않는 요청 방식이거나 형식입니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid27"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 405,
+      "step": "플랫폼 POST"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "요청한 API를 찾을 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid28"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 404,
+      "step": "목록 끝 슬래시"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "요청한 API를 찾을 수 없습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid29"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 404,
+      "step": "목록 대소문자"
+    },
+    {
+      "body": {
+        "appVersions": [
+          {
+            "changeReason": "출시 확인",
+            "createdAt": "<t+0s iso Z>",
+            "lastChangedBy": "$uuid9",
+            "minimumSupportedVersion": "1.0.0",
+            "platform": "ANDROID",
+            "revision": 0,
+            "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+            "updatedAt": "<t+0s iso Z>"
+          },
+          {
+            "changeReason": "출시 확인",
+            "createdAt": "<t+0s iso Z>",
+            "lastChangedBy": "$uuid9",
+            "minimumSupportedVersion": "1.0.0",
+            "platform": "IOS",
+            "revision": 0,
+            "storeUrl": "https://apps.apple.com/app/id1234567890",
+            "updatedAt": "<t+0s iso Z>"
+          }
+        ]
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid30"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "본문 형태 후 목록"
+    }
+  ]
+}
