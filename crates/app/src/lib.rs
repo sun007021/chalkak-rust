@@ -11,6 +11,7 @@
 //!   (`POST /api/v1/feedbacks`, 회원 존재 확인, 관리자 로그아웃 요청 검증.) 해당 도메인 이슈에서 확장한다.
 
 pub mod admin;
+pub mod aireview;
 pub mod analytics;
 pub mod auth;
 pub mod common;
