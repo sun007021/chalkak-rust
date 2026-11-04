@@ -11,6 +11,7 @@
 //!   (`POST /api/v1/feedbacks`, 회원 존재 확인, 관리자 로그아웃 요청 검증.) 해당 도메인 이슈에서 확장한다.
 
 pub mod admin;
+pub mod aireview;
 pub mod analytics;
 pub mod appversion;
 pub mod auth;
@@ -50,6 +51,8 @@ pub struct AppContext {
     pub post: post::PostWiring,
     /// 사용자 지표 집계 러너. 스케줄러와 관리자 수동 집계가 같은 러너(같은 진행 중 표시)를 써야 한다.
     pub analytics: Arc<analytics::UserMetricsAggregationRunner>,
+    /// AI 리뷰 생성기(OpenAI 어댑터 또는 시험용 대역).
+    pub ai_review: aireview::AiReviewWiring,
 }
 
 /// 모든 도메인의 라우트를 등록한다.
@@ -65,6 +68,7 @@ pub fn register_routes(routes: web::Routes, ctx: &AppContext) -> web::Routes {
     let routes = user::api::register(routes, ctx, &components);
     let routes = post::api::register(routes, ctx);
     let routes = like::api::register(routes, ctx);
+    let routes = aireview::api::register(routes, ctx, Arc::clone(&ctx.ai_review.generator));
     let routes = banner::api::register(routes, ctx);
     let routes = appversion::api::register(routes, ctx);
     let routes = post::callback::register(routes, ctx);

@@ -8,6 +8,7 @@
 //! - 보관 기간이 지난 알림 정리 쿼리: [`cleanup`]. 스케줄은 주기 작업 이슈에서 건다.
 //! - 공지([`notice`])와 예약 시각이 된 공지의 알림함 배포([`distribution`]), 주제 푸시 발송 시간표([`topic_push_schedule`]).
 
+pub mod ai_review;
 pub mod api;
 pub mod cleanup;
 pub mod direct_push;

@@ -3,6 +3,9 @@
 //! 하위 구성: `analytics`(사용자 지표 수동 집계), `auth`(로그인·토큰), `audit`(감사 로그), `user`·`post`·`topic`·`feedback`·`notice`·`topic_push_schedule`·`app_version`(관리 API),
 //! `bootstrap`(시작 시 계정 보장).
 
+pub mod aireview;
+#[cfg(test)]
+mod aireview_tests;
 pub mod analytics;
 pub mod app_version;
 #[cfg(test)]
@@ -54,6 +57,7 @@ pub fn register(routes: Routes, ctx: &AppContext) -> Routes {
         image_urls: ctx.post.image_urls(),
     };
     let routes = register_with(routes, &deps);
+    let routes = aireview::register(routes, &deps, Arc::clone(&ctx.ai_review.generator));
     analytics::register(routes, &deps, Arc::clone(&ctx.analytics))
 }
 

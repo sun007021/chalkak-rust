@@ -540,12 +540,14 @@ fn deps(p: &Pending) -> JobDeps {
         }),
         analytics: None,
         worker: None,
+        ai_review_worker: None,
     }
 }
 
 fn all_enabled() -> JobsSettings {
     JobsSettings::from_env(
-        &Env::from_pairs(Vec::<(String, String)>::new()),
+        // AI 리뷰 워커는 정리 작업 시험과 상관없으니 끈다.
+        &Env::from_pairs([("CHALKAK_AIREVIEW_WORKER_ENABLED", "false")]),
         false,
         false,
     )

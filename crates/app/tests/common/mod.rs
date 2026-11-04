@@ -592,6 +592,9 @@ impl World {
                 Arc::clone(&clock),
                 Arc::clone(&logger),
             ),
+            ai_review: chalkak_app::aireview::AiReviewWiring {
+                generator: Arc::new(chalkak_app::aireview::testing::StubGenerator::idle()),
+            },
         };
         (ctx, logger)
     }

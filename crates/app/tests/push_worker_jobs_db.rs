@@ -207,6 +207,8 @@ fn settings(extra: &[(&str, &str)]) -> JobsSettings {
             "CHALKAK_AUTH_PENDINGAPPLEAUTHORIZATION_CLEANUP_ENABLED",
             "false",
         ),
+        // AI 리뷰 워커는 이 시험과 상관없으니 끈다.
+        ("CHALKAK_AIREVIEW_WORKER_ENABLED", "false"),
     ];
     pairs.extend_from_slice(extra);
     JobsSettings::from_env(&Env::from_pairs(pairs), false, false).unwrap()
@@ -235,6 +237,7 @@ impl Fx {
             publisher: Some(self.publisher.clone()),
             analytics: None,
             worker,
+            ai_review_worker: None,
         }
     }
 }

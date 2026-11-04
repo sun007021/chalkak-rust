@@ -128,6 +128,31 @@ impl NotificationRepository {
         Ok(())
     }
 
+    /// `insertIfAbsent`: 같은 회원의 같은 사건 키가 이미 있으면 저장하지 않는다. 저장한 행 수(이미 있으면 0).
+    pub fn insert_if_absent(
+        &self,
+        db: &mut impl Db,
+        notification: &Notification,
+    ) -> Result<u64, DbError> {
+        Ok(db.execute(
+            "INSERT INTO notifications (user_id, source_type, source_id, event_key, type, title, \
+             body, created_at, sqs_publish_status, next_attempt_at) \
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (user_id, event_key) DO NOTHING",
+            &[
+                &notification.user_id,
+                &notification.source_type.map(NotificationSourceType::as_str),
+                &notification.source_id,
+                &notification.event_key,
+                &notification.kind.as_str(),
+                &notification.title,
+                &notification.body,
+                &notification.created_at,
+                &notification.publish_status.as_str(),
+                &notification.next_attempt_at,
+            ],
+        )?)
+    }
+
     /// `findByUserId`: 최신순(`created_at DESC, id DESC`)으로 `offset`부터 `page_size`건. 한 건을 더 읽어 다음 쪽 여부를 안다
     /// (Spring Data `Slice`). `created_from` 이전에 생긴 알림은 보이지 않는다.
     pub fn find_by_user_id(

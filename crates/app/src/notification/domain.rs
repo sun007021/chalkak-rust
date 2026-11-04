@@ -42,6 +42,10 @@ pub enum NotificationType {
     PostRejected,
     /// 오늘의 주제.
     Topic,
+    /// AI 리뷰 완료.
+    AiReviewCompleted,
+    /// AI 리뷰 실패.
+    AiReviewFailed,
     /// 관리자 공지.
     Notice,
     /// 관리자 리마인더. 알림함 없이 SQS로 직접 보낸다.
@@ -54,6 +58,8 @@ impl NotificationType {
             NotificationType::PostApproved => "POST_APPROVED",
             NotificationType::PostRejected => "POST_REJECTED",
             NotificationType::Topic => "TOPIC",
+            NotificationType::AiReviewCompleted => "AI_REVIEW_COMPLETED",
+            NotificationType::AiReviewFailed => "AI_REVIEW_FAILED",
             NotificationType::Notice => "NOTICE",
             NotificationType::Reminder => "REMINDER",
         }
@@ -62,9 +68,10 @@ impl NotificationType {
     /// `isSourceOf`: 이 종류의 알림이 가리키는 대상 종류.
     pub const fn source_type(self) -> NotificationSourceType {
         match self {
-            NotificationType::PostApproved | NotificationType::PostRejected => {
-                NotificationSourceType::Post
-            }
+            NotificationType::PostApproved
+            | NotificationType::PostRejected
+            | NotificationType::AiReviewCompleted
+            | NotificationType::AiReviewFailed => NotificationSourceType::Post,
             NotificationType::Topic => NotificationSourceType::Topic,
             NotificationType::Notice => NotificationSourceType::Notice,
             NotificationType::Reminder => NotificationSourceType::Reminder,
@@ -79,6 +86,9 @@ impl NotificationType {
             }
             // 리마인더는 주제 알림 수신 설정을 따른다.
             NotificationType::Topic | NotificationType::Reminder => user.topic_push_enabled,
+            NotificationType::AiReviewCompleted | NotificationType::AiReviewFailed => {
+                user.ai_review_push_enabled
+            }
             NotificationType::Notice => true,
         }
     }
@@ -88,6 +98,8 @@ impl NotificationType {
             "POST_APPROVED" => Some(NotificationType::PostApproved),
             "POST_REJECTED" => Some(NotificationType::PostRejected),
             "TOPIC" => Some(NotificationType::Topic),
+            "AI_REVIEW_COMPLETED" => Some(NotificationType::AiReviewCompleted),
+            "AI_REVIEW_FAILED" => Some(NotificationType::AiReviewFailed),
             "NOTICE" => Some(NotificationType::Notice),
             "REMINDER" => Some(NotificationType::Reminder),
             _ => None,
@@ -240,6 +252,27 @@ impl Notification {
             created_at,
             push_enabled,
         ))
+    }
+
+    /// `Notification.aiReview`: AI 리뷰 결과 알림. 같은 리뷰의 같은 회차는 같은 사건 키를 가진다(호출 측이 만든다).
+    pub fn ai_review(
+        user_id: Uuid,
+        post_id: Uuid,
+        event_key: Uuid,
+        outcome: super::ai_review::AiReviewOutcome,
+        created_at: Timestamp,
+        push_enabled: bool,
+    ) -> Notification {
+        Notification::new(
+            user_id,
+            post_id,
+            event_key,
+            outcome.kind(),
+            (outcome.title(), outcome.body()),
+            None,
+            created_at,
+            push_enabled,
+        )
     }
 
     /// `getPushExpiresAt`

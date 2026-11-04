@@ -1195,3 +1195,125 @@ fn 배포_후_삭제된_공지의_알림은_보내지_않는다() {
     let result = fx.process(&fx.message);
     assert_skipped(&fx, result, "NOTIFICATION_UNAVAILABLE");
 }
+
+// ---------------------------------------------------------------------------------------------
+// PushWorkerAiReviewTest (AI 리뷰 결과 알림)
+// ---------------------------------------------------------------------------------------------
+
+/// `approved()`와 같은 게시물에 AI 리뷰 결과 알림을 만들어 메시지를 바꿔 끼운다.
+fn ai_review() -> Option<Approved> {
+    let mut a = approved()?;
+    let (user, post, now) = (a.fx.user, a.post, a.fx.now);
+    let event_key =
+        chalkak_app::notification::ai_review::event_key_for_ai_review(Uuid::new_v4(), 1);
+    a.fx.execute("DELETE FROM notifications");
+    let notification = transact(&a.fx.pool, |tx| {
+        let mut notification = Notification::ai_review(
+            user,
+            post,
+            event_key,
+            chalkak_app::notification::ai_review::AiReviewOutcome::Completed,
+            now,
+            true,
+        );
+        NotificationRepository.save(tx, &mut notification)?;
+        Ok(notification)
+    })
+    .unwrap();
+    a.fx.message = PushMessage {
+        event_id: notification.event_key,
+        notification_id: notification.id,
+        user_id: user,
+        kind: notification.kind,
+        source_type: notification.source_type,
+        source_id: Some(post),
+        occurred_at: now,
+        expires_at: plus(now, 1800),
+    };
+    Some(a)
+}
+
+// PushWorkerAiReviewTest#process_aiReviewNotification_sendsStoredMessage
+#[test]
+fn ai_리뷰_알림을_저장된_문구와_종류_게시물_대상으로_현재_기기에_보낸다() {
+    let Some(a) = ai_review() else { return };
+    let result = a.fx.process(&a.fx.message);
+    assert!(!result.retryable);
+    let requests = a.fx.sender.requests();
+    assert_eq!(requests.len(), 1);
+    assert_eq!(requests[0].title, "AI 피드백이 도착했어요");
+    assert_eq!(
+        requests[0].body,
+        "사진의 구도 점수와 피드백을 확인해 보세요."
+    );
+    assert_eq!(
+        requests[0].message.kind,
+        NotificationType::AiReviewCompleted
+    );
+    assert_eq!(
+        requests[0].message.source_type,
+        Some(NotificationSourceType::Post)
+    );
+    assert_eq!(requests[0].message.source_id, Some(a.post));
+    assert_eq!(
+        requests[0].message.notification_id,
+        a.fx.message.notification_id
+    );
+}
+
+// PushWorkerAiReviewTest#process_otherPushSettingsDisabled_sendsAiReviewPush
+#[test]
+fn 승인_반려와_주제_푸시를_꺼도_ai_리뷰_결과_설정이_켜져_있으면_보낸다() {
+    let Some(a) = ai_review() else { return };
+    a.fx.execute("UPDATE users SET moderation_push_enabled = false, topic_push_enabled = false");
+    a.fx.process(&a.fx.message);
+    assert_eq!(a.fx.sender.calls(), 1);
+}
+
+// PushWorkerAiReviewTest#process_ineligibleState_skipsPush
+#[test]
+fn 읽음_게시물_삭제_ai_리뷰_결과_설정_꺼짐이면_발송을_생략한다() {
+    let cases = [
+        (
+            "read",
+            "UPDATE notifications SET read_at = $1",
+            "ALREADY_READ",
+        ),
+        (
+            "postDeleted",
+            "UPDATE posts SET deleted_at = $1",
+            "NOTIFICATION_UNAVAILABLE",
+        ),
+        (
+            "disabled",
+            "UPDATE users SET ai_review_push_enabled = false WHERE $1::timestamptz IS NOT NULL",
+            "PUSH_DISABLED",
+        ),
+    ];
+    for (state, sql, reason) in cases {
+        let Some(a) = ai_review() else { return };
+        a.fx.execute_at(sql, a.fx.now);
+        let result = a.fx.process(&a.fx.message);
+        assert!(!result.retryable, "{state}");
+        assert_eq!(a.fx.sender.calls(), 0, "{state}");
+        assert_eq!(a.fx.skipped_reasons(), vec![reason.to_owned()], "{state}");
+    }
+}
+
+// PushWorkerAiReviewTest#process_deadlineBoundary_stopsAtDeadline
+#[test]
+fn ai_리뷰_알림은_발생_후_30분_직전까지만_보낸다() {
+    for seconds in [1799, 1800, 1801] {
+        let Some(a) = ai_review() else { return };
+        let result = a.fx.process_at(plus(a.fx.now, seconds), &a.fx.message);
+        assert!(!result.retryable, "{seconds}");
+        assert_eq!(
+            a.fx.sender.calls(),
+            usize::from(seconds < 1800),
+            "{seconds}"
+        );
+        if seconds >= 1800 {
+            assert_eq!(a.fx.skipped_reasons(), vec!["EXPIRED".to_owned()]);
+        }
+    }
+}

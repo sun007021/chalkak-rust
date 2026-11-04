@@ -11,6 +11,7 @@
 use std::path::PathBuf;
 use std::time::Duration;
 
+use chalkak_app::aireview::openai::OpenAiSettings;
 use chalkak_app::analytics::AnalyticsSettings;
 use chalkak_app::config::AppSettings;
 use chalkak_app::jobs::JobsSettings;
@@ -86,6 +87,8 @@ pub struct Settings {
     pub jobs: JobsSettings,
     /// 사용자 지표 집계 설정(팀 계정 제외 목록, 접근 로그 그룹).
     pub analytics: AnalyticsSettings,
+    /// OpenAI 호출 설정(AI 리뷰 생성기). `OPENAI_API_KEY`는 필수다.
+    pub openai: OpenAiSettings,
 }
 
 impl Settings {
@@ -123,6 +126,9 @@ impl Settings {
             JobsSettings::from_env(env, profile != Profile::Local, profile == Profile::Prod)?;
         let analytics =
             AnalyticsSettings::from_env(env, profile == Profile::Prod, &post.image.region)?;
+        let openai = OpenAiSettings::from_env(env)?;
+        // 임대가 호출 제한 시간보다 짧으면 같은 행을 두 번 호출하므로 시작할 때 거절한다(`AiReviewWorkerConfiguration.validateLease`).
+        jobs.ai_review_worker.validate_lease(&openai)?;
 
         Ok(Settings {
             profile,
@@ -144,6 +150,7 @@ impl Settings {
             admin_notification,
             jobs,
             analytics,
+            openai,
         })
     }
 }
@@ -282,13 +289,19 @@ mod tests {
         ]);
         let prod = Settings::from_env(&prod).unwrap().jobs;
         assert!(prod.runtime_log);
-        // 정리 4종, 런타임 로그, 발행 대기 모니터, 사용자 지표 집계(application-prod.yml). Relay·주제 푸시는 기본 꺼짐.
-        assert_eq!(prod.planned().len(), 7);
+        // 정리 4종, 런타임 로그, 발행 대기 모니터, 사용자 지표 집계(application-prod.yml), AI 리뷰 워커(application.yml 기본 켜짐).
+        // Relay·주제 푸시는 기본 꺼짐.
+        assert_eq!(prod.planned().len(), 8);
+        assert!(
+            prod.planned()
+                .contains(&chalkak_app::jobs::Job::AiReviewWorker)
+        );
         assert!(
             prod.planned()
                 .contains(&chalkak_app::jobs::Job::PublicationMonitor)
         );
-        assert_eq!(local_planned, 4);
+        // 정리 4종 + AI 리뷰 워커.
+        assert_eq!(local_planned, 5);
     }
 
     #[test]
