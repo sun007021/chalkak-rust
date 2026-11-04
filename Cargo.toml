@@ -28,7 +28,7 @@ postgres = "0.19"
 tokio-postgres-rustls = "0.13"
 hmac = "0.12"
 sha2 = "0.10"
-p256 = { version = "0.13", default-features = false }
+p256 = { version = "0.14", default-features = false }
 rsa = { version = "0.9", default-features = false }
 jiff = { version = "0.2", features = ["tzdb-bundle-always"] }
 uuid = { version = "1", features = ["v4"] }
