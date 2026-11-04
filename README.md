@@ -5,7 +5,8 @@
 - 전환 계획: [docs/plan/migration-plan.md](docs/plan/migration-plan.md)
 - 검증 하네스: [harness/README.md](harness/README.md)
 - 구현 설계·이슈 단위: [docs/plan/implementation-design.md](docs/plan/implementation-design.md)
-- 로컬 환경: `harness/scripts/up.sh` (docker compose로 PostgreSQL·원본 Java 서버·Rust 서버)
+- 백엔드 전체를 로컬에서 한 번에: `./up-all.sh` (Rust 서버 + PostgreSQL + S3·SQS + 이미지 Lambda + PushWorker, 자세히는 [local-aws/README.md](local-aws/README.md), iOS 시연은 [docs/local-aws/ios-demo.md](docs/local-aws/ios-demo.md))
+- 하네스용 로컬 환경: `harness/scripts/up.sh` (docker compose로 PostgreSQL·원본 Java 서버·Rust 서버)
 - 원칙: 웹 프레임워크·ORM 없음, 우리 코드에 `unsafe` 없음(`forbid(unsafe_code)`), 원본과 응답·DB 상태가 같을 것.
 
 | 경로 | 내용 |
