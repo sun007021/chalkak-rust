@@ -28,6 +28,8 @@ pub(super) const SERVICE_LOGGER: &str =
     "com.chalkak.backend.notification.infrastructure.infra.SqsPushService";
 const TYPE_NOTIFICATION: &str = "notification";
 const RECEIVE_COUNT_ATTRIBUTE: &str = "ApproximateReceiveCount";
+/// 수신 요청에만 싣는다. 처리 시간 계측에 쓰는 값은 push_deliveries 이슈에서 읽는다.
+const SENT_TIMESTAMP_ATTRIBUTE: &str = "SentTimestamp";
 /// 수신 한 번이 기다리는 시간(`waitTimeSeconds`).
 const LONG_POLL_SECONDS: u32 = 20;
 /// 수신한 메시지가 다른 소비자에게 숨는 시간(`visibilityTimeout`).
@@ -130,7 +132,10 @@ impl WorkerQueue for SqsWorkerQueue {
             max_number_of_messages: Some(1),
             visibility_timeout: Some(VISIBILITY_SECONDS),
             wait_time_seconds: Some(LONG_POLL_SECONDS),
-            message_system_attribute_names: vec![RECEIVE_COUNT_ATTRIBUTE.to_owned()],
+            message_system_attribute_names: vec![
+                RECEIVE_COUNT_ATTRIBUTE.to_owned(),
+                SENT_TIMESTAMP_ATTRIBUTE.to_owned(),
+            ],
         };
         let messages = self
             .receive_client

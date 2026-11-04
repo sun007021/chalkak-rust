@@ -1,0 +1,198 @@
+{
+  "db": {
+    "admins": [
+      "{\"created_at\":\"<t-4928400s db +09:00>\",\"id\":\"$uuid?\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"updated_at\":\"<t-4928400s db +09:00>\",\"username\":\"reviewer\"}",
+      "{\"created_at\":\"<t-5014800s db +09:00>\",\"id\":\"$uuid?\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"updated_at\":\"<t-5014800s db +09:00>\",\"username\":\"operator\"}"
+    ],
+    "app_versions": [
+      "{\"change_reason\":null,\"created_at\":\"<t-82800s db +09:00>\",\"id\":\"$uuid?\",\"last_changed_by\":null,\"minimum_supported_version\":\"2147483647.0.10\",\"platform\":\"IOS\",\"revision\":0,\"store_url\":\"https://apps.apple.com/kr/app/chalkak/id1234567890?l=ko&mt=8\",\"updated_at\":\"<t-79200s db +09:00>\"}",
+      "{\"change_reason\":null,\"created_at\":\"<t-86400s db +09:00>\",\"id\":\"$uuid?\",\"last_changed_by\":null,\"minimum_supported_version\":\"1.2.0\",\"platform\":\"ANDROID\",\"revision\":0,\"store_url\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\",\"updated_at\":\"<t-86400s db +09:00>\"}"
+    ],
+    "users": [
+      "{\"ai_review_push_enabled\":true,\"app_version\":\"1.0.0\",\"created_at\":\"<t-2250000s db +09:00>\",\"deleted_at\":\"<t-2077200s db +09:00>\",\"email\":\"withdrawn+$uuid?@chalkak.invalid\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"withdrawn/$uuid?\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t-2077200s db +09:00>\"}",
+      "{\"ai_review_push_enabled\":true,\"app_version\":\"1.2.0\",\"created_at\":\"<t-2422800s db +09:00>\",\"deleted_at\":null,\"email\":\"alice@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u1/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u1/thumbnail.png\",\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t-2422800s db +09:00>\"}",
+      "{\"ai_review_push_enabled\":true,\"app_version\":null,\"created_at\":\"<t-2336400s db +09:00>\",\"deleted_at\":null,\"email\":\"bob@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u2/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"BANNED\",\"topic_push_enabled\":true,\"updated_at\":\"<t-2336400s db +09:00>\"}"
+    ]
+  },
+  "steps": [
+    {
+      "body": {
+        "minimumSupportedVersion": "1.2.0",
+        "platform": "ANDROID",
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-store"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "ANDROID 기존 설정"
+    },
+    {
+      "body": {
+        "minimumSupportedVersion": "2147483647.0.10",
+        "platform": "IOS",
+        "storeUrl": "https://apps.apple.com/kr/app/chalkak/id1234567890?l=ko&mt=8"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-store"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid2"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "IOS 기존 설정"
+    },
+    {
+      "body": {
+        "minimumSupportedVersion": "2147483647.0.10",
+        "platform": "IOS",
+        "storeUrl": "https://apps.apple.com/kr/app/chalkak/id1234567890?l=ko&mt=8"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-store"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid3"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "기존 설정 캐시 헤더는 관리자 토큰도 같다"
+    },
+    {
+      "body": {
+        "appVersions": [
+          {
+            "changeReason": null,
+            "createdAt": "<t-86400s iso Z>",
+            "lastChangedBy": null,
+            "minimumSupportedVersion": "1.2.0",
+            "platform": "ANDROID",
+            "revision": 0,
+            "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+            "updatedAt": "<t-86400s iso Z>"
+          },
+          {
+            "changeReason": null,
+            "createdAt": "<t-82800s iso Z>",
+            "lastChangedBy": null,
+            "minimumSupportedVersion": "2147483647.0.10",
+            "platform": "IOS",
+            "revision": 0,
+            "storeUrl": "https://apps.apple.com/kr/app/chalkak/id1234567890?l=ko&mt=8",
+            "updatedAt": "<t-79200s iso Z>"
+          }
+        ]
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid4"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "관리자 목록은 변경자·사유 null"
+    }
+  ]
+}

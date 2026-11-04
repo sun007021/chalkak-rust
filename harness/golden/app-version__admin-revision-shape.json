@@ -1,0 +1,1838 @@
+{
+  "db": {
+    "admin_audit_logs": [
+      "{\"action\":\"APP_VERSION_CREATED\",\"actor_admin_id\":\"$uuid19\",\"after_state\":{\"minimumSupportedVersion\":\"1.0.0\",\"platform\":\"ANDROID\",\"revision\":0,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"before_state\":{},\"id\":\"$uuid?\",\"occurred_at\":\"<t+0s db +09:00>\",\"reason\":\"출시 확인\",\"request_id\":\"$uuid18\",\"target_id\":\"$uuid?\",\"target_type\":\"APP_VERSION\"}",
+      "{\"action\":\"APP_VERSION_CREATED\",\"actor_admin_id\":\"$uuid19\",\"after_state\":{\"minimumSupportedVersion\":\"1.0.0\",\"platform\":\"IOS\",\"revision\":0,\"storeUrl\":\"https://apps.apple.com/app/id1234567890\"},\"before_state\":{},\"id\":\"$uuid?\",\"occurred_at\":\"<t+0s db +09:00>\",\"reason\":\"출시 확인\",\"request_id\":\"$uuid20\",\"target_id\":\"$uuid?\",\"target_type\":\"APP_VERSION\"}",
+      "{\"action\":\"APP_VERSION_UPDATED\",\"actor_admin_id\":\"$uuid19\",\"after_state\":{\"minimumSupportedVersion\":\"1.1.0\",\"platform\":\"ANDROID\",\"revision\":1,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"before_state\":{\"minimumSupportedVersion\":\"1.0.0\",\"platform\":\"ANDROID\",\"revision\":0,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t+0s db +09:00>\",\"reason\":\"문자열 revision\",\"request_id\":\"$uuid24\",\"target_id\":\"$uuid?\",\"target_type\":\"APP_VERSION\"}",
+      "{\"action\":\"APP_VERSION_UPDATED\",\"actor_admin_id\":\"$uuid19\",\"after_state\":{\"minimumSupportedVersion\":\"1.2.0\",\"platform\":\"ANDROID\",\"revision\":2,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"before_state\":{\"minimumSupportedVersion\":\"1.1.0\",\"platform\":\"ANDROID\",\"revision\":1,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t+0s db +09:00>\",\"reason\":\"소수 revision\",\"request_id\":\"$uuid25\",\"target_id\":\"$uuid?\",\"target_type\":\"APP_VERSION\"}",
+      "{\"action\":\"APP_VERSION_UPDATED\",\"actor_admin_id\":\"$uuid19\",\"after_state\":{\"minimumSupportedVersion\":\"1.3.0\",\"platform\":\"ANDROID\",\"revision\":3,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"before_state\":{\"minimumSupportedVersion\":\"1.2.0\",\"platform\":\"ANDROID\",\"revision\":2,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t+0s db +09:00>\",\"reason\":\"지수 revision\",\"request_id\":\"$uuid26\",\"target_id\":\"$uuid?\",\"target_type\":\"APP_VERSION\"}",
+      "{\"action\":\"APP_VERSION_UPDATED\",\"actor_admin_id\":\"$uuid19\",\"after_state\":{\"minimumSupportedVersion\":\"1.4.0\",\"platform\":\"ANDROID\",\"revision\":4,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"before_state\":{\"minimumSupportedVersion\":\"1.3.0\",\"platform\":\"ANDROID\",\"revision\":3,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t+0s db +09:00>\",\"reason\":\"부호 revision\",\"request_id\":\"$uuid27\",\"target_id\":\"$uuid?\",\"target_type\":\"APP_VERSION\"}",
+      "{\"action\":\"APP_VERSION_UPDATED\",\"actor_admin_id\":\"$uuid19\",\"after_state\":{\"minimumSupportedVersion\":\"1.5.0\",\"platform\":\"ANDROID\",\"revision\":5,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"before_state\":{\"minimumSupportedVersion\":\"1.4.0\",\"platform\":\"ANDROID\",\"revision\":4,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t+0s db +09:00>\",\"reason\":\"공백 revision\",\"request_id\":\"$uuid28\",\"target_id\":\"$uuid?\",\"target_type\":\"APP_VERSION\"}",
+      "{\"action\":\"APP_VERSION_UPDATED\",\"actor_admin_id\":\"$uuid19\",\"after_state\":{\"minimumSupportedVersion\":\"1.6.0\",\"platform\":\"ANDROID\",\"revision\":6,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"before_state\":{\"minimumSupportedVersion\":\"1.5.0\",\"platform\":\"ANDROID\",\"revision\":5,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"id\":\"$uuid?\",\"occurred_at\":\"<t+0s db +09:00>\",\"reason\":\"앞자리 0 revision\",\"request_id\":\"$uuid29\",\"target_id\":\"$uuid?\",\"target_type\":\"APP_VERSION\"}"
+    ],
+    "admins": [
+      "{\"created_at\":\"<t-4928400s db +09:00>\",\"id\":\"$uuid?\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"updated_at\":\"<t-4928400s db +09:00>\",\"username\":\"reviewer\"}",
+      "{\"created_at\":\"<t-5014800s db +09:00>\",\"id\":\"$uuid19\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"updated_at\":\"<t-5014800s db +09:00>\",\"username\":\"operator\"}"
+    ],
+    "app_versions": [
+      "{\"change_reason\":\"앞자리 0 revision\",\"created_at\":\"<t+0s db +09:00>\",\"id\":\"$uuid?\",\"last_changed_by\":\"$uuid19\",\"minimum_supported_version\":\"1.6.0\",\"platform\":\"ANDROID\",\"revision\":6,\"store_url\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\",\"updated_at\":\"<t+0s db +09:00>\"}",
+      "{\"change_reason\":\"출시 확인\",\"created_at\":\"<t+0s db +09:00>\",\"id\":\"$uuid?\",\"last_changed_by\":\"$uuid19\",\"minimum_supported_version\":\"1.0.0\",\"platform\":\"IOS\",\"revision\":0,\"store_url\":\"https://apps.apple.com/app/id1234567890\",\"updated_at\":\"<t+0s db +09:00>\"}"
+    ]
+  },
+  "steps": [
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must be greater than or equal to 0"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "revision 음수"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must be greater than or equal to 0"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid2"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "revision 음수 소수 -1.5"
+    },
+    {
+      "body": {
+        "errorCode": "RESOURCE_STATE_CHANGED",
+        "message": "설정이 변경되었습니다. 다시 조회한 뒤 저장해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid3"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "revision 음수 소수 -0.5는 0으로 읽힌다"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid4"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "revision 불리언"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid5"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "revision 배열"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid6"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "revision 배열 값"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid7"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "revision 객체"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid8"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "revision 문자 문자열"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid9"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "revision 소수 문자열"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid10"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "revision 지수 표기"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid11"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "revision long 초과"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid12"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "revision 매우 큰 수"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid13"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "revision 음수 long 미만"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid14"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "revision 지수 큰 값"
+    },
+    {
+      "body": {
+        "errorCode": "RESOURCE_STATE_CHANGED",
+        "message": "설정이 변경되었습니다. 다시 조회한 뒤 저장해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid15"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "revision 정수 0 최초 저장은 충돌"
+    },
+    {
+      "body": {
+        "errorCode": "RESOURCE_STATE_CHANGED",
+        "message": "설정이 변경되었습니다. 다시 조회한 뒤 저장해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid16"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "revision 소수 0.9는 0으로 읽혀 충돌"
+    },
+    {
+      "body": {
+        "errorCode": "RESOURCE_STATE_CHANGED",
+        "message": "설정이 변경되었습니다. 다시 조회한 뒤 저장해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid17"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "revision 문자열 0 최초 저장은 충돌"
+    },
+    {
+      "body": {
+        "changeReason": "출시 확인",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid19",
+        "minimumSupportedVersion": "1.0.0",
+        "platform": "ANDROID",
+        "revision": 0,
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid18"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "revision 빈 문자열은 null로 읽혀 최초 저장"
+    },
+    {
+      "body": {
+        "changeReason": "출시 확인",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid19",
+        "minimumSupportedVersion": "1.0.0",
+        "platform": "IOS",
+        "revision": 0,
+        "storeUrl": "https://apps.apple.com/app/id1234567890",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid20"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "revision 최초 저장 빈 문자열"
+    },
+    {
+      "body": {
+        "changeReason": "출시 확인",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid19",
+        "minimumSupportedVersion": "1.0.0",
+        "platform": "IOS",
+        "revision": 0,
+        "storeUrl": "https://apps.apple.com/app/id1234567890",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid21"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "revision 공백 문자열"
+    },
+    {
+      "body": {
+        "changeReason": "출시 확인",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid19",
+        "minimumSupportedVersion": "1.0.0",
+        "platform": "ANDROID",
+        "revision": 0,
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid22"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "revision 최초 저장 null은 같은 값 재시도"
+    },
+    {
+      "body": {
+        "changeReason": "출시 확인",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid19",
+        "minimumSupportedVersion": "1.0.0",
+        "platform": "ANDROID",
+        "revision": 0,
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid23"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "revision 문자열 0은 같은 값 재시도"
+    },
+    {
+      "body": {
+        "changeReason": "문자열 revision",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid19",
+        "minimumSupportedVersion": "1.1.0",
+        "platform": "ANDROID",
+        "revision": 1,
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid24"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "revision 문자열 0 일치"
+    },
+    {
+      "body": {
+        "changeReason": "소수 revision",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid19",
+        "minimumSupportedVersion": "1.2.0",
+        "platform": "ANDROID",
+        "revision": 2,
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid25"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "revision 소수 1.9 일치"
+    },
+    {
+      "body": {
+        "changeReason": "지수 revision",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid19",
+        "minimumSupportedVersion": "1.3.0",
+        "platform": "ANDROID",
+        "revision": 3,
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid26"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "revision 지수 표기 2e0 일치"
+    },
+    {
+      "body": {
+        "changeReason": "부호 revision",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid19",
+        "minimumSupportedVersion": "1.4.0",
+        "platform": "ANDROID",
+        "revision": 4,
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid27"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "revision 플러스 문자열"
+    },
+    {
+      "body": {
+        "changeReason": "공백 revision",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid19",
+        "minimumSupportedVersion": "1.5.0",
+        "platform": "ANDROID",
+        "revision": 5,
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid28"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "revision 앞뒤 공백 문자열 일치"
+    },
+    {
+      "body": {
+        "changeReason": "앞자리 0 revision",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid19",
+        "minimumSupportedVersion": "1.6.0",
+        "platform": "ANDROID",
+        "revision": 6,
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid29"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "revision 앞자리 0 문자열 일치"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid30"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "revision 소수 문자열은 읽을 수 없음"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be blank"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid31"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "여러 위반 모두 비어 있음"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "JSON 형식이 올바르지 않거나 요청 본문이 비어 있습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid32"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "여러 위반 읽을 수 없는 revision과 비어 있는 필드"
+    },
+    {
+      "body": {
+        "appVersions": [
+          {
+            "changeReason": "앞자리 0 revision",
+            "createdAt": "<t+0s iso Z>",
+            "lastChangedBy": "$uuid19",
+            "minimumSupportedVersion": "1.6.0",
+            "platform": "ANDROID",
+            "revision": 6,
+            "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+            "updatedAt": "<t+0s iso Z>"
+          },
+          {
+            "changeReason": "출시 확인",
+            "createdAt": "<t+0s iso Z>",
+            "lastChangedBy": "$uuid19",
+            "minimumSupportedVersion": "1.0.0",
+            "platform": "IOS",
+            "revision": 0,
+            "storeUrl": "https://apps.apple.com/app/id1234567890",
+            "updatedAt": "<t+0s iso Z>"
+          }
+        ]
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid33"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "revision 형태 후 목록"
+    }
+  ]
+}

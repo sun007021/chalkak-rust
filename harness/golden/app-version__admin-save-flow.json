@@ -1,0 +1,2221 @@
+{
+  "db": {
+    "admin_audit_logs": [
+      "{\"action\":\"APP_VERSION_CREATED\",\"actor_admin_id\":\"$uuid3\",\"after_state\":{\"minimumSupportedVersion\":\"2.0.0\",\"platform\":\"ANDROID\",\"revision\":0,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"before_state\":{},\"id\":\"$uuid29\",\"occurred_at\":\"<t+0s db +09:00>\",\"reason\":\"출시 확인\",\"request_id\":\"$uuid2\",\"target_id\":\"$uuid30\",\"target_type\":\"APP_VERSION\"}",
+      "{\"action\":\"APP_VERSION_CREATED\",\"actor_admin_id\":\"$uuid9\",\"after_state\":{\"minimumSupportedVersion\":\"1.0.0\",\"platform\":\"IOS\",\"revision\":0,\"storeUrl\":\"https://apps.apple.com/kr/app/chalkak/id1234567890?l=ko&mt=8\"},\"before_state\":{},\"id\":\"$uuid33\",\"occurred_at\":\"<t+180s db +09:00>\",\"reason\":\"iOS 출시 확인\",\"request_id\":\"$uuid20\",\"target_id\":\"$uuid34\",\"target_type\":\"APP_VERSION\"}",
+      "{\"action\":\"APP_VERSION_UPDATED\",\"actor_admin_id\":\"$uuid3\",\"after_state\":{\"minimumSupportedVersion\":\"0.0.0\",\"platform\":\"ANDROID\",\"revision\":4,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"before_state\":{\"minimumSupportedVersion\":\"2.0.0\",\"platform\":\"ANDROID\",\"revision\":3,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR\"},\"id\":\"$uuid37\",\"occurred_at\":\"<t+270s db +09:00>\",\"reason\":\"제한 해제\",\"request_id\":\"$uuid23\",\"target_id\":\"$uuid30\",\"target_type\":\"APP_VERSION\"}",
+      "{\"action\":\"APP_VERSION_UPDATED\",\"actor_admin_id\":\"$uuid3\",\"after_state\":{\"minimumSupportedVersion\":\"1.0.0\",\"platform\":\"IOS\",\"revision\":1,\"storeUrl\":\"https://apps.apple.com/app/id1234567890\"},\"before_state\":{\"minimumSupportedVersion\":\"1.0.0\",\"platform\":\"IOS\",\"revision\":0,\"storeUrl\":\"https://apps.apple.com/kr/app/chalkak/id1234567890?l=ko&mt=8\"},\"id\":\"$uuid35\",\"occurred_at\":\"<t+210s db +09:00>\",\"reason\":\"주소 정리\",\"request_id\":\"$uuid21\",\"target_id\":\"$uuid34\",\"target_type\":\"APP_VERSION\"}",
+      "{\"action\":\"APP_VERSION_UPDATED\",\"actor_admin_id\":\"$uuid3\",\"after_state\":{\"minimumSupportedVersion\":\"1.10.0\",\"platform\":\"ANDROID\",\"revision\":1,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"before_state\":{\"minimumSupportedVersion\":\"2.0.0\",\"platform\":\"ANDROID\",\"revision\":0,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"id\":\"$uuid31\",\"occurred_at\":\"<t+60s db +09:00>\",\"reason\":\"잘못 올린 최소 버전 복구\",\"request_id\":\"$uuid7\",\"target_id\":\"$uuid30\",\"target_type\":\"APP_VERSION\"}",
+      "{\"action\":\"APP_VERSION_UPDATED\",\"actor_admin_id\":\"$uuid3\",\"after_state\":{\"minimumSupportedVersion\":\"2.0.0\",\"platform\":\"ANDROID\",\"revision\":3,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR\"},\"before_state\":{\"minimumSupportedVersion\":\"1.10.0\",\"platform\":\"ANDROID\",\"revision\":2,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR\"},\"id\":\"$uuid36\",\"occurred_at\":\"<t+240s db +09:00>\",\"reason\":\"다시 상향\",\"request_id\":\"$uuid22\",\"target_id\":\"$uuid30\",\"target_type\":\"APP_VERSION\"}",
+      "{\"action\":\"APP_VERSION_UPDATED\",\"actor_admin_id\":\"$uuid3\",\"after_state\":{\"minimumSupportedVersion\":\"2147483647.2147483647.2147483647\",\"platform\":\"ANDROID\",\"revision\":5,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"before_state\":{\"minimumSupportedVersion\":\"0.0.0\",\"platform\":\"ANDROID\",\"revision\":4,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"id\":\"$uuid38\",\"occurred_at\":\"<t+300s db +09:00>\",\"reason\":\"상한 확인\",\"request_id\":\"$uuid24\",\"target_id\":\"$uuid30\",\"target_type\":\"APP_VERSION\"}",
+      "{\"action\":\"APP_VERSION_UPDATED\",\"actor_admin_id\":\"$uuid9\",\"after_state\":{\"minimumSupportedVersion\":\"1.10.0\",\"platform\":\"ANDROID\",\"revision\":2,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR\"},\"before_state\":{\"minimumSupportedVersion\":\"1.10.0\",\"platform\":\"ANDROID\",\"revision\":1,\"storeUrl\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\"},\"id\":\"$uuid32\",\"occurred_at\":\"<t+120s db +09:00>\",\"reason\":\"주소 변경\",\"request_id\":\"$uuid8\",\"target_id\":\"$uuid30\",\"target_type\":\"APP_VERSION\"}"
+    ],
+    "admins": [
+      "{\"created_at\":\"<t-4928400s db +09:00>\",\"id\":\"$uuid9\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"updated_at\":\"<t-4928400s db +09:00>\",\"username\":\"reviewer\"}",
+      "{\"created_at\":\"<t-5014800s db +09:00>\",\"id\":\"$uuid3\",\"password\":\"$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6\",\"updated_at\":\"<t-5014800s db +09:00>\",\"username\":\"operator\"}"
+    ],
+    "app_versions": [
+      "{\"change_reason\":\"상한 확인\",\"created_at\":\"<t+0s db +09:00>\",\"id\":\"$uuid30\",\"last_changed_by\":\"$uuid3\",\"minimum_supported_version\":\"2147483647.2147483647.2147483647\",\"platform\":\"ANDROID\",\"revision\":5,\"store_url\":\"https://play.google.com/store/apps/details?id=com.example.chalkak\",\"updated_at\":\"<t+300s db +09:00>\"}",
+      "{\"change_reason\":\"주소 정리\",\"created_at\":\"<t+180s db +09:00>\",\"id\":\"$uuid34\",\"last_changed_by\":\"$uuid3\",\"minimum_supported_version\":\"1.0.0\",\"platform\":\"IOS\",\"revision\":1,\"store_url\":\"https://apps.apple.com/app/id1234567890\",\"updated_at\":\"<t+210s db +09:00>\"}"
+    ],
+    "users": [
+      "{\"ai_review_push_enabled\":true,\"app_version\":\"1.0.0\",\"created_at\":\"<t-2250000s db +09:00>\",\"deleted_at\":\"<t-2077200s db +09:00>\",\"email\":\"withdrawn+$uuid?@chalkak.invalid\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"withdrawn/$uuid?\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t-2077200s db +09:00>\"}",
+      "{\"ai_review_push_enabled\":true,\"app_version\":\"1.2.0\",\"created_at\":\"<t-2422800s db +09:00>\",\"deleted_at\":null,\"email\":\"alice@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u1/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":\"chalkak/signatures/u1/thumbnail.png\",\"status\":\"ACTIVE\",\"topic_push_enabled\":true,\"updated_at\":\"<t-2422800s db +09:00>\"}",
+      "{\"ai_review_push_enabled\":true,\"app_version\":null,\"created_at\":\"<t-2336400s db +09:00>\",\"deleted_at\":null,\"email\":\"bob@test.chalkak\",\"id\":\"$uuid?\",\"moderation_push_enabled\":true,\"pending_signature_upload_id\":null,\"signature_original_storage_key\":\"chalkak/signatures/u2/original.png\",\"signature_processing_started_at\":null,\"signature_processing_status\":null,\"signature_thumbnail_storage_key\":null,\"status\":\"BANNED\",\"topic_push_enabled\":true,\"updated_at\":\"<t-2336400s db +09:00>\"}"
+    ]
+  },
+  "steps": [
+    {
+      "body": {
+        "appVersions": [
+          {
+            "changeReason": null,
+            "createdAt": null,
+            "lastChangedBy": null,
+            "minimumSupportedVersion": null,
+            "platform": "ANDROID",
+            "revision": null,
+            "storeUrl": null,
+            "updatedAt": null
+          },
+          {
+            "changeReason": null,
+            "createdAt": null,
+            "lastChangedBy": null,
+            "minimumSupportedVersion": null,
+            "platform": "IOS",
+            "revision": null,
+            "storeUrl": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid1"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "미설정 목록"
+    },
+    {
+      "body": {
+        "changeReason": "출시 확인",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid3",
+        "minimumSupportedVersion": "2.0.0",
+        "platform": "ANDROID",
+        "revision": 0,
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+        "updatedAt": "<t+0s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid2"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "ANDROID 최초 저장"
+    },
+    {
+      "body": {
+        "minimumSupportedVersion": "2.0.0",
+        "platform": "ANDROID",
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-store"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid4"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "공개 ANDROID 즉시 반영"
+    },
+    {
+      "body": {
+        "minimumSupportedVersion": null,
+        "platform": "IOS",
+        "storeUrl": null
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-store"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid5"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "공개 IOS는 그대로 미설정"
+    },
+    {
+      "body": {
+        "appVersions": [
+          {
+            "changeReason": "출시 확인",
+            "createdAt": "<t+0s iso Z>",
+            "lastChangedBy": "$uuid3",
+            "minimumSupportedVersion": "2.0.0",
+            "platform": "ANDROID",
+            "revision": 0,
+            "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+            "updatedAt": "<t+0s iso Z>"
+          },
+          {
+            "changeReason": null,
+            "createdAt": null,
+            "lastChangedBy": null,
+            "minimumSupportedVersion": null,
+            "platform": "IOS",
+            "revision": null,
+            "storeUrl": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid6"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "저장 후 목록"
+    },
+    {
+      "body": {
+        "changeReason": "잘못 올린 최소 버전 복구",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid3",
+        "minimumSupportedVersion": "1.10.0",
+        "platform": "ANDROID",
+        "revision": 1,
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+        "updatedAt": "<t+60s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid7"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "버전 하향"
+    },
+    {
+      "body": {
+        "changeReason": "주소 변경",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid9",
+        "minimumSupportedVersion": "1.10.0",
+        "platform": "ANDROID",
+        "revision": 2,
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR",
+        "updatedAt": "<t+120s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid8"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "주소 변경"
+    },
+    {
+      "body": {
+        "changeReason": "주소 변경",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid9",
+        "minimumSupportedVersion": "1.10.0",
+        "platform": "ANDROID",
+        "revision": 2,
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR",
+        "updatedAt": "<t+120s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid10"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "같은 값 재시도 오래된 revision 앞뒤 공백 주소"
+    },
+    {
+      "body": {
+        "changeReason": "주소 변경",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid9",
+        "minimumSupportedVersion": "1.10.0",
+        "platform": "ANDROID",
+        "revision": 2,
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR",
+        "updatedAt": "<t+120s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid11"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "같은 값 재시도 revision null"
+    },
+    {
+      "body": {
+        "changeReason": "주소 변경",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid9",
+        "minimumSupportedVersion": "1.10.0",
+        "platform": "ANDROID",
+        "revision": 2,
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR",
+        "updatedAt": "<t+120s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid12"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "같은 값 재시도 존재하지 않는 revision"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "must not be blank"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid13"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "같은 값 재시도라도 사유는 검증한다"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "스토어 주소는 해당 플랫폼의 공식 HTTPS 앱 상세 주소여야 합니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid14"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "같은 값 재시도라도 주소 형식은 검증한다"
+    },
+    {
+      "body": {
+        "errorCode": "RESOURCE_STATE_CHANGED",
+        "message": "설정이 변경되었습니다. 다시 조회한 뒤 저장해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid15"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "오래된 revision 충돌"
+    },
+    {
+      "body": {
+        "errorCode": "RESOURCE_STATE_CHANGED",
+        "message": "설정이 변경되었습니다. 다시 조회한 뒤 저장해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid16"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "revision null 충돌"
+    },
+    {
+      "body": {
+        "errorCode": "RESOURCE_STATE_CHANGED",
+        "message": "설정이 변경되었습니다. 다시 조회한 뒤 저장해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid17"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "미래 revision 충돌"
+    },
+    {
+      "body": {
+        "errorCode": "RESOURCE_STATE_CHANGED",
+        "message": "설정이 변경되었습니다. 다시 조회한 뒤 저장해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid18"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "큰 revision 충돌"
+    },
+    {
+      "body": {
+        "errorCode": "RESOURCE_STATE_CHANGED",
+        "message": "설정이 변경되었습니다. 다시 조회한 뒤 저장해 주세요."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid19"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "IOS 최초 revision 0은 충돌"
+    },
+    {
+      "body": {
+        "changeReason": "iOS 출시 확인",
+        "createdAt": "<t+180s iso Z>",
+        "lastChangedBy": "$uuid9",
+        "minimumSupportedVersion": "1.0.0",
+        "platform": "IOS",
+        "revision": 0,
+        "storeUrl": "https://apps.apple.com/kr/app/chalkak/id1234567890?l=ko&mt=8",
+        "updatedAt": "<t+180s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid20"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "IOS 최초 저장"
+    },
+    {
+      "body": {
+        "changeReason": "주소 정리",
+        "createdAt": "<t+180s iso Z>",
+        "lastChangedBy": "$uuid3",
+        "minimumSupportedVersion": "1.0.0",
+        "platform": "IOS",
+        "revision": 1,
+        "storeUrl": "https://apps.apple.com/app/id1234567890",
+        "updatedAt": "<t+210s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid21"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "IOS 주소만 변경"
+    },
+    {
+      "body": {
+        "changeReason": "다시 상향",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid3",
+        "minimumSupportedVersion": "2.0.0",
+        "platform": "ANDROID",
+        "revision": 3,
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR",
+        "updatedAt": "<t+240s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid22"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "ANDROID 버전을 올려 복구 이력"
+    },
+    {
+      "body": {
+        "changeReason": "제한 해제",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid3",
+        "minimumSupportedVersion": "0.0.0",
+        "platform": "ANDROID",
+        "revision": 4,
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+        "updatedAt": "<t+270s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid23"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "0.0.0으로 제한 해제"
+    },
+    {
+      "body": {
+        "changeReason": "상한 확인",
+        "createdAt": "<t+0s iso Z>",
+        "lastChangedBy": "$uuid3",
+        "minimumSupportedVersion": "2147483647.2147483647.2147483647",
+        "platform": "ANDROID",
+        "revision": 5,
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+        "updatedAt": "<t+300s iso Z>"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid24"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "정수 상한 버전"
+    },
+    {
+      "body": {
+        "appVersions": [
+          {
+            "changeReason": "상한 확인",
+            "createdAt": "<t+0s iso Z>",
+            "lastChangedBy": "$uuid3",
+            "minimumSupportedVersion": "2147483647.2147483647.2147483647",
+            "platform": "ANDROID",
+            "revision": 5,
+            "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak",
+            "updatedAt": "<t+300s iso Z>"
+          },
+          {
+            "changeReason": "주소 정리",
+            "createdAt": "<t+180s iso Z>",
+            "lastChangedBy": "$uuid3",
+            "minimumSupportedVersion": "1.0.0",
+            "platform": "IOS",
+            "revision": 1,
+            "storeUrl": "https://apps.apple.com/app/id1234567890",
+            "updatedAt": "<t+210s iso Z>"
+          }
+        ]
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid25"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "최종 목록"
+    },
+    {
+      "body": {
+        "minimumSupportedVersion": "2147483647.2147483647.2147483647",
+        "platform": "ANDROID",
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-store"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid26"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "공개 ANDROID 최종"
+    },
+    {
+      "body": {
+        "minimumSupportedVersion": "1.0.0",
+        "platform": "IOS",
+        "storeUrl": "https://apps.apple.com/app/id1234567890"
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-store"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid27"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "공개 IOS 최종"
+    },
+    {
+      "body": {
+        "auditLogs": [
+          {
+            "action": "APP_VERSION_CREATED",
+            "actorAdminId": "$uuid3",
+            "actorUsername": "operator",
+            "afterState": {
+              "minimumSupportedVersion": "2.0.0",
+              "platform": "ANDROID",
+              "revision": 0,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak"
+            },
+            "auditLogId": "$uuid29",
+            "beforeState": {},
+            "occurredAt": "<t+0s iso Z>",
+            "reason": "출시 확인",
+            "requestId": "$uuid2",
+            "targetId": "$uuid30",
+            "targetType": "APP_VERSION"
+          },
+          {
+            "action": "APP_VERSION_UPDATED",
+            "actorAdminId": "$uuid3",
+            "actorUsername": "operator",
+            "afterState": {
+              "minimumSupportedVersion": "1.10.0",
+              "platform": "ANDROID",
+              "revision": 1,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak"
+            },
+            "auditLogId": "$uuid31",
+            "beforeState": {
+              "minimumSupportedVersion": "2.0.0",
+              "platform": "ANDROID",
+              "revision": 0,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak"
+            },
+            "occurredAt": "<t+60s iso Z>",
+            "reason": "잘못 올린 최소 버전 복구",
+            "requestId": "$uuid7",
+            "targetId": "$uuid30",
+            "targetType": "APP_VERSION"
+          },
+          {
+            "action": "APP_VERSION_UPDATED",
+            "actorAdminId": "$uuid9",
+            "actorUsername": "reviewer",
+            "afterState": {
+              "minimumSupportedVersion": "1.10.0",
+              "platform": "ANDROID",
+              "revision": 2,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR"
+            },
+            "auditLogId": "$uuid32",
+            "beforeState": {
+              "minimumSupportedVersion": "1.10.0",
+              "platform": "ANDROID",
+              "revision": 1,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak"
+            },
+            "occurredAt": "<t+120s iso Z>",
+            "reason": "주소 변경",
+            "requestId": "$uuid8",
+            "targetId": "$uuid30",
+            "targetType": "APP_VERSION"
+          },
+          {
+            "action": "APP_VERSION_CREATED",
+            "actorAdminId": "$uuid9",
+            "actorUsername": "reviewer",
+            "afterState": {
+              "minimumSupportedVersion": "1.0.0",
+              "platform": "IOS",
+              "revision": 0,
+              "storeUrl": "https://apps.apple.com/kr/app/chalkak/id1234567890?l=ko&mt=8"
+            },
+            "auditLogId": "$uuid33",
+            "beforeState": {},
+            "occurredAt": "<t+180s iso Z>",
+            "reason": "iOS 출시 확인",
+            "requestId": "$uuid20",
+            "targetId": "$uuid34",
+            "targetType": "APP_VERSION"
+          },
+          {
+            "action": "APP_VERSION_UPDATED",
+            "actorAdminId": "$uuid3",
+            "actorUsername": "operator",
+            "afterState": {
+              "minimumSupportedVersion": "1.0.0",
+              "platform": "IOS",
+              "revision": 1,
+              "storeUrl": "https://apps.apple.com/app/id1234567890"
+            },
+            "auditLogId": "$uuid35",
+            "beforeState": {
+              "minimumSupportedVersion": "1.0.0",
+              "platform": "IOS",
+              "revision": 0,
+              "storeUrl": "https://apps.apple.com/kr/app/chalkak/id1234567890?l=ko&mt=8"
+            },
+            "occurredAt": "<t+210s iso Z>",
+            "reason": "주소 정리",
+            "requestId": "$uuid21",
+            "targetId": "$uuid34",
+            "targetType": "APP_VERSION"
+          },
+          {
+            "action": "APP_VERSION_UPDATED",
+            "actorAdminId": "$uuid3",
+            "actorUsername": "operator",
+            "afterState": {
+              "minimumSupportedVersion": "2.0.0",
+              "platform": "ANDROID",
+              "revision": 3,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR"
+            },
+            "auditLogId": "$uuid36",
+            "beforeState": {
+              "minimumSupportedVersion": "1.10.0",
+              "platform": "ANDROID",
+              "revision": 2,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR"
+            },
+            "occurredAt": "<t+240s iso Z>",
+            "reason": "다시 상향",
+            "requestId": "$uuid22",
+            "targetId": "$uuid30",
+            "targetType": "APP_VERSION"
+          },
+          {
+            "action": "APP_VERSION_UPDATED",
+            "actorAdminId": "$uuid3",
+            "actorUsername": "operator",
+            "afterState": {
+              "minimumSupportedVersion": "0.0.0",
+              "platform": "ANDROID",
+              "revision": 4,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak"
+            },
+            "auditLogId": "$uuid37",
+            "beforeState": {
+              "minimumSupportedVersion": "2.0.0",
+              "platform": "ANDROID",
+              "revision": 3,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR"
+            },
+            "occurredAt": "<t+270s iso Z>",
+            "reason": "제한 해제",
+            "requestId": "$uuid23",
+            "targetId": "$uuid30",
+            "targetType": "APP_VERSION"
+          },
+          {
+            "action": "APP_VERSION_UPDATED",
+            "actorAdminId": "$uuid3",
+            "actorUsername": "operator",
+            "afterState": {
+              "minimumSupportedVersion": "2147483647.2147483647.2147483647",
+              "platform": "ANDROID",
+              "revision": 5,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak"
+            },
+            "auditLogId": "$uuid38",
+            "beforeState": {
+              "minimumSupportedVersion": "0.0.0",
+              "platform": "ANDROID",
+              "revision": 4,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak"
+            },
+            "occurredAt": "<t+300s iso Z>",
+            "reason": "상한 확인",
+            "requestId": "$uuid24",
+            "targetId": "$uuid30",
+            "targetType": "APP_VERSION"
+          }
+        ],
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 100
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid28"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "감사 로그 전체 오름차순"
+    },
+    {
+      "body": {
+        "auditLogs": [
+          {
+            "action": "APP_VERSION_CREATED",
+            "actorAdminId": "$uuid3",
+            "actorUsername": "operator",
+            "afterState": {
+              "minimumSupportedVersion": "2.0.0",
+              "platform": "ANDROID",
+              "revision": 0,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak"
+            },
+            "auditLogId": "$uuid29",
+            "beforeState": {},
+            "occurredAt": "<t+0s iso Z>",
+            "reason": "출시 확인",
+            "requestId": "$uuid2",
+            "targetId": "$uuid30",
+            "targetType": "APP_VERSION"
+          },
+          {
+            "action": "APP_VERSION_CREATED",
+            "actorAdminId": "$uuid9",
+            "actorUsername": "reviewer",
+            "afterState": {
+              "minimumSupportedVersion": "1.0.0",
+              "platform": "IOS",
+              "revision": 0,
+              "storeUrl": "https://apps.apple.com/kr/app/chalkak/id1234567890?l=ko&mt=8"
+            },
+            "auditLogId": "$uuid33",
+            "beforeState": {},
+            "occurredAt": "<t+180s iso Z>",
+            "reason": "iOS 출시 확인",
+            "requestId": "$uuid20",
+            "targetId": "$uuid34",
+            "targetType": "APP_VERSION"
+          }
+        ],
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid39"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "감사 로그 생성만"
+    },
+    {
+      "body": {
+        "auditLogs": [
+          {
+            "action": "APP_VERSION_UPDATED",
+            "actorAdminId": "$uuid3",
+            "actorUsername": "operator",
+            "afterState": {
+              "minimumSupportedVersion": "2147483647.2147483647.2147483647",
+              "platform": "ANDROID",
+              "revision": 5,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak"
+            },
+            "auditLogId": "$uuid38",
+            "beforeState": {
+              "minimumSupportedVersion": "0.0.0",
+              "platform": "ANDROID",
+              "revision": 4,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak"
+            },
+            "occurredAt": "<t+300s iso Z>",
+            "reason": "상한 확인",
+            "requestId": "$uuid24",
+            "targetId": "$uuid30",
+            "targetType": "APP_VERSION"
+          },
+          {
+            "action": "APP_VERSION_UPDATED",
+            "actorAdminId": "$uuid3",
+            "actorUsername": "operator",
+            "afterState": {
+              "minimumSupportedVersion": "0.0.0",
+              "platform": "ANDROID",
+              "revision": 4,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak"
+            },
+            "auditLogId": "$uuid37",
+            "beforeState": {
+              "minimumSupportedVersion": "2.0.0",
+              "platform": "ANDROID",
+              "revision": 3,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR"
+            },
+            "occurredAt": "<t+270s iso Z>",
+            "reason": "제한 해제",
+            "requestId": "$uuid23",
+            "targetId": "$uuid30",
+            "targetType": "APP_VERSION"
+          },
+          {
+            "action": "APP_VERSION_UPDATED",
+            "actorAdminId": "$uuid3",
+            "actorUsername": "operator",
+            "afterState": {
+              "minimumSupportedVersion": "2.0.0",
+              "platform": "ANDROID",
+              "revision": 3,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR"
+            },
+            "auditLogId": "$uuid36",
+            "beforeState": {
+              "minimumSupportedVersion": "1.10.0",
+              "platform": "ANDROID",
+              "revision": 2,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR"
+            },
+            "occurredAt": "<t+240s iso Z>",
+            "reason": "다시 상향",
+            "requestId": "$uuid22",
+            "targetId": "$uuid30",
+            "targetType": "APP_VERSION"
+          },
+          {
+            "action": "APP_VERSION_UPDATED",
+            "actorAdminId": "$uuid3",
+            "actorUsername": "operator",
+            "afterState": {
+              "minimumSupportedVersion": "1.0.0",
+              "platform": "IOS",
+              "revision": 1,
+              "storeUrl": "https://apps.apple.com/app/id1234567890"
+            },
+            "auditLogId": "$uuid35",
+            "beforeState": {
+              "minimumSupportedVersion": "1.0.0",
+              "platform": "IOS",
+              "revision": 0,
+              "storeUrl": "https://apps.apple.com/kr/app/chalkak/id1234567890?l=ko&mt=8"
+            },
+            "occurredAt": "<t+210s iso Z>",
+            "reason": "주소 정리",
+            "requestId": "$uuid21",
+            "targetId": "$uuid34",
+            "targetType": "APP_VERSION"
+          },
+          {
+            "action": "APP_VERSION_UPDATED",
+            "actorAdminId": "$uuid9",
+            "actorUsername": "reviewer",
+            "afterState": {
+              "minimumSupportedVersion": "1.10.0",
+              "platform": "ANDROID",
+              "revision": 2,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR"
+            },
+            "auditLogId": "$uuid32",
+            "beforeState": {
+              "minimumSupportedVersion": "1.10.0",
+              "platform": "ANDROID",
+              "revision": 1,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak"
+            },
+            "occurredAt": "<t+120s iso Z>",
+            "reason": "주소 변경",
+            "requestId": "$uuid8",
+            "targetId": "$uuid30",
+            "targetType": "APP_VERSION"
+          },
+          {
+            "action": "APP_VERSION_UPDATED",
+            "actorAdminId": "$uuid3",
+            "actorUsername": "operator",
+            "afterState": {
+              "minimumSupportedVersion": "1.10.0",
+              "platform": "ANDROID",
+              "revision": 1,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak"
+            },
+            "auditLogId": "$uuid31",
+            "beforeState": {
+              "minimumSupportedVersion": "2.0.0",
+              "platform": "ANDROID",
+              "revision": 0,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak"
+            },
+            "occurredAt": "<t+60s iso Z>",
+            "reason": "잘못 올린 최소 버전 복구",
+            "requestId": "$uuid7",
+            "targetId": "$uuid30",
+            "targetType": "APP_VERSION"
+          }
+        ],
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid40"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "감사 로그 수정만 내림차순"
+    },
+    {
+      "body": {
+        "auditLogs": [
+          {
+            "action": "APP_VERSION_UPDATED",
+            "actorAdminId": "$uuid9",
+            "actorUsername": "reviewer",
+            "afterState": {
+              "minimumSupportedVersion": "1.10.0",
+              "platform": "ANDROID",
+              "revision": 2,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR"
+            },
+            "auditLogId": "$uuid32",
+            "beforeState": {
+              "minimumSupportedVersion": "1.10.0",
+              "platform": "ANDROID",
+              "revision": 1,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak"
+            },
+            "occurredAt": "<t+120s iso Z>",
+            "reason": "주소 변경",
+            "requestId": "$uuid8",
+            "targetId": "$uuid30",
+            "targetType": "APP_VERSION"
+          },
+          {
+            "action": "APP_VERSION_CREATED",
+            "actorAdminId": "$uuid9",
+            "actorUsername": "reviewer",
+            "afterState": {
+              "minimumSupportedVersion": "1.0.0",
+              "platform": "IOS",
+              "revision": 0,
+              "storeUrl": "https://apps.apple.com/kr/app/chalkak/id1234567890?l=ko&mt=8"
+            },
+            "auditLogId": "$uuid33",
+            "beforeState": {},
+            "occurredAt": "<t+180s iso Z>",
+            "reason": "iOS 출시 확인",
+            "requestId": "$uuid20",
+            "targetId": "$uuid34",
+            "targetType": "APP_VERSION"
+          }
+        ],
+        "currentPage": 1,
+        "hasNext": false,
+        "pageSize": 20
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid41"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "감사 로그 관리자 A2"
+    },
+    {
+      "body": {
+        "auditLogs": [
+          {
+            "action": "APP_VERSION_CREATED",
+            "actorAdminId": "$uuid9",
+            "actorUsername": "reviewer",
+            "afterState": {
+              "minimumSupportedVersion": "1.0.0",
+              "platform": "IOS",
+              "revision": 0,
+              "storeUrl": "https://apps.apple.com/kr/app/chalkak/id1234567890?l=ko&mt=8"
+            },
+            "auditLogId": "$uuid33",
+            "beforeState": {},
+            "occurredAt": "<t+180s iso Z>",
+            "reason": "iOS 출시 확인",
+            "requestId": "$uuid20",
+            "targetId": "$uuid34",
+            "targetType": "APP_VERSION"
+          },
+          {
+            "action": "APP_VERSION_UPDATED",
+            "actorAdminId": "$uuid3",
+            "actorUsername": "operator",
+            "afterState": {
+              "minimumSupportedVersion": "1.0.0",
+              "platform": "IOS",
+              "revision": 1,
+              "storeUrl": "https://apps.apple.com/app/id1234567890"
+            },
+            "auditLogId": "$uuid35",
+            "beforeState": {
+              "minimumSupportedVersion": "1.0.0",
+              "platform": "IOS",
+              "revision": 0,
+              "storeUrl": "https://apps.apple.com/kr/app/chalkak/id1234567890?l=ko&mt=8"
+            },
+            "occurredAt": "<t+210s iso Z>",
+            "reason": "주소 정리",
+            "requestId": "$uuid21",
+            "targetId": "$uuid34",
+            "targetType": "APP_VERSION"
+          },
+          {
+            "action": "APP_VERSION_UPDATED",
+            "actorAdminId": "$uuid3",
+            "actorUsername": "operator",
+            "afterState": {
+              "minimumSupportedVersion": "2.0.0",
+              "platform": "ANDROID",
+              "revision": 3,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR"
+            },
+            "auditLogId": "$uuid36",
+            "beforeState": {
+              "minimumSupportedVersion": "1.10.0",
+              "platform": "ANDROID",
+              "revision": 2,
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak&hl=ko&gl=KR"
+            },
+            "occurredAt": "<t+240s iso Z>",
+            "reason": "다시 상향",
+            "requestId": "$uuid22",
+            "targetId": "$uuid30",
+            "targetType": "APP_VERSION"
+          }
+        ],
+        "currentPage": 2,
+        "hasNext": true,
+        "pageSize": 3
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid42"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 200,
+      "step": "감사 로그 페이지"
+    },
+    {
+      "body": {
+        "errorCode": "BUSINESS_ERROR",
+        "message": "targetType: 요청 값의 형식이 올바르지 않습니다."
+      },
+      "headers": [
+        [
+          "cache-control",
+          "no-cache, no-store, max-age=0, must-revalidate"
+        ],
+        [
+          "content-type",
+          "application/json"
+        ],
+        [
+          "expires",
+          "0"
+        ],
+        [
+          "pragma",
+          "no-cache"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Headers"
+        ],
+        [
+          "vary",
+          "Access-Control-Request-Method"
+        ],
+        [
+          "vary",
+          "Origin"
+        ],
+        [
+          "x-content-type-options",
+          "nosniff"
+        ],
+        [
+          "x-frame-options",
+          "DENY"
+        ],
+        [
+          "x-request-id",
+          "$uuid43"
+        ],
+        [
+          "x-xss-protection",
+          "0"
+        ]
+      ],
+      "status": 400,
+      "step": "감사 로그 대상 종류 소문자는 거절"
+    }
+  ]
+}

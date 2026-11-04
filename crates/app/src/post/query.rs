@@ -12,8 +12,9 @@ use uuid::Uuid;
 
 use super::domain::ModerationStatus;
 use super::policy::PostProcessingPolicy;
-use super::repository::{ListOrder, PostListRow, PostRepository, PostSlice};
+use super::repository::{AuthorPostSlice, ListOrder, PostListRow, PostRepository, PostSlice};
 use super::support::require_active_user;
+use crate::like::domain::PostLikes;
 use crate::like::repository::PostLikeRepository;
 use crate::photo::url::CloudFrontUrlProvider;
 use crate::topic::domain::kst_date;
@@ -54,6 +55,7 @@ pub struct TopicBrief {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PostDetail {
     pub id: Uuid,
+    pub author_id: Uuid,
     pub topic: TopicBrief,
     pub original_image_url: Option<String>,
     pub thumbnail_image_url: Option<String>,
@@ -89,6 +91,7 @@ pub struct PostCalendarResult {
 #[derive(Clone, Debug, PartialEq)]
 pub struct PostSummary {
     pub id: Uuid,
+    pub author_id: Uuid,
     pub original_image_url: Option<String>,
     pub thumbnail_image_url: Option<String>,
     pub signature_original_image_url: Option<String>,
@@ -98,6 +101,26 @@ pub struct PostSummary {
     pub like_count: i64,
     pub is_liked: bool,
     pub is_mine: bool,
+}
+
+/// 작성자 공개 사진 목록의 한 장(`AuthorPostListResult.PostSummary`).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct AuthorPostSummary {
+    pub id: Uuid,
+    pub original_image_url: Option<String>,
+    pub thumbnail_image_url: Option<String>,
+    pub topic: TopicBrief,
+    pub like_count: i64,
+    pub is_liked: bool,
+}
+
+/// `AuthorPostListResult`
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct AuthorPostListResult {
+    pub current_page: i32,
+    pub page_size: i32,
+    pub has_next: bool,
+    pub posts: Vec<AuthorPostSummary>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -127,6 +150,7 @@ pub struct PostQueryService {
     posts: PostRepository,
     topics: TopicRepository,
     likes: PostLikeRepository,
+    users: crate::user::UserRepository,
 }
 
 fn not_found(message: &str) -> ApiError {
@@ -152,6 +176,7 @@ impl PostQueryService {
             posts: PostRepository::default(),
             topics: TopicRepository,
             likes: PostLikeRepository,
+            users: crate::user::UserRepository,
         }
     }
 
@@ -175,6 +200,7 @@ impl PostQueryService {
             .exists_by_post_id_and_user_id(&mut conn, post_id, user_id)?;
         Ok(PostDetail {
             id: post.id,
+            author_id: post.author_id,
             topic: TopicBrief {
                 id: post.topic_id,
                 title: post.topic_title,
@@ -186,6 +212,81 @@ impl PostQueryService {
             title: post.title,
             like_count,
             is_liked,
+        })
+    }
+
+    /// `getAuthorPosts`: 작성자의 공개 사진을 주제 날짜 최신순으로 한 쪽 읽는다. 조회자는 탈퇴하지 않은 회원이어야(아니면 401),
+    /// 작성자는 탈퇴하지 않았어야(아니면 404) 한다. 정지 회원은 조회자도 작성자도 허용한다. 좋아요 수는 현재 전체 수이고
+    /// `isLiked`는 조회자 본인의 좋아요 여부다.
+    pub fn get_author_posts(
+        &self,
+        author_id: Uuid,
+        page: i32,
+        page_size: i32,
+        viewer_id: Uuid,
+    ) -> Result<AuthorPostListResult, ApiError> {
+        let mut conn = self.pool.get()?;
+        require_active_user(&mut conn, viewer_id)?;
+        if !self.users.exists_active_by_id(&mut conn, author_id)? {
+            return Err(not_found("작성자를 찾을 수 없습니다."));
+        }
+        // Spring Data는 오프셋을 int로 줄여 쓴다. 넘치면 요청이 실패한다.
+        let offset = i64::from(page - 1) * i64::from(page_size);
+        if offset > i64::from(i32::MAX) {
+            return Err(ApiError::Internal(
+                "Page offset exceeds Integer.MAX_VALUE".to_owned(),
+            ));
+        }
+        let slice = self.posts.find_visible_recent_by_author_id(
+            &mut conn,
+            author_id,
+            i64::from(page - 1),
+            i64::from(page_size),
+        )?;
+        let likes = self.find_post_likes(&mut conn, &slice, Some(viewer_id))?;
+        self.create_author_list_result(slice, page, page_size, &likes)
+    }
+
+    /// `findPostLikes`: 게시물이 없으면 질의하지 않는다.
+    fn find_post_likes(
+        &self,
+        db: &mut impl Db,
+        slice: &AuthorPostSlice,
+        viewer_id: Option<Uuid>,
+    ) -> Result<PostLikes, ApiError> {
+        load_post_likes(&self.likes, db, slice, viewer_id)
+    }
+
+    fn create_author_list_result(
+        &self,
+        slice: AuthorPostSlice,
+        page: i32,
+        page_size: i32,
+        likes: &PostLikes,
+    ) -> Result<AuthorPostListResult, ApiError> {
+        let posts = slice
+            .posts
+            .into_iter()
+            .map(|post| {
+                Ok(AuthorPostSummary {
+                    id: post.id,
+                    original_image_url: self.url(Some(&post.original_storage_key))?,
+                    thumbnail_image_url: self.url(post.thumbnail_storage_key.as_deref())?,
+                    topic: TopicBrief {
+                        id: post.topic_id,
+                        title: post.topic_title,
+                        topic_date: post.topic_date,
+                    },
+                    like_count: likes.like_count(post.id),
+                    is_liked: likes.is_liked(post.id),
+                })
+            })
+            .collect::<Result<Vec<_>, ApiError>>()?;
+        Ok(AuthorPostListResult {
+            current_page: page,
+            page_size,
+            has_next: slice.has_next,
+            posts,
         })
     }
 
@@ -362,6 +463,7 @@ impl PostQueryService {
     ) -> Result<PostSummary, ApiError> {
         Ok(PostSummary {
             id: post.id,
+            author_id: post.author_id,
             original_image_url: self.url(Some(&post.original_storage_key))?,
             thumbnail_image_url: self.url(post.thumbnail_storage_key.as_deref())?,
             signature_original_image_url: self.url(Some(&post.signature_original_storage_key))?,
@@ -402,6 +504,25 @@ impl PostQueryService {
 }
 
 /// `validateRandomSeedCombination`
+/// 한 쪽의 좋아요를 게시물 수와 상관없이 질의 두 번(수, 조회자의 좋아요)으로 읽는다. 빈 쪽이면 질의하지 않는다.
+fn load_post_likes(
+    likes: &PostLikeRepository,
+    db: &mut impl Db,
+    slice: &AuthorPostSlice,
+    viewer_id: Option<Uuid>,
+) -> Result<PostLikes, ApiError> {
+    if slice.posts.is_empty() {
+        return Ok(PostLikes::create_empty());
+    }
+    let post_ids: Vec<Uuid> = slice.posts.iter().map(|p| p.id).collect();
+    let counts = likes.count_by_post_ids(db, &post_ids)?;
+    let liked = match viewer_id {
+        Some(viewer_id) => likes.find_liked_post_ids(db, &post_ids, viewer_id)?,
+        None => Default::default(),
+    };
+    Ok(PostLikes::new(counts, liked))
+}
+
 fn validate_random_seed_combination(
     sort: PostSort,
     random_seed: Option<&str>,
@@ -430,6 +551,103 @@ mod tests {
                 .all(|c| c.is_ascii_hexdigit() && !c.is_ascii_uppercase())
         );
         assert_ne!(generate_random_seed(), generate_random_seed());
+    }
+
+    /// 질의 횟수를 세는 `Db`.
+    struct Counting {
+        client: postgres::Client,
+        queries: usize,
+    }
+
+    impl Db for Counting {
+        fn query(
+            &mut self,
+            sql: &str,
+            params: &[&(dyn postgres::types::ToSql + Sync)],
+        ) -> Result<Vec<postgres::Row>, postgres::Error> {
+            self.queries += 1;
+            self.client.query(sql, params)
+        }
+        fn query_one(
+            &mut self,
+            sql: &str,
+            params: &[&(dyn postgres::types::ToSql + Sync)],
+        ) -> Result<postgres::Row, postgres::Error> {
+            self.queries += 1;
+            self.client.query_one(sql, params)
+        }
+        fn query_opt(
+            &mut self,
+            sql: &str,
+            params: &[&(dyn postgres::types::ToSql + Sync)],
+        ) -> Result<Option<postgres::Row>, postgres::Error> {
+            self.queries += 1;
+            self.client.query_opt(sql, params)
+        }
+        fn execute(
+            &mut self,
+            sql: &str,
+            params: &[&(dyn postgres::types::ToSql + Sync)],
+        ) -> Result<u64, postgres::Error> {
+            self.queries += 1;
+            self.client.execute(sql, params)
+        }
+        fn batch_execute(&mut self, sql: &str) -> Result<(), postgres::Error> {
+            self.queries += 1;
+            self.client.batch_execute(sql)
+        }
+    }
+
+    fn author_row() -> super::super::repository::AuthorPostRow {
+        super::super::repository::AuthorPostRow {
+            id: Uuid::new_v4(),
+            original_storage_key: "o".to_owned(),
+            thumbnail_storage_key: None,
+            topic_id: Uuid::new_v4(),
+            topic_title: "t".to_owned(),
+            topic_date: jiff::civil::date(2026, 4, 1),
+        }
+    }
+
+    // AuthorPostQueryServiceTest#getAuthorPosts_pageSize_usesBoundedQueries: 좋아요는 쪽 단위로 한 번에 읽는다.
+    #[test]
+    fn 작성자_목록_좋아요는_게시물_수와_상관없이_두_번의_질의로_읽는다() {
+        let Some(db) = crate::testing::TestDb::create() else {
+            return;
+        };
+        let likes = PostLikeRepository;
+        let viewer = Some(Uuid::new_v4());
+        for size in [1, 20, 100] {
+            let slice = AuthorPostSlice {
+                posts: (0..size).map(|_| author_row()).collect(),
+                has_next: false,
+            };
+            let mut conn = Counting {
+                client: db.client(),
+                queries: 0,
+            };
+            load_post_likes(&likes, &mut conn, &slice, viewer).unwrap();
+            assert_eq!(conn.queries, 2, "size {size}");
+        }
+    }
+
+    #[test]
+    fn 작성자_목록이_비어_있으면_좋아요를_질의하지_않는다() {
+        let Some(db) = crate::testing::TestDb::create() else {
+            return;
+        };
+        let mut conn = Counting {
+            client: db.client(),
+            queries: 0,
+        };
+        let slice = AuthorPostSlice {
+            posts: vec![],
+            has_next: false,
+        };
+        let result =
+            load_post_likes(&PostLikeRepository, &mut conn, &slice, Some(Uuid::new_v4())).unwrap();
+        assert_eq!(conn.queries, 0);
+        assert_eq!(result.like_count(Uuid::new_v4()), 0);
     }
 
     #[test]
