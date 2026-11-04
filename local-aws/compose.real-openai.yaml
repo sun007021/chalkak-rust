@@ -1,0 +1,13 @@
+# 실제 OpenAI 호출 오버레이. 백엔드(rust|java)가 가짜 OpenAI 대신 api.openai.com 으로 AI 리뷰를 요청한다.
+#   cp env/real-openai.env.example env/real-openai.env   # OPENAI_API_KEY 를 채운다(커밋 금지, gitignore)
+#   scripts/up-all.sh --real-openai
+# real-oidc 오버레이와 함께 쓸 수 있다(--real-oidc --real-openai). 뒤의 env 파일이 앞의 같은 키를 덮어쓴다.
+services:
+  rust:
+    env_file:
+      - ./env/local-aws.env
+      - ./env/real-openai.env
+  java:
+    env_file:
+      - ./env/local-aws.env
+      - ./env/real-openai.env

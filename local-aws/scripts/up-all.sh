@@ -6,6 +6,7 @@
 #   scripts/up-all.sh --no-smoke      # 스모크 생략
 #   scripts/up-all.sh --rebuild       # Rust 바이너리를 다시 빌드한다(코드를 바꾼 뒤)
 #   scripts/up-all.sh --real-oidc     # env/real-oidc.env 를 겹쳐 실제 Kakao·Apple 로그인으로 띄운다
+#   scripts/up-all.sh --real-openai   # env/real-openai.env 를 겹쳐 실제 OpenAI 로 AI 리뷰를 호출한다
 #   scripts/up-all.sh status          # 컨테이너 상태와 접속 정보
 #   scripts/up-all.sh down            # 내린다(DB 볼륨은 남는다)
 #   scripts/up-all.sh reset           # 내리고 DB·큐 데이터까지 지운다(down -v)
@@ -17,13 +18,14 @@ cd "$(dirname "$0")/.."          # local-aws/
 ROOT="$(cd .. && pwd)"
 STATE="$PWD/.state"
 
-cmd=up; smoke=1; rebuild=0; real_oidc=0
+cmd=up; smoke=1; rebuild=0; real_oidc=0; real_openai=0
 for a in "$@"; do
   case "$a" in
     up|down|reset|status) cmd="$a" ;;
     --no-smoke) smoke=0 ;;
     --rebuild) rebuild=1 ;;
     --real-oidc) real_oidc=1 ;;
+    --real-openai) real_openai=1 ;;
     -h|--help) sed -n '2,15p' "$0"; exit 0 ;;
     *) echo "알 수 없는 인자: $a (-h 참고)" >&2; exit 2 ;;
   esac
@@ -53,6 +55,10 @@ files=(-f compose.yaml)
 if [[ $real_oidc -eq 1 ]]; then
   [[ -f env/real-oidc.env ]] || die "env/real-oidc.env 가 없다(env/real-oidc.env.example 을 복사해 채운다)"
   files+=(-f compose.real-oidc.yaml)
+fi
+if [[ $real_openai -eq 1 ]]; then
+  [[ -f env/real-openai.env ]] || die "env/real-openai.env 가 없다(env/real-openai.env.example 을 복사해 OPENAI_API_KEY 를 채운다)"
+  files+=(-f compose.real-openai.yaml)
 fi
 dc() { docker compose "${files[@]}" --profile rust "$@"; }
 
