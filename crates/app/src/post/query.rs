@@ -254,16 +254,7 @@ impl PostQueryService {
         slice: &AuthorPostSlice,
         viewer_id: Option<Uuid>,
     ) -> Result<PostLikes, ApiError> {
-        if slice.posts.is_empty() {
-            return Ok(PostLikes::create_empty());
-        }
-        let post_ids: Vec<Uuid> = slice.posts.iter().map(|p| p.id).collect();
-        let counts = self.likes.count_by_post_ids(db, &post_ids)?;
-        let liked = match viewer_id {
-            Some(viewer_id) => self.likes.find_liked_post_ids(db, &post_ids, viewer_id)?,
-            None => Default::default(),
-        };
-        Ok(PostLikes::new(counts, liked))
+        load_post_likes(&self.likes, db, slice, viewer_id)
     }
 
     fn create_author_list_result(
@@ -513,6 +504,25 @@ impl PostQueryService {
 }
 
 /// `validateRandomSeedCombination`
+/// 한 쪽의 좋아요를 게시물 수와 상관없이 질의 두 번(수, 조회자의 좋아요)으로 읽는다. 빈 쪽이면 질의하지 않는다.
+fn load_post_likes(
+    likes: &PostLikeRepository,
+    db: &mut impl Db,
+    slice: &AuthorPostSlice,
+    viewer_id: Option<Uuid>,
+) -> Result<PostLikes, ApiError> {
+    if slice.posts.is_empty() {
+        return Ok(PostLikes::create_empty());
+    }
+    let post_ids: Vec<Uuid> = slice.posts.iter().map(|p| p.id).collect();
+    let counts = likes.count_by_post_ids(db, &post_ids)?;
+    let liked = match viewer_id {
+        Some(viewer_id) => likes.find_liked_post_ids(db, &post_ids, viewer_id)?,
+        None => Default::default(),
+    };
+    Ok(PostLikes::new(counts, liked))
+}
+
 fn validate_random_seed_combination(
     sort: PostSort,
     random_seed: Option<&str>,
@@ -541,6 +551,103 @@ mod tests {
                 .all(|c| c.is_ascii_hexdigit() && !c.is_ascii_uppercase())
         );
         assert_ne!(generate_random_seed(), generate_random_seed());
+    }
+
+    /// 질의 횟수를 세는 `Db`.
+    struct Counting {
+        client: postgres::Client,
+        queries: usize,
+    }
+
+    impl Db for Counting {
+        fn query(
+            &mut self,
+            sql: &str,
+            params: &[&(dyn postgres::types::ToSql + Sync)],
+        ) -> Result<Vec<postgres::Row>, postgres::Error> {
+            self.queries += 1;
+            self.client.query(sql, params)
+        }
+        fn query_one(
+            &mut self,
+            sql: &str,
+            params: &[&(dyn postgres::types::ToSql + Sync)],
+        ) -> Result<postgres::Row, postgres::Error> {
+            self.queries += 1;
+            self.client.query_one(sql, params)
+        }
+        fn query_opt(
+            &mut self,
+            sql: &str,
+            params: &[&(dyn postgres::types::ToSql + Sync)],
+        ) -> Result<Option<postgres::Row>, postgres::Error> {
+            self.queries += 1;
+            self.client.query_opt(sql, params)
+        }
+        fn execute(
+            &mut self,
+            sql: &str,
+            params: &[&(dyn postgres::types::ToSql + Sync)],
+        ) -> Result<u64, postgres::Error> {
+            self.queries += 1;
+            self.client.execute(sql, params)
+        }
+        fn batch_execute(&mut self, sql: &str) -> Result<(), postgres::Error> {
+            self.queries += 1;
+            self.client.batch_execute(sql)
+        }
+    }
+
+    fn author_row() -> super::super::repository::AuthorPostRow {
+        super::super::repository::AuthorPostRow {
+            id: Uuid::new_v4(),
+            original_storage_key: "o".to_owned(),
+            thumbnail_storage_key: None,
+            topic_id: Uuid::new_v4(),
+            topic_title: "t".to_owned(),
+            topic_date: jiff::civil::date(2026, 4, 1),
+        }
+    }
+
+    // AuthorPostQueryServiceTest#getAuthorPosts_pageSize_usesBoundedQueries: 좋아요는 쪽 단위로 한 번에 읽는다.
+    #[test]
+    fn 작성자_목록_좋아요는_게시물_수와_상관없이_두_번의_질의로_읽는다() {
+        let Some(db) = crate::testing::TestDb::create() else {
+            return;
+        };
+        let likes = PostLikeRepository;
+        let viewer = Some(Uuid::new_v4());
+        for size in [1, 20, 100] {
+            let slice = AuthorPostSlice {
+                posts: (0..size).map(|_| author_row()).collect(),
+                has_next: false,
+            };
+            let mut conn = Counting {
+                client: db.client(),
+                queries: 0,
+            };
+            load_post_likes(&likes, &mut conn, &slice, viewer).unwrap();
+            assert_eq!(conn.queries, 2, "size {size}");
+        }
+    }
+
+    #[test]
+    fn 작성자_목록이_비어_있으면_좋아요를_질의하지_않는다() {
+        let Some(db) = crate::testing::TestDb::create() else {
+            return;
+        };
+        let mut conn = Counting {
+            client: db.client(),
+            queries: 0,
+        };
+        let slice = AuthorPostSlice {
+            posts: vec![],
+            has_next: false,
+        };
+        let result =
+            load_post_likes(&PostLikeRepository, &mut conn, &slice, Some(Uuid::new_v4())).unwrap();
+        assert_eq!(conn.queries, 0);
+        assert_eq!(result.like_count(Uuid::new_v4()), 0);
     }
 
     #[test]

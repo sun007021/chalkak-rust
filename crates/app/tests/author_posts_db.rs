@@ -293,6 +293,34 @@ fn get_author_posts_twenty_one_photos_across_year_returns_all_without_duplicates
     }
 }
 
+// AuthorPostQueryServiceTest#getAuthorPosts_requestedPageSize_limitsReturnedPosts (요청한 pageSize 전체)
+#[test]
+fn get_author_posts_requested_page_size_limits_returned_posts() {
+    let Some(fx) = Fx::create() else { return };
+    let author = fx.user();
+    let viewer = fx.user();
+    for day in 1..=7 {
+        approved_on(&fx, author, day);
+    }
+    for (page_size, expected_len, has_next) in [
+        (1, 1, true),
+        (2, 2, true),
+        (5, 5, true),
+        (6, 6, true),
+        (7, 7, false),
+        (20, 7, false),
+        (100, 7, false),
+    ] {
+        let result = fx
+            .query
+            .get_author_posts(author, 1, page_size, viewer)
+            .unwrap();
+        assert_eq!(result.posts.len(), expected_len, "pageSize={page_size}");
+        assert_eq!(result.page_size, page_size);
+        assert_eq!(result.has_next, has_next, "pageSize={page_size}");
+    }
+}
+
 // AuthorPostQueryServiceTest#getAuthorPosts_noExtraPhoto_returnsEndMetadata, _deletedPhotos_returnsCurrentOffsetWithoutSnapshot
 #[test]
 fn get_author_posts_past_end_keeps_requested_page_metadata() {
