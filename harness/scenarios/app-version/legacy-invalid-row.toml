@@ -1,0 +1,37 @@
+name = "앱 버전: 값 객체 검증을 통과하지 못하는 기존 행의 조회"
+tags = ["app-version", "app-version-admin"]
+clock = "2026-10-29T10:00:00+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO admins (id, username, password, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000000a1', 'operator', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-01T00:00:00Z', '2026-09-01T00:00:00Z'),
+  ('01990000-0000-7000-8000-0000000000a2', 'reviewer', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-02T00:00:00Z', '2026-09-02T00:00:00Z');
+INSERT INTO app_versions (id, platform, minimum_supported_version, store_url, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000a0001', 'ANDROID', '1.2.0', 'https://play.google.com/store/apps/details?id=com.example.chalkak', '2026-10-28T01:00:00Z', '2026-10-28T01:00:00Z'),
+  ('01990000-0000-7000-8000-0000000a0002', 'IOS', '1.2.0', 'https://apps.apple.com/app/id999?uo=4', '2026-10-28T02:00:00Z', '2026-10-28T03:00:00Z');
+"""]
+
+[[step]]
+name = "ANDROID 정상 행"
+method = "GET"
+path = "/api/v1/app-version?platform=ANDROID"
+
+[[step]]
+name = "IOS 허용되지 않은 쿼리가 든 행"
+method = "GET"
+path = "/api/v1/app-version?platform=IOS"
+
+[[step]]
+name = "관리자 목록"
+method = "GET"
+path = "/api/v1/admin/app-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "IOS 수정 시도"
+method = "PUT"
+path = "/api/v1/admin/app-versions/IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": 0, "minimumSupportedVersion": "1.1.0", "storeUrl": "https://apps.apple.com/app/id1234567890", "reason": "출시 확인"}'''
