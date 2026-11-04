@@ -328,6 +328,34 @@ mod tests {
         );
     }
 
+    // 작성자 공개 사진 목록은 회원 토큰만 통과한다. 익명은 401(Bearer), 관리자 토큰은 403이다.
+    #[test]
+    fn 작성자_사진_목록은_회원만_통과하고_익명은_401_관리자는_403이다() {
+        let path = "/api/v1/users/01990000-0000-7000-8000-000000000002/posts";
+        assert_eq!(check(Method::Get, path, Some(&user())), Access::Allow);
+        assert_eq!(check(Method::Get, path, None), Access::Deny);
+        assert_eq!(check(Method::Get, path, Some(&admin())), Access::Deny);
+        assert_eq!(check(Method::Get, path, Some(&no_scope())), Access::Deny);
+
+        let logger = Arc::new(Logger::new(
+            Box::new(std::io::sink()),
+            chalkak_core::log::Level::Error,
+            Arc::new(chalkak_core::FixedClock::new(
+                "2026-10-12T00:00:00Z".parse().unwrap(),
+            )),
+        ));
+        let mw = Authorize::new(false, logger);
+        let ok = |_: Request| Response::new(200);
+        let r = mw.handle(Request::new(Method::Get, path), &ok);
+        assert_eq!(r.status, 401);
+        assert_eq!(r.headers.get("www-authenticate"), Some("Bearer"));
+
+        let _guard = security::enter(admin());
+        let r = mw.handle(Request::new(Method::Get, path), &ok);
+        assert_eq!(r.status, 403);
+        assert!(!r.headers.contains("www-authenticate"));
+    }
+
     // AccessLogTest#accessLog_memberRequest_logsUserId: 관리자 토큰의 sub는 남기지 않는다.
     #[test]
     fn 회원_토큰일_때만_접근_로그에_user_id를_올린다() {

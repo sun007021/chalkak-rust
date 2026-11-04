@@ -112,6 +112,24 @@ pub struct PostSlice {
     pub has_next: bool,
 }
 
+/// 작성자 공개 사진 목록 한 줄(`findVisibleRecentByAuthorId`가 읽는 게시물·주제·사진).
+#[derive(Clone, Debug, PartialEq)]
+pub struct AuthorPostRow {
+    pub id: Uuid,
+    pub original_storage_key: String,
+    pub thumbnail_storage_key: Option<String>,
+    pub topic_id: Uuid,
+    pub topic_title: String,
+    pub topic_date: Date,
+}
+
+/// 작성자 공개 사진 목록 한 쪽.
+#[derive(Clone, Debug, PartialEq)]
+pub struct AuthorPostSlice {
+    pub posts: Vec<AuthorPostRow>,
+    pub has_next: bool,
+}
+
 /// 달력 한 줄(`findCalendarPostsByAuthorIdAndTopicDateBetween`).
 #[derive(Clone, Debug, PartialEq)]
 pub struct CalendarPostRow {
@@ -473,6 +491,45 @@ impl PostRepository {
         let has_next = i64::try_from(posts.len()).unwrap_or(i64::MAX) > page_size;
         posts.truncate(usize::try_from(page_size).unwrap_or(usize::MAX));
         Ok(PostSlice { posts, has_next })
+    }
+
+    /// `findVisibleRecentByAuthorId`: 작성자의 승인된 공개 사진을 주제 날짜 최신순(같으면 게시물 식별자 내림차순)으로 한 쪽
+    /// 읽는다. 게시물·주제·사진·작성자 중 하나라도 삭제됐으면 제외한다. `offset`은 호출 측이 `int` 범위를 확인한다.
+    pub fn find_visible_recent_by_author_id(
+        &self,
+        db: &mut impl Db,
+        author_id: Uuid,
+        page: i64,
+        page_size: i64,
+    ) -> Result<AuthorPostSlice, DbError> {
+        let limit = page_size + 1;
+        let offset = page * page_size;
+        let rows = db.query(
+            "SELECT p.id, ph.original_storage_key, ph.thumbnail_storage_key, \
+             t.id AS topic_id, t.title AS topic_title, t.topic_date \
+             FROM posts p JOIN topics t ON t.id = p.topic_id JOIN photos ph ON ph.id = p.photo_id \
+             JOIN users u ON u.id = p.user_id \
+             WHERE u.id = $1 AND p.moderation_status = 'APPROVED' AND p.deleted_at IS NULL \
+             AND t.deleted_at IS NULL AND ph.deleted_at IS NULL AND u.deleted_at IS NULL \
+             ORDER BY t.topic_date DESC, p.id DESC LIMIT $2 OFFSET $3",
+            &[&author_id, &limit, &offset],
+        )?;
+        let mut posts = rows
+            .iter()
+            .map(|row| {
+                Ok(AuthorPostRow {
+                    id: row.try_get("id")?,
+                    original_storage_key: row.try_get("original_storage_key")?,
+                    thumbnail_storage_key: row.try_get("thumbnail_storage_key")?,
+                    topic_id: row.try_get("topic_id")?,
+                    topic_title: row.try_get("topic_title")?,
+                    topic_date: row.try_get("topic_date")?,
+                })
+            })
+            .collect::<Result<Vec<_>, DbError>>()?;
+        let has_next = i64::try_from(posts.len()).unwrap_or(i64::MAX) > page_size;
+        posts.truncate(usize::try_from(page_size).unwrap_or(usize::MAX));
+        Ok(AuthorPostSlice { posts, has_next })
     }
 }
 
