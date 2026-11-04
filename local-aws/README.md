@@ -14,7 +14,7 @@ docker compose 한 벌에 올린다. 백엔드는 Rust와 Java를 프로필로 �
 
 ## 빠른 시작
 
-**한 번에:** `scripts/up-all.sh`가 아래 준비(도구·Lambda 의존성·Docker 안 Linux 빌드)와 기동, 스모크를 이어서 한다(Mac·Linux, Rust 설치 불필요). `down`·`reset`·`status`·`--rebuild`·`--real-oidc` 지원. iOS 시연은 [`docs/local-aws/ios-demo.md`](../docs/local-aws/ios-demo.md).
+**한 번에:** 저장소 루트의 `./up-all.sh`(= `scripts/up-all.sh`)가 아래 준비(도구·Lambda 의존성·Docker 안 Linux 빌드)와 기동, 스모크를 이어서 한다(Mac·Linux, Rust 설치 불필요). `down`·`reset`·`status`·`--rebuild`·`--real-oidc` 지원. iOS 시연은 [`docs/local-aws/ios-demo.md`](../docs/local-aws/ios-demo.md).
 아래는 같은 일을 단계별로 하는 방법이다.
 
 ```bash
