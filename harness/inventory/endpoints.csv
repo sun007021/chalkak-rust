@@ -1,10 +1,20 @@
 domain,method,path,handler,auth
+admin,POST,/api/v1/admin/ai-prompt-previews,AdminAiPromptPreviewController#preview,관리자 토큰
+admin,GET,/api/v1/admin/ai-prompt-versions,AdminAiPromptVersionController#getVersions,관리자 토큰
+admin,POST,/api/v1/admin/ai-prompt-versions,AdminAiPromptVersionController#createVersion,관리자 토큰
+admin,GET,/api/v1/admin/ai-prompt-versions/{promptVersionId},AdminAiPromptVersionController#getVersion,관리자 토큰
+admin,GET,/api/v1/admin/ai-reviews,AdminAiReviewController#getAiReviews,관리자 토큰
+admin,GET,/api/v1/admin/ai-reviews/{aiReviewId},AdminAiReviewController#getAiReview,관리자 토큰
 admin,POST,/api/v1/admin/analytics/aggregations,AdminAnalyticsController#startUserMetricsAggregation,관리자 토큰
+admin,GET,/api/v1/admin/app-versions,AdminAppVersionController#getAppVersions,관리자 토큰
+admin,PUT,/api/v1/admin/app-versions/{platform},AdminAppVersionController#saveAppVersion,관리자 토큰
 admin,GET,/api/v1/admin/audit-logs,AdminAuditLogController#getAuditLogs,관리자 토큰
 admin,POST,/api/v1/admin/auth/login,AdminAuthController#login,공개(관리자 인증 전)
 admin,POST,/api/v1/admin/auth/logout,AdminAuthController#logout,공개(관리자 인증 전)
 admin,GET,/api/v1/admin/auth/me,AdminAuthController#getCurrentAdmin,관리자 토큰
 admin,POST,/api/v1/admin/auth/refresh,AdminAuthController#refresh,공개(관리자 인증 전)
+admin,POST,/api/v1/admin/banners,AdminBannerController#createBanner,관리자 토큰
+admin,DELETE,/api/v1/admin/banners/{bannerId},AdminBannerController#deleteBanner,관리자 토큰
 admin,GET,/api/v1/admin/feedbacks,AdminFeedbackController#getFeedbacks,관리자 토큰
 admin,GET,/api/v1/admin/notices,AdminNoticeController#getNotices,관리자 토큰
 admin,POST,/api/v1/admin/notices,AdminNoticeController#createNotice,관리자 토큰
@@ -15,6 +25,10 @@ admin,GET,/api/v1/admin/posts,AdminPostController#getPosts,관리자 토큰
 admin,DELETE,/api/v1/admin/posts/{postId},AdminPostController#deletePost,관리자 토큰
 admin,GET,/api/v1/admin/posts/{postId},AdminPostController#getPost,관리자 토큰
 admin,PUT,/api/v1/admin/posts/{postId}/moderation,AdminPostController#moderatePost,관리자 토큰
+admin,GET,/api/v1/admin/reminders,AdminReminderController#getReminders,관리자 토큰
+admin,POST,/api/v1/admin/reminders,AdminReminderController#createReminder,관리자 토큰
+admin,DELETE,/api/v1/admin/reminders/{reminderId},AdminReminderController#deleteReminder,관리자 토큰
+admin,PUT,/api/v1/admin/reminders/{reminderId},AdminReminderController#updateReminder,관리자 토큰
 admin,GET,/api/v1/admin/topic-push-schedules,AdminTopicPushScheduleController#getSchedules,관리자 토큰
 admin,POST,/api/v1/admin/topic-push-schedules,AdminTopicPushScheduleController#createSchedule,관리자 토큰
 admin,DELETE,/api/v1/admin/topic-push-schedules/{scheduleId},AdminTopicPushScheduleController#deleteSchedule,관리자 토큰
@@ -27,11 +41,13 @@ admin,PUT,/api/v1/admin/topics/{topicId},AdminTopicController#updateTopic,관리
 admin,GET,/api/v1/admin/users,AdminUserController#getUsers,관리자 토큰
 admin,GET,/api/v1/admin/users/{userId},AdminUserController#getUser,관리자 토큰
 admin,PATCH,/api/v1/admin/users/{userId}/status,AdminUserController#updateStatus,관리자 토큰
+appversion,GET,/api/v1/app-version,AppVersionController#getAppVersion,회원 토큰
 auth,POST,/api/v1/auth/logout,AuthController#logout,공개
 auth,POST,/api/v1/auth/refresh,AuthController#refresh,공개
 auth,POST,/api/v1/auth/social-login,AuthController#socialLogin,공개
 auth,POST,/api/v1/auth/social-signup,AuthController#socialSignup,공개
 auth,POST,/api/v1/auth/social-signup/signature/uploads,AuthController#createSocialSignupSignatureUpload,공개
+banner,GET,/api/v1/banners,BannerController#getBanners,회원 토큰
 feedback,POST,/api/v1/feedbacks,FeedbackController#submitFeedback,회원 토큰
 notification,GET,/api/v1/notification-settings,NotificationSettingsController#getSettings,회원 토큰
 notification,PATCH,/api/v1/notification-settings,NotificationSettingsController#updateSettings,회원 토큰
@@ -49,6 +65,8 @@ post,POST,/api/v1/posts/uploads,PostController#createPostImageUpload,회원 토�
 post,DELETE,/api/v1/posts/{postId},PostController#deletePost,회원 토큰
 post,GET,/api/v1/posts/{postId},PostController#getPost,회원 토큰
 post,PUT,/api/v1/posts/{postId},PostController#updatePost,회원 토큰
+aireview,GET,/api/v1/posts/{postId}/ai-review,PostAiReviewController#getAiReview,회원 토큰
+aireview,POST,/api/v1/posts/{postId}/ai-review,PostAiReviewController#requestAiReview,회원 토큰
 like,DELETE,/api/v1/posts/{postId}/likes,PostLikeController#unlikePost,회원 토큰
 like,PUT,/api/v1/posts/{postId}/likes,PostLikeController#likePost,회원 토큰
 notification,PUT,/api/v1/push-devices/current,PushDeviceController#registerCurrentDevice,회원 토큰
@@ -57,6 +75,7 @@ user,DELETE,/api/v1/users/me,UserController#withdraw,회원 토큰
 user,GET,/api/v1/users/me/signature,UserController#getSignature,회원 토큰
 user,PUT,/api/v1/users/me/signature,UserController#updateSignature,회원 토큰
 user,POST,/api/v1/users/me/signature/uploads,UserController#createSignatureUpload,회원 토큰
+user,GET,/api/v1/users/{userId}/posts,UserController#getAuthorPosts,회원 토큰
 post,POST,/internal/v1/post-image-processing/{uploadId}/complete,PostImageProcessingCallbackController#complete,HMAC 콜백
 post,POST,/internal/v1/post-image-processing/{uploadId}/failed,PostImageProcessingCallbackController#fail,HMAC 콜백
 post,POST,/internal/v1/post-image-processing/{uploadId}/upload-urls,PostImageProcessingCallbackController#issueUploadUrls,HMAC 콜백

@@ -22,6 +22,7 @@ const TOKEN_REQUIRED: &str = "FCM 토큰이 필요합니다.";
 struct NotificationSettingsResponse {
     topic_push_enabled: bool,
     moderation_push_enabled: bool,
+    ai_review_push_enabled: bool,
 }
 
 impl From<NotificationSettingsResult> for NotificationSettingsResponse {
@@ -29,6 +30,7 @@ impl From<NotificationSettingsResult> for NotificationSettingsResponse {
         NotificationSettingsResponse {
             topic_push_enabled: r.topic_push_enabled,
             moderation_push_enabled: r.moderation_push_enabled,
+            ai_review_push_enabled: r.ai_review_push_enabled,
         }
     }
 }
@@ -90,11 +92,12 @@ fn update_settings(
     let body = binding::read_json_object(req)?;
     let topic = read_boolean(&body, "topicPushEnabled")?;
     let moderation = read_boolean(&body, "moderationPushEnabled")?;
-    if topic.is_none() && moderation.is_none() {
+    let ai_review = read_boolean(&body, "aiReviewPushEnabled")?;
+    if topic.is_none() && moderation.is_none() && ai_review.is_none() {
         return Err(ApiError::Validation(UPDATE_REQUIRED.to_owned()));
     }
     let user = policy.validate_existing()?;
-    service.update_settings(user.user_id, topic, moderation)?;
+    service.update_settings(user.user_id, topic, moderation, ai_review)?;
     Ok(Response::new(204))
 }
 

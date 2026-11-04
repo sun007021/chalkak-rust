@@ -3,17 +3,17 @@ tags = ["notification", "settings"]
 clock = "2026-10-12T09:00:00+09:00"
 
 # 근거: NotificationSettingsController, NotificationSettingsService, NotificationSettingsUpdateRequest,
-# User#updatePushPreferences, NotificationSettingsControllerTest/AccessTest/ServiceTest.
+# User#updatePushPreferences(1fb74d9: aiReviewPushEnabled 추가), NotificationSettingsControllerTest/AccessTest/ServiceTest.
 # PATCH는 값이 하나도 없으면 400, 있는 값만 바꾸고 값이 그대로면 UPDATE하지 않는다(updated_at 유지).
 # 인자 해석(@Valid @RequestBody) -> @RequiresExistingUser -> 서비스 순서라 본문 오류가 인증 오류보다 먼저다.
 
 [setup]
 sql = ["""
-INSERT INTO users (id, email, signature_original_storage_key, topic_push_enabled, moderation_push_enabled, deleted_at) VALUES
-  ('01990000-0000-7000-8000-000000000001', 'user1@test.chalkak', 'chalkak/signatures/user1/original.png', true, true, NULL),
-  ('01990000-0000-7000-8000-000000000002', 'user2@test.chalkak', 'chalkak/signatures/user2/original.png', false, true, NULL),
-  ('01990000-0000-7000-8000-000000000003', 'gone@test.chalkak', 'chalkak/signatures/user3/original.png', true, true, '2026-10-01T00:00:00+09:00'),
-  ('01990000-0000-7000-8000-000000000004', 'banned@test.chalkak', 'chalkak/signatures/user4/original.png', true, false, NULL);
+INSERT INTO users (id, email, signature_original_storage_key, topic_push_enabled, moderation_push_enabled, ai_review_push_enabled, deleted_at) VALUES
+  ('01990000-0000-7000-8000-000000000001', 'user1@test.chalkak', 'chalkak/signatures/user1/original.png', true, true, true, NULL),
+  ('01990000-0000-7000-8000-000000000002', 'user2@test.chalkak', 'chalkak/signatures/user2/original.png', false, true, false, NULL),
+  ('01990000-0000-7000-8000-000000000003', 'gone@test.chalkak', 'chalkak/signatures/user3/original.png', true, true, true, '2026-10-01T00:00:00+09:00'),
+  ('01990000-0000-7000-8000-000000000004', 'banned@test.chalkak', 'chalkak/signatures/user4/original.png', true, false, true, NULL);
 UPDATE users SET status = 'BANNED' WHERE id = '01990000-0000-7000-8000-000000000004'
 """]
 
@@ -301,3 +301,67 @@ name = "최종 확인"
 method = "GET"
 path = "/api/v1/notification-settings"
 auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+# 1fb74d9: AI 리뷰 결과 푸시 수신 설정(aiReviewPushEnabled)
+
+[[step]]
+name = "AI 리뷰 푸시만 끈다"
+method = "PATCH"
+path = "/api/v1/notification-settings"
+auth = { user = "01990000-0000-7000-8000-000000000004" }
+body = '{"aiReviewPushEnabled":false}'
+advance_seconds = 60
+
+[[step]]
+name = "AI 리뷰만 껐고 나머지는 그대로"
+method = "GET"
+path = "/api/v1/notification-settings"
+auth = { user = "01990000-0000-7000-8000-000000000004" }
+
+[[step]]
+name = "AI 리뷰 푸시를 다시 켠다"
+method = "PATCH"
+path = "/api/v1/notification-settings"
+auth = { user = "01990000-0000-7000-8000-000000000004" }
+body = '{"aiReviewPushEnabled":true,"topicPushEnabled":null}'
+advance_seconds = 60
+
+[[step]]
+name = "AI 리뷰 푸시 복구 확인"
+method = "GET"
+path = "/api/v1/notification-settings"
+auth = { user = "01990000-0000-7000-8000-000000000004" }
+
+[[step]]
+name = "AI 리뷰 값이 null뿐이면 400"
+method = "PATCH"
+path = "/api/v1/notification-settings"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '{"aiReviewPushEnabled":null}'
+
+[[step]]
+name = "AI 리뷰 문자열 false는 불리언으로 읽는다"
+method = "PATCH"
+path = "/api/v1/notification-settings"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '{"aiReviewPushEnabled":"false"}'
+
+[[step]]
+name = "AI 리뷰 필드 형식이 객체이면 400"
+method = "PATCH"
+path = "/api/v1/notification-settings"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+body = '{"aiReviewPushEnabled":{}}'
+
+[[step]]
+name = "AI 리뷰 변경 후 조회"
+method = "GET"
+path = "/api/v1/notification-settings"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "탈퇴 회원의 AI 리뷰 설정 수정은 401"
+method = "PATCH"
+path = "/api/v1/notification-settings"
+auth = { user = "01990000-0000-7000-8000-000000000003" }
+body = '{"aiReviewPushEnabled":false}'
