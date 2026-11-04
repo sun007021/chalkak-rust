@@ -1,0 +1,252 @@
+name = "앱 버전 공개 조회: 미설정, 플랫폼 파라미터, 인증 경계"
+tags = ["app-version", "app-version-public"]
+clock = "2026-10-29T10:00:00+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO admins (id, username, password, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000000a1', 'operator', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-01T00:00:00Z', '2026-09-01T00:00:00Z'),
+  ('01990000-0000-7000-8000-0000000000a2', 'reviewer', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-02T00:00:00Z', '2026-09-02T00:00:00Z');
+INSERT INTO users (id, email, status, signature_original_storage_key, signature_thumbnail_storage_key, app_version, created_at, updated_at, deleted_at) VALUES
+  ('01990000-0000-7000-8000-000000000001', 'alice@test.chalkak', 'ACTIVE', 'chalkak/signatures/u1/original.png', 'chalkak/signatures/u1/thumbnail.png', '1.2.0', '2026-10-01T00:00:00Z', '2026-10-01T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-000000000002', 'bob@test.chalkak', 'BANNED', 'chalkak/signatures/u2/original.png', NULL, NULL, '2026-10-02T00:00:00Z', '2026-10-02T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-000000000003', 'withdrawn+01990000-0000-7000-8000-000000000003@chalkak.invalid', 'ACTIVE', 'withdrawn/01990000-0000-7000-8000-000000000003', NULL, '1.0.0', '2026-10-03T00:00:00Z', '2026-10-05T00:00:00Z', '2026-10-05T00:00:00Z');
+"""]
+
+[[step]]
+name = "미설정 ANDROID 익명"
+method = "GET"
+path = "/api/v1/app-version?platform=ANDROID"
+
+[[step]]
+name = "미설정 IOS 익명"
+method = "GET"
+path = "/api/v1/app-version?platform=IOS"
+
+[[step]]
+name = "플랫폼 누락"
+method = "GET"
+path = "/api/v1/app-version"
+
+[[step]]
+name = "플랫폼 빈 값"
+method = "GET"
+path = "/api/v1/app-version?platform="
+
+[[step]]
+name = "플랫폼 공백"
+method = "GET"
+path = "/api/v1/app-version?platform=%20"
+
+[[step]]
+name = "플랫폼 탭"
+method = "GET"
+path = "/api/v1/app-version?platform=%09"
+
+[[step]]
+name = "플랫폼 유니코드 공백"
+method = "GET"
+path = "/api/v1/app-version?platform=%E2%80%83"
+
+[[step]]
+name = "플랫폼 소문자"
+method = "GET"
+path = "/api/v1/app-version?platform=android"
+
+[[step]]
+name = "플랫폼 혼합 대소문자"
+method = "GET"
+path = "/api/v1/app-version?platform=Ios"
+
+[[step]]
+name = "플랫폼 지원하지 않는 값"
+method = "GET"
+path = "/api/v1/app-version?platform=WINDOWS"
+
+[[step]]
+name = "플랫폼 숫자"
+method = "GET"
+path = "/api/v1/app-version?platform=0"
+
+[[step]]
+name = "플랫폼 앞뒤 공백 허용"
+method = "GET"
+path = "/api/v1/app-version?platform=%20IOS%20"
+
+[[step]]
+name = "플랫폼 앞뒤 탭 허용"
+method = "GET"
+path = "/api/v1/app-version?platform=%09ANDROID%09"
+
+[[step]]
+name = "플랫폼 중복은 첫 값"
+method = "GET"
+path = "/api/v1/app-version?platform=IOS&platform=ANDROID"
+
+[[step]]
+name = "플랫폼 중복 첫 값이 잘못"
+method = "GET"
+path = "/api/v1/app-version?platform=WINDOWS&platform=ANDROID"
+
+[[step]]
+name = "플랫폼 이름 대소문자 다른 파라미터"
+method = "GET"
+path = "/api/v1/app-version?Platform=ANDROID"
+
+[[step]]
+name = "다른 쿼리는 무시"
+method = "GET"
+path = "/api/v1/app-version?platform=ANDROID&version=1.0.0"
+
+[[step]]
+name = "퍼센트 인코딩된 값"
+method = "GET"
+path = "/api/v1/app-version?platform=%41NDROID"
+
+[[step]]
+name = "플랫폼 널 문자"
+method = "GET"
+path = "/api/v1/app-version?platform=AND%00ROID"
+
+[[step]]
+name = "플랫폼 한글"
+method = "GET"
+path = "/api/v1/app-version?platform=%EC%95%88%EB%93%9C"
+
+[[step]]
+name = "회원 토큰"
+method = "GET"
+path = "/api/v1/app-version?platform=ANDROID"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "정지 회원 토큰"
+method = "GET"
+path = "/api/v1/app-version?platform=IOS"
+auth = { user = "01990000-0000-7000-8000-000000000002" }
+
+[[step]]
+name = "탈퇴 회원 토큰"
+method = "GET"
+path = "/api/v1/app-version?platform=IOS"
+auth = { user = "01990000-0000-7000-8000-000000000003" }
+
+[[step]]
+name = "없는 회원 토큰"
+method = "GET"
+path = "/api/v1/app-version?platform=ANDROID"
+auth = { user = "01990000-0000-7000-8000-0000000000ff" }
+
+[[step]]
+name = "관리자 토큰"
+method = "GET"
+path = "/api/v1/app-version?platform=ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "없는 관리자 토큰"
+method = "GET"
+path = "/api/v1/app-version?platform=IOS"
+auth = { admin = "01990000-0000-7000-8000-0000000000ff" }
+
+[[step]]
+name = "만료된 토큰"
+method = "GET"
+path = "/api/v1/app-version?platform=ANDROID"
+auth = { user = "01990000-0000-7000-8000-000000000001", expires_in = -60 }
+
+[[step]]
+name = "만료 직후 허용 오차 안"
+method = "GET"
+path = "/api/v1/app-version?platform=ANDROID"
+auth = { user = "01990000-0000-7000-8000-000000000001", expires_in = -10 }
+
+[[step]]
+name = "형식 오류 토큰"
+method = "GET"
+path = "/api/v1/app-version?platform=ANDROID"
+auth = { raw = "Bearer not-a-jwt" }
+
+[[step]]
+name = "Bearer 아닌 스킴"
+method = "GET"
+path = "/api/v1/app-version?platform=ANDROID"
+auth = { raw = "Basic dXNlcjpwYXNz" }
+
+[[step]]
+name = "서명 위조 토큰"
+method = "GET"
+path = "/api/v1/app-version?platform=ANDROID"
+auth = { raw = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ4In0.AAAA" }
+
+[[step]]
+name = "잘못된 토큰과 잘못된 플랫폼"
+method = "GET"
+path = "/api/v1/app-version?platform=WINDOWS"
+auth = { raw = "Bearer not-a-jwt" }
+
+[[step]]
+name = "POST는 허용하지 않는다 익명"
+method = "POST"
+path = "/api/v1/app-version?platform=ANDROID"
+
+[[step]]
+name = "POST 회원"
+method = "POST"
+path = "/api/v1/app-version?platform=ANDROID"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "PUT 회원"
+method = "PUT"
+path = "/api/v1/app-version?platform=ANDROID"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "DELETE 회원"
+method = "DELETE"
+path = "/api/v1/app-version?platform=ANDROID"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "HEAD 익명"
+method = "HEAD"
+path = "/api/v1/app-version?platform=ANDROID"
+
+[[step]]
+name = "HEAD 회원"
+method = "HEAD"
+path = "/api/v1/app-version?platform=ANDROID"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "OPTIONS 익명"
+method = "OPTIONS"
+path = "/api/v1/app-version?platform=ANDROID"
+
+[[step]]
+name = "끝 슬래시 익명"
+method = "GET"
+path = "/api/v1/app-version/?platform=ANDROID"
+
+[[step]]
+name = "끝 슬래시 회원"
+method = "GET"
+path = "/api/v1/app-version/?platform=ANDROID"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "대소문자 다른 경로 익명"
+method = "GET"
+path = "/api/v1/App-Version?platform=ANDROID"
+
+[[step]]
+name = "하위 경로 익명"
+method = "GET"
+path = "/api/v1/app-version/android"
+
+[[step]]
+name = "하위 경로 회원"
+method = "GET"
+path = "/api/v1/app-version/android"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
