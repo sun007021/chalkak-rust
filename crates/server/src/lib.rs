@@ -14,7 +14,10 @@ use std::sync::Arc;
 use chalkak_app::admin::AdminConfig;
 use chalkak_app::admin::bootstrap::AdminAccount;
 use chalkak_app::aireview::AiReviewWiring;
+use chalkak_app::aireview::backoff::AiReviewRetryBackoff;
 use chalkak_app::aireview::openai::OpenAiResponsesReviewGenerator;
+use chalkak_app::aireview::worker::{AiReviewWorker, SHUTDOWN_GRACE as AI_REVIEW_SHUTDOWN_GRACE};
+use chalkak_app::aireview::worker_service::AiReviewWorkerService;
 use chalkak_app::analytics::{self, UserMetricsAggregationRunner};
 use chalkak_app::jobs::{self, AppleRevocation, Job, JobDeps, Jobs};
 use chalkak_app::notification::push_worker_config::build_push_worker;
@@ -210,7 +213,7 @@ pub fn run(settings: &Settings, shutdown: ShutdownSignal) -> Result<(), Box<dyn 
     ensure_admin_account(&pool, settings)?;
 
     let analytics = build_analytics(settings, &pool, &clock, &logger)?;
-    let jobs = start_jobs(
+    let (jobs, ai_review_worker) = start_jobs(
         settings,
         &pool,
         &clock,
@@ -239,12 +242,19 @@ pub fn run(settings: &Settings, shutdown: ShutdownSignal) -> Result<(), Box<dyn 
     // 풀을 닫는다.
     shutdown.trigger();
     jobs.join();
+    // 진행 중인 AI 리뷰 처리를 유예 시간까지 기다린다. 끝나지 못한 행은 임대가 끝난 뒤 다시 가져간다.
+    if let Some(worker) = ai_review_worker {
+        worker.stop(AI_REVIEW_SHUTDOWN_GRACE);
+    }
     pool.close();
     logger
         .info("com.chalkak.backend.BackendApplication")
         .log("서버를 종료했습니다");
     result.map_err(Into::into)
 }
+
+/// 시작한 주기 작업과, 종료할 때 기다려야 하는 AI 리뷰 워커.
+type StartedJobs = (Jobs, Option<Arc<AiReviewWorker>>);
 
 /// 주기 작업(정리 4종, 공지 배포, 알림 SQS 발행·주제 푸시·발행 대기 모니터, 런타임 상태 로그)을 시작한다. 스케줄링이 꺼져 있으면 아무것도 시작하지 않는다.
 fn start_jobs(
@@ -254,7 +264,7 @@ fn start_jobs(
     logger: &Arc<Logger>,
     shutdown: &ShutdownSignal,
     analytics: Arc<UserMetricsAggregationRunner>,
-) -> Result<Jobs, Box<dyn Error>> {
+) -> Result<StartedJobs, Box<dyn Error>> {
     let wants_apple = settings
         .jobs
         .planned()
@@ -289,6 +299,14 @@ fn start_jobs(
     } else {
         None
     };
+    // AI 리뷰 워커는 폴러가 돌 때만 만든다(스케줄링이 꺼진 환경에서는 서비스 메서드를 직접 부른다).
+    let ai_review_worker = if settings.jobs.planned().contains(&Job::AiReviewWorker) {
+        Some(Arc::new(build_ai_review_worker(
+            settings, pool, clock, logger,
+        )?))
+    } else {
+        None
+    };
     let deps = JobDeps {
         pool: pool.clone(),
         clock: Arc::clone(clock),
@@ -297,8 +315,38 @@ fn start_jobs(
         publisher,
         analytics: Some(analytics),
         worker,
+        ai_review_worker: ai_review_worker.clone(),
     };
-    Ok(jobs::start(&deps, &settings.jobs, shutdown)?)
+    Ok((
+        jobs::start(&deps, &settings.jobs, shutdown)?,
+        ai_review_worker,
+    ))
+}
+
+/// AI 리뷰 워커(생성기, 이미지 주소 변환기, 백오프)를 조립한다.
+fn build_ai_review_worker(
+    settings: &Settings,
+    pool: &Pool,
+    clock: &Arc<dyn Clock>,
+    logger: &Arc<Logger>,
+) -> Result<AiReviewWorker, Box<dyn Error>> {
+    let generator = OpenAiResponsesReviewGenerator::new(&settings.openai, Arc::clone(clock))?;
+    let urls = chalkak_app::photo::url::CloudFrontUrlProvider::new(
+        &settings.post.cloudfront_base_url,
+        &settings.post.cloudfront_origin_path,
+    );
+    let worker = &settings.jobs.ai_review_worker;
+    let service = AiReviewWorkerService::new(
+        pool.clone(),
+        Arc::new(generator),
+        Arc::new(urls),
+        Arc::clone(clock),
+        Arc::clone(logger),
+        worker.lease_duration,
+        worker.max_claims,
+        AiReviewRetryBackoff::random(),
+    );
+    Ok(AiReviewWorker::new(Arc::new(service), worker.concurrency))
 }
 
 /// 시작할 때 관리자 계정을 보장한다(`AdminAccountBootstrap`, `DevelopmentAdminBootstrap`).

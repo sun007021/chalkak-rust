@@ -27,7 +27,7 @@ pub mod post;
 mod push_schedule_tests;
 pub mod support;
 #[cfg(test)]
-mod testing;
+pub(crate) mod testing;
 pub mod topic;
 pub mod topic_push_schedule;
 pub mod user;

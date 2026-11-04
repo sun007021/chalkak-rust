@@ -127,6 +127,8 @@ impl Settings {
         let analytics =
             AnalyticsSettings::from_env(env, profile == Profile::Prod, &post.image.region)?;
         let openai = OpenAiSettings::from_env(env)?;
+        // 임대가 호출 제한 시간보다 짧으면 같은 행을 두 번 호출하므로 시작할 때 거절한다(`AiReviewWorkerConfiguration.validateLease`).
+        jobs.ai_review_worker.validate_lease(&openai)?;
 
         Ok(Settings {
             profile,

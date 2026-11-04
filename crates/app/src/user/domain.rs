@@ -101,6 +101,8 @@ pub struct User {
     pub topic_push_enabled: bool,
     /// 게시물 승인·반려 결과 푸시 수신 여부(기본 수신).
     pub moderation_push_enabled: bool,
+    /// AI 리뷰 결과 푸시 수신 여부(기본 수신). 이 포트에는 변경 경로가 없고 읽기만 한다.
+    pub ai_review_push_enabled: bool,
     pub created_at: Timestamp,
     pub updated_at: Timestamp,
     pub deleted_at: Option<Timestamp>,
@@ -141,6 +143,7 @@ impl User {
             app_version: None,
             topic_push_enabled: true,
             moderation_push_enabled: true,
+            ai_review_push_enabled: true,
             created_at: Timestamp::UNIX_EPOCH,
             updated_at: Timestamp::UNIX_EPOCH,
             deleted_at: None,

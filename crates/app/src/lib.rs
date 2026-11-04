@@ -66,6 +66,7 @@ pub fn register_routes(routes: web::Routes, ctx: &AppContext) -> web::Routes {
     let routes = user::api::register(routes, ctx, &components);
     let routes = post::api::register(routes, ctx);
     let routes = like::api::register(routes, ctx);
+    let routes = aireview::api::register(routes, ctx, Arc::clone(&ctx.ai_review.generator));
     let routes = post::callback::register(routes, ctx);
     admin::register(routes, ctx)
 }

@@ -224,6 +224,13 @@ mod tests {
         fn count_likes_on_live_posts(&self) -> Result<i64, ApiError> {
             Ok(0)
         }
+        fn count_ai_reviews(
+            &self,
+            _: jiff::Timestamp,
+            _: jiff::Timestamp,
+        ) -> Result<crate::analytics::service::AiReviewCounts, ApiError> {
+            Ok(Default::default())
+        }
     }
 
     struct Fixture {

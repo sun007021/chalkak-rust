@@ -16,7 +16,7 @@ use super::domain::{SignatureProcessingStatus, User, UserStatus};
 pub const COLUMNS: &str = "u.id, u.email, u.status::text AS status, u.signature_original_storage_key, \
      u.signature_thumbnail_storage_key, u.app_version, u.pending_signature_upload_id, \
      u.signature_processing_status::text AS signature_processing_status, \
-     u.signature_processing_started_at, u.topic_push_enabled, u.moderation_push_enabled, u.created_at, u.updated_at, u.deleted_at";
+     u.signature_processing_started_at, u.topic_push_enabled, u.moderation_push_enabled, u.ai_review_push_enabled, u.created_at, u.updated_at, u.deleted_at";
 
 fn corrupt(column: &str, value: &str) -> DbError {
     DbError::Config(format!("users.{column} 값을 해석할 수 없습니다: {value}"))
@@ -43,6 +43,7 @@ pub fn user_from_row(row: &Row) -> Result<User, DbError> {
         app_version: row.try_get("app_version")?,
         topic_push_enabled: row.try_get("topic_push_enabled")?,
         moderation_push_enabled: row.try_get("moderation_push_enabled")?,
+        ai_review_push_enabled: row.try_get("ai_review_push_enabled")?,
         created_at: row.try_get("created_at")?,
         updated_at: row.try_get("updated_at")?,
         deleted_at: row.try_get("deleted_at")?,
