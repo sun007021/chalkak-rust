@@ -100,6 +100,8 @@ fn assign(message: &mut RawPushMessage, name: &str, value: &Json) -> Result<(), 
                     ("POST_APPROVED", NotificationType::PostApproved),
                     ("POST_REJECTED", NotificationType::PostRejected),
                     ("TOPIC", NotificationType::Topic),
+                    ("AI_REVIEW_COMPLETED", NotificationType::AiReviewCompleted),
+                    ("AI_REVIEW_FAILED", NotificationType::AiReviewFailed),
                     ("NOTICE", NotificationType::Notice),
                 ],
             )?;

@@ -12,6 +12,7 @@
 //! | 주제 푸시 발행 | 매분 0초 | `chalkak.notification.sqs.topic-push-enabled`(기본 꺼짐) |
 //! | 푸시 Worker 폴링(2개) | 앞 실행이 끝난 뒤 1ms(시작 즉시 한 번) | `chalkak.notification.fcm.worker-enabled`(기본 꺼짐) |
 //! | 알림 발행 대기 모니터 | 60초마다(시작 즉시 한 번) | dev·prod 프로필에서만(끄는 키 없음) |
+//! | AI 리뷰 워커 폴링 | 앞 실행이 끝난 뒤 1초(시작 즉시 한 번) | `chalkak.ai-review.worker.enabled`(기본 켜짐) |
 //! | 런타임 상태 로그 | 60초마다(시작 즉시 한 번) | `chalkak.monitoring.runtime-log.enabled` |
 //!
 //! 스케줄링 기능 전체를 끄는 키는 `chalkak.scheduling.enabled`(기본 켜짐)이고 작업별 키와 서로 독립이다. 환경변수
@@ -39,6 +40,9 @@ use chalkak_core::scheduler::{CronSchedule, SEOUL, Scheduler};
 use chalkak_core::{Clock, ShutdownSignal};
 use chalkak_db::Pool;
 
+use crate::aireview::worker::{
+    AiReviewWorker, AiReviewWorkerSettings, POLL_DELAY as AI_REVIEW_POLL_DELAY,
+};
 use crate::analytics::UserMetricsAggregationRunner;
 use crate::auth::apple::AppleTokenClient;
 use crate::auth::tokens::AppleCipher;
@@ -87,6 +91,8 @@ pub enum Job {
     NotificationWorkerSecond,
     PublicationMonitor,
     RuntimeSnapshot,
+    /// AI 리뷰 대기열 폴러(`AiReviewWorker.poll`).
+    AiReviewWorker,
 }
 
 /// 작업이 도는 때.
@@ -101,7 +107,7 @@ pub enum Schedule {
 }
 
 impl Job {
-    pub const ALL: [Job; 12] = [
+    pub const ALL: [Job; 13] = [
         Job::RefreshTokenCleanup,
         Job::ConsumedSignupTokenCleanup,
         Job::NotificationCleanup,
@@ -114,6 +120,7 @@ impl Job {
         Job::NotificationWorkerSecond,
         Job::PublicationMonitor,
         Job::RuntimeSnapshot,
+        Job::AiReviewWorker,
     ];
 
     /// 스레드 이름·오류 로그에 쓰는 이름(원본 메서드 이름).
@@ -130,6 +137,7 @@ impl Job {
             Job::NotificationWorkerFirst | Job::NotificationWorkerSecond => "poll",
             Job::PublicationMonitor => "logBacklog",
             Job::RuntimeSnapshot => "logSnapshot",
+            Job::AiReviewWorker => "poll",
         }
     }
 
@@ -148,6 +156,7 @@ impl Job {
             }
             Job::PublicationMonitor => Schedule::FixedRate(RUNTIME_LOG_PERIOD),
             Job::RuntimeSnapshot => Schedule::FixedRate(RUNTIME_LOG_PERIOD),
+            Job::AiReviewWorker => Schedule::FixedDelay(AI_REVIEW_POLL_DELAY),
         }
     }
 
@@ -183,6 +192,8 @@ pub struct JobsSettings {
     /// `NotificationPublicationMonitor`는 dev·prod 프로필에서만 존재한다(`@Profile({"dev", "prod"})`).
     pub publication_monitor: bool,
     pub runtime_log: bool,
+    /// `chalkak.ai-review.worker.*`. 임대 시간 검증은 OpenAI 설정을 아는 서버 설정 단계가 한다.
+    pub ai_review_worker: AiReviewWorkerSettings,
 }
 
 impl JobsSettings {
@@ -214,6 +225,7 @@ impl JobsSettings {
             fcm,
             publication_monitor: deployed,
             runtime_log: env.bool_or("CHALKAK_MONITORING_RUNTIMELOG_ENABLED", deployed)?,
+            ai_review_worker: AiReviewWorkerSettings::from_env(env)?,
         })
     }
 
@@ -231,6 +243,7 @@ impl JobsSettings {
             Job::NotificationWorkerFirst | Job::NotificationWorkerSecond => self.sqs.worker_enabled,
             Job::PublicationMonitor => self.publication_monitor,
             Job::RuntimeSnapshot => self.runtime_log,
+            Job::AiReviewWorker => self.ai_review_worker.enabled,
         }
     }
 
@@ -267,6 +280,8 @@ pub struct JobDeps {
     pub analytics: Option<Arc<UserMetricsAggregationRunner>>,
     /// 푸시 Worker가 켜져 있으면 필요하다. 두 폴링 작업이 같은 서비스를 쓴다.
     pub worker: Option<Arc<PushWorker>>,
+    /// AI 리뷰 워커가 켜져 있으면 필요하다.
+    pub ai_review_worker: Option<Arc<AiReviewWorker>>,
 }
 
 /// 돌고 있는 주기 작업들.
@@ -445,6 +460,14 @@ fn body(
             let monitor = NotificationPublicationMonitor::new(pool, clock, logger);
             Box::new(move || monitor.log_backlog())
         }
+        Job::AiReviewWorker => {
+            let worker = deps
+                .ai_review_worker
+                .clone()
+                .ok_or_else(|| "AI 리뷰 워커 폴링에는 워커가 필요합니다".to_owned())?;
+            // 폴링 실패는 워커가 로그를 남기고 삼킨다.
+            Box::new(move || worker.poll())
+        }
         Job::RuntimeSnapshot => {
             let reader = runtime::RuntimeSnapshotReader::for_process(pool);
             Box::new(move || runtime::log_snapshot(&logger, &reader))
@@ -516,6 +539,7 @@ mod tests {
                 Job::ConsumedSignupTokenCleanup,
                 Job::NotificationCleanup,
                 Job::PendingAppleAuthorizationCleanup,
+                Job::AiReviewWorker,
             ]
         );
     }
@@ -540,7 +564,35 @@ mod tests {
 
         assert!(s.scheduling_enabled);
         assert!(!s.planned().contains(&Job::RefreshTokenCleanup));
-        assert_eq!(s.planned().len(), 3);
+        assert_eq!(s.planned().len(), 4);
+    }
+
+    // application.yml: chalkak.ai-review.worker.enabled 기본 true, concurrency 10, lease-duration 120s, max-claims 3
+    #[test]
+    fn ai_review_worker_is_on_by_default_with_original_policy_values() {
+        let s = settings(&[], false);
+        assert!(s.job_enabled(Job::AiReviewWorker));
+        assert_eq!(s.ai_review_worker.concurrency, 10);
+        assert_eq!(s.ai_review_worker.lease_duration, Duration::from_secs(120));
+        assert_eq!(s.ai_review_worker.max_claims, 3);
+        assert_eq!(
+            Job::AiReviewWorker.schedule(),
+            Schedule::FixedDelay(Duration::from_secs(1))
+        );
+    }
+
+    // application-test.yml: chalkak.ai-review.worker.enabled=false
+    #[test]
+    fn ai_review_worker_can_be_turned_off_and_validates_its_numbers() {
+        let off = settings(&[("CHALKAK_AIREVIEW_WORKER_ENABLED", "false")], false);
+        assert!(!off.planned().contains(&Job::AiReviewWorker));
+        for (key, value) in [
+            ("CHALKAK_AIREVIEW_WORKER_CONCURRENCY", "0"),
+            ("CHALKAK_AIREVIEW_WORKER_MAXCLAIMS", "0"),
+        ] {
+            let env = Env::from_pairs([(key, value)]);
+            assert!(JobsSettings::from_env(&env, false, false).is_err(), "{key}");
+        }
     }
 
     #[test]
@@ -566,7 +618,7 @@ mod tests {
             let s = settings(&[(key, "false")], false);
             let planned = s.planned();
             assert!(!planned.contains(&job), "{key}");
-            assert_eq!(planned.len(), 3, "{key}");
+            assert_eq!(planned.len(), 4, "{key}");
         }
     }
 

@@ -4,11 +4,22 @@
 //! - [`generator`]: 리뷰 생성 포트와 실패 분류. [`openai`]가 Responses API 어댑터다.
 //! - [`prompt_repository`]: 프롬프트 버전 저장소. [`post_query`]: 리뷰 대상(공개) 게시물 조회.
 
+pub mod api;
+pub mod backoff;
+#[cfg(test)]
+mod db_tests;
 pub mod domain;
 pub mod generator;
 pub mod openai;
 pub mod post_query;
+pub mod post_service;
 pub mod prompt_repository;
+pub mod review;
+pub mod review_repository;
+#[cfg(test)]
+mod review_tests;
+pub mod worker;
+pub mod worker_service;
 
 use std::sync::Arc;
 

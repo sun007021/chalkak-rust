@@ -1,0 +1,151 @@
+name = "게시물 AI 리뷰: 요청·조회·재요청과 오류"
+tags = ["ai-review", "post-ai-review"]
+clock = "2026-10-12T09:00:00+09:00"
+
+# 근거: PostAiReviewControllerTest, PostAiReviewServiceTest, AiReviewTest.
+# 하네스는 스케줄링을 꺼 두므로 워커는 돌지 않는다. 요청·조회·재요청 API만 비교하고, 워커 처리(완료·실패·재시도·알림)는
+# cargo test(aireview::db_tests)가 확인한다.
+
+[setup]
+sql = ["""
+INSERT INTO admins (id, username, password, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000000a1', 'operator', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-01T00:00:00Z', '2026-09-01T00:00:00Z');
+INSERT INTO users (id, email, status, signature_original_storage_key, signature_thumbnail_storage_key) VALUES
+  ('01990000-0000-7000-8000-000000000001', 'alice@test.chalkak', 'ACTIVE', 'chalkak/signatures/u1/original.png', 'chalkak/signatures/u1/thumbnail.png'),
+  ('01990000-0000-7000-8000-000000000002', 'bob@test.chalkak', 'ACTIVE', 'chalkak/signatures/u2/original.png', 'chalkak/signatures/u2/thumbnail.png'),
+  ('01990000-0000-7000-8000-000000000003', 'carol@test.chalkak', 'BANNED', 'chalkak/signatures/u3/original.png', 'chalkak/signatures/u3/thumbnail.png');
+INSERT INTO topics (id, title, topic_date, starts_at, ends_at) VALUES
+  ('01990000-0000-7000-8000-0000000000f1', '가을 하늘', '2026-10-12', '2026-10-12T00:00:00+09:00', ('2026-10-12'::date + 1)::timestamp AT TIME ZONE 'Asia/Seoul'),
+  ('01990000-0000-7000-8000-0000000000f2', '어제', '2026-10-11', '2026-10-11T00:00:00+09:00', ('2026-10-11'::date + 1)::timestamp AT TIME ZONE 'Asia/Seoul'),
+  ('01990000-0000-7000-8000-0000000000f3', '그제', '2026-10-10', '2026-10-10T00:00:00+09:00', ('2026-10-10'::date + 1)::timestamp AT TIME ZONE 'Asia/Seoul'),
+  ('01990000-0000-7000-8000-0000000000f4', '그끄제', '2026-10-09', '2026-10-09T00:00:00+09:00', ('2026-10-09'::date + 1)::timestamp AT TIME ZONE 'Asia/Seoul');
+INSERT INTO photos (id, original_storage_key, thumbnail_storage_key, metadata) VALUES
+  ('01990000-0000-7000-8000-0000000002a1', 'chalkak/posts/p1/original.webp', 'chalkak/posts/p1/thumbnail.webp', '{"width": 4000, "height": 3000, "byteSize": 2048}'),
+  ('01990000-0000-7000-8000-0000000002a2', 'chalkak/posts/p2/original.webp', 'chalkak/posts/p2/thumbnail.webp', '{"width": 4000, "height": 3000, "byteSize": 2048}'),
+  ('01990000-0000-7000-8000-0000000002a3', 'chalkak/posts/p3/original.webp', 'chalkak/posts/p3/thumbnail.webp', '{"width": 4000, "height": 3000, "byteSize": 2048}'),
+  ('01990000-0000-7000-8000-0000000002a4', 'chalkak/posts/p4/original.webp', 'chalkak/posts/p4/thumbnail.webp', '{"width": 4000, "height": 3000, "byteSize": 2048}'),
+  ('01990000-0000-7000-8000-0000000002a5', 'chalkak/posts/p5/original.webp', 'chalkak/posts/p5/thumbnail.webp', '{"width": 4000, "height": 3000, "byteSize": 2048}');
+INSERT INTO posts (id, user_id, topic_id, photo_id, title, moderation_status, moderated_at, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000004a1', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-0000000002a1', '새 요청', 'APPROVED', '2026-10-12T08:00:00+09:00', '2026-10-12T07:00:00+09:00', '2026-10-12T08:00:00+09:00'),
+  ('01990000-0000-7000-8000-0000000004a2', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000000f2', '01990000-0000-7000-8000-0000000002a2', '대기', 'PENDING', NULL, '2026-10-11T07:00:00+09:00', '2026-10-11T07:00:00+09:00'),
+  ('01990000-0000-7000-8000-0000000004a3', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000000f3', '01990000-0000-7000-8000-0000000002a3', '실패 한 번', 'APPROVED', '2026-10-10T08:00:00+09:00', '2026-10-10T07:00:00+09:00', '2026-10-10T08:00:00+09:00'),
+  ('01990000-0000-7000-8000-0000000004a4', '01990000-0000-7000-8000-000000000002', '01990000-0000-7000-8000-0000000000f3', '01990000-0000-7000-8000-0000000002a4', '실패 세 번', 'APPROVED', '2026-10-10T08:00:00+09:00', '2026-10-10T07:00:00+09:00', '2026-10-10T08:00:00+09:00'),
+  ('01990000-0000-7000-8000-0000000004a5', '01990000-0000-7000-8000-000000000002', '01990000-0000-7000-8000-0000000000f4', '01990000-0000-7000-8000-0000000002a5', '완료', 'APPROVED', '2026-10-09T08:00:00+09:00', '2026-10-09T07:00:00+09:00', '2026-10-09T08:00:00+09:00');
+INSERT INTO ai_prompt_versions (id, type, version, system_prompt, user_prompt_template, model, parameters, output_schema_version, memo, created_by_admin_id, created_at) VALUES
+  ('01990000-0000-7000-8000-0000000009a1', 'PHOTO_REVIEW', 1, '시스템 프롬프트', '{{topicTitle}}', 'gpt-6.1-sol', '{"imageDetail": "HIGH", "maxOutputTokens": 8000, "reasoningEffort": null, "distinctivePerspectiveThreshold": 7.0}', '2', NULL, '01990000-0000-7000-8000-0000000000a1', '2026-10-10T00:00:00Z');
+INSERT INTO ai_reviews (id, post_id, user_id, prompt_version_id, status, attempt, round_attempt, request_count, error_code, request_id, requested_at, last_requested_at, started_at, completed_at) VALUES
+  ('01990000-0000-7000-8000-0000000010a3', '01990000-0000-7000-8000-0000000004a3', '01990000-0000-7000-8000-000000000001', '01990000-0000-7000-8000-0000000009a1', 'FAILED', 1, 1, 1, 'INVALID_OUTPUT', '33333333-3333-4333-8333-333333333333', '2026-10-11T23:00:00Z', '2026-10-11T23:00:00Z', '2026-10-11T23:00:01Z', '2026-10-11T23:00:30Z'),
+  ('01990000-0000-7000-8000-0000000010a4', '01990000-0000-7000-8000-0000000004a4', '01990000-0000-7000-8000-000000000002', '01990000-0000-7000-8000-0000000009a1', 'FAILED', 3, 1, 3, 'TIMEOUT', '44444444-4444-4444-8444-444444444444', '2026-10-11T20:00:00Z', '2026-10-11T23:00:00Z', '2026-10-11T23:00:01Z', '2026-10-11T23:01:00Z');
+INSERT INTO ai_reviews (id, post_id, user_id, prompt_version_id, status, attempt, round_attempt, request_count, result, output, input_tokens, cached_input_tokens, output_tokens, reasoning_tokens, latency_ms, openai_response_id, request_id, requested_at, last_requested_at, started_at, completed_at) VALUES
+  ('01990000-0000-7000-8000-0000000010a5', '01990000-0000-7000-8000-0000000004a5', '01990000-0000-7000-8000-000000000002', '01990000-0000-7000-8000-0000000009a1', 'COMPLETED', 1, 1, 1,
+   '{"overallScore": 7.5, "criteria": [{"key": "COMPOSITION", "label": "구도", "score": 7.5}], "distinctivePerspective": true, "feedback": {"summary": "요약", "strength": "좋은 점", "weakness": "아쉬운 점", "suggestion": "제안"}}',
+   '{"composition": 7.46, "theme_expression": 8, "feedback": {"summary": "요약", "strength": "좋은 점", "weakness": "아쉬운 점", "suggestion": "제안"}}',
+   1200, 200, 300, 100, 21000, 'resp_abc', '55555555-5555-4555-8555-555555555555', '2026-10-10T23:00:00Z', '2026-10-10T23:00:00Z', '2026-10-10T23:00:01Z', '2026-10-10T23:00:21Z');
+"""]
+
+[[step]]
+name = "요청 전 조회는 NONE"
+method = "GET"
+path = "/api/v1/posts/01990000-0000-7000-8000-0000000004a1/ai-review"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "처음 요청은 202 처리 중"
+method = "POST"
+path = "/api/v1/posts/01990000-0000-7000-8000-0000000004a1/ai-review"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "같은 요청을 다시 보내면 같은 상태"
+method = "POST"
+path = "/api/v1/posts/01990000-0000-7000-8000-0000000004a1/ai-review"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "처리 중 조회"
+method = "GET"
+path = "/api/v1/posts/01990000-0000-7000-8000-0000000004a1/ai-review"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "작성자가 아니면 404 (요청)"
+method = "POST"
+path = "/api/v1/posts/01990000-0000-7000-8000-0000000004a1/ai-review"
+auth = { user = "01990000-0000-7000-8000-000000000002" }
+
+[[step]]
+name = "작성자가 아니면 404 (조회)"
+method = "GET"
+path = "/api/v1/posts/01990000-0000-7000-8000-0000000004a1/ai-review"
+auth = { user = "01990000-0000-7000-8000-000000000002" }
+
+[[step]]
+name = "승인되지 않은 게시물은 404"
+method = "POST"
+path = "/api/v1/posts/01990000-0000-7000-8000-0000000004a2/ai-review"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "없는 게시물은 404"
+method = "GET"
+path = "/api/v1/posts/01990000-0000-7000-8000-0000000004ff/ai-review"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "게시물 ID 형식 오류는 400"
+method = "POST"
+path = "/api/v1/posts/not-a-uuid/ai-review"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "인증 없이 요청하면 401"
+method = "POST"
+path = "/api/v1/posts/01990000-0000-7000-8000-0000000004a1/ai-review"
+
+[[step]]
+name = "정지 회원은 요청할 수 없다"
+method = "POST"
+path = "/api/v1/posts/01990000-0000-7000-8000-0000000004a1/ai-review"
+auth = { user = "01990000-0000-7000-8000-000000000003" }
+
+[[step]]
+name = "실패한 리뷰 조회는 다시 요청 가능"
+method = "GET"
+path = "/api/v1/posts/01990000-0000-7000-8000-0000000004a3/ai-review"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "실패한 리뷰를 다시 요청하면 202"
+method = "POST"
+path = "/api/v1/posts/01990000-0000-7000-8000-0000000004a3/ai-review"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "다시 요청 뒤 조회는 처리 중"
+method = "GET"
+path = "/api/v1/posts/01990000-0000-7000-8000-0000000004a3/ai-review"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "요청 횟수를 모두 쓴 실패 조회"
+method = "GET"
+path = "/api/v1/posts/01990000-0000-7000-8000-0000000004a4/ai-review"
+auth = { user = "01990000-0000-7000-8000-000000000002" }
+
+[[step]]
+name = "요청 횟수를 모두 쓴 뒤 다시 요청하면 400"
+method = "POST"
+path = "/api/v1/posts/01990000-0000-7000-8000-0000000004a4/ai-review"
+auth = { user = "01990000-0000-7000-8000-000000000002" }
+
+[[step]]
+name = "완료된 리뷰 조회"
+method = "GET"
+path = "/api/v1/posts/01990000-0000-7000-8000-0000000004a5/ai-review"
+auth = { user = "01990000-0000-7000-8000-000000000002" }
+
+[[step]]
+name = "완료된 리뷰를 요청하면 200"
+method = "POST"
+path = "/api/v1/posts/01990000-0000-7000-8000-0000000004a5/ai-review"
+auth = { user = "01990000-0000-7000-8000-000000000002" }
