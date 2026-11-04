@@ -4,27 +4,31 @@
 //! - 메시지가 올바르지 않거나 기한이 지났으면 보내지 않고 완료한다(`INVALID_MESSAGE`, `EXPIRED`).
 //! - 기기 목록은 트랜잭션 하나로 읽고, 기기마다 별도 트랜잭션에서 로그인·회원·수신 설정·알림(또는 오늘 주제)을 다시 확인한다.
 //!   FCM 호출은 트랜잭션 밖이다. 조건이 바뀌었으면 그 기기는 건너뛴다.
-//! - 한 기기라도 수락되면 메시지는 완료다. 수락이 없고 일시 실패가 있으면 가장 긴 `Retry-After`로 재시도를 요청한다.
+//! - 기기별 발송은 [`PushDeliveryService`]의 발송 기록(`push_deliveries`)을 거친다. 이미 처리된 기기는 다시 보내지 않고, 일시 실패한
+//!   기기가 하나라도 있으면(다른 기기가 수락됐어도) 가장 긴 `Retry-After`로 재시도를 요청한다. 모두 끝나야 메시지가 완료다.
 //! - 무효 토큰이면 그 기기 행을 (기기 ID, 토큰 해시)로 지운다. 지우기에 실패해도 재시도 사유가 아니다.
 //! - 기기 처리 중 예상하지 못한 오류는 그 기기를 일시 실패로 보고 로그만 남긴다(다른 기기는 계속 처리한다).
 
 use std::sync::Arc;
 
 use chalkak_core::Clock;
-use chalkak_core::log::Logger;
+use chalkak_core::log::{EventBuilder, Logger};
 use chalkak_db::{Db, Pool};
+use serde_json::{Value, json};
 use uuid::Uuid;
 
 use super::domain::{NotificationType, PublishStatus, is_push_expired_at, is_valid_push_lifetime};
+use super::push_delivery::{PushDeliveryAttempt, PushDeliveryError, PushDeliveryService};
 use super::push_device::{FcmToken, PushDevice, PushDeviceRepository, find_usable_user};
 use super::push_message::RawPushMessage;
 use super::push_sender::{
-    DevicePushRequest, DevicePushResult, DevicePushSender, DeviceStatus, PushProcessingResult,
+    DevicePushRequest, DevicePushResult, DevicePushSender, DevicePushTiming, DeviceStatus,
+    PushProcessingResult,
 };
 use super::reminder::{ReminderRepository, ReminderTarget};
 use super::repository::NotificationRepository;
 use super::sqs_push::PushMessage;
-use crate::common::transact;
+use crate::common::{Elapsed, transact};
 use crate::post::repository::PostRepository;
 use crate::topic::domain::kst_date;
 use crate::topic::repository::TopicRepository;
@@ -48,6 +52,7 @@ pub struct PushWorkerService {
     clock: Arc<dyn Clock>,
     sender: Arc<dyn DevicePushSender>,
     logger: Arc<Logger>,
+    delivery: PushDeliveryService,
 }
 
 impl PushWorkerService {
@@ -57,16 +62,23 @@ impl PushWorkerService {
         sender: Arc<dyn DevicePushSender>,
         logger: Arc<Logger>,
     ) -> Self {
+        let delivery = PushDeliveryService::new(pool.clone(), Arc::clone(&logger));
         Self {
             pool,
             clock,
             sender,
             logger,
+            delivery,
         }
     }
 
-    /// `process`. 기기 목록 조회가 실패하면 오류를 돌려준다(그 메시지는 삭제하지 않고 SQS가 다시 전달한다).
-    pub fn process_message(&self, raw: &RawPushMessage) -> Result<PushProcessingResult, ApiError> {
+    /// `process`. 처리 중 예상하지 못한 오류가 나면 DB 계측 집계(`processingCompleted=false`)를 남기고 오류를 돌려준다
+    /// (그 메시지는 삭제하지 않고 SQS가 다시 전달한다). 같은 (사건, 회원)을 처리 중이거나 발송 기록을 확인하지 못하면 오류가 아니라
+    /// 1분 뒤 재처리 결과를 돌려준다.
+    pub fn process_message(
+        &self,
+        raw: &RawPushMessage,
+    ) -> Result<PushProcessingResult, PushDeliveryError> {
         let Some(message) = self.validate(raw) else {
             self.log_skipped(raw, None, "INVALID_MESSAGE");
             return Ok(PushProcessingResult::completed());
@@ -75,33 +87,59 @@ impl PushWorkerService {
             self.log_skipped(raw, None, "EXPIRED");
             return Ok(PushProcessingResult::completed());
         }
-        let device_ids = transact(&self.pool, |tx| {
+        let mut db_timing = PushWorkerDbTiming::default();
+        let outcome = self.delivery.process(&message, |attempt| {
+            self.process_devices(&message, raw, &mut db_timing, attempt)
+        });
+        if let Err(error) = &outcome {
+            self.log_summary_failed(&message, &db_timing, error.exception_name());
+        }
+        outcome
+    }
+
+    fn process_devices(
+        &self,
+        message: &PushMessage,
+        raw: &RawPushMessage,
+        db_timing: &mut PushWorkerDbTiming,
+        attempt: &mut PushDeliveryAttempt<'_>,
+    ) -> Result<PushProcessingResult, PushDeliveryError> {
+        let device_ids = self.measured(db_timing, None, "DEVICE_LOOKUP", |tx| {
             Ok(PushDeviceRepository.find_ids_by_user_id(tx, message.user_id)?)
         })?;
         if device_ids.is_empty() {
             self.log_skipped(raw, None, "NO_DEVICES");
         }
         let mut counts = Counts::default();
-        let mut accepted = false;
         let mut retryable = false;
         let mut retry_after = std::time::Duration::ZERO;
         for device_id in &device_ids {
-            let result = self.send_to_device(&message, *device_id);
+            let result = self.send_to_device(message, *device_id, db_timing, attempt)?;
             counts.add(result.status);
-            accepted = accepted || result.is_accepted();
             retryable = retryable || result.is_retryable();
             if result.is_retryable() && result.retry_after > retry_after {
                 retry_after = result.retry_after;
             }
         }
-        self.log_summary(&message, device_ids.len(), &counts, !accepted && retryable);
-        if accepted {
-            return Ok(PushProcessingResult::completed());
-        }
+        self.log_summary(message, device_ids.len(), &counts, retryable, db_timing);
         Ok(PushProcessingResult {
             retryable,
             retry_after,
         })
+    }
+
+    /// `executeMeasuredTransaction`: 트랜잭션 하나를 실행하고 걸린 시간을 계측에 남긴다(끝까지 가지 못해도 남긴다).
+    fn measured<T>(
+        &self,
+        db_timing: &mut PushWorkerDbTiming,
+        device_id: Option<Uuid>,
+        operation: &'static str,
+        action: impl FnOnce(&mut chalkak_db::Tx<'_>) -> Result<T, ApiError>,
+    ) -> Result<T, ApiError> {
+        let elapsed = Elapsed::start();
+        let result = transact(&self.pool, action);
+        db_timing.record_transaction(device_id, operation, elapsed, result.is_ok());
+        result
     }
 
     /// `isValidMessage`: 필수 값이 모두 있고, 종류와 대상 종류가 맞고, 주제는 알림함 ID 없이 지금까지 발생한 사건이며
@@ -142,40 +180,93 @@ impl PushWorkerService {
         })
     }
 
-    fn send_to_device(&self, message: &PushMessage, device_id: Uuid) -> DevicePushResult {
-        match self.send_to_current_device(message, device_id) {
-            Ok(result) => result,
-            Err(exception) => {
-                self.log_device_failure(message, device_id, "worker_device_failed", &exception);
-                DevicePushResult::retryable(&exception)
+    fn send_to_device(
+        &self,
+        message: &PushMessage,
+        device_id: Uuid,
+        db_timing: &mut PushWorkerDbTiming,
+        attempt: &mut PushDeliveryAttempt<'_>,
+    ) -> Result<DevicePushResult, PushDeliveryError> {
+        let mut timing = DevicePushTiming::default();
+        match self.send_to_current_device(message, device_id, &mut timing, db_timing, attempt) {
+            Err(PushDeliveryError::Api(error)) => {
+                let exception = error.exception_name();
+                self.log_device_failure(
+                    message,
+                    device_id,
+                    "worker_device_failed",
+                    exception,
+                    Some(&timing),
+                );
+                Ok(DevicePushResult::retryable(exception))
             }
+            // 기록이 불명확하면 이 사용자 처리를 멈추고 재처리로 넘긴다.
+            other => other,
         }
     }
 
-    /// 실패하면 예외 이름을 돌려준다.
     fn send_to_current_device(
         &self,
         message: &PushMessage,
         device_id: Uuid,
-    ) -> Result<DevicePushResult, String> {
-        let Some(request) = transact(&self.pool, |tx| self.find_request(tx, message, device_id))
-            .map_err(|e| e.exception_name().to_owned())?
+        timing: &mut DevicePushTiming,
+        db_timing: &mut PushWorkerDbTiming,
+        attempt: &mut PushDeliveryAttempt<'_>,
+    ) -> Result<DevicePushResult, PushDeliveryError> {
+        let Some(request) = self.measured(
+            db_timing,
+            Some(device_id),
+            "LATEST_CONDITIONS_LOOKUP",
+            |tx| self.find_request(tx, message, device_id),
+        )?
         else {
             return Ok(DevicePushResult::skipped("LATEST_CONDITIONS"));
         };
-        let result = self
-            .sender
-            .send(&request)
-            .map_err(|failure| failure.exception)?;
+        let result = attempt.send(device_id, &*self.clock, || {
+            self.send_to_fcm(message, device_id, &request, timing)
+        })?;
         if result.status == DeviceStatus::Skipped {
-            self.log_skipped_message(message, Some(device_id), result.error_code.as_deref());
+            self.log_skipped_message(
+                message,
+                Some(device_id),
+                result.error_code.as_deref(),
+                Some(timing),
+            );
             return Ok(result);
         }
-        self.log_result(message, device_id, &result);
         if result.is_invalid_token() {
-            self.delete_invalid_token(message, device_id, &request);
+            self.delete_invalid_token(message, device_id, &request, db_timing);
         }
         Ok(result)
+    }
+
+    /// `sendToFcm`: 발송기를 부르고 결과(건너뜀 제외)를 로그에 남긴다. 발송기가 실패하면 로그를 남기고 예외 이름을 돌려준다
+    /// (발송 기록이 결과 불명으로 저장한다).
+    fn send_to_fcm(
+        &self,
+        message: &PushMessage,
+        device_id: Uuid,
+        request: &DevicePushRequest,
+        timing: &mut DevicePushTiming,
+    ) -> Result<DevicePushResult, String> {
+        match self.sender.send(request, timing) {
+            Err(failure) => {
+                self.log_device_failure(
+                    message,
+                    device_id,
+                    "worker_device_failed",
+                    &failure.exception,
+                    Some(timing),
+                );
+                Err(failure.exception)
+            }
+            Ok(result) => {
+                if result.status != DeviceStatus::Skipped {
+                    self.log_result(message, device_id, &result, timing);
+                }
+                Ok(result)
+            }
+        }
     }
 
     fn delete_invalid_token(
@@ -183,11 +274,12 @@ impl PushWorkerService {
         message: &PushMessage,
         device_id: Uuid,
         request: &DevicePushRequest,
+        db_timing: &mut PushWorkerDbTiming,
     ) {
         let outcome = FcmToken::new(&request.token)
             .map_err(|_| "BusinessException".to_owned())
             .and_then(|token| {
-                transact(&self.pool, |tx| {
+                self.measured(db_timing, Some(device_id), "INVALID_TOKEN_CLEANUP", |tx| {
                     Ok(PushDeviceRepository.delete_by_id_and_token_hash(
                         tx,
                         device_id,
@@ -202,6 +294,7 @@ impl PushWorkerService {
                 device_id,
                 "worker_invalid_token_cleanup_failed",
                 &exception,
+                None,
             );
         }
     }
@@ -367,7 +460,7 @@ impl PushWorkerService {
         device_id: Uuid,
         reason: &str,
     ) -> Option<DevicePushRequest> {
-        self.log_skipped_message(message, Some(device_id), Some(reason));
+        self.log_skipped_message(message, Some(device_id), Some(reason), None);
         None
     }
 
@@ -397,8 +490,10 @@ impl PushWorkerService {
         message: &PushMessage,
         device_id: Option<Uuid>,
         reason: Option<&str>,
+        timing: Option<&DevicePushTiming>,
     ) {
-        self.logger
+        let builder = self
+            .logger
             .info(WORKER_LOGGER)
             .field("type", TYPE_NOTIFICATION)
             .field("stage", "worker_skipped")
@@ -411,11 +506,17 @@ impl PushWorkerService {
             .field(
                 "notificationId",
                 message.notification_id.map(|id| id.to_string()),
-            )
-            .log("푸시 발송 조건 미충족");
+            );
+        add_request_timing(builder, timing).log("푸시 발송 조건 미충족");
     }
 
-    fn log_result(&self, message: &PushMessage, device_id: Uuid, result: &DevicePushResult) {
+    fn log_result(
+        &self,
+        message: &PushMessage,
+        device_id: Uuid,
+        result: &DevicePushResult,
+        timing: &DevicePushTiming,
+    ) {
         let builder = if result.is_permanent_failure() {
             self.logger.error(WORKER_LOGGER)
         } else if result.is_retryable() || result.is_invalid_token() {
@@ -423,7 +524,7 @@ impl PushWorkerService {
         } else {
             self.logger.info(WORKER_LOGGER)
         };
-        builder
+        let builder = builder
             .field("type", TYPE_NOTIFICATION)
             .field("stage", "fcm_result")
             .field("userId", message.user_id.to_string())
@@ -436,17 +537,16 @@ impl PushWorkerService {
             )
             .field("deviceId", device_id.to_string())
             .field("result", result.status.as_str())
-            .field("errorCode", result.error_code.as_deref())
-            .log("FCM 발송 요청 결과");
+            .field("errorCode", result.error_code.as_deref());
+        add_request_timing(builder, Some(timing)).log("FCM 발송 요청 결과");
     }
 
-    fn log_summary(
+    /// `createSummaryEvent`: 실패 원인은 기존 오류 로그로 추적하므로 요약은 INFO다(ERROR 지표를 중복 증가시키지 않는다).
+    fn summary_event(
         &self,
         message: &PushMessage,
-        target_count: usize,
-        counts: &Counts,
-        retryable: bool,
-    ) {
+        db_timing: &PushWorkerDbTiming,
+    ) -> EventBuilder<'_> {
         self.logger
             .info(WORKER_LOGGER)
             .field("type", TYPE_NOTIFICATION)
@@ -458,6 +558,24 @@ impl PushWorkerService {
             )
             .field("userId", message.user_id.to_string())
             .field("notificationType", message.kind.as_str())
+            .field("dbTransactionCount", db_timing.transactions.len())
+            .field("dbTransactionDurationMs", db_timing.duration_ms)
+            .field(
+                "dbTransactions",
+                Value::Array(db_timing.transactions.clone()),
+            )
+    }
+
+    fn log_summary(
+        &self,
+        message: &PushMessage,
+        target_count: usize,
+        counts: &Counts,
+        retryable: bool,
+        db_timing: &PushWorkerDbTiming,
+    ) {
+        self.summary_event(message, db_timing)
+            .field("processingCompleted", true)
             .field("targetCount", target_count)
             .field("acceptedCount", counts.of(DeviceStatus::Accepted))
             .field("retryableCount", counts.of(DeviceStatus::Retryable))
@@ -471,14 +589,28 @@ impl PushWorkerService {
             .log("푸시 기기 처리 결과 집계");
     }
 
+    fn log_summary_failed(
+        &self,
+        message: &PushMessage,
+        db_timing: &PushWorkerDbTiming,
+        exception: &str,
+    ) {
+        self.summary_event(message, db_timing)
+            .field("processingCompleted", false)
+            .field("errorCode", exception)
+            .log("푸시 처리 중단 시점의 DB 계측 집계");
+    }
+
     fn log_device_failure(
         &self,
         message: &PushMessage,
         device_id: Uuid,
         stage: &str,
         exception: &str,
+        timing: Option<&DevicePushTiming>,
     ) {
-        self.logger
+        let builder = self
+            .logger
             .error(WORKER_LOGGER)
             .field("type", TYPE_NOTIFICATION)
             .field("stage", stage)
@@ -491,8 +623,8 @@ impl PushWorkerService {
                 message.notification_id.map(|id| id.to_string()),
             )
             .field("deviceId", device_id.to_string())
-            .field("errorCode", exception)
-            .log("푸시 기기 처리 오류");
+            .field("errorCode", exception);
+        add_request_timing(builder, timing).log("푸시 기기 처리 오류");
     }
 }
 
@@ -534,5 +666,45 @@ impl Counts {
 
     fn of(&self, status: DeviceStatus) -> usize {
         self.0[Self::index(status)]
+    }
+}
+
+/// `addRequestTiming`: FCM 요청을 보냈을 때만 걸린 시간과 SDK 수락 여부를 덧붙인다.
+fn add_request_timing<'a>(
+    builder: EventBuilder<'a>,
+    timing: Option<&DevicePushTiming>,
+) -> EventBuilder<'a> {
+    match timing {
+        Some(timing) if timing.has_request() => builder
+            .field("fcmRequestDurationMs", timing.request_duration_ms())
+            .field("sdkAccepted", timing.sdk_accepted()),
+        _ => builder,
+    }
+}
+
+/// `PushWorkerDbTiming`: 메시지 하나를 처리하며 연 DB 트랜잭션의 종류별 소요 시간.
+#[derive(Default)]
+pub struct PushWorkerDbTiming {
+    transactions: Vec<Value>,
+    duration_ms: u64,
+}
+
+impl PushWorkerDbTiming {
+    /// `recordTransaction`. 항목의 키 순서는 `deviceId`, `operation`, `transactionCompleted`, `dbTransactionDurationMs`다.
+    fn record_transaction(
+        &mut self,
+        device_id: Option<Uuid>,
+        operation: &str,
+        elapsed: Elapsed,
+        completed: bool,
+    ) {
+        let duration_ms = elapsed.to_millis();
+        self.transactions.push(json!({
+            "deviceId": device_id.map(|id| id.to_string()),
+            "operation": operation,
+            "transactionCompleted": completed,
+            "dbTransactionDurationMs": duration_ms,
+        }));
+        self.duration_ms += duration_ms;
     }
 }

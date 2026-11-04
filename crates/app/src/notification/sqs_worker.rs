@@ -20,14 +20,17 @@ use chalkak_core::log::Logger;
 use chalkak_core::scheduler::ShutdownSignal;
 use chalkak_core::{Clock, mdc};
 use jiff::Timestamp;
+use serde_json::Value;
 
 use super::push_message::{RawPushMessage, parse_push_message};
 use super::push_worker::PushProcessor;
+use crate::common::Elapsed;
 
 pub(super) const SERVICE_LOGGER: &str =
     "com.chalkak.backend.notification.infrastructure.infra.SqsPushService";
 const TYPE_NOTIFICATION: &str = "notification";
 const RECEIVE_COUNT_ATTRIBUTE: &str = "ApproximateReceiveCount";
+const SENT_TIMESTAMP_ATTRIBUTE: &str = "SentTimestamp";
 /// 수신 한 번이 기다리는 시간(`waitTimeSeconds`).
 const LONG_POLL_SECONDS: u32 = 20;
 /// 수신한 메시지가 다른 소비자에게 숨는 시간(`visibilityTimeout`).
@@ -49,6 +52,8 @@ pub struct QueueMessage {
     pub body: String,
     /// `ApproximateReceiveCount` 시스템 속성
     pub receive_count: Option<String>,
+    /// `SentTimestamp` 시스템 속성(밀리초 문자열). 수신 요청이 이 속성을 요청해야 값이 온다. 없어도 처리에는 영향이 없다.
+    pub sent_timestamp: Option<String>,
 }
 
 /// 큐 호출 실패. `exception`은 로그의 `errorCode`로 남기는 예외 이름이다(메시지는 요청 내용이 섞일 수 있어 담지 않는다).
@@ -138,6 +143,7 @@ impl WorkerQueue for SqsWorkerQueue {
             .map_err(|e| failure_of(&e, true))?;
         Ok(messages.into_iter().next().map(|m| QueueMessage {
             receive_count: m.attribute(RECEIVE_COUNT_ATTRIBUTE).map(str::to_owned),
+            sent_timestamp: m.attribute(SENT_TIMESTAMP_ATTRIBUTE).map(str::to_owned),
             message_id: m.message_id,
             receipt_handle: m.receipt_handle,
             body: m.body,
@@ -368,66 +374,119 @@ impl SqsPushService {
     }
 
     /// `poll`: 메시지를 한 건 받아 처리한다. 수신이 실패하면 로그를 남기고 1초 쉰다(종료 신호가 오면 바로 깬다).
+    /// 수신에 걸린 시간을 재서 빈 응답·수신 로그·실패 로그에 싣는다.
     pub fn poll(&self) {
+        let elapsed = Elapsed::start();
         match self.queue.receive() {
-            Ok(Some(message)) => self.process(&message),
-            Ok(None) => {}
+            Ok(Some(message)) => self.process_received(&message, Some(elapsed.to_millis())),
+            Ok(None) => {
+                self.logger
+                    .debug(SERVICE_LOGGER)
+                    .field("type", TYPE_NOTIFICATION)
+                    .field("stage", "worker_sqs_receive")
+                    .field("received", false)
+                    .field("sqsMessageId", Value::Null)
+                    .field("receiveCount", Value::Null)
+                    .field("sqsReceiveDurationMs", elapsed.to_millis())
+                    .log("SQS 빈 수신 응답");
+            }
             Err(failure) => {
-                self.log_failure("worker_poll_failed", &failure.exception);
+                self.logger
+                    .error(SERVICE_LOGGER)
+                    .field("type", TYPE_NOTIFICATION)
+                    .field("stage", "worker_poll_failed")
+                    .field("phase", "RECEIVE")
+                    .field("sqsReceiveDurationMs", elapsed.to_millis())
+                    .field("errorCode", failure.exception.as_str())
+                    .log("푸시 작업 수신 오류");
                 self.shutdown.wait_timeout(POLL_FAILURE_WAIT);
             }
         }
     }
 
-    /// `process`: 수신한 메시지 하나를 끝까지 처리한다. 어떤 실패도 밖으로 내지 않는다.
+    /// `process(Message)`: 수신 시간을 모르는 채로 처리한다.
     pub fn process(&self, message: &QueueMessage) {
+        self.process_received(message, None);
+    }
+
+    /// `process(Message, Long)`: 수신한 메시지 하나를 끝까지 처리한다. 어떤 실패도 밖으로 내지 않는다. 처리 시도가 끝나면
+    /// 결과(`outcome`)·큐에서 기다린 시간·처리 시간을 한 줄로 남긴다.
+    pub fn process_received(&self, message: &QueueMessage, sqs_receive_duration_ms: Option<u64>) {
+        let elapsed = Elapsed::start();
+        let received_at = self.clock.now();
         let _context = mdc::enter(&[
             ("sqsMessageId", message.message_id.as_deref()),
             ("receiveCount", message.receive_count.as_deref()),
         ]);
         let extension = VisibilityExtension::start(self, message);
-        let outcome = self.process_message(message, &extension);
+        let processed = self.process_message(message, &extension, sqs_receive_duration_ms);
         // 자원 해제는 오류 로그보다 먼저다(`try-with-resources`).
         extension.close();
-        if let Err(exception) = outcome {
-            // 삭제하지 않는다. SQS가 다시 전달하거나 설정된 최대 수신 횟수 이후 DLQ로 이동한다.
-            self.log_failure("worker_processing_failed", &exception);
-        }
+        let outcome = match processed {
+            Ok(outcome) => outcome,
+            Err(failure) => {
+                // 삭제하지 않는다. SQS가 다시 전달하거나 설정된 최대 수신 횟수 이후 DLQ로 이동한다.
+                self.log_processing_failed(
+                    &failure.exception,
+                    sqs_receive_duration_ms,
+                    failure.received_logged,
+                );
+                "FAILED"
+            }
+        };
+        self.log_attempt_completed(message, received_at, elapsed, outcome);
     }
 
     fn process_message(
         &self,
         message: &QueueMessage,
         extension: &VisibilityExtension,
-    ) -> Result<(), String> {
+        sqs_receive_duration_ms: Option<u64>,
+    ) -> Result<&'static str, ProcessingFailure> {
+        let after_received = |exception: String| ProcessingFailure {
+            exception,
+            received_logged: true,
+        };
         let push = match parse_push_message(&message.body) {
-            Ok(Some(push)) => push,
-            Ok(None) => return extension.finish_attempt(|| self.delete(message)),
+            Ok(push) => push,
             Err(exception) => {
                 self.log_failure("worker_invalid_message", exception);
-                return extension.finish_attempt(|| self.delete(message));
+                None
             }
         };
-        self.log_received(&push);
-        let result = self.processor.process(&push)?;
-        extension.finish_attempt(|| {
-            if !result.retryable {
-                return self.delete(message);
-            }
-            self.postpone_retry(message, &push, result.retry_after)?;
-            self.logger
-                .info(SERVICE_LOGGER)
-                .field("type", TYPE_NOTIFICATION)
-                .field("stage", "worker_retry_pending")
-                .field("eventId", push.event_id.map(|id| id.to_string()))
-                .field("userId", push.user_id.map(|id| id.to_string()))
-                .field(
-                    "notificationId",
-                    push.notification_id.map(|id| id.to_string()),
-                )
-                .field("retryAfterSeconds", result.retry_after.as_secs())
-                .log("푸시 작업 재전달 대기");
-            Ok(())
+        self.log_received(push.as_ref(), sqs_receive_duration_ms);
+        let Some(push) = push else {
+            extension
+                .finish_attempt(|| self.delete(message))
+                .map_err(after_received)?;
+            return Ok("INVALID_MESSAGE_DELETED");
+        };
+        let result = self.processor.process(&push).map_err(after_received)?;
+        extension
+            .finish_attempt(|| {
+                if !result.retryable {
+                    return self.delete(message);
+                }
+                self.postpone_retry(message, &push, result.retry_after)?;
+                self.logger
+                    .info(SERVICE_LOGGER)
+                    .field("type", TYPE_NOTIFICATION)
+                    .field("stage", "worker_retry_pending")
+                    .field("eventId", push.event_id.map(|id| id.to_string()))
+                    .field("userId", push.user_id.map(|id| id.to_string()))
+                    .field(
+                        "notificationId",
+                        push.notification_id.map(|id| id.to_string()),
+                    )
+                    .field("retryAfterSeconds", result.retry_after.as_secs())
+                    .log("푸시 작업 재전달 대기");
+                Ok(())
+            })
+            .map_err(after_received)?;
+        Ok(if result.retryable {
+            "RETRY_PENDING"
+        } else {
+            "DELETED"
         })
     }
 
@@ -452,13 +511,27 @@ impl SqsPushService {
     }
 
     fn delete(&self, message: &QueueMessage) -> Result<(), String> {
-        self.queue
-            .delete(receipt(message)?)
-            .map_err(|f| f.exception)?;
+        let elapsed = Elapsed::start();
+        let deleted = receipt(message).and_then(|handle| {
+            self.queue
+                .delete(handle)
+                .map_err(|failure| failure.exception)
+        });
+        if let Err(exception) = deleted {
+            // 기존 `worker_processing_failed`만 ERROR로 남겨 오류 지표를 중복 집계하지 않는다.
+            self.logger
+                .info(SERVICE_LOGGER)
+                .field("type", TYPE_NOTIFICATION)
+                .field("stage", "worker_sqs_delete_failed")
+                .field("sqsDeleteDurationMs", elapsed.to_millis())
+                .log("SQS 삭제 요청 실패 시간");
+            return Err(exception);
+        }
         self.logger
             .info(SERVICE_LOGGER)
             .field("type", TYPE_NOTIFICATION)
             .field("stage", "worker_message_deleted")
+            .field("sqsDeleteDurationMs", elapsed.to_millis())
             .log("SQS 푸시 작업 완료");
         Ok(())
     }
@@ -472,21 +545,81 @@ impl SqsPushService {
             .log("푸시 작업 처리 오류");
     }
 
-    fn log_received(&self, push: &RawPushMessage) {
-        self.logger
+    fn log_processing_failed(
+        &self,
+        exception: &str,
+        sqs_receive_duration_ms: Option<u64>,
+        received_logged: bool,
+    ) {
+        let mut event = self
+            .logger
+            .error(SERVICE_LOGGER)
+            .field("type", TYPE_NOTIFICATION)
+            .field("stage", "worker_processing_failed")
+            .field("errorCode", exception);
+        if !received_logged && let Some(millis) = sqs_receive_duration_ms {
+            event = event.field("sqsReceiveDurationMs", millis);
+        }
+        event.log("푸시 작업 처리 오류");
+    }
+
+    fn log_received(&self, push: Option<&RawPushMessage>, sqs_receive_duration_ms: Option<u64>) {
+        let mut event = self
+            .logger
             .info(SERVICE_LOGGER)
             .field("type", TYPE_NOTIFICATION)
             .field("stage", "worker_received")
-            .field("eventId", push.event_id.map(|id| id.to_string()))
-            .field(
-                "notificationId",
-                push.notification_id.map(|id| id.to_string()),
-            )
-            .field("userId", push.user_id.map(|id| id.to_string()))
-            .field("notificationType", push.kind.map(|k| k.as_str()))
-            .field("sourceId", push.source_id.map(|id| id.to_string()))
-            .log("푸시 작업 수신");
+            .field("received", true)
+            .field("messageParsed", push.is_some());
+        if let Some(millis) = sqs_receive_duration_ms {
+            event = event.field("sqsReceiveDurationMs", millis);
+        }
+        if let Some(push) = push {
+            event = event
+                .field("eventId", push.event_id.map(|id| id.to_string()))
+                .field(
+                    "notificationId",
+                    push.notification_id.map(|id| id.to_string()),
+                )
+                .field("userId", push.user_id.map(|id| id.to_string()))
+                .field("notificationType", push.kind.map(|k| k.as_str()))
+                .field("sourceId", push.source_id.map(|id| id.to_string()));
+        }
+        event.log("푸시 작업 수신");
     }
+
+    fn log_attempt_completed(
+        &self,
+        message: &QueueMessage,
+        received_at: Timestamp,
+        elapsed: Elapsed,
+        outcome: &str,
+    ) {
+        self.logger
+            .info(SERVICE_LOGGER)
+            .field("type", TYPE_NOTIFICATION)
+            .field("stage", "worker_attempt_completed")
+            .field("outcome", outcome)
+            .field("queueAgeMs", find_queue_age_millis(message, received_at))
+            .field("processingDurationMs", elapsed.to_millis())
+            .log("푸시 처리 시도 종료");
+    }
+}
+
+/// 처리 도중 실패. `received_logged`는 `worker_received`를 이미 남겼는지다(수신 시간은 둘 중 한 곳에만 싣는다).
+struct ProcessingFailure {
+    exception: String,
+    received_logged: bool,
+}
+
+/// `findQueueAgeMillis`: 큐에 보낸 시각(`SentTimestamp`)부터 받은 시각까지. 값이 없거나 숫자가 아니거나 음수이거나 미래이면 `None`이다.
+fn find_queue_age_millis(message: &QueueMessage, received_at: Timestamp) -> Option<i64> {
+    let sent_at = message.sent_timestamp.as_deref()?.parse::<i64>().ok()?;
+    let received_millis = received_at.as_millisecond();
+    if sent_at < 0 || sent_at > received_millis {
+        return None;
+    }
+    Some(received_millis - sent_at)
 }
 
 fn receipt(message: &QueueMessage) -> Result<&str, String> {

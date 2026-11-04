@@ -25,7 +25,10 @@ use jiff::Timestamp;
 
 use self::message::FcmMessage;
 use super::domain::is_push_expired_at;
-use super::push_sender::{DevicePushRequest, DevicePushResult, DevicePushSender, SenderFailure};
+use super::push_sender::{
+    DevicePushRequest, DevicePushResult, DevicePushSender, DevicePushTiming, SenderFailure,
+};
+use crate::common::Elapsed;
 
 /// `MINIMUM_RETRY_DELAY`: 재시도 지연의 최소 간격
 const MINIMUM_RETRY_DELAY: Duration = Duration::from_secs(60);
@@ -192,13 +195,21 @@ impl FcmDevicePushSender {
 }
 
 impl DevicePushSender for FcmDevicePushSender {
-    fn send(&self, request: &DevicePushRequest) -> Result<DevicePushResult, SenderFailure> {
+    fn send(
+        &self,
+        request: &DevicePushRequest,
+        timing: &mut DevicePushTiming,
+    ) -> Result<DevicePushResult, SenderFailure> {
         let now = self.clock.now();
         if is_push_expired_at(request.expires_at, now) {
             return Ok(DevicePushResult::skipped("EXPIRED"));
         }
         let message = create_message(request, now)?;
-        match self.messaging.send(&message) {
+        // `sendToFcm`: 메시지 생성은 시간에 넣지 않고, SDK 호출만 재서 결과와 상관없이 남긴다.
+        let elapsed = Elapsed::start();
+        let sent = self.messaging.send(&message);
+        timing.record_request(elapsed, sent.is_ok());
+        match sent {
             Ok(()) => Ok(DevicePushResult::accepted()),
             Err(MessagingFailure::Exception(exception)) => Ok(self.to_result(&exception)),
             Err(MessagingFailure::Thrown(name)) => Err(SenderFailure::new(name)),

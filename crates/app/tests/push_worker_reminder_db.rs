@@ -6,7 +6,7 @@ use chalkak_app::notification::domain::{NotificationSourceType, NotificationType
 use chalkak_app::notification::push_device::FcmToken;
 use chalkak_app::notification::push_message::RawPushMessage;
 use chalkak_app::notification::push_sender::{
-    DevicePushRequest, DevicePushResult, DevicePushSender, SenderFailure,
+    DevicePushRequest, DevicePushResult, DevicePushSender, DevicePushTiming, SenderFailure,
 };
 use chalkak_app::notification::push_worker::PushWorkerService;
 use chalkak_app::testing::TestDb;
@@ -68,7 +68,11 @@ struct FakeSender {
 }
 
 impl DevicePushSender for FakeSender {
-    fn send(&self, request: &DevicePushRequest) -> Result<DevicePushResult, SenderFailure> {
+    fn send(
+        &self,
+        request: &DevicePushRequest,
+        _timing: &mut DevicePushTiming,
+    ) -> Result<DevicePushResult, SenderFailure> {
         self.requests.lock().unwrap().push(request.clone());
         Ok(DevicePushResult::accepted())
     }

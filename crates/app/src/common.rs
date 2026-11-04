@@ -211,6 +211,25 @@ pub fn parse_canonical_uuid(text: &str) -> Option<Uuid> {
         .then_some(uuid)
 }
 
+/// 원본 `common/logging/Elapsed`: 시작한 뒤 흐른 시간을 밀리초(내림)로 읽는 단조 시계 측정기.
+#[derive(Clone, Copy, Debug)]
+pub struct Elapsed {
+    started: std::time::Instant,
+}
+
+impl Elapsed {
+    pub fn start() -> Self {
+        Self {
+            started: std::time::Instant::now(),
+        }
+    }
+
+    /// `toMillis`: `TimeUnit.NANOSECONDS.toMillis`처럼 내림한다.
+    pub fn to_millis(self) -> u64 {
+        u64::try_from(self.started.elapsed().as_millis()).unwrap_or(u64::MAX)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

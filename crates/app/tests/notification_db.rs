@@ -373,7 +373,7 @@ fn mark_all_read_marks_every_own_unread_notification() {
 // ---------------------------------------------------------------------------------------------
 
 const NOW: &str = "2026-09-29T00:00:00Z";
-const NORMAL_THRESHOLD: &str = "2026-07-31T00:00:00Z"; // NOW - 60일
+const NORMAL_THRESHOLD: &str = "2026-08-30T00:00:00Z"; // NOW - 30일
 const WITHDRAWN_THRESHOLD: &str = "2026-08-30T00:00:00Z"; // NOW - 30일
 
 struct Cleanup {
@@ -435,9 +435,9 @@ fn run_cleanup(db: &TestDb) {
     tx.commit().unwrap();
 }
 
-// NotificationCleanupSchedulerTest#deleteExpiredNotifications_activeUser_deletesOnlyOlderThanSixtyDays
+// NotificationCleanupSchedulerTest#deleteExpiredNotifications_activeUser_deletesOnlyOlderThanThirtyDays
 #[test]
-fn cleanup_active_user_deletes_only_older_than_sixty_days() {
+fn cleanup_active_user_deletes_only_older_than_thirty_days() {
     let Some(c) = cleanup_fixture() else { return };
     let expired = insert_cleanup_notification(&c.db, USER_ID, &shift(NORMAL_THRESHOLD, -1));
     let on_boundary = insert_cleanup_notification(&c.db, USER_ID, NORMAL_THRESHOLD);
@@ -483,6 +483,116 @@ fn cleanup_recent_withdrawal_keeps_older_notification() {
     run_cleanup(&c.db);
 
     assert!(exists(&c.db, notification));
+}
+
+fn insert_delivery(db: &TestDb, user: &str, created_at: &str) -> Uuid {
+    let delivery_id = Uuid::new_v4();
+    db.client()
+        .execute(
+            "INSERT INTO push_deliveries (id, event_id, user_id, created_at) VALUES ($1, $2, $3, $4)",
+            &[&delivery_id, &Uuid::new_v4(), &id(user), &ts(created_at)],
+        )
+        .unwrap();
+    delivery_id
+}
+
+fn delivery_exists(db: &TestDb, delivery_id: Uuid) -> bool {
+    db.client()
+        .query_one(
+            "SELECT EXISTS(SELECT 1 FROM push_deliveries WHERE id = $1)",
+            &[&delivery_id],
+        )
+        .unwrap()
+        .get(0)
+}
+
+// NotificationCleanupSchedulerTest#deleteExpiredNotifications_deliveryRetention_matchesNotificationBoundary
+#[test]
+fn cleanup_delivery_retention_matches_notification_boundary() {
+    for (status, seconds, retained) in [
+        ("ACTIVE", -1, false),
+        ("ACTIVE", 0, true),
+        ("ACTIVE", 1, true),
+        ("BANNED", -1, false),
+        ("BANNED", 0, true),
+    ] {
+        let Some(c) = cleanup_fixture() else { return };
+        c.db.client()
+            .execute(
+                "UPDATE users SET status = CAST(CAST($1 AS text) AS user_status) WHERE id = $2",
+                &[&status, &id(USER_ID)],
+            )
+            .unwrap();
+        let delivery = insert_delivery(&c.db, USER_ID, &shift(NORMAL_THRESHOLD, seconds));
+
+        run_cleanup(&c.db);
+
+        assert_eq!(
+            delivery_exists(&c.db, delivery),
+            retained,
+            "{status} {seconds}"
+        );
+    }
+}
+
+// NotificationCleanupSchedulerTest#deleteExpiredNotifications_withdrawnDeliveries_followWithdrawalBoundary
+#[test]
+fn cleanup_withdrawn_deliveries_follow_withdrawal_boundary() {
+    for (seconds, retained) in [(-1, false), (0, true), (1, true)] {
+        let Some(c) = cleanup_fixture() else { return };
+        c.db.client()
+            .execute(
+                "UPDATE users SET deleted_at = $1 WHERE id = $2",
+                &[
+                    &ts(&shift(WITHDRAWN_THRESHOLD, seconds)),
+                    &id(OTHER_USER_ID),
+                ],
+            )
+            .unwrap();
+        let old = insert_delivery(&c.db, OTHER_USER_ID, &shift(NORMAL_THRESHOLD, -1));
+        let recent = insert_delivery(&c.db, OTHER_USER_ID, &shift(NOW, -1));
+
+        run_cleanup(&c.db);
+
+        assert_eq!(delivery_exists(&c.db, old), retained, "{seconds}");
+        assert_eq!(delivery_exists(&c.db, recent), retained, "{seconds}");
+    }
+}
+
+// NotificationCleanupSchedulerTest#deleteExpiredNotifications_pendingOrCompletedDelivery_usesRetentionPeriod
+// NotificationCleanupSchedulerTest#deleteExpiredNotifications_completedDelivery_deletesDeviceResultsTogether
+#[test]
+fn cleanup_deletes_expired_deliveries_regardless_of_status() {
+    for withdrawn in [false, true] {
+        for completed in [false, true] {
+            let Some(c) = cleanup_fixture() else { return };
+            let user = if withdrawn { OTHER_USER_ID } else { USER_ID };
+            if withdrawn {
+                c.db.client()
+                    .execute(
+                        "UPDATE users SET deleted_at = $1 WHERE id = $2",
+                        &[&ts(&shift(WITHDRAWN_THRESHOLD, -1)), &id(OTHER_USER_ID)],
+                    )
+                    .unwrap();
+            }
+            let delivery = insert_delivery(&c.db, user, &shift(NORMAL_THRESHOLD, -1));
+            if completed {
+                c.db.client()
+                    .execute(
+                        "UPDATE push_deliveries SET status = 'COMPLETED', \
+                         completed_at = clock_timestamp(), \
+                         device_results = jsonb_build_object('test-device', \
+                             jsonb_build_object('status', 'ACCEPTED')) WHERE id = $1",
+                        &[&delivery],
+                    )
+                    .unwrap();
+            }
+
+            run_cleanup(&c.db);
+
+            assert!(!delivery_exists(&c.db, delivery), "{withdrawn} {completed}");
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------------------------

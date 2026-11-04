@@ -1,4 +1,4 @@
-//! 보관 기간이 지난 알림 정리. 원본 `NotificationCleanupScheduler.deleteExpiredNotifications`의 본문이다.
+//! 보관 기간이 지난 알림과 푸시 발송 기록 정리. 원본 `NotificationCleanupScheduler.deleteExpiredNotifications`의 본문이다.
 //!
 //! 스케줄(`0 50 4 * * *`, Asia/Seoul)은 주기 작업 이슈에서 건다. 여기에는 쿼리를 호출하는 함수만 둔다.
 
@@ -8,10 +8,11 @@ use chalkak_db::Db;
 use chalkak_db::DbError;
 use jiff::{SignedDuration, Timestamp};
 
+use super::push_delivery::PushDeliveryRepository;
 use super::repository::NotificationRepository;
 
 /// 탈퇴하지 않은 회원의 알림 보관 기간.
-pub const NORMAL_RETENTION: Duration = Duration::from_secs(60 * 24 * 60 * 60);
+pub const NORMAL_RETENTION: Duration = Duration::from_secs(30 * 24 * 60 * 60);
 /// 탈퇴한 회원의 알림 보관 기간(탈퇴 시각부터).
 pub const WITHDRAWN_RETENTION: Duration = Duration::from_secs(30 * 24 * 60 * 60);
 
@@ -34,6 +35,10 @@ pub fn delete_expired_notifications(tx: &mut impl Db, now: Timestamp) -> Result<
     let active_users = repository.delete_expired_for_active_users(tx, minus(NORMAL_RETENTION))?;
     let withdrawn_users =
         repository.delete_expired_for_withdrawn_users(tx, minus(WITHDRAWN_RETENTION))?;
+    // 푸시 발송 기록도 알림과 같은 보관 기준으로 정리한다(결과 수는 원본도 쓰지 않는다).
+    let deliveries = PushDeliveryRepository;
+    deliveries.delete_expired_for_active_users(tx, minus(NORMAL_RETENTION))?;
+    deliveries.delete_expired_for_withdrawn_users(tx, minus(WITHDRAWN_RETENTION))?;
     Ok(Deleted {
         active_users,
         withdrawn_users,

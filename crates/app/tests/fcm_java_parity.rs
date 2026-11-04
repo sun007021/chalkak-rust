@@ -18,7 +18,9 @@ use chalkak_app::notification::fcm::client::FirebaseMessagingClient;
 use chalkak_app::notification::fcm::transport::{
     ExchangeError, ExchangeRequest, ExchangeResponse, HttpExchange,
 };
-use chalkak_app::notification::push_sender::{DevicePushRequest, DevicePushSender};
+use chalkak_app::notification::push_sender::{
+    DevicePushRequest, DevicePushSender, DevicePushTiming,
+};
 use chalkak_app::notification::sqs_push::PushMessage;
 use chalkak_core::{Clock, FixedClock};
 use jiff::{SignedDuration, Timestamp};
@@ -207,7 +209,7 @@ fn case_request() -> DevicePushRequest {
 }
 
 fn outcome(sender: &FcmDevicePushSender, request: &DevicePushRequest) -> String {
-    match sender.send(request) {
+    match sender.send(request, &mut DevicePushTiming::default()) {
         Ok(result) => format!(
             "status={} errorCode={} retryAfter={}",
             result.status.as_str(),
@@ -515,7 +517,9 @@ fn 요청_바이트와_헤더가_원본_기록과_같다() {
     assert_eq!(rows.len(), requests.len());
     for ((name, request), row) in requests.iter().zip(&rows) {
         assert!(row.starts_with(&format!("REQUEST\t{name}\t")), "{name}");
-        let result = sender.send(request).unwrap();
+        let result = sender
+            .send(request, &mut DevicePushTiming::default())
+            .unwrap();
         assert_eq!(result.status.as_str(), "ACCEPTED", "{name}");
         let seen = transport.fcm.lock().unwrap().last().cloned().unwrap();
         let (head, expected_body) = recorded_request(row);
@@ -565,7 +569,9 @@ fn 요청_바이트와_헤더가_원본_기록과_같다() {
 fn 토큰_요청은_원본_기록과_같다() {
     let transport = Transport::new(Server::new());
     let sender = sender(&transport);
-    sender.send(&case_request()).unwrap();
+    sender
+        .send(&case_request(), &mut DevicePushTiming::default())
+        .unwrap();
     let seen = transport.tokens.lock().unwrap()[0].clone();
     let row = EXPECTED
         .lines()

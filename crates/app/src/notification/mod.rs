@@ -19,6 +19,9 @@ pub mod fcm;
 pub mod notice;
 pub mod publication_monitor;
 pub mod push_api;
+pub mod push_delivery;
+#[cfg(test)]
+mod push_delivery_tests;
 pub mod push_device;
 pub mod push_event_id;
 pub mod push_message;

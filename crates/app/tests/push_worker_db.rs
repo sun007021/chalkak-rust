@@ -13,7 +13,8 @@ use chalkak_app::notification::notice::{Notice, NoticeRepository};
 use chalkak_app::notification::push_device::FcmToken;
 use chalkak_app::notification::push_message::RawPushMessage;
 use chalkak_app::notification::push_sender::{
-    DevicePushRequest, DevicePushResult, DevicePushSender, PushProcessingResult, SenderFailure,
+    DevicePushRequest, DevicePushResult, DevicePushSender, DevicePushTiming, PushProcessingResult,
+    SenderFailure,
 };
 use chalkak_app::notification::push_worker::PushWorkerService;
 use chalkak_app::notification::repository::NotificationRepository;
@@ -78,6 +79,8 @@ type Responder =
 struct FakeSender {
     responder: Mutex<Responder>,
     requests: Mutex<Vec<DevicePushRequest>>,
+    /// 참이면 실제 발송기처럼 요청 시간을 `DevicePushTiming`에 남긴다.
+    record_timing: std::sync::atomic::AtomicBool,
 }
 
 impl FakeSender {
@@ -85,6 +88,7 @@ impl FakeSender {
         Arc::new(FakeSender {
             responder: Mutex::new(Box::new(|_| Ok(DevicePushResult::accepted()))),
             requests: Mutex::new(Vec::new()),
+            record_timing: std::sync::atomic::AtomicBool::new(false),
         })
     }
 
@@ -116,9 +120,18 @@ impl FakeSender {
 }
 
 impl DevicePushSender for FakeSender {
-    fn send(&self, request: &DevicePushRequest) -> Result<DevicePushResult, SenderFailure> {
+    fn send(
+        &self,
+        request: &DevicePushRequest,
+        timing: &mut DevicePushTiming,
+    ) -> Result<DevicePushResult, SenderFailure> {
         self.requests.lock().unwrap().push(request.clone());
-        (self.responder.lock().unwrap())(request)
+        let outcome = (self.responder.lock().unwrap())(request);
+        if self.record_timing.load(std::sync::atomic::Ordering::SeqCst) {
+            let accepted = outcome.as_ref().is_ok_and(DevicePushResult::is_accepted);
+            timing.record_request(chalkak_app::common::Elapsed::start(), accepted);
+        }
+        outcome
     }
 }
 
@@ -433,8 +446,10 @@ fn 모든_기기가_일시_실패하면_재전달을_요청하며_가장_긴_ret
     assert_eq!(result.retry_after, Duration::from_secs(120));
 }
 
+// PushWorkerServiceTest#process_partialAcceptance_retriesOnlyFailedDevice
+// 일부 기기가 수락돼도 일시 실패 기기는 재전달에서 다시 보내고, 수락한 기기는 다시 보내지 않으며, 모두 끝나면 완료한다.
 #[test]
-fn 기기_하나라도_수락되면_나머지_일시_실패를_재시도하지_않는다() {
+fn 일부_기기가_수락돼도_일시_실패_기기만_재전달에서_다시_보내고_모두_종료되면_완료한다() {
     let Some(a) = approved() else { return };
     a.fx.add_device("second-token");
     a.fx.sender.queue(vec![
@@ -443,41 +458,77 @@ fn 기기_하나라도_수락되면_나머지_일시_실패를_재시도하지_�
             Duration::from_secs(60),
         )),
         ok(DevicePushResult::accepted()),
+        ok(DevicePushResult::accepted()),
     ]);
-    assert!(!a.fx.process(&a.fx.message).retryable);
+    let first = a.fx.process(&a.fx.message);
+    assert!(first.retryable);
+    assert_eq!(first.retry_after, Duration::from_secs(60));
     assert_eq!(a.fx.sender.calls(), 2);
     let summary = a.fx.lines.at_stage("worker_summary");
     assert_eq!(summary.len(), 1);
     assert_eq!(summary[0]["targetCount"], 2);
     assert_eq!(summary[0]["acceptedCount"], 1);
     assert_eq!(summary[0]["retryableCount"], 1);
-    assert_eq!(summary[0]["retryable"], false);
+    assert_eq!(summary[0]["retryable"], true);
+    assert_eq!(delivery_status(&a.fx), "PENDING");
+
+    let repeated = a.fx.process_at(plus(a.fx.now, 60), &a.fx.message);
+
+    assert!(!repeated.retryable);
+    // 수락한 기기는 다시 보내지 않아 발송기는 한 번만 더 불린다.
+    assert_eq!(a.fx.sender.calls(), 3);
+    assert_eq!(delivery_status(&a.fx), "COMPLETED");
+    assert_eq!(accepted_device_count(&a.fx), 2);
 }
 
+/// `push_deliveries`의 상태(없으면 `NONE`).
+fn delivery_status(fx: &Fx) -> String {
+    fx.db
+        .client()
+        .query_opt(
+            "SELECT status FROM push_deliveries WHERE event_id = $1 AND user_id = $2",
+            &[&fx.message.event_id, &fx.user],
+        )
+        .unwrap()
+        .map_or_else(|| "NONE".to_owned(), |row| row.get(0))
+}
+
+fn accepted_device_count(fx: &Fx) -> i64 {
+    fx.db
+        .client()
+        .query_one(
+            "SELECT count(*) FROM push_deliveries d, jsonb_each(d.device_results) r \
+             WHERE d.event_id = $1 AND d.user_id = $2 AND r.value ->> 'status' = 'ACCEPTED'",
+            &[&fx.message.event_id, &fx.user],
+        )
+        .unwrap()
+        .get(0)
+}
+
+// PushWorkerServiceTest#process_acceptedThenDeviceException_preservesAcceptanceAndRetries
 #[test]
-fn 첫_기기_수락_후_다음_기기의_예외가_발생해도_사용자_작업을_완료한다() {
+fn 첫_기기_수락_후_다른_기기의_결과가_불명확하면_수락_이력을_보존하고_재처리한다() {
     let Some(a) = approved() else { return };
     a.fx.add_device("second-token");
     a.fx.sender
         .queue(vec![ok(DevicePushResult::accepted()), boom()]);
-    assert_eq!(
-        a.fx.process(&a.fx.message),
-        PushProcessingResult::completed()
-    );
+    let result = a.fx.process(&a.fx.message);
+    assert!(result.retryable);
     assert_eq!(a.fx.sender.calls(), 2);
+    assert_eq!(delivery_status(&a.fx), "PENDING");
+    assert_eq!(accepted_device_count(&a.fx), 1);
 }
 
+// PushWorkerServiceTest#process_deviceExceptionThenAccepted_retriesUnknownDevice
 #[test]
-fn 첫_기기의_예외가_발생해도_다음_기기를_발송하고_수락되면_완료한다() {
+fn 첫_기기가_결과_불명이어도_다음_기기는_발송하고_미확정_기기는_재처리한다() {
     let Some(a) = approved() else { return };
     a.fx.add_device("second-token");
     a.fx.sender
         .queue(vec![boom(), ok(DevicePushResult::accepted())]);
-    assert_eq!(
-        a.fx.process(&a.fx.message),
-        PushProcessingResult::completed()
-    );
+    assert!(a.fx.process(&a.fx.message).retryable);
     assert_eq!(a.fx.sender.calls(), 2);
+    assert_eq!(delivery_status(&a.fx), "PENDING");
 }
 
 #[test]
@@ -1011,17 +1062,24 @@ fn 재전달_때는_당시의_기기를_다시_조회하고_새_등록_기기로
     assert_eq!(tokens, vec!["topic-token", "new-topic-token"]);
 }
 
+// PushWorkerTopicTest: 주제도 일부 기기가 수락돼도 일시 실패 기기는 다음 수신에서 다시 보낸다.
 #[test]
-fn 주제도_기기_하나가_수락하면_다른_기기의_실패를_재시도하지_않는다() {
+fn 주제도_기기_하나가_수락해도_다른_기기의_실패는_재전달에서_이어_보낸다() {
     let Some(t) = topic_fx() else { return };
     t.fx.add_device("second-topic-token");
     t.fx.sender.queue(vec![
         ok(DevicePushResult::accepted()),
         ok(DevicePushResult::retryable("UNAVAILABLE")),
+        ok(DevicePushResult::accepted()),
     ]);
-    let result = t.fx.process_at(plus(t.fx.now, 60), &t.fx.message);
-    assert_eq!(result, PushProcessingResult::completed());
+    let first = t.fx.process_at(plus(t.fx.now, 60), &t.fx.message);
+    assert!(first.retryable);
     assert_eq!(t.fx.sender.calls(), 2);
+
+    let second = t.fx.process_at(plus(t.fx.now, 120), &t.fx.message);
+
+    assert_eq!(second, PushProcessingResult::completed());
+    assert_eq!(t.fx.sender.calls(), 3);
 }
 
 #[test]
@@ -1194,4 +1252,462 @@ fn 배포_후_삭제된_공지의_알림은_보내지_않는다() {
     fx.execute_at("UPDATE notices SET deleted_at = $1", fx.now);
     let result = fx.process(&fx.message);
     assert_skipped(&fx, result, "NOTIFICATION_UNAVAILABLE");
+}
+
+// ---------------------------------------------------------------------------------------------
+// 푸시 발송 기록(push_deliveries)과 처리 시간 계측: PushWorkerServiceTest, PushWorkerTopicTest의 기록 관련 시험
+// ---------------------------------------------------------------------------------------------
+
+/// 이 사건·회원의 기기별 결과(`device_results`). 기록이 없으면 `Null`.
+fn device_results(fx: &Fx) -> Value {
+    fx.db
+        .client()
+        .query_opt(
+            "SELECT device_results::text FROM push_deliveries WHERE event_id = $1 AND user_id = $2",
+            &[&fx.message.event_id, &fx.user],
+        )
+        .unwrap()
+        .map_or(Value::Null, |row| {
+            serde_json::from_str(&row.get::<_, String>(0)).unwrap()
+        })
+}
+
+fn result_of(results: &Value, device: Uuid) -> &Value {
+    &results[device.to_string()]
+}
+
+fn processing_failed_codes(fx: &Fx) -> Vec<String> {
+    fx.lines
+        .at_stage("worker_device_failed")
+        .iter()
+        .map(|log| log["errorCode"].as_str().unwrap().to_owned())
+        .collect()
+}
+
+// PushWorkerServiceTest#process_transientRedelivery_recordsAttemptsWithoutInternalRetryLoop
+#[test]
+fn 명확한_일시_실패는_기록을_남기고_다음_수신에서만_다시_발송한다() {
+    let Some(t) = topic_fx() else { return };
+    let device = t.fx.device_ids()[0];
+    t.fx.sender.queue(vec![
+        ok(DevicePushResult::retryable("UNAVAILABLE")),
+        ok(DevicePushResult::accepted()),
+    ]);
+
+    let first = t.fx.process_at(plus(t.fx.now, 60), &t.fx.message);
+
+    assert!(first.retryable);
+    // 같은 수신 안에서 되풀이하지 않는다.
+    assert_eq!(t.fx.sender.calls(), 1);
+    let recorded = device_results(&t.fx);
+    assert_eq!(result_of(&recorded, device)["status"], "RETRYABLE");
+    assert_eq!(result_of(&recorded, device)["attemptCount"], 1);
+    assert_eq!(result_of(&recorded, device)["lastErrorCode"], "UNAVAILABLE");
+
+    let second = t.fx.process_at(plus(t.fx.now, 120), &t.fx.message);
+
+    assert!(!second.retryable);
+    assert_eq!(t.fx.sender.calls(), 2);
+    let recorded = device_results(&t.fx);
+    assert_eq!(result_of(&recorded, device)["status"], "ACCEPTED");
+    assert_eq!(result_of(&recorded, device)["attemptCount"], 2);
+    assert_eq!(delivery_status(&t.fx), "COMPLETED");
+}
+
+// PushWorkerServiceTest#process_unknownResult_preservesUncertaintyAndRetriesOnRedelivery
+#[test]
+fn sdk_호출_중_예상하지_못한_예외는_결과_불명으로_기록하고_다음_수신에서_재처리한다() {
+    let Some(t) = topic_fx() else { return };
+    let device = t.fx.device_ids()[0];
+    t.fx.sender
+        .queue(vec![boom(), ok(DevicePushResult::accepted())]);
+
+    let first = t.fx.process_at(plus(t.fx.now, 60), &t.fx.message);
+
+    assert!(first.retryable);
+    let recorded = device_results(&t.fx);
+    assert_eq!(result_of(&recorded, device)["status"], "UNKNOWN");
+    assert_eq!(
+        result_of(&recorded, device)["lastErrorCode"],
+        "IllegalStateException"
+    );
+    assert_eq!(delivery_status(&t.fx), "PENDING");
+    assert_eq!(
+        processing_failed_codes(&t.fx),
+        vec!["IllegalStateException".to_owned()]
+    );
+
+    let second = t.fx.process_at(plus(t.fx.now, 120), &t.fx.message);
+
+    assert!(!second.retryable);
+    assert_eq!(delivery_status(&t.fx), "COMPLETED");
+    assert_eq!(
+        t.fx.lines
+            .at_stage("worker_delivery_previous_unknown")
+            .len(),
+        1
+    );
+}
+
+// PushWorkerServiceTest#process_mixedDeviceResults_retriesOnlyTransientFailure
+#[test]
+fn 종료된_기기는_반복_발송하지_않고_일시_실패한_기기만_재처리한다() {
+    for terminal in ["PERMANENT_FAILURE", "INVALID_TOKEN", "SKIPPED", "ACCEPTED"] {
+        let Some(t) = topic_fx() else { return };
+        t.fx.add_device("second-topic-token");
+        let first_result = match terminal {
+            "PERMANENT_FAILURE" => DevicePushResult::permanent_failure("SENDER_ID_MISMATCH"),
+            "INVALID_TOKEN" => DevicePushResult::invalid_token("UNREGISTERED"),
+            "SKIPPED" => DevicePushResult::skipped("EXPIRED"),
+            _ => DevicePushResult::accepted(),
+        };
+        t.fx.sender.queue(vec![
+            ok(first_result),
+            ok(DevicePushResult::retryable("UNAVAILABLE")),
+            ok(DevicePushResult::accepted()),
+        ]);
+
+        assert!(
+            t.fx.process_at(plus(t.fx.now, 60), &t.fx.message).retryable,
+            "{terminal}"
+        );
+        assert!(
+            !t.fx
+                .process_at(plus(t.fx.now, 120), &t.fx.message)
+                .retryable,
+            "{terminal}"
+        );
+
+        // 두 번째 수신에서는 일시 실패했던 기기 하나만 다시 보냈다.
+        assert_eq!(t.fx.sender.calls(), 3, "{terminal}");
+        assert_eq!(delivery_status(&t.fx), "COMPLETED", "{terminal}");
+    }
+}
+
+// PushWorkerServiceTest#process_failedDeviceBecomesIneligible_completesWithoutResending
+#[test]
+fn 일시_실패_기기의_최신_발송_조건이_무효가_되면_재요청하지_않고_처리를_종료한다() {
+    for changed in ["pushDisabled", "deviceDeleted", "topicSubmitted"] {
+        let Some(t) = topic_fx() else { return };
+        t.fx.sender
+            .queue(vec![ok(DevicePushResult::retryable("UNAVAILABLE"))]);
+        assert!(t.fx.process_at(plus(t.fx.now, 60), &t.fx.message).retryable);
+        match changed {
+            "pushDisabled" => t.fx.execute("UPDATE users SET topic_push_enabled = false"),
+            "deviceDeleted" => t.fx.execute("DELETE FROM push_devices"),
+            _ => insert_post(&t.fx.db, t.fx.now, t.fx.user, t.topic, "APPROVED", false),
+        }
+
+        let repeated = t.fx.process_at(plus(t.fx.now, 120), &t.fx.message);
+
+        assert!(!repeated.retryable, "{changed}");
+        assert_eq!(t.fx.sender.calls(), 1, "{changed}");
+        assert_eq!(delivery_status(&t.fx), "COMPLETED", "{changed}");
+    }
+}
+
+// PushWorkerServiceTest#process_completedDeliveryAndNewDevice_doesNotResend
+#[test]
+fn 완료한_사건이_다시_오거나_새_기기가_등록돼도_fcm을_재호출하지_않는다() {
+    let Some(t) = topic_fx() else { return };
+    let device = t.fx.device_ids()[0];
+    assert!(!t.fx.process_at(plus(t.fx.now, 60), &t.fx.message).retryable);
+    t.fx.add_device("new-topic-token");
+
+    let repeated = t.fx.process_at(plus(t.fx.now, 120), &t.fx.message);
+
+    assert!(!repeated.retryable);
+    assert_eq!(t.fx.sender.calls(), 1);
+    assert_eq!(delivery_status(&t.fx), "COMPLETED");
+    assert_eq!(
+        result_of(&device_results(&t.fx), device)["status"],
+        "ACCEPTED"
+    );
+    assert_eq!(t.fx.lines.at_stage("worker_delivery_skipped").len(), 1);
+    assert_eq!(
+        t.fx.lines.at_stage("worker_delivery_skipped")[0]["reason"],
+        "ALREADY_COMPLETED"
+    );
+}
+
+// PushWorkerServiceTest#process_acceptedHistoryWithoutCompletion_recoversRemainingDevice
+#[test]
+fn 수락_기록을_남기고_중단돼도_수락한_기기는_생략하고_미완료_기기를_이어_보낸다() {
+    for previous in ["SENDING", "UNKNOWN", "RETRYABLE"] {
+        let Some(t) = topic_fx() else { return };
+        let accepted = t.fx.device_ids()[0];
+        t.fx.add_device("second-topic-token");
+        let remaining = t.fx.device_ids()[1];
+        let at = t.fx.now.to_string();
+        let results = serde_json::json!({
+            accepted.to_string(): {
+                "status": "ACCEPTED", "attemptCount": 1, "lastErrorCode": null,
+                "sendStartedAt": at, "acceptedAt": at,
+            },
+            remaining.to_string(): {
+                "status": previous, "attemptCount": 3, "lastErrorCode": "UNAVAILABLE",
+                "sendStartedAt": at, "acceptedAt": null,
+            },
+        });
+        t.fx.db
+            .client()
+            .execute(
+                "INSERT INTO push_deliveries (event_id, user_id, device_results) \
+                 VALUES ($1, $2, $3::text::jsonb)",
+                &[&t.fx.message.event_id, &t.fx.user, &results.to_string()],
+            )
+            .unwrap();
+
+        let recovered = t.fx.process_at(plus(t.fx.now, 60), &t.fx.message);
+
+        assert!(!recovered.retryable, "{previous}");
+        assert_eq!(t.fx.sender.calls(), 1, "{previous}");
+        let after = device_results(&t.fx);
+        assert_eq!(result_of(&after, remaining)["status"], "ACCEPTED");
+        assert_eq!(result_of(&after, remaining)["attemptCount"], 4);
+        assert_eq!(result_of(&after, accepted)["attemptCount"], 1);
+        assert_eq!(delivery_status(&t.fx), "COMPLETED");
+    }
+}
+
+// PushWorkerServiceTest#process_deviceDeletedAfterAcceptance_preservesDeliveryHistory
+#[test]
+fn 로그아웃으로_기기_행을_삭제해도_완료_기록과_기기_결과는_유지한다() {
+    let Some(t) = topic_fx() else { return };
+    let device = t.fx.device_ids()[0];
+    assert!(!t.fx.process_at(plus(t.fx.now, 60), &t.fx.message).retryable);
+
+    t.fx.execute("DELETE FROM push_devices");
+
+    assert_eq!(delivery_status(&t.fx), "COMPLETED");
+    assert_eq!(
+        result_of(&device_results(&t.fx), device)["status"],
+        "ACCEPTED"
+    );
+}
+
+// PushWorkerServiceTest#process_invalidOccurrenceBeforeValidMessage_doesNotPoisonCompletion
+#[test]
+fn 잘못된_메시지는_정상_사건의_완료_기록을_선점하지_않는다() {
+    let Some(t) = topic_fx() else { return };
+    let mut invalid = t.fx.message.clone();
+    invalid.occurred_at = plus(t.fx.now, 3600);
+    invalid.expires_at = plus(invalid.occurred_at, 1800);
+
+    assert!(!t.fx.process_at(plus(t.fx.now, 1), &invalid).retryable);
+    assert_eq!(delivery_status(&t.fx), "NONE");
+
+    assert!(!t.fx.process_at(plus(t.fx.now, 60), &t.fx.message).retryable);
+    assert_eq!(t.fx.sender.calls(), 1);
+    assert_eq!(delivery_status(&t.fx), "COMPLETED");
+}
+
+// PushWorkerServiceTest#process_deliveryWriteFailure_preservesUncertainty
+#[test]
+fn 시작_기록_저장_실패_시_fcm을_호출하지_않고_수락_결과_저장_실패_시_성공으로_확정하지_않는다() {
+    for fail_acceptance in [false, true] {
+        let Some(t) = topic_fx() else { return };
+        let status = if fail_acceptance {
+            "ACCEPTED"
+        } else {
+            "SENDING"
+        };
+        t.fx.execute(&format!(
+            "ALTER TABLE push_deliveries ADD CONSTRAINT ck_test_push_delivery_write \
+             CHECK (NOT jsonb_path_exists(device_results, '$.* ? (@.status == \"{status}\")'))"
+        ));
+
+        let result = t.fx.process_at(plus(t.fx.now, 60), &t.fx.message);
+
+        assert!(result.retryable, "{fail_acceptance}");
+        assert_eq!(result.retry_after, Duration::from_secs(60));
+        // 시작 기록이 막히면 FCM에 가지 않고, 수락 결과 저장만 막히면 FCM에는 한 번 갔다.
+        assert_eq!(
+            t.fx.sender.calls(),
+            usize::from(fail_acceptance),
+            "{fail_acceptance}"
+        );
+        assert_ne!(delivery_status(&t.fx), "COMPLETED");
+        assert!(t.fx.lines.at_stage("worker_summary").is_empty());
+        t.fx.execute("ALTER TABLE push_deliveries DROP CONSTRAINT ck_test_push_delivery_write");
+    }
+}
+
+// PushWorkerServiceTest#process_sqsDeletionFailsThenRedelivers_retriesOnlyDeletion
+#[test]
+fn sqs_삭제_실패_후_같은_메시지를_다시_받아도_fcm은_다시_보내지_않는다() {
+    let Some(t) = topic_fx() else { return };
+    assert!(!t.fx.process_at(plus(t.fx.now, 60), &t.fx.message).retryable);
+
+    // 삭제에 실패한 메시지가 다시 전달된다.
+    let redelivered = t.fx.process_at(plus(t.fx.now, 120), &t.fx.message);
+
+    assert!(!redelivered.retryable);
+    assert_eq!(t.fx.sender.calls(), 1);
+}
+
+// PushWorkerServiceTest#process_concurrentSameEvent_sendsOnlyFromLockOwner
+#[test]
+fn 동시에_같은_사건을_받아도_락을_획득한_worker만_fcm을_요청한다() {
+    let Some(t) = topic_fx() else { return };
+    let now = plus(t.fx.now, 60);
+    let worker = t.fx.worker(now);
+    let (sending_tx, sending_rx) = std::sync::mpsc::channel::<()>();
+    let (finish_tx, finish_rx) = std::sync::mpsc::channel::<()>();
+    let finish_rx = Mutex::new(finish_rx);
+    t.fx.sender.respond(move |_| {
+        sending_tx.send(()).unwrap();
+        finish_rx
+            .lock()
+            .unwrap()
+            .recv_timeout(Duration::from_secs(10))
+            .unwrap();
+        Ok(DevicePushResult::accepted())
+    });
+    let raw_message = raw(&t.fx.message);
+    let first = {
+        let (worker, message) = (worker.clone(), raw_message.clone());
+        std::thread::spawn(move || worker.process_message(&message).unwrap())
+    };
+    sending_rx.recv_timeout(Duration::from_secs(5)).unwrap();
+
+    // 같은 서비스를 공유하는 다른 스레드는 FCM을 기다리는 동안 들어오지 못하고 1분 뒤 재처리로 넘어간다.
+    let others: Vec<_> = (0..3)
+        .map(|_| {
+            let (worker, message) = (worker.clone(), raw_message.clone());
+            std::thread::spawn(move || worker.process_message(&message).unwrap())
+        })
+        .collect();
+    for other in others {
+        let result = other.join().unwrap();
+        assert!(result.retryable);
+        assert_eq!(result.retry_after, Duration::from_secs(60));
+    }
+    finish_tx.send(()).unwrap();
+
+    assert!(!first.join().unwrap().retryable);
+    assert_eq!(t.fx.sender.calls(), 1);
+    assert_eq!(t.fx.lines.at_stage("worker_delivery_lock_busy").len(), 3);
+    assert_eq!(delivery_status(&t.fx), "COMPLETED");
+}
+
+// PushWorkerTimingLog / PushWorkerDbTiming: 요약 로그의 DB 계측 필드 모양.
+#[test]
+fn 요약_로그는_db_트랜잭션_종류별_시간과_완료_여부를_원본_키_순서로_남긴다() {
+    let Some(t) = topic_fx() else { return };
+    let device = t.fx.device_ids()[0];
+
+    t.fx.process_at(plus(t.fx.now, 60), &t.fx.message);
+
+    let summaries = t.fx.lines.at_stage("worker_summary");
+    assert_eq!(summaries.len(), 1);
+    let summary = &summaries[0];
+    assert_eq!(summary["level"], "INFO");
+    assert_eq!(summary["processingCompleted"], true);
+    assert_eq!(summary["dbTransactionCount"], 2);
+    let transactions = summary["dbTransactions"].as_array().unwrap();
+    assert_eq!(transactions[0]["deviceId"], Value::Null);
+    assert_eq!(transactions[0]["operation"], "DEVICE_LOOKUP");
+    assert_eq!(transactions[0]["transactionCompleted"], true);
+    assert_eq!(transactions[1]["deviceId"], device.to_string());
+    assert_eq!(transactions[1]["operation"], "LATEST_CONDITIONS_LOOKUP");
+    let total: u64 = transactions
+        .iter()
+        .map(|t| t["dbTransactionDurationMs"].as_u64().unwrap())
+        .sum();
+    assert_eq!(summary["dbTransactionDurationMs"], total);
+    // JSON 키 순서도 원본(LinkedHashMap)과 같다.
+    let raw_line =
+        t.fx.lines
+            .text()
+            .lines()
+            .find(|l| l.contains("worker_summary"))
+            .unwrap()
+            .to_owned();
+    let order = [
+        "\"stage\"",
+        "\"eventId\"",
+        "\"notificationId\"",
+        "\"userId\"",
+        "\"notificationType\"",
+        "\"dbTransactionCount\"",
+        "\"dbTransactionDurationMs\"",
+        "\"dbTransactions\"",
+        "\"processingCompleted\"",
+        "\"targetCount\"",
+        "\"acceptedCount\"",
+        "\"retryableCount\"",
+        "\"permanentFailureCount\"",
+        "\"invalidTokenCount\"",
+        "\"skippedCount\"",
+        "\"retryable\"",
+    ];
+    let positions: Vec<usize> = order.iter().map(|k| raw_line.find(k).unwrap()).collect();
+    assert!(positions.windows(2).all(|w| w[0] < w[1]), "{raw_line}");
+    let entry = raw_line.find("\"deviceId\":null").unwrap();
+    let rest = &raw_line[entry..];
+    assert!(
+        rest.find("\"operation\"").unwrap() < rest.find("\"transactionCompleted\"").unwrap()
+            && rest.find("\"transactionCompleted\"").unwrap()
+                < rest.find("\"dbTransactionDurationMs\"").unwrap(),
+        "{raw_line}"
+    );
+}
+
+// PushWorkerServiceTest: 처리 중단 시점의 DB 계측 집계(processingCompleted=false).
+#[test]
+fn 기기_목록_조회가_실패하면_중단_시점의_계측_집계를_남기고_오류를_돌려준다() {
+    let Some(t) = topic_fx() else { return };
+    t.fx.execute("ALTER TABLE push_devices RENAME TO push_devices_hidden");
+
+    let outcome =
+        t.fx.worker(plus(t.fx.now, 60))
+            .process_message(&raw(&t.fx.message));
+    t.fx.execute("ALTER TABLE push_devices_hidden RENAME TO push_devices");
+
+    assert!(outcome.is_err());
+    let summaries = t.fx.lines.at_stage("worker_summary");
+    assert_eq!(summaries.len(), 1);
+    let summary = &summaries[0];
+    assert_eq!(summary["level"], "INFO");
+    assert_eq!(summary["message"], "푸시 처리 중단 시점의 DB 계측 집계");
+    assert_eq!(summary["processingCompleted"], false);
+    assert!(summary["errorCode"].as_str().is_some());
+    assert!(summary.get("targetCount").is_none());
+    let transactions = summary["dbTransactions"].as_array().unwrap();
+    assert_eq!(transactions.len(), 1);
+    assert_eq!(transactions[0]["operation"], "DEVICE_LOOKUP");
+    assert_eq!(transactions[0]["transactionCompleted"], false);
+}
+
+// DevicePushTiming: FCM 결과·건너뜀·기기 오류 로그에 요청 시간과 SDK 수락 여부를 붙인다.
+#[test]
+fn fcm_요청을_보낸_경우에만_결과_로그에_요청_시간과_sdk_수락_여부를_붙인다() {
+    let Some(t) = topic_fx() else { return };
+    t.fx.sender
+        .record_timing
+        .store(true, std::sync::atomic::Ordering::SeqCst);
+    t.fx.sender
+        .queue(vec![ok(DevicePushResult::retryable("UNAVAILABLE")), boom()]);
+
+    t.fx.process_at(plus(t.fx.now, 60), &t.fx.message);
+    t.fx.process_at(plus(t.fx.now, 120), &t.fx.message);
+
+    let results = t.fx.lines.at_stage("fcm_result");
+    assert_eq!(results.len(), 1);
+    assert!(results[0]["fcmRequestDurationMs"].as_u64().is_some());
+    assert_eq!(results[0]["sdkAccepted"], false);
+    let failed = t.fx.lines.at_stage("worker_device_failed");
+    assert_eq!(failed.len(), 1);
+    assert!(failed[0]["fcmRequestDurationMs"].as_u64().is_some());
+    assert_eq!(failed[0]["sdkAccepted"], false);
+    // 요청을 보내지 않은 건너뜀 로그에는 붙지 않는다.
+    t.fx.execute("UPDATE users SET topic_push_enabled = false");
+    t.fx.process_at(plus(t.fx.now, 180), &t.fx.message);
+    let skipped = t.fx.lines.at_stage("worker_skipped");
+    assert!(
+        skipped
+            .iter()
+            .all(|log| log.get("fcmRequestDurationMs").is_none())
+    );
 }

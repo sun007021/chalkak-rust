@@ -6,6 +6,7 @@ use std::time::Duration;
 use jiff::Timestamp;
 
 use super::sqs_push::PushMessage;
+use crate::common::Elapsed;
 
 /// 기기 한 대에 보낼 요청(`DevicePushRequest`). `expires_at`은 이 푸시를 보낼 수 있는 마지막 시각이다(정각부터 만료).
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -117,9 +118,40 @@ impl SenderFailure {
     }
 }
 
+/// `DevicePushTiming`: 기기 하나의 FCM 요청 시간. 요청을 보냈을 때만 값이 있다.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct DevicePushTiming {
+    request_duration_ms: Option<u64>,
+    sdk_accepted: Option<bool>,
+}
+
+impl DevicePushTiming {
+    /// `recordRequest`: SDK 호출이 끝난(성공이든 실패든) 뒤 걸린 시간과 SDK가 받아들였는지를 남긴다.
+    pub fn record_request(&mut self, elapsed: Elapsed, accepted: bool) {
+        self.request_duration_ms = Some(elapsed.to_millis());
+        self.sdk_accepted = Some(accepted);
+    }
+
+    pub fn has_request(&self) -> bool {
+        self.request_duration_ms.is_some()
+    }
+
+    pub fn request_duration_ms(&self) -> Option<u64> {
+        self.request_duration_ms
+    }
+
+    pub fn sdk_accepted(&self) -> Option<bool> {
+        self.sdk_accepted
+    }
+}
+
 /// `DevicePushSender`
 pub trait DevicePushSender: Send + Sync {
-    fn send(&self, request: &DevicePushRequest) -> Result<DevicePushResult, SenderFailure>;
+    fn send(
+        &self,
+        request: &DevicePushRequest,
+        timing: &mut DevicePushTiming,
+    ) -> Result<DevicePushResult, SenderFailure>;
 }
 
 /// 사용자 메시지 하나의 처리 결과(`PushProcessingResult`). 재시도해야 하면 SQS 숨김 시간을 `retry_after`만큼 미룬다.

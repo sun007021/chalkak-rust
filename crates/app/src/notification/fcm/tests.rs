@@ -15,7 +15,7 @@ use super::client::FirebaseMessagingClient;
 use super::transport::{ExchangeError, ExchangeRequest, ExchangeResponse, HttpExchange};
 use crate::notification::domain::{NotificationSourceType, NotificationType};
 use crate::notification::push_sender::{
-    DevicePushRequest, DevicePushResult, DevicePushSender, DeviceStatus,
+    DevicePushRequest, DevicePushResult, DevicePushSender, DevicePushTiming, DeviceStatus,
 };
 use crate::notification::sqs_push::PushMessage;
 
@@ -174,10 +174,14 @@ fn ok(_: &ExchangeRequest, _: usize) -> Result<ExchangeResponse, ExchangeError> 
 fn 수락된_요청은_화면_이동_정보와_android_ttl_apns_절대_만료를_담는다() {
     let fixture = fixture(ok);
     let request = request();
+    let mut timing = DevicePushTiming::default();
 
-    let result = fixture.sender.send(&request).unwrap();
+    let result = fixture.sender.send(&request, &mut timing).unwrap();
 
     assert_eq!(result.status, DeviceStatus::Accepted);
+    // assertRequestTiming(true)
+    assert!(timing.has_request());
+    assert_eq!(timing.sdk_accepted(), Some(true));
     let body = sent_body(&fixture, 0);
     let message = &body["message"];
     assert_eq!(message["android"]["ttl"], "1800s");
@@ -218,7 +222,11 @@ fn 주제_요청은_알림함_id_없이_주제_종류와_대상을_보낸다() {
     };
 
     assert_eq!(
-        fixture.sender.send(&request).unwrap().status,
+        fixture
+            .sender
+            .send(&request, &mut DevicePushTiming::default())
+            .unwrap()
+            .status,
         DeviceStatus::Accepted
     );
 
@@ -273,10 +281,15 @@ fn fcm_응답을_무효_토큰_영구_오류_일시_실패로_분류한다() {
         let body = error_body(code, status, detail);
         let fixture = fixture(move |_, _| Ok(response(code, &[], &body)));
 
-        let result = fixture.sender.send(&request()).unwrap();
+        let mut timing = DevicePushTiming::default();
+
+        let result = fixture.sender.send(&request(), &mut timing).unwrap();
 
         assert_eq!(result.status, expected, "{code} {status} {detail}");
         assert!(fcm_calls(&fixture) >= 1);
+        // assertRequestTiming(false): 오류 응답이어도 요청 시간은 남고 SDK가 받아들이지 않았다.
+        assert!(timing.has_request());
+        assert_eq!(timing.sdk_accepted(), Some(false));
     }
 }
 
@@ -300,7 +313,11 @@ fn 재시도에도_최초_계산한_android_ttl과_apns_만료를_유지한다()
     let request = request();
 
     assert_eq!(
-        fixture.sender.send(&request).unwrap().status,
+        fixture
+            .sender
+            .send(&request, &mut DevicePushTiming::default())
+            .unwrap()
+            .status,
         DeviceStatus::Accepted
     );
 
@@ -329,7 +346,11 @@ fn 긴_retry_after는_재시도_지연으로_전달한다() {
     let fixture = quota_exceeded(&[("Retry-After", "120")]);
 
     assert_eq!(
-        fixture.sender.send(&request()).unwrap().retry_after,
+        fixture
+            .sender
+            .send(&request(), &mut DevicePushTiming::default())
+            .unwrap()
+            .retry_after,
         Duration::from_secs(120)
     );
 }
@@ -351,7 +372,11 @@ fn http_날짜_retry_after는_해석하고_잘못된_값은_최소_간격을_유
         let fixture = quota_exceeded(headers);
 
         assert_eq!(
-            fixture.sender.send(&request()).unwrap().retry_after,
+            fixture
+                .sender
+                .send(&request(), &mut DevicePushTiming::default())
+                .unwrap()
+                .retry_after,
             Duration::from_secs(seconds),
             "{header}"
         );
@@ -365,7 +390,9 @@ fn fcm_요청_직전_기한을_확인하여_정각부터는_생략한다() {
         let fixture = fixture(ok);
         fixture.clock.set(plus(seconds));
 
-        let result = fixture.sender.send(&request()).unwrap();
+        let mut timing = DevicePushTiming::default();
+
+        let result = fixture.sender.send(&request(), &mut timing).unwrap();
 
         if seconds < 1800 {
             assert_eq!(result.status, DeviceStatus::Accepted);
@@ -373,6 +400,7 @@ fn fcm_요청_직전_기한을_확인하여_정각부터는_생략한다() {
         } else {
             assert_eq!(result, DevicePushResult::skipped("EXPIRED"));
             assert_eq!(fcm_calls(&fixture), 0);
+            assert!(!timing.has_request());
             // 건너뛰면 토큰도 받지 않는다.
             assert!(fixture.transport.tokens.lock().unwrap().is_empty());
         }
@@ -398,7 +426,11 @@ fn 기한_직전에_시작한_재시도는_기한이_지나도_수락_결과로_
     fixture.clock.set(plus(1799));
 
     assert_eq!(
-        fixture.sender.send(&request()).unwrap().status,
+        fixture
+            .sender
+            .send(&request(), &mut DevicePushTiming::default())
+            .unwrap()
+            .status,
         DeviceStatus::Accepted
     );
 
@@ -413,27 +445,39 @@ fn 기한_직전에_시작한_재시도는_기한이_지나도_수락_결과로_
 fn 토큰은_캐시하고_만료_직전에_다시_받는다() {
     let fixture = fixture(ok);
 
-    fixture.sender.send(&request()).unwrap();
-    fixture.sender.send(&request()).unwrap();
+    fixture
+        .sender
+        .send(&request(), &mut DevicePushTiming::default())
+        .unwrap();
+    fixture
+        .sender
+        .send(&request(), &mut DevicePushTiming::default())
+        .unwrap();
     assert_eq!(fixture.transport.tokens.lock().unwrap().len(), 1);
 
     // 3600초짜리 토큰: 남은 시간이 225초 이하가 되면 새로 받는다.
     fixture.clock.set(plus(3600 - 226));
     fixture
         .sender
-        .send(&DevicePushRequest {
-            expires_at: plus(7200),
-            ..request()
-        })
+        .send(
+            &DevicePushRequest {
+                expires_at: plus(7200),
+                ..request()
+            },
+            &mut DevicePushTiming::default(),
+        )
         .unwrap();
     assert_eq!(fixture.transport.tokens.lock().unwrap().len(), 1);
     fixture.clock.set(plus(3600 - 225));
     fixture
         .sender
-        .send(&DevicePushRequest {
-            expires_at: plus(7200),
-            ..request()
-        })
+        .send(
+            &DevicePushRequest {
+                expires_at: plus(7200),
+                ..request()
+            },
+            &mut DevicePushTiming::default(),
+        )
         .unwrap();
     assert_eq!(fixture.transport.tokens.lock().unwrap().len(), 2);
 }
@@ -442,7 +486,10 @@ fn 토큰은_캐시하고_만료_직전에_다시_받는다() {
 fn 토큰_요청은_서비스_계정_jwt를_form으로_보낸다() {
     let fixture = fixture(ok);
 
-    fixture.sender.send(&request()).unwrap();
+    fixture
+        .sender
+        .send(&request(), &mut DevicePushTiming::default())
+        .unwrap();
 
     let tokens = fixture.transport.tokens.lock().unwrap();
     let body = String::from_utf8(tokens[0].body.clone()).unwrap();
@@ -505,7 +552,10 @@ fn 토큰_교환이_일시_오류면_1_2_4초_간격으로_세_번_다시_보내
     for status in [408, 429, 500, 503] {
         let fixture = fixture_with(ok, move |_, _| Ok(response(status, &[], "{}")));
 
-        let result = fixture.sender.send(&request()).unwrap();
+        let result = fixture
+            .sender
+            .send(&request(), &mut DevicePushTiming::default())
+            .unwrap();
 
         assert_eq!(
             result,
@@ -529,7 +579,10 @@ fn 토큰_교환이_일시_오류면_1_2_4초_간격으로_세_번_다시_보내
     // 재시도 대상이 아닌 상태는 바로 실패한다.
     for status in [400, 401, 403, 404, 501, 502, 504] {
         let fixture = fixture_with(ok, move |_, _| Ok(response(status, &[], "{}")));
-        fixture.sender.send(&request()).unwrap();
+        fixture
+            .sender
+            .send(&request(), &mut DevicePushTiming::default())
+            .unwrap();
         assert_eq!(
             fixture.transport.tokens.lock().unwrap().len(),
             1,
@@ -548,7 +601,10 @@ fn 토큰_교환_응답이_이상하면_unknown_또는_예외다() {
         (r#"{"access_token":5,"expires_in":3600}"#, "UNKNOWN"),
     ] {
         let fixture = fixture_with(ok, move |_, _| Ok(response(200, &[], body)));
-        let result = fixture.sender.send(&request()).unwrap();
+        let result = fixture
+            .sender
+            .send(&request(), &mut DevicePushTiming::default())
+            .unwrap();
         assert_eq!(result.error_code.as_deref(), Some(expected), "{body}");
         assert!(result.is_retryable());
     }
@@ -560,7 +616,10 @@ fn 토큰_교환_응답이_이상하면_unknown_또는_예외다() {
             r#"{"access_token":"t","expires_in":3600.5}"#,
         ))
     });
-    let failure = fixture.sender.send(&request()).unwrap_err();
+    let failure = fixture
+        .sender
+        .send(&request(), &mut DevicePushTiming::default())
+        .unwrap_err();
     assert_eq!(failure.exception, "ArithmeticException");
     // 3600.0 은 정수로 읽힌다. 빈 토큰도 받는다.
     let fixture = fixture_with(ok, |_, _| {
@@ -570,7 +629,13 @@ fn 토큰_교환_응답이_이상하면_unknown_또는_예외다() {
             r#"{"access_token":"","expires_in":3600.0}"#,
         ))
     });
-    assert!(fixture.sender.send(&request()).unwrap().is_accepted());
+    assert!(
+        fixture
+            .sender
+            .send(&request(), &mut DevicePushTiming::default())
+            .unwrap()
+            .is_accepted()
+    );
 }
 
 #[test]
@@ -582,7 +647,10 @@ fn 응답을_받지_못하면_예외_종류로_오류_코드를_정한다() {
     ] {
         let fixture = fixture(move |_, _| Err(error.clone()));
 
-        let result = fixture.sender.send(&request()).unwrap();
+        let result = fixture
+            .sender
+            .send(&request(), &mut DevicePushTiming::default())
+            .unwrap();
 
         assert_eq!(
             result,
@@ -603,13 +671,20 @@ fn 일부_오류_응답은_sdk가_예외를_던진다() {
         r#"{"error":{"status":"OK"}}"#,
     ] {
         let fixture = fixture(move |_, _| Ok(response(400, &[], body)));
-        let failure = fixture.sender.send(&request()).unwrap_err();
+        let failure = fixture
+            .sender
+            .send(&request(), &mut DevicePushTiming::default())
+            .unwrap_err();
         assert_eq!(failure.exception, "IllegalArgumentException", "{body}");
     }
     let body = r#"{"error":{"status":"NOT_FOUND","details":[{"@type":"type.googleapis.com/google.firebase.fcm.v1.FcmError","errorCode":5}]}}"#;
     let fixture = fixture(move |_, _| Ok(response(404, &[], body)));
     assert_eq!(
-        fixture.sender.send(&request()).unwrap_err().exception,
+        fixture
+            .sender
+            .send(&request(), &mut DevicePushTiming::default())
+            .unwrap_err()
+            .exception,
         "ClassCastException"
     );
 }
@@ -619,14 +694,21 @@ fn 성공_응답_본문이_비었거나_객체가_아니면_예외이고_json이
     for body in ["", "[1]", "\"x\""] {
         let fixture = fixture(move |_, _| Ok(response(200, &[], body)));
         assert_eq!(
-            fixture.sender.send(&request()).unwrap_err().exception,
+            fixture
+                .sender
+                .send(&request(), &mut DevicePushTiming::default())
+                .unwrap_err()
+                .exception,
             "IllegalArgumentException",
             "{body:?}"
         );
     }
     let fixture = fixture(|_, _| Ok(response(200, &[], "not json")));
     assert_eq!(
-        fixture.sender.send(&request()).unwrap(),
+        fixture
+            .sender
+            .send(&request(), &mut DevicePushTiming::default())
+            .unwrap(),
         DevicePushResult::retryable_after("UNKNOWN", Duration::from_secs(60))
     );
 }
@@ -645,7 +727,10 @@ fn 오류_본문이_없으면_http_상태로_코드를_정한다() {
         (504, "UNKNOWN", true),
     ] {
         let fixture = fixture(move |_, _| Ok(response(status, &[], "")));
-        let result = fixture.sender.send(&request()).unwrap();
+        let result = fixture
+            .sender
+            .send(&request(), &mut DevicePushTiming::default())
+            .unwrap();
         assert_eq!(result.error_code.as_deref(), Some(code), "{status}");
         assert_eq!(result.is_retryable(), retryable, "{status}");
     }
@@ -680,7 +765,10 @@ fn 세부_코드는_처음_만난_fcm_오류만_쓴다() {
     ] {
         let body = format!(r#"{{"error":{{"status":"NOT_FOUND","details":{details}}}}}"#);
         let fixture = fixture(move |_, _| Ok(response(404, &[], &body)));
-        let result = fixture.sender.send(&request()).unwrap();
+        let result = fixture
+            .sender
+            .send(&request(), &mut DevicePushTiming::default())
+            .unwrap();
         assert_eq!(result.error_code.as_deref(), Some(expected), "{details}");
     }
 }
@@ -719,7 +807,10 @@ fn 응답_헤더의_retry_after는_503_재시도에도_쓴다() {
             }
         });
 
-        let result = fixture.sender.send(&request()).unwrap();
+        let result = fixture
+            .sender
+            .send(&request(), &mut DevicePushTiming::default())
+            .unwrap();
 
         match expected {
             Some(delay) => {
@@ -740,7 +831,10 @@ fn 계속_503이면_네_번_다시_보내고_0_5_1_2_4초를_기다린다() {
     let body = error_body(503, "UNAVAILABLE", "UNAVAILABLE");
     let fixture = fixture(move |_, _| Ok(response(503, &[], &body)));
 
-    let result = fixture.sender.send(&request()).unwrap();
+    let result = fixture
+        .sender
+        .send(&request(), &mut DevicePushTiming::default())
+        .unwrap();
 
     assert_eq!(
         result,
@@ -762,7 +856,10 @@ fn 계속_503이면_네_번_다시_보내고_0_5_1_2_4초를_기다린다() {
 fn 일시_오류_500_429는_다시_보내지_않는다() {
     for status in [500, 429] {
         let fixture = fixture(move |_, _| Ok(response(status, &[], "")));
-        fixture.sender.send(&request()).unwrap();
+        fixture
+            .sender
+            .send(&request(), &mut DevicePushTiming::default())
+            .unwrap();
         assert_eq!(fcm_calls(&fixture), 1);
         assert!(fixture.sleeps.lock().unwrap().is_empty());
     }
@@ -793,7 +890,10 @@ fn 응답_401은_토큰을_새로_받고_바로_다시_보낸다() {
             }
         });
 
-        let result = fixture.sender.send(&request()).unwrap();
+        let result = fixture
+            .sender
+            .send(&request(), &mut DevicePushTiming::default())
+            .unwrap();
 
         if refreshes {
             assert!(result.is_accepted(), "{www:?}");
@@ -817,7 +917,10 @@ fn 계속_401이면_다섯_번_보내고_토큰은_여섯_번_받는다() {
     let body = error_body(401, "PERMISSION_DENIED", "UNREGISTERED");
     let fixture = fixture(move |_, _| Ok(response(401, &[], &body)));
 
-    let result = fixture.sender.send(&request()).unwrap();
+    let result = fixture
+        .sender
+        .send(&request(), &mut DevicePushTiming::default())
+        .unwrap();
 
     assert_eq!(
         result,
@@ -831,7 +934,10 @@ fn 계속_401이면_다섯_번_보내고_토큰은_여섯_번_받는다() {
 fn 요청_헤더와_주소() {
     let fixture = fixture(ok);
 
-    fixture.sender.send(&request()).unwrap();
+    fixture
+        .sender
+        .send(&request(), &mut DevicePushTiming::default())
+        .unwrap();
 
     let seen = fixture.transport.fcm.lock().unwrap();
     assert_eq!(
@@ -878,4 +984,27 @@ fn 서비스_계정_json은_필수_필드와_키를_기동_때_확인한다() {
     ] {
         assert!(ServiceAccount::from_json(&bad).is_err(), "{bad}");
     }
+}
+
+/// 메시지 구성 뒤 SDK가 예외를 던지는 가짜.
+struct ThrowingMessaging;
+
+impl super::FirebaseMessaging for ThrowingMessaging {
+    fn send(&self, _: &super::message::FcmMessage) -> Result<(), super::MessagingFailure> {
+        Err(super::MessagingFailure::Thrown("IllegalStateException"))
+    }
+}
+
+// FcmDevicePushSenderTest#send_unexpectedSdkFailure_recordsTimingAndPropagates
+#[test]
+fn 예상_밖_sdk_예외도_시간을_기록하고_호출자에게_전달한다() {
+    let clock: Arc<dyn Clock> = Arc::new(FixedClock::new(now()));
+    let sender = FcmDevicePushSender::new(Arc::new(ThrowingMessaging), clock);
+    let mut timing = DevicePushTiming::default();
+
+    let failure = sender.send(&request(), &mut timing).unwrap_err();
+
+    assert_eq!(failure.exception, "IllegalStateException");
+    assert!(timing.has_request());
+    assert_eq!(timing.sdk_accepted(), Some(false));
 }

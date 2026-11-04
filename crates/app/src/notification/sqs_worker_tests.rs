@@ -314,10 +314,15 @@ fn queue_message(id: &str, receipt: &str, body: &str, receive_count: Option<&str
         receipt_handle: Some(receipt.to_owned()),
         body: body.to_owned(),
         receive_count: receive_count.map(str::to_owned),
+        sent_timestamp: None,
     }
 }
 
 fn fx() -> Fx {
+    fx_at(chalkak_core::log::Level::Info)
+}
+
+fn fx_at(level: chalkak_core::log::Level) -> Fx {
     let wire = Arc::new(Wire::default());
     *wire.receive_response.lock().unwrap() = "{}".to_owned();
     let client = SqsClient::new(
@@ -339,7 +344,11 @@ fn fx() -> Fx {
         Arc::new(SqsWorkerQueue::new(&client, QUEUE)),
         processor.clone(),
         clock.clone() as Arc<dyn Clock>,
-        logger(&lines, &clock),
+        Arc::new(chalkak_core::log::Logger::new(
+            Box::new(lines.clone()),
+            level,
+            clock.clone(),
+        )),
         scheduler.clone(),
         shutdown.clone(),
     ));
@@ -1018,4 +1027,250 @@ fn 숨김_연장_실행기는_종료하면_스레드가_끝나고_예약한_작�
     );
     std::thread::sleep(Duration::from_millis(100));
     assert_eq!(runs.load(Ordering::SeqCst), after_shutdown);
+}
+
+// ---------------------------------------------------------------------------------------------
+// 처리 시간 계측(SqsPushLog): worker_sqs_receive, worker_poll_failed, worker_received,
+// worker_message_deleted, worker_sqs_delete_failed, worker_attempt_completed
+// ---------------------------------------------------------------------------------------------
+
+fn receive_one(fx: &Fx, sent_timestamp: Option<&str>) {
+    let body = fx.message.body.clone();
+    let mut attributes = serde_json::json!({"ApproximateReceiveCount": "1"});
+    if let Some(sent) = sent_timestamp {
+        attributes["SentTimestamp"] = Value::String(sent.to_owned());
+    }
+    *fx.wire.receive_response.lock().unwrap() = serde_json::json!({"Messages": [{
+        "MessageId": "sqs-id",
+        "ReceiptHandle": "receipt-handle",
+        "MD5OfBody": md5_hex(body.as_bytes()),
+        "Body": body,
+        "Attributes": attributes,
+    }]})
+    .to_string();
+}
+
+fn now_millis() -> i64 {
+    ts(NOW).as_millisecond()
+}
+
+// SqsPushServiceTest#poll_emptyQueueWithDebug_recordsReceiveTiming
+#[test]
+fn debug에서만_빈_수신_응답의_시간과_메타데이터를_기록한다() {
+    let info = fx();
+    info.worker.poll();
+    assert!(info.lines.at_stage("worker_sqs_receive").is_empty());
+
+    let debug = fx_at(chalkak_core::log::Level::Debug);
+    debug.worker.poll();
+
+    let logs = debug.lines.at_stage("worker_sqs_receive");
+    assert_eq!(logs.len(), 1);
+    assert_eq!(logs[0]["level"], "DEBUG");
+    assert_eq!(logs[0]["message"], "SQS 빈 수신 응답");
+    assert_eq!(logs[0]["received"], false);
+    assert_eq!(logs[0]["sqsMessageId"], Value::Null);
+    assert_eq!(logs[0]["receiveCount"], Value::Null);
+    assert!(logs[0]["sqsReceiveDurationMs"].as_u64().is_some());
+    assert_eq!(logs[0]["type"], "notification");
+}
+
+// SqsPushLog.logPollFailed: 수신 단계 실패는 phase와 수신 시간을 남긴다.
+#[test]
+fn 수신_실패_로그는_단계와_수신_시간을_남긴다() {
+    let fx = fx();
+    fx.wire.fail_receive.store(true, Ordering::SeqCst);
+
+    fx.worker.poll();
+
+    let failed = fx.lines.at_stage("worker_poll_failed");
+    assert_eq!(failed.len(), 1);
+    assert_eq!(failed[0]["level"], "ERROR");
+    assert_eq!(failed[0]["message"], "푸시 작업 수신 오류");
+    assert_eq!(failed[0]["phase"], "RECEIVE");
+    assert!(failed[0]["sqsReceiveDurationMs"].as_u64().is_some());
+    assert!(failed[0]["errorCode"].as_str().is_some());
+}
+
+// SqsPushServiceTest#poll_oneMessage...: 수신 로그에 received, messageParsed, 수신 시간이 붙고 삭제 로그에 삭제 시간이 붙는다.
+#[test]
+fn 수신_로그에_파싱_여부와_수신_시간이_붙고_삭제_로그에_삭제_시간이_붙는다() {
+    let fx = fx();
+    receive_one(&fx, None);
+
+    fx.worker.poll();
+
+    let received = fx.lines.at_stage("worker_received");
+    assert_eq!(received.len(), 1);
+    assert_eq!(received[0]["received"], true);
+    assert_eq!(received[0]["messageParsed"], true);
+    assert!(received[0]["sqsReceiveDurationMs"].as_u64().is_some());
+    assert_eq!(
+        str_field(&received[0], "eventId"),
+        fx.push.event_id.to_string()
+    );
+    let deleted = fx.lines.at_stage("worker_message_deleted");
+    assert_eq!(deleted.len(), 1);
+    assert!(deleted[0]["sqsDeleteDurationMs"].as_u64().is_some());
+    assert_eq!(deleted[0]["message"], "SQS 푸시 작업 완료");
+}
+
+#[test]
+fn 수신_시간을_모르는_직접_처리의_수신_로그에는_수신_시간이_없다() {
+    let fx = fx();
+
+    fx.worker.process(&fx.message);
+
+    let received = fx.lines.at_stage("worker_received");
+    assert_eq!(received.len(), 1);
+    assert!(received[0].get("sqsReceiveDurationMs").is_none());
+}
+
+// SqsPushServiceTest#poll_invalidMessage_preservesReceiveTiming
+#[test]
+fn 해석_실패와_json_null도_수신_식별자와_시간을_한_번_남기고_삭제한다() {
+    for body in ["invalid", "null"] {
+        let fx = fx();
+        let mut invalid = fx.message.clone();
+        invalid.body = body.to_owned();
+
+        fx.worker.process_received(&invalid, Some(7));
+
+        let received = fx.lines.at_stage("worker_received");
+        assert_eq!(received.len(), 1, "{body}");
+        assert_eq!(received[0]["received"], true);
+        assert_eq!(received[0]["messageParsed"], false);
+        assert_eq!(received[0]["sqsReceiveDurationMs"], 7);
+        assert_eq!(received[0]["sqsMessageId"], "sqs-id");
+        assert!(received[0].get("eventId").is_none());
+        assert_eq!(fx.wire.operations(), vec!["AmazonSQS.DeleteMessage"]);
+        let completed = fx.lines.at_stage("worker_attempt_completed");
+        assert_eq!(completed[0]["outcome"], "INVALID_MESSAGE_DELETED");
+    }
+}
+
+// SqsPushServiceTest#process_sentTimestamp_recordsAgeAndReceiveCount
+#[test]
+fn 처리_시도_종료_로그는_결과와_큐_나이와_처리_시간을_남긴다() {
+    let fx = fx();
+    let mut message = fx.message.clone();
+    message.sent_timestamp = Some((now_millis() - 1_500).to_string());
+
+    fx.worker.process(&message);
+
+    let completed = fx.lines.at_stage("worker_attempt_completed");
+    assert_eq!(completed.len(), 1);
+    assert_eq!(completed[0]["level"], "INFO");
+    assert_eq!(completed[0]["message"], "푸시 처리 시도 종료");
+    assert_eq!(completed[0]["outcome"], "DELETED");
+    assert_eq!(completed[0]["queueAgeMs"], 1_500);
+    assert!(completed[0]["processingDurationMs"].as_u64().is_some());
+    // 처리 문맥(큐 메시지 식별자와 횟수)이 붙는다.
+    assert_eq!(completed[0]["sqsMessageId"], "sqs-id");
+    assert_eq!(completed[0]["receiveCount"], "1");
+}
+
+// SqsPushServiceTest#process_invalidSentTimestamp_completesWithUnknownAge
+#[test]
+fn 입력_시각이_누락_음수_미래_잘못된_숫자여도_나이를_꾸미지_않고_처리한다() {
+    for sent in [
+        None,
+        Some("-1".to_owned()),
+        Some((now_millis() + 1).to_string()),
+        Some("not-a-number".to_owned()),
+        Some(String::new()),
+    ] {
+        let fx = fx();
+        let mut message = fx.message.clone();
+        message.sent_timestamp = sent.clone();
+
+        fx.worker.process(&message);
+
+        let completed = fx.lines.at_stage("worker_attempt_completed");
+        assert_eq!(completed.len(), 1, "{sent:?}");
+        assert_eq!(completed[0]["queueAgeMs"], Value::Null, "{sent:?}");
+        assert_eq!(completed[0]["outcome"], "DELETED");
+        assert_eq!(fx.wire.operations(), vec!["AmazonSQS.DeleteMessage"]);
+    }
+}
+
+// SqsPushServiceTest#process_sentTimestampAroundReceipt_validatesAgeBoundary
+#[test]
+fn 수신_시각_직전_동일_직후의_입력_시각을_구분한다() {
+    for (offset, expected) in [(-1_i64, Some(1_i64)), (0, Some(0)), (1, None)] {
+        let fx = fx();
+        let mut message = fx.message.clone();
+        message.sent_timestamp = Some((now_millis() + offset).to_string());
+
+        fx.worker.process(&message);
+
+        let completed = fx.lines.at_stage("worker_attempt_completed");
+        let age = &completed[0]["queueAgeMs"];
+        match expected {
+            Some(age_ms) => assert_eq!(*age, age_ms, "{offset}"),
+            None => assert_eq!(*age, Value::Null, "{offset}"),
+        }
+    }
+}
+
+// 시도 종료 결과: 재시도 대기와 처리 실패.
+#[test]
+fn 처리_시도_종료_로그의_결과는_재시도_대기와_실패를_구분한다() {
+    let retry = fx();
+    retry.processor.set(|_| {
+        Ok(PushProcessingResult {
+            retryable: true,
+            retry_after: Duration::from_secs(5),
+        })
+    });
+    retry.worker.process(&retry.message);
+    assert_eq!(
+        retry.lines.at_stage("worker_attempt_completed")[0]["outcome"],
+        "RETRY_PENDING"
+    );
+
+    let failed = fx();
+    failed
+        .processor
+        .set(|_| Err("IllegalStateException".to_owned()));
+    failed.worker.process(&failed.message);
+    assert_eq!(
+        failed.lines.at_stage("worker_attempt_completed")[0]["outcome"],
+        "FAILED"
+    );
+    assert_eq!(failed.lines.at_stage("worker_processing_failed").len(), 1);
+}
+
+// SqsPushLog.logDeleteFailed: 삭제 실패는 시간만 INFO로 남기고 오류 지표는 worker_processing_failed 하나만 올린다.
+#[test]
+fn 삭제_실패는_삭제_시간을_info로_남기고_결과는_실패로_기록한다() {
+    let fx = fx();
+    fx.wire.fail_delete.store(true, Ordering::SeqCst);
+
+    fx.worker.process(&fx.message);
+
+    let failed = fx.lines.at_stage("worker_sqs_delete_failed");
+    assert_eq!(failed.len(), 1);
+    assert_eq!(failed[0]["level"], "INFO");
+    assert_eq!(failed[0]["message"], "SQS 삭제 요청 실패 시간");
+    assert!(failed[0]["sqsDeleteDurationMs"].as_u64().is_some());
+    assert_eq!(fx.lines.at_stage("worker_processing_failed").len(), 1);
+    assert!(fx.lines.at_stage("worker_message_deleted").is_empty());
+    assert_eq!(
+        fx.lines.at_stage("worker_attempt_completed")[0]["outcome"],
+        "FAILED"
+    );
+}
+
+// SqsPushServiceTest#process_sentTimestamp...: SentTimestamp 시스템 속성을 받으면 큐 메시지에 싣는다.
+#[test]
+fn 수신_응답의_sent_timestamp_속성을_큐_나이로_기록한다() {
+    let fx = fx();
+    receive_one(&fx, Some(&(now_millis() - 250).to_string()));
+
+    fx.worker.poll();
+
+    let completed = fx.lines.at_stage("worker_attempt_completed");
+    assert_eq!(completed.len(), 1);
+    assert_eq!(completed[0]["queueAgeMs"], 250);
 }
