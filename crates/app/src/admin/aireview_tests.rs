@@ -58,6 +58,36 @@ struct Reply {
     text: String,
 }
 
+fn call_router(
+    router: &Router,
+    admin: Uuid,
+    method: Method,
+    path: &str,
+    query: &[(&str, &str)],
+    body: Option<Value>,
+) -> Reply {
+    let _guard = security::enter(Principal {
+        subject: admin.hyphenated().to_string(),
+        authorities: vec![AUTHORITY_ADMIN.to_owned()],
+    });
+    let mut req = Request::new(method, path);
+    req.query = query
+        .iter()
+        .map(|(k, v)| ((*k).to_owned(), (*v).to_owned()))
+        .collect();
+    if let Some(body) = body {
+        req.headers.append("Content-Type", "application/json");
+        req.body = body.to_string().into_bytes();
+    }
+    let response = router.handle(req);
+    let text = String::from_utf8_lossy(&response.body).into_owned();
+    Reply {
+        status: response.status,
+        body: serde_json::from_str(&text).unwrap_or(Value::Null),
+        text,
+    }
+}
+
 impl Api {
     fn call(
         &self,
@@ -66,26 +96,7 @@ impl Api {
         query: &[(&str, &str)],
         body: Option<Value>,
     ) -> Reply {
-        let _guard = security::enter(Principal {
-            subject: self.admin.hyphenated().to_string(),
-            authorities: vec![AUTHORITY_ADMIN.to_owned()],
-        });
-        let mut req = Request::new(method, path);
-        req.query = query
-            .iter()
-            .map(|(k, v)| ((*k).to_owned(), (*v).to_owned()))
-            .collect();
-        if let Some(body) = body {
-            req.headers.append("Content-Type", "application/json");
-            req.body = body.to_string().into_bytes();
-        }
-        let response = self.router.handle(req);
-        let text = String::from_utf8_lossy(&response.body).into_owned();
-        Reply {
-            status: response.status,
-            body: serde_json::from_str(&text).unwrap_or(Value::Null),
-            text,
-        }
+        call_router(&self.router, self.admin, method, path, query, body)
     }
 
     fn get(&self, path: &str, query: &[(&str, &str)]) -> Reply {
@@ -888,4 +899,53 @@ fn 출력_문자열은_공백을_없애고_제이슨_이스케이프로_쓴다()
         ),
         "{\"a\":[1,2.50,\"x y\"],\"b\":{\"c\":null},\"d\":\"\\u0001\\n\\\"q\\\"\"}"
     );
+}
+
+// AdminAiPromptVersionConcurrencyTest#createVersion_concurrent_assignsDistinctVersions
+#[test]
+fn 같은_유형에_동시에_버전을_만들어도_중복_없이_1부터_5까지_부여된다() {
+    const THREADS: usize = 5;
+    let Some(api) = api() else { return };
+    let barrier = std::sync::Barrier::new(THREADS);
+    let (router, admin) = (&api.router, api.admin);
+    let mut versions: Vec<i64> = std::thread::scope(|scope| {
+        let handles: Vec<_> = (0..THREADS)
+            .map(|index| {
+                let barrier = &barrier;
+                scope.spawn(move || {
+                    let mut body = valid_version();
+                    body["systemPrompt"] = json!(format!("동시 시스템 {index}"));
+                    barrier.wait();
+                    let reply = call_router(router, admin, Method::Post, PV, &[], Some(body));
+                    assert_eq!(reply.status, 201, "{}", reply.text);
+                    reply.body["version"].as_i64().unwrap()
+                })
+            })
+            .collect();
+        handles.into_iter().map(|h| h.join().unwrap()).collect()
+    });
+    versions.sort_unstable();
+    assert_eq!(versions, vec![1, 2, 3, 4, 5]);
+    let stored: Vec<i32> = api
+        .db
+        .client()
+        .query(
+            "SELECT version FROM ai_prompt_versions ORDER BY version",
+            &[],
+        )
+        .unwrap()
+        .iter()
+        .map(|r| r.get(0))
+        .collect();
+    assert_eq!(stored, vec![1, 2, 3, 4, 5]);
+    let audits: i64 = api
+        .db
+        .client()
+        .query_one(
+            "SELECT COUNT(*) FROM admin_audit_logs WHERE action = 'AI_PROMPT_VERSION_CREATED'",
+            &[],
+        )
+        .unwrap()
+        .get(0);
+    assert_eq!(audits, THREADS as i64);
 }
