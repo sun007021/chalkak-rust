@@ -12,6 +12,9 @@ pub mod app_version;
 mod app_version_tests;
 pub mod audit;
 pub mod auth;
+pub mod banner;
+#[cfg(test)]
+mod banner_tests;
 pub mod binding;
 pub mod bootstrap;
 pub mod config;
@@ -64,6 +67,7 @@ pub fn register_with(routes: Routes, deps: &support::AdminDeps) -> Routes {
     let routes = post::api::register(routes, &deps);
     let routes = topic::register(routes, &deps);
     let routes = notice::register(routes, &deps);
+    let routes = banner::register(routes, &deps);
     let routes = topic_push_schedule::register(routes, &deps);
     let routes = app_version::register(routes, &deps);
     feedback::register(routes, &deps)

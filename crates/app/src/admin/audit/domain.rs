@@ -293,6 +293,10 @@ impl AdminAction {
             AdminAction::AiPromptVersionCreated => {
                 before.is_empty() && is_valid_ai_prompt_version_state(after)
             }
+            AdminAction::BannerCreated => {
+                before.is_empty() && is_valid_banner_state(after, &BANNER_STATE_FIELDS)
+            }
+            AdminAction::BannerDeleted => is_banner_deleted(before, after),
             AdminAction::AppVersionCreated => {
                 before.is_empty()
                     && is_valid_app_version_state(after)
@@ -300,9 +304,7 @@ impl AdminAction {
             }
             AdminAction::AppVersionUpdated => is_app_version_updated(before, after),
             // 아래 작업의 상태 전이 규칙은 해당 기능을 옮기는 이슈에서 채운다. 그때까지 감사 로그로 기록할 수 없다.
-            AdminAction::BannerCreated
-            | AdminAction::BannerDeleted
-            | AdminAction::ReminderCreated
+            AdminAction::ReminderCreated
             | AdminAction::ReminderUpdated
             | AdminAction::ReminderDeleted => false,
         }
@@ -493,6 +495,8 @@ const APP_VERSION_FIELDS: [&str; 4] = [
 ];
 const NOTICE_STATE_FIELDS: [&str; 3] = ["title", "scheduledAt", "bodySha256"];
 const DELETED_NOTICE_STATE_FIELDS: [&str; 4] = ["title", "scheduledAt", "bodySha256", "deletedAt"];
+const BANNER_STATE_FIELDS: [&str; 2] = ["titleSha256", "subtitleSha256"];
+const DELETED_BANNER_STATE_FIELDS: [&str; 3] = ["titleSha256", "subtitleSha256", "deletedAt"];
 /// 게시물 `ModerationStatus`의 이름들.
 const MODERATION_STATUSES: [&str; 4] = ["VALIDATING", "PENDING", "APPROVED", "REJECTED"];
 
@@ -604,6 +608,29 @@ fn is_valid_notice_fields(state: &AuditSnapshot, expected_fields: &[&str]) -> bo
             .value("bodySha256")
             .and_then(Value::as_str)
             .is_some_and(is_sha256_hex)
+}
+
+fn is_valid_banner_state(state: &AuditSnapshot, expected_fields: &[&str]) -> bool {
+    state.has_exactly_fields(expected_fields)
+        && state
+            .value("titleSha256")
+            .and_then(Value::as_str)
+            .is_some_and(is_sha256_hex)
+        && state
+            .value("subtitleSha256")
+            .and_then(Value::as_str)
+            .is_some_and(is_sha256_hex)
+}
+
+/// `isBannerDeleted`: 해시는 그대로이고 `deletedAt`만 null에서 시각으로 바뀐다.
+fn is_banner_deleted(before: &AuditSnapshot, after: &AuditSnapshot) -> bool {
+    is_valid_banner_state(before, &DELETED_BANNER_STATE_FIELDS)
+        && is_valid_banner_state(after, &DELETED_BANNER_STATE_FIELDS)
+        && BANNER_STATE_FIELDS
+            .iter()
+            .all(|field| before.value(field) == after.value(field))
+        && matches!(before.value("deletedAt"), Some(Value::Null))
+        && is_instant(after.value("deletedAt"))
 }
 
 /// `[0-9a-f]{64}`
@@ -1397,6 +1424,47 @@ mod tests {
         );
         assert_eq!(AdminTargetType::parse("x"), None);
     }
+    // ----- BannerAuditTransitionTest -----
+
+    fn sha(c: char) -> String {
+        c.to_string().repeat(64)
+    }
+
+    fn banner_deletion(deleted_at: Value) -> Value {
+        json!({"titleSha256": sha('a'), "subtitleSha256": sha('b'), "deletedAt": deleted_at})
+    }
+
+    fn banner_create(
+        target: AdminTargetType,
+        before: Value,
+        after: Value,
+    ) -> Result<AdminAuditLog, AppError> {
+        create(
+            AdminAction::BannerCreated,
+            target,
+            None,
+            &snap(before),
+            &snap(after),
+            id(),
+        )
+    }
+
+    fn banner_delete(
+        target: AdminTargetType,
+        before: Value,
+        after: Value,
+    ) -> Result<AdminAuditLog, AppError> {
+        // 스냅샷 단계에서 거절되는 값(민감 키 등)도 거절로 본다.
+        create(
+            AdminAction::BannerDeleted,
+            target,
+            None,
+            &AuditSnapshot::from_map(before.as_object().unwrap())?,
+            &AuditSnapshot::from_map(after.as_object().unwrap())?,
+            id(),
+        )
+    }
+
     // ----- AdminAppVersionAuditTest -----
 
     const STORE_URL: &str = "https://apps.apple.com/app/id123";
@@ -1424,6 +1492,111 @@ mod tests {
             after,
             id(),
         )
+    }
+
+    #[test]
+    fn 배너_생성은_빈_이전_상태와_제목_부제목_해시만_있는_이후_상태를_허용한다() {
+        let after = json!({"titleSha256": sha('a'), "subtitleSha256": sha('b')});
+        let log = banner_create(AdminTargetType::Banner, json!({}), after.clone()).unwrap();
+        assert!(log.before_state.is_empty());
+        assert_eq!(&log.after_state, after.as_object().unwrap());
+        assert_eq!(log.reason, None);
+    }
+
+    #[test]
+    fn 배너_생성은_잘못된_대상_이전_상태_필드_해시를_거절한다() {
+        let valid = json!({"titleSha256": sha('a'), "subtitleSha256": sha('b')});
+        let cases = [
+            (AdminTargetType::Banner, valid.clone(), valid.clone()),
+            (AdminTargetType::Post, json!({}), valid.clone()),
+            (
+                AdminTargetType::Banner,
+                json!({}),
+                json!({"titleSha256": sha('a')}),
+            ),
+            (
+                AdminTargetType::Banner,
+                json!({}),
+                json!({"titleSha256": sha('g'), "subtitleSha256": sha('b')}),
+            ),
+            (
+                AdminTargetType::Banner,
+                json!({}),
+                json!({"titleSha256": "a".repeat(63), "subtitleSha256": sha('b')}),
+            ),
+            (
+                AdminTargetType::Banner,
+                json!({}),
+                json!({"titleSha256": sha('a'), "subtitleSha256": 1}),
+            ),
+            (
+                AdminTargetType::Banner,
+                json!({}),
+                json!({"titleSha256": sha('a'), "subtitleSha256": sha('b'), "extra": true}),
+            ),
+        ];
+        for (target, before, after) in cases {
+            assert!(
+                banner_create(target, before.clone(), after.clone()).is_err(),
+                "{before} {after}"
+            );
+        }
+    }
+
+    #[test]
+    fn 배너_삭제_감사는_사유_없이_같은_해시와_삭제_시각_전이를_기록한다() {
+        let before = banner_deletion(Value::Null);
+        let after = banner_deletion(json!("2026-10-19T01:00:00Z"));
+        let log = banner_delete(AdminTargetType::Banner, before.clone(), after.clone()).unwrap();
+        assert_eq!(log.reason, None);
+        assert_eq!(&log.before_state, before.as_object().unwrap());
+        assert_eq!(&log.after_state, after.as_object().unwrap());
+    }
+
+    #[test]
+    fn 배너_삭제_감사는_잘못된_대상_상태_전이를_거절한다() {
+        let before = banner_deletion(Value::Null);
+        let after = banner_deletion(json!("2026-10-19T01:00:00Z"));
+        let mut changed = after.clone();
+        changed["titleSha256"] = json!(sha('c'));
+        let mut invalid_hash = before.clone();
+        invalid_hash["subtitleSha256"] = json!("invalid");
+        let mut extra = after.clone();
+        extra["webViewUrl"] = json!("https://example.com");
+        let cases = [
+            (AdminTargetType::Post, before.clone(), after.clone()),
+            (AdminTargetType::Banner, after.clone(), after.clone()),
+            (AdminTargetType::Banner, before.clone(), before.clone()),
+            (
+                AdminTargetType::Banner,
+                before.clone(),
+                banner_deletion(json!("invalid")),
+            ),
+            (AdminTargetType::Banner, before.clone(), changed),
+            (AdminTargetType::Banner, invalid_hash, after.clone()),
+            (AdminTargetType::Banner, before.clone(), extra),
+        ];
+        for (target, before, after) in cases {
+            assert!(
+                banner_delete(target, before.clone(), after.clone()).is_err(),
+                "{before} {after}"
+            );
+        }
+    }
+
+    #[test]
+    fn 배너_작업은_사유를_요구하지_않고_대상은_배너다() {
+        assert!(!AdminAction::BannerCreated.reason_required());
+        assert!(!AdminAction::BannerDeleted.reason_required());
+        assert_eq!(
+            AdminAction::BannerCreated.target_type(),
+            AdminTargetType::Banner
+        );
+        assert_eq!(AdminAction::BannerDeleted.as_str(), "BANNER_DELETED");
+        assert_eq!(
+            AdminTargetType::parse("BANNER"),
+            Some(AdminTargetType::Banner)
+        );
     }
 
     #[test]
