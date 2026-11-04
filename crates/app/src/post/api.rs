@@ -11,7 +11,8 @@ use super::command::{
 };
 use super::domain::PostTitle;
 use super::query::{
-    PostCalendarResult, PostDetail, PostListResult, PostQueryService, PostSort, TodayPostStatus,
+    AuthorPostListResult, PostCalendarResult, PostDetail, PostListResult, PostQueryService,
+    PostSort, TodayPostStatus,
 };
 use super::request::{jackson_uuid, parse_canonical_uuid, spring_integer};
 use super::support::UserGuard;
@@ -90,6 +91,7 @@ struct TopicResponse {
 #[serde(rename_all = "camelCase")]
 struct PostDetailResponse {
     id: String,
+    author_id: String,
     topic: TopicResponse,
     original_image_url: Option<String>,
     thumbnail_image_url: Option<String>,
@@ -103,6 +105,7 @@ impl From<PostDetail> for PostDetailResponse {
     fn from(d: PostDetail) -> Self {
         PostDetailResponse {
             id: d.id.to_string(),
+            author_id: d.author_id.to_string(),
             topic: TopicResponse {
                 id: d.topic.id.to_string(),
                 title: d.topic.title,
@@ -189,6 +192,7 @@ struct PostCalendarMonthsResponse {
 #[serde(rename_all = "camelCase")]
 struct PostListItemResponse {
     id: String,
+    author_id: String,
     original_image_url: Option<String>,
     thumbnail_image_url: Option<String>,
     signature_original_image_url: Option<String>,
@@ -223,6 +227,7 @@ impl From<PostListResult> for PostListResponse {
                 .into_iter()
                 .map(|p| PostListItemResponse {
                     id: p.id.to_string(),
+                    author_id: p.author_id.to_string(),
                     original_image_url: p.original_image_url,
                     thumbnail_image_url: p.thumbnail_image_url,
                     signature_original_image_url: p.signature_original_image_url,
@@ -292,6 +297,81 @@ pub(crate) fn read_update_request(req: &Request) -> Result<Option<String>, ApiEr
         return Err(ApiError::Validation(TITLE_TOO_LONG.to_owned()));
     }
     Ok(title)
+}
+
+/// `AuthorPostListResponse`
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct AuthorPostListResponse {
+    current_page: i32,
+    page_size: i32,
+    has_next: bool,
+    posts: Vec<AuthorPostResponse>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct AuthorPostResponse {
+    id: String,
+    original_image_url: Option<String>,
+    thumbnail_image_url: Option<String>,
+    topic: AuthorPostTopicResponse,
+    like_count: i64,
+    is_liked: bool,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct AuthorPostTopicResponse {
+    id: String,
+    title: String,
+    topic_date: String,
+}
+
+impl From<AuthorPostListResult> for AuthorPostListResponse {
+    fn from(r: AuthorPostListResult) -> Self {
+        AuthorPostListResponse {
+            current_page: r.current_page,
+            page_size: r.page_size,
+            has_next: r.has_next,
+            posts: r
+                .posts
+                .into_iter()
+                .map(|p| AuthorPostResponse {
+                    id: p.id.to_string(),
+                    original_image_url: p.original_image_url,
+                    thumbnail_image_url: p.thumbnail_image_url,
+                    topic: AuthorPostTopicResponse {
+                        id: p.topic.id.to_string(),
+                        title: p.topic.title,
+                        topic_date: p.topic.topic_date.to_string(),
+                    },
+                    like_count: p.like_count,
+                    is_liked: p.is_liked,
+                })
+                .collect(),
+        }
+    }
+}
+
+/// `@Valid @ModelAttribute AuthorPostListRequest`: `page`(기본 1, 1 이상)와 `pageSize`(기본 20, 1~100).
+/// 바인딩 실패(`page`, `pageSize` 순)가 검증보다 먼저 나간다.
+pub(crate) fn bind_author_post_list_request(req: &Request) -> Result<(i32, i32), ApiError> {
+    let mismatch = |name: &str| ApiError::ArgumentTypeMismatch(name.to_owned());
+    let page = match req.query_param("page") {
+        Some(text) => spring_integer(text).map_err(|_| mismatch("page"))?,
+        None => None,
+    };
+    let page_size = match req.query_param("pageSize") {
+        Some(text) => spring_integer(text).map_err(|_| mismatch("pageSize"))?,
+        None => None,
+    };
+    let page = page.unwrap_or(1);
+    let page_size = page_size.unwrap_or(20);
+    if page < 1 || !(1..=100).contains(&page_size) {
+        return Err(ApiError::Validation(LIST_CONDITION_INVALID.to_owned()));
+    }
+    Ok((page, page_size))
 }
 
 /// `PostListRequest`(바인딩 후 검증을 거친 값).

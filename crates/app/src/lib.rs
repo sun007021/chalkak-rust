@@ -13,6 +13,7 @@
 pub mod admin;
 pub mod aireview;
 pub mod analytics;
+pub mod appversion;
 pub mod auth;
 pub mod common;
 pub mod config;
@@ -66,6 +67,7 @@ pub fn register_routes(routes: web::Routes, ctx: &AppContext) -> web::Routes {
     let routes = user::api::register(routes, ctx, &components);
     let routes = post::api::register(routes, ctx);
     let routes = like::api::register(routes, ctx);
+    let routes = appversion::api::register(routes, ctx);
     let routes = post::callback::register(routes, ctx);
     admin::register(routes, ctx)
 }

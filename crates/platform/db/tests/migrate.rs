@@ -109,9 +109,9 @@ fn applies_all_repository_migrations_to_an_empty_database() {
         .unwrap()
         .migrate(&mut client)
         .unwrap();
-    assert_eq!(report.applied.len(), 45);
+    assert_eq!(report.applied.len(), 70);
     let rows = rust_history(&mut client);
-    assert_eq!(rows.len(), 45);
+    assert_eq!(rows.len(), 70);
     for (i, row) in rows.iter().enumerate() {
         assert_eq!(row.installed_rank, i as i32 + 1);
         assert_eq!(row.kind, "SQL");

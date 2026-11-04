@@ -16,6 +16,7 @@ use crate::web::ApiError;
 pub struct NotificationSettingsResult {
     pub topic_push_enabled: bool,
     pub moderation_push_enabled: bool,
+    pub ai_review_push_enabled: bool,
 }
 
 fn invalid_credentials() -> ApiError {
@@ -52,6 +53,7 @@ impl NotificationSettingsService {
         Ok(NotificationSettingsResult {
             topic_push_enabled: user.topic_push_enabled,
             moderation_push_enabled: user.moderation_push_enabled,
+            ai_review_push_enabled: user.ai_review_push_enabled,
         })
     }
 
@@ -62,6 +64,7 @@ impl NotificationSettingsService {
         user_id: Uuid,
         topic_push_enabled: Option<bool>,
         moderation_push_enabled: Option<bool>,
+        ai_review_push_enabled: Option<bool>,
     ) -> Result<(), ApiError> {
         transact(&self.pool, |tx| {
             let before = self
@@ -72,6 +75,7 @@ impl NotificationSettingsService {
             after.update_push_preferences(
                 topic_push_enabled.unwrap_or(before.topic_push_enabled),
                 moderation_push_enabled.unwrap_or(before.moderation_push_enabled),
+                ai_review_push_enabled.unwrap_or(before.ai_review_push_enabled),
             )?;
             self.users
                 .update_if_changed(tx, &before, &after, self.clock.now())?;
