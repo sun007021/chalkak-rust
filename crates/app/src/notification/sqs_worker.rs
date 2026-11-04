@@ -52,7 +52,7 @@ pub struct QueueMessage {
     pub body: String,
     /// `ApproximateReceiveCount` 시스템 속성
     pub receive_count: Option<String>,
-    /// `SentTimestamp` 시스템 속성(밀리초 문자열). 수신 요청이 이 속성을 요청해야 값이 온다. 없어도 처리에는 영향이 없다.
+    /// `SentTimestamp` 시스템 속성(밀리초 문자열). 없어도 처리에는 영향이 없다.
     pub sent_timestamp: Option<String>,
 }
 
@@ -135,7 +135,10 @@ impl WorkerQueue for SqsWorkerQueue {
             max_number_of_messages: Some(1),
             visibility_timeout: Some(VISIBILITY_SECONDS),
             wait_time_seconds: Some(LONG_POLL_SECONDS),
-            message_system_attribute_names: vec![RECEIVE_COUNT_ATTRIBUTE.to_owned()],
+            message_system_attribute_names: vec![
+                RECEIVE_COUNT_ATTRIBUTE.to_owned(),
+                SENT_TIMESTAMP_ATTRIBUTE.to_owned(),
+            ],
         };
         let messages = self
             .receive_client

@@ -61,7 +61,9 @@ fn device_count(w: &World) -> i64 {
 fn get_settings_authenticated_user_returns_settings() {
     let Some(w) = World::create() else { return };
     let user = w.save_user();
-    w.modify_user(user.id, |u| u.update_push_preferences(false, true).unwrap());
+    w.modify_user(user.id, |u| {
+        u.update_push_preferences(false, true, true).unwrap()
+    });
     let router = w.push_router();
     let _login = login_as(user.id, None);
 
@@ -77,7 +79,8 @@ fn get_settings_authenticated_user_returns_settings() {
     let body = json_of(&response);
     assert_eq!(body["topicPushEnabled"], false);
     assert_eq!(body["moderationPushEnabled"], true);
-    assert_eq!(body.as_object().unwrap().len(), 2);
+    assert_eq!(body["aiReviewPushEnabled"], true);
+    assert_eq!(body.as_object().unwrap().len(), 3);
 }
 
 // NotificationSettingsControllerTest#getSettings_invalidUser_returnsUnauthorized
@@ -139,6 +142,7 @@ fn update_settings_empty_update_returns_bad_request() {
         r#"{"topicPushEnabled":null}"#,
         r#"{"moderationPushEnabled":null}"#,
         r#"{"topicPushEnabled":null,"moderationPushEnabled":null}"#,
+        r#"{"aiReviewPushEnabled":null}"#,
     ] {
         let Some(w) = World::create() else { return };
         let user = w.save_user();
@@ -150,6 +154,30 @@ fn update_settings_empty_update_returns_bad_request() {
         let json = assert_error(&response, 400, "BUSINESS_ERROR");
         assert_eq!(json["message"], UPDATE_REQUIRED, "{body}");
     }
+}
+
+// 1fb74d9 NotificationSettingsUpdateRequest: aiReviewPushEnabled만 보내도 변경으로 인정한다.
+#[test]
+fn update_settings_ai_review_only_returns_no_content() {
+    let Some(w) = World::create() else { return };
+    let user = w.save_user();
+    let router = w.push_router();
+    let _login = login_as(user.id, None);
+
+    let response = send(
+        &router,
+        Method::Patch,
+        SETTINGS,
+        Some(r#"{"aiReviewPushEnabled":false}"#),
+    );
+
+    assert_eq!(response.status, 204);
+    let saved = w.find_user(user.id);
+    assert!(saved.topic_push_enabled && saved.moderation_push_enabled);
+    assert!(!saved.ai_review_push_enabled);
+    let response = send(&router, Method::Get, SETTINGS, None);
+    let json: serde_json::Value = serde_json::from_slice(&response.body).unwrap();
+    assert_eq!(json["aiReviewPushEnabled"], false);
 }
 
 // NotificationSettingsControllerTest#updateSettings_unreadableBody_returnsBadRequest

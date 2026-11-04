@@ -1,0 +1,134 @@
+name = "관리자 앱 버전: 인증·권한 경계"
+tags = ["app-version", "app-version-admin"]
+clock = "2026-10-29T10:00:00+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO admins (id, username, password, created_at, updated_at) VALUES
+  ('01990000-0000-7000-8000-0000000000a1', 'operator', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-01T00:00:00Z', '2026-09-01T00:00:00Z'),
+  ('01990000-0000-7000-8000-0000000000a2', 'reviewer', '$2y$12$GbP5jGCW/tL2TyqY9POOG.gHRFksjWnUfK/OtpzXE.U5.tyR1.MX6', '2026-09-02T00:00:00Z', '2026-09-02T00:00:00Z');
+INSERT INTO users (id, email, status, signature_original_storage_key, signature_thumbnail_storage_key, app_version, created_at, updated_at, deleted_at) VALUES
+  ('01990000-0000-7000-8000-000000000001', 'alice@test.chalkak', 'ACTIVE', 'chalkak/signatures/u1/original.png', 'chalkak/signatures/u1/thumbnail.png', '1.2.0', '2026-10-01T00:00:00Z', '2026-10-01T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-000000000002', 'bob@test.chalkak', 'BANNED', 'chalkak/signatures/u2/original.png', NULL, NULL, '2026-10-02T00:00:00Z', '2026-10-02T00:00:00Z', NULL),
+  ('01990000-0000-7000-8000-000000000003', 'withdrawn+01990000-0000-7000-8000-000000000003@chalkak.invalid', 'ACTIVE', 'withdrawn/01990000-0000-7000-8000-000000000003', NULL, '1.0.0', '2026-10-03T00:00:00Z', '2026-10-05T00:00:00Z', '2026-10-05T00:00:00Z');
+"""]
+
+[[step]]
+name = "목록 익명"
+method = "GET"
+path = "/api/v1/admin/app-versions"
+
+[[step]]
+name = "목록 회원"
+method = "GET"
+path = "/api/v1/admin/app-versions"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "목록 정지 회원"
+method = "GET"
+path = "/api/v1/admin/app-versions"
+auth = { user = "01990000-0000-7000-8000-000000000002" }
+
+[[step]]
+name = "목록 없는 회원"
+method = "GET"
+path = "/api/v1/admin/app-versions"
+auth = { user = "01990000-0000-7000-8000-0000000000ff" }
+
+[[step]]
+name = "목록 만료 관리자"
+method = "GET"
+path = "/api/v1/admin/app-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1", expires_in = -60 }
+
+[[step]]
+name = "목록 형식 오류 토큰"
+method = "GET"
+path = "/api/v1/admin/app-versions"
+auth = { raw = "Bearer not-a-jwt" }
+
+[[step]]
+name = "목록 Bearer 아닌 스킴"
+method = "GET"
+path = "/api/v1/admin/app-versions"
+auth = { raw = "Basic dXNlcjpwYXNz" }
+
+[[step]]
+name = "목록 없는 관리자"
+method = "GET"
+path = "/api/v1/admin/app-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000ff" }
+
+[[step]]
+name = "저장 익명"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "저장 회원"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "저장 정지 회원"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { user = "01990000-0000-7000-8000-000000000002" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "저장 회원 잘못된 플랫폼은 권한이 먼저"
+method = "PUT"
+path = "/api/v1/admin/app-versions/WEB"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "저장 익명 잘못된 본문"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+headers = { "Content-Type" = "application/json" }
+body = '''깨진'''
+
+[[step]]
+name = "저장 형식 오류 토큰"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { raw = "Bearer not-a-jwt" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "저장 없는 관리자는 감사 로그 외래 키 때문에 서버 오류"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000ff" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "권한 거절 뒤에도 미설정"
+method = "GET"
+path = "/api/v1/admin/app-versions"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+
+[[step]]
+name = "관리자 저장"
+method = "PUT"
+path = "/api/v1/admin/app-versions/ANDROID"
+auth = { admin = "01990000-0000-7000-8000-0000000000a1" }
+headers = { "Content-Type" = "application/json" }
+body = '''{"revision": null, "minimumSupportedVersion": "1.0.0", "storeUrl": "https://play.google.com/store/apps/details?id=com.example.chalkak", "reason": "출시 확인"}'''
+
+[[step]]
+name = "공개 조회 익명"
+method = "GET"
+path = "/api/v1/app-version?platform=ANDROID"

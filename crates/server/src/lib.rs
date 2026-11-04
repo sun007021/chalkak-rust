@@ -313,6 +313,8 @@ fn ensure_admin_account(pool: &Pool, settings: &Settings) -> Result<(), Box<dyn 
 fn migrate(settings: &Settings, pool: &Pool, logger: &Logger) -> Result<(), Box<dyn Error>> {
     let migrator = Migrator::from_dir(&settings.migrations_dir)?;
     let mut conn = pool.get()?;
+    // Flyway `BEFORE_MIGRATE` 콜백: 기존 앱 버전 설정이 새 도메인으로 읽히는지 DDL 전에 확인한다.
+    chalkak_app::appversion::migration_validator::validate_before_migrate(&mut conn)?;
     let report = migrator.migrate(&mut conn)?;
     logger
         .info("org.flywaydb.core.internal.command.DbMigrate")

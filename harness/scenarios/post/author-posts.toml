@@ -1,0 +1,176 @@
+name = "작성자 공개 사진 목록: 조회, 페이지, 공개 조건, 오류"
+tags = ["author-posts", "post"]
+clock = "2026-10-12T09:00:00+09:00"
+
+[setup]
+sql = ["""
+INSERT INTO users (id, email, status, signature_original_storage_key, deleted_at) VALUES
+  ('01990000-0000-7000-8000-000000000001', 'viewer@test.chalkak', 'ACTIVE', 'chalkak/signatures/u1/original.png', NULL),
+  ('01990000-0000-7000-8000-000000000002', 'author@test.chalkak', 'ACTIVE', 'chalkak/signatures/u2/original.png', NULL),
+  ('01990000-0000-7000-8000-000000000003', 'banned-author@test.chalkak', 'BANNED', 'chalkak/signatures/u3/original.png', NULL),
+  ('01990000-0000-7000-8000-000000000004', 'withdrawn@test.chalkak', 'ACTIVE', 'chalkak/signatures/u4/original.png', '2026-10-01T00:00:00Z'),
+  ('01990000-0000-7000-8000-000000000009', 'banned-viewer@test.chalkak', 'BANNED', 'chalkak/signatures/u9/original.png', NULL);
+INSERT INTO topics (id, title, topic_date, starts_at, ends_at, deleted_at)
+SELECT ('01990000-0000-7000-8000-0000000000' || lpad((i + 16)::text, 2, '0'))::uuid, '주제 ' || i,
+  ('2026-09-01'::date + i), ('2026-09-01'::date + i)::timestamptz, ('2026-09-02'::date + i)::timestamptz,
+  CASE WHEN i = 25 THEN '2026-10-01T00:00:00Z'::timestamptz END
+FROM generate_series(1, 25) AS i;
+INSERT INTO photos (id, original_storage_key, thumbnail_storage_key, metadata)
+SELECT ('01990000-0000-7000-8000-0000000001' || lpad(i::text, 2, '0'))::uuid, 'chalkak/posts/test/original/p' || i || '.webp',
+  CASE WHEN i = 3 THEN NULL ELSE 'chalkak/posts/test/thumbnail/p' || i || '.webp' END, '{}'::jsonb
+FROM generate_series(1, 30) AS i;
+INSERT INTO posts (id, user_id, topic_id, photo_id, moderation_status, created_at, updated_at, deleted_at)
+SELECT ('01990000-0000-7000-8000-0000000002' || lpad(i::text, 2, '0'))::uuid,
+  '01990000-0000-7000-8000-000000000002'::uuid,
+  ('01990000-0000-7000-8000-0000000000' || lpad((i + 16)::text, 2, '0'))::uuid,
+  ('01990000-0000-7000-8000-0000000001' || lpad(i::text, 2, '0'))::uuid,
+  CASE WHEN i = 22 THEN 'PENDING' WHEN i = 23 THEN 'REJECTED' ELSE 'APPROVED' END::moderation_status,
+  '2026-10-01T00:00:00Z'::timestamptz - (i || ' minutes')::interval, '2026-10-01T00:00:00Z'::timestamptz,
+  CASE WHEN i = 24 THEN '2026-10-02T00:00:00Z'::timestamptz END
+FROM generate_series(1, 25) AS i;
+INSERT INTO topics (id, title, topic_date, starts_at, ends_at) VALUES
+  ('01990000-0000-7000-8000-0000000000f1', '다른 작성자 주제', '2026-08-01', '2026-08-01T00:00:00Z', '2026-08-02T00:00:00Z');
+INSERT INTO posts (id, user_id, topic_id, photo_id, moderation_status) VALUES
+  ('01990000-0000-7000-8000-0000000003a1', '01990000-0000-7000-8000-000000000003', '01990000-0000-7000-8000-0000000000f1', '01990000-0000-7000-8000-000000000126', 'APPROVED');
+INSERT INTO post_likes (post_id, user_id) VALUES
+  ('01990000-0000-7000-8000-000000000225', '01990000-0000-7000-8000-000000000001'),
+  ('01990000-0000-7000-8000-000000000225', '01990000-0000-7000-8000-000000000002'),
+  ('01990000-0000-7000-8000-000000000221', '01990000-0000-7000-8000-000000000002');
+"""]
+
+[[step]]
+name = "작성자 목록 기본"
+method = "GET"
+path = "/api/v1/users/01990000-0000-7000-8000-000000000002/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "작성자 목록 1쪽 크기 5"
+method = "GET"
+path = "/api/v1/users/01990000-0000-7000-8000-000000000002/posts?page=1&pageSize=5"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "작성자 목록 2쪽 크기 5"
+method = "GET"
+path = "/api/v1/users/01990000-0000-7000-8000-000000000002/posts?page=2&pageSize=5"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "작성자 목록 마지막 쪽"
+method = "GET"
+path = "/api/v1/users/01990000-0000-7000-8000-000000000002/posts?page=5&pageSize=5"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "작성자 목록 범위 밖"
+method = "GET"
+path = "/api/v1/users/01990000-0000-7000-8000-000000000002/posts?page=9&pageSize=5"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "작성자 목록 크기 100"
+method = "GET"
+path = "/api/v1/users/01990000-0000-7000-8000-000000000002/posts?pageSize=100"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "작성자 목록 page 0"
+method = "GET"
+path = "/api/v1/users/01990000-0000-7000-8000-000000000002/posts?page=0"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "작성자 목록 pageSize 0"
+method = "GET"
+path = "/api/v1/users/01990000-0000-7000-8000-000000000002/posts?pageSize=0"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "작성자 목록 pageSize 101"
+method = "GET"
+path = "/api/v1/users/01990000-0000-7000-8000-000000000002/posts?pageSize=101"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "작성자 목록 page 문자"
+method = "GET"
+path = "/api/v1/users/01990000-0000-7000-8000-000000000002/posts?page=abc"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "작성자 목록 page 공백"
+method = "GET"
+path = "/api/v1/users/01990000-0000-7000-8000-000000000002/posts?page=%20"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "작성자 목록 offset 초과"
+method = "GET"
+path = "/api/v1/users/01990000-0000-7000-8000-000000000002/posts?page=2147483647&pageSize=100"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "작성자 목록 offset 경계"
+method = "GET"
+path = "/api/v1/users/01990000-0000-7000-8000-000000000002/posts?page=2147483647&pageSize=1"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "본인 조회"
+method = "GET"
+path = "/api/v1/users/01990000-0000-7000-8000-000000000002/posts"
+auth = { user = "01990000-0000-7000-8000-000000000002" }
+
+[[step]]
+name = "정지 조회자"
+method = "GET"
+path = "/api/v1/users/01990000-0000-7000-8000-000000000002/posts"
+auth = { user = "01990000-0000-7000-8000-000000000009" }
+
+[[step]]
+name = "정지 작성자"
+method = "GET"
+path = "/api/v1/users/01990000-0000-7000-8000-000000000003/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "탈퇴 작성자"
+method = "GET"
+path = "/api/v1/users/01990000-0000-7000-8000-000000000004/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "없는 작성자"
+method = "GET"
+path = "/api/v1/users/01990000-0000-7000-8000-0000000000ff/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "잘못된 작성자 ID"
+method = "GET"
+path = "/api/v1/users/not-a-uuid/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "대문자 작성자 ID"
+method = "GET"
+path = "/api/v1/users/01990000-0000-7000-8000-000000000002/posts"
+auth = { user = "01990000-0000-7000-8000-000000000001" }
+
+[[step]]
+name = "없는 조회자"
+method = "GET"
+path = "/api/v1/users/01990000-0000-7000-8000-000000000002/posts"
+auth = { user = "01990000-0000-7000-8000-0000000000fe" }
+
+[[step]]
+name = "인증 없음"
+method = "GET"
+path = "/api/v1/users/01990000-0000-7000-8000-000000000002/posts"
+
+[[step]]
+name = "쿼리 오류가 ID 오류보다 먼저"
+method = "GET"
+path = "/api/v1/users/not-a-uuid/posts?page=0"
+auth = { user = "01990000-0000-7000-8000-000000000001" }

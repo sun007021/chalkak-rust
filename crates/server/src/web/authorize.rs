@@ -7,8 +7,10 @@
 //! 5. `/error` 공개.
 //! 6. 개발 관리자 우회가 켜져 있으면 `/api/v1/admin/**` 공개.
 //! 7. `/api/v1/admin/**`은 `SCOPE_ADMIN`.
-//! 8. GET `/api/v1/topics`, `/api/v1/posts`(정확히 이 경로)는 익명이거나 `SCOPE_USER`.
-//! 9. 나머지는 모두 `SCOPE_USER`. 새 API에 인증을 붙이는 것을 잊어도 기본값이 차단이 되도록.
+//! 8. GET `/api/v1/banners`, `/api/v1/app-version`(정확히 이 경로)은 회원 식별자를 해석하지 않는 공통 공개 조회라 익명,
+//!    `SCOPE_USER`, `SCOPE_ADMIN` 모두 통과한다.
+//! 9. GET `/api/v1/topics`, `/api/v1/posts`(정확히 이 경로)는 익명이거나 `SCOPE_USER`.
+//! 10. 나머지는 모두 `SCOPE_USER`. 새 API에 인증을 붙이는 것을 잊어도 기본값이 차단이 되도록.
 //!
 //! 거부하면 익명은 401(`WWW-Authenticate: Bearer`), 인증된 주체는 403이다. 경로 규칙은 끝 슬래시와 대소문자를 구분한다.
 
@@ -31,6 +33,8 @@ const PUBLIC_ADMIN_AUTH_PATHS: [&str; 3] = [
     "/api/v1/admin/auth/logout",
 ];
 const PUBLIC_GET_PATHS: [&str; 2] = ["/api/v1/topics", "/api/v1/posts"];
+/// 익명, 회원, 관리자 토큰이 모두 통과하는 공개 조회.
+const COMMON_PUBLIC_GET_PATHS: [&str; 2] = ["/api/v1/banners", "/api/v1/app-version"];
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Access {
@@ -66,6 +70,9 @@ pub fn decide(
     }
     if under(path, "/api/v1/admin") {
         return allow_if(admin_development_bypass || has(AUTHORITY_ADMIN));
+    }
+    if *method == Method::Get && COMMON_PUBLIC_GET_PATHS.contains(&path) {
+        return allow_if(principal.is_none() || has(AUTHORITY_USER) || has(AUTHORITY_ADMIN));
     }
     if *method == Method::Get && PUBLIC_GET_PATHS.contains(&path) {
         return allow_if(principal.is_none() || has(AUTHORITY_USER));
@@ -206,6 +213,38 @@ mod tests {
         }
     }
 
+    // SecurityFilterChainTest: 배너 조회는 익명·회원·관리자 모두 통과한다.
+    #[test]
+    fn 배너_조회는_익명_회원_관리자_모두_통과한다() {
+        let path = "/api/v1/banners";
+        assert_eq!(check(Method::Get, path, None), Access::Allow);
+        assert_eq!(check(Method::Get, path, Some(&user())), Access::Allow);
+        assert_eq!(check(Method::Get, path, Some(&admin())), Access::Allow);
+        assert_eq!(check(Method::Get, path, Some(&no_scope())), Access::Deny);
+        assert_eq!(check(Method::Post, path, None), Access::Deny);
+        assert_eq!(check(Method::Get, "/api/v1/banners/", None), Access::Deny);
+    }
+
+    // SecurityConfig: 앱 버전 설정은 회원 식별자를 해석하지 않는 공통 공개 조회(익명, 회원, 관리자)
+    #[test]
+    fn 앱_버전_조회는_익명_회원_관리자가_통과한다() {
+        let path = "/api/v1/app-version";
+        assert_eq!(check(Method::Get, path, None), Access::Allow);
+        assert_eq!(check(Method::Get, path, Some(&user())), Access::Allow);
+        assert_eq!(check(Method::Get, path, Some(&admin())), Access::Allow);
+        // 권한 없는 토큰, GET이 아닌 요청, 끝 슬래시·대소문자·하위 경로는 공개가 아니다.
+        assert_eq!(check(Method::Get, path, Some(&no_scope())), Access::Deny);
+        assert_eq!(check(Method::Post, path, None), Access::Deny);
+        assert_eq!(check(Method::Head, path, None), Access::Deny);
+        for other in [
+            "/api/v1/app-version/",
+            "/api/v1/App-Version",
+            "/api/v1/app-version/x",
+        ] {
+            assert_eq!(check(Method::Get, other, None), Access::Deny, "{other}");
+        }
+    }
+
     #[test]
     fn 공개_목록의_끝_슬래시와_대소문자와_하위_경로는_공개가_아니다() {
         for path in [
@@ -299,6 +338,34 @@ mod tests {
             String::from_utf8(r.body).unwrap(),
             r#"{"errorCode":"FORBIDDEN","message":"접근 권한이 없습니다."}"#
         );
+    }
+
+    // 작성자 공개 사진 목록은 회원 토큰만 통과한다. 익명은 401(Bearer), 관리자 토큰은 403이다.
+    #[test]
+    fn 작성자_사진_목록은_회원만_통과하고_익명은_401_관리자는_403이다() {
+        let path = "/api/v1/users/01990000-0000-7000-8000-000000000002/posts";
+        assert_eq!(check(Method::Get, path, Some(&user())), Access::Allow);
+        assert_eq!(check(Method::Get, path, None), Access::Deny);
+        assert_eq!(check(Method::Get, path, Some(&admin())), Access::Deny);
+        assert_eq!(check(Method::Get, path, Some(&no_scope())), Access::Deny);
+
+        let logger = Arc::new(Logger::new(
+            Box::new(std::io::sink()),
+            chalkak_core::log::Level::Error,
+            Arc::new(chalkak_core::FixedClock::new(
+                "2026-10-12T00:00:00Z".parse().unwrap(),
+            )),
+        ));
+        let mw = Authorize::new(false, logger);
+        let ok = |_: Request| Response::new(200);
+        let r = mw.handle(Request::new(Method::Get, path), &ok);
+        assert_eq!(r.status, 401);
+        assert_eq!(r.headers.get("www-authenticate"), Some("Bearer"));
+
+        let _guard = security::enter(admin());
+        let r = mw.handle(Request::new(Method::Get, path), &ok);
+        assert_eq!(r.status, 403);
+        assert!(!r.headers.contains("www-authenticate"));
     }
 
     // AccessLogTest#accessLog_memberRequest_logsUserId: 관리자 토큰의 sub는 남기지 않는다.

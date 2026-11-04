@@ -737,9 +737,10 @@ fn 수신은_20초_롱_폴링_60초_숨김_한_건으로_요청한다() {
     assert_eq!(body["WaitTimeSeconds"], 20);
     assert_eq!(body["VisibilityTimeout"], 60);
     assert_eq!(body["MaxNumberOfMessages"], 1);
+    // 1fb74d9 SqsPushService: ApproximateReceiveCount, SentTimestamp 순서로 요청한다.
     assert_eq!(
-        body["MessageSystemAttributeNames"][0],
-        "ApproximateReceiveCount"
+        body["MessageSystemAttributeNames"],
+        serde_json::json!(["ApproximateReceiveCount", "SentTimestamp"])
     );
     assert_eq!(fx.wire.timeouts(), vec![RECEIVE_TIMEOUT]);
 }
