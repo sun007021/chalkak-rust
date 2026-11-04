@@ -8,7 +8,7 @@
 | 경로 | 내용 |
 | --- | --- |
 | `parity/` | 시나리오 러너, 정규화, 비교기, ID Token 서명 (`chalkak-parity`) |
-| `fakes/` | 가짜 외부 서버 (`chalkak-fakes`): OIDC JWKS, Apple 토큰 교환·철회, Slack Webhook, S3 HeadObject, SQS(SendMessage·Receive·Delete·ChangeMessageVisibility), FCM v1 전송·OAuth 토큰 교환, CloudWatch Logs Insights. 받은 요청을 기록한다 |
+| `fakes/` | 가짜 외부 서버 (`chalkak-fakes`): OIDC JWKS, Apple 토큰 교환·철회, Slack Webhook, S3 HeadObject, SQS(SendMessage·Receive·Delete·ChangeMessageVisibility), FCM v1 전송·OAuth 토큰 교환, OpenAI Responses, CloudWatch Logs Insights. 받은 요청을 기록한다 |
 | `keys/` | 가짜 JWKS와 러너가 ID Token 서명에 쓰는 테스트 RSA 키 쌍 (비밀 아님) |
 | `scenarios/` | 시나리오(TOML). 형식은 `parity/src/scenario.rs` 상단 주석 참고 |
 | `golden/` | Java oracle에서 녹화한 정규화 결과 |
@@ -159,6 +159,7 @@ FAKES_LOCAL=1 COMPOSE_UP_ARGS="--no-build" harness/scripts/up.sh selfcheck
 | `POST /` + `X-Amz-Target: AmazonSQS.<작업>` | SQS (JSON 프로토콜) | `SendMessage`는 메시지를 저장하고 정상 응답(본문 MD5·`MessageId`). `ReceiveMessage`·`DeleteMessage`·`ChangeMessageVisibility`는 저장한 메시지에 대해 동작한다. 빈 `ReceiveMessage`는 `WaitTimeSeconds`만큼(최대 1초) 기다렸다 비어서 돌아가고 기록하지 않는다(Worker의 유휴 폴링이 기록을 흐리지 않게). 오류·지연은 규칙 목록(`[[fakes.sqs]]`)으로 지정. `POST /__admin/sqs/messages`(`{"messages":[...]}`)로 Relay를 거치지 않는 본문을 큐에 넣는다 |
 | `POST /oauth2/token` | Google OAuth 토큰 교환(FCM 서비스 계정) | 정상이면 `{"access_token":"fake-access-token","expires_in":3600}`. 규칙 `[[fakes.oauth]]`로 응답 지정. 서비스 `oauth_token` |
 | `POST /v1/projects/<id>/messages:send` | FCM HTTP v1 | 정상이면 `{"name":"projects/<id>/messages/fake-N"}`. 규칙 `[[fakes.fcm]]`. 서비스 `fcm_send` |
+| `POST /v1/responses` | OpenAI Responses API(AI 리뷰 생성) | 정상이면 구도 8.0·주제 표현 7.5의 구조화 출력과 토큰 사용량(`resp_fake_N`). 규칙 `[[fakes.openai]]`(`contains`는 요청 본문에서 찾는다). 서비스 `openai_responses`. 앱은 `CHALKAK_AIREVIEW_OPENAI_BASEURL=http://fakes:9000/v1`로 이 서버를 본다 |
 | `POST /` + `X-Amz-Target: Logs_20140328.*` | CloudWatch Logs Insights(`StartQuery`·`GetQueryResults`·`StopQuery`) | 쿼리는 즉시 `Complete`. 쿼리의 `as <지표>` 이름으로 시나리오가 지정한 결과 행을 돌려주고, 지정하지 않은 지표는 행이 없다. 쿼리 ID는 `fake-query-N` |
 | `PUT /__admin/responses`, `GET /__admin/requests`, `POST /__admin/reset`, `GET /__admin/health` | 관리 | 응답 지정(통째로 교체), 기록 조회, 초기화 |
 

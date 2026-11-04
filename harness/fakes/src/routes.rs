@@ -9,6 +9,7 @@
 //! | `POST /` + `X-Amz-Target: AmazonSQS.*` | SQS JSON 프로토콜(SendMessage 저장, Receive·Delete·ChangeMessageVisibility). `sqs.rs` 참고 |
 //! | `POST /oauth2/token` | Google OAuth 토큰 교환(서비스 계정 JWT → 액세스 토큰). 기본은 성공, `oauth` 규칙으로 바꾼다 |
 //! | `POST /v1/projects/<프로젝트>/messages:send` | FCM HTTP v1 발송. 기본은 성공, `fcm` 규칙으로 바꾼다 |
+//! | `POST /v1/responses` | OpenAI Responses API(AI 리뷰 생성). 기본은 구도 8.0·주제 표현 7.5의 정상 출력, `openai` 규칙으로 바꾼다 |
 //! | `POST /__admin/sqs/messages` | 시나리오가 큐에 미리 넣는 메시지 |
 //! | `POST /` + `X-Amz-Target: Logs_20140328.*` | CloudWatch Logs Insights(StartQuery·GetQueryResults·StopQuery). 지표 이름별 결과 행 지정 |
 //! | `PUT /__admin/responses`, `GET /__admin/requests`, `POST /__admin/reset` | 관리 |
@@ -57,6 +58,9 @@ pub struct Fakes {
     /// FCM 발송 규칙(`fcm`). 규칙이 없으면 성공 응답이다.
     fcm: Vec<Rule>,
     fcm_sent: u64,
+    /// OpenAI Responses 규칙(`openai`). 규칙이 없으면 정상 출력이다.
+    openai: Vec<Rule>,
+    openai_calls: u64,
     logs: Option<LogsConfig>,
     /// `StartQuery`가 받은 쿼리 문자열. 인덱스 + 1이 쿼리 ID(`fake-query-N`).
     log_queries: Vec<String>,
@@ -127,6 +131,13 @@ impl Fakes {
                     )
                 });
                 ("fcm_send".into(), None, res)
+            }
+            ("POST", "/v1/responses") => {
+                let body = String::from_utf8_lossy(&req.body).into_owned();
+                self.openai_calls += 1;
+                let res = rules::respond(&self.openai, "", &body)
+                    .unwrap_or_else(|| default_openai_response(self.openai_calls));
+                ("openai_responses".into(), None, res)
             }
             ("GET", "/oidc/apple/keys") => ("oidc_jwks:apple".into(), None, jwks()),
             ("GET", "/oidc/google/certs") => ("oidc_jwks:google".into(), None, jwks()),
@@ -340,6 +351,7 @@ impl Fakes {
         let mut sqs_rules = Vec::new();
         let mut oauth = Vec::new();
         let mut fcm = Vec::new();
+        let mut openai = Vec::new();
         let mut logs = None;
         for (name, value) in obj {
             match name.as_str() {
@@ -356,6 +368,7 @@ impl Fakes {
                 "sqs" => sqs_rules = Sqs::parse_rules(value)?,
                 "oauth" => oauth = rules::parse_rules("oauth", "application/json", value)?,
                 "fcm" => fcm = rules::parse_rules("fcm", "application/json", value)?,
+                "openai" => openai = rules::parse_rules("openai", "application/json", value)?,
                 other => return Err(format!("알 수 없는 항목: {other}")),
             }
         }
@@ -366,9 +379,43 @@ impl Fakes {
         self.sqs.set_rules(sqs_rules);
         self.oauth = oauth;
         self.fcm = fcm;
+        self.openai = openai;
         self.logs = logs;
         Ok(())
     }
+}
+
+/// OpenAI Responses의 정상 응답. 모델 출력은 구조화 출력 스키마(composition, theme_expression, feedback) 모양이다.
+fn default_openai_response(call: u64) -> Response {
+    let output_text = json!({
+        "composition": 8.0,
+        "theme_expression": 7.5,
+        "feedback": {
+            "summary": "구도가 안정적입니다.",
+            "strength": "빛과 구도가 좋습니다.",
+            "weakness": "수평이 조금 아쉽습니다.",
+            "suggestion": "낮은 시점에서 찍어 보세요."
+        }
+    })
+    .to_string();
+    Response::json(
+        200,
+        &json!({
+            "id": format!("resp_fake_{call}"),
+            "status": "completed",
+            "output": [{
+                "type": "message",
+                "content": [{"type": "output_text", "text": output_text}]
+            }],
+            "usage": {
+                "input_tokens": 1200,
+                "input_tokens_details": {"cached_tokens": 300},
+                "output_tokens": 85,
+                "output_tokens_details": {"reasoning_tokens": 40}
+            }
+        })
+        .to_string(),
+    )
 }
 
 fn logs_json(v: &Value) -> Response {
@@ -842,9 +889,43 @@ mod tests {
     }
 
     #[test]
+    fn openai_응답은_기본_정상_출력이고_규칙으로_바꾼다() {
+        let mut f = Fakes::new("test-bucket");
+        let body = r#"{"model":"gpt-6.1-sol","input":[]}"#;
+        let res = f.handle(&req("POST", "/v1/responses", &[], body));
+        assert_eq!(res.status, 200);
+        let v: Value = serde_json::from_slice(&res.body).unwrap();
+        assert_eq!(v["id"], "resp_fake_1");
+        assert_eq!(v["status"], "completed");
+        let text = v["output"][0]["content"][0]["text"].as_str().unwrap();
+        let out: Value = serde_json::from_str(text).unwrap();
+        assert_eq!(out["composition"], 8.0);
+        assert_eq!(out["theme_expression"], 7.5);
+        assert_eq!(v["usage"]["input_tokens_details"]["cached_tokens"], 300);
+
+        configure(
+            &mut f,
+            r#"{"openai":[{"contains":"timeout-topic","status":429,"headers":{"retry-after":"7"},
+                "body":"{\"error\":{\"code\":\"rate_limit_exceeded\"}}"}]}"#,
+        );
+        let res = f.handle(&req("POST", "/v1/responses", &[], "timeout-topic"));
+        assert_eq!(res.status, 429);
+        assert!(
+            res.headers
+                .iter()
+                .any(|(k, v)| k == "retry-after" && v == "7")
+        );
+        let res = f.handle(&req("POST", "/v1/responses", &[], body));
+        assert_eq!(res.status, 200);
+        let rs = records(&mut f);
+        assert_eq!(rs[0]["service"], "openai_responses");
+        assert_eq!(rs[0]["path"], "/v1/responses");
+    }
+
+    #[test]
     fn 잘못된_oauth_fcm_규칙은_거절한다() {
         let mut f = Fakes::new("test-bucket");
-        for config in [r#"{"oauth":{}}"#, r#"{"fcm":[{}]}"#] {
+        for config in [r#"{"oauth":{}}"#, r#"{"fcm":[{}]}"#, r#"{"openai":[{}]}"#] {
             let res = f.handle(&req("PUT", "/__admin/responses", &[], config));
             assert_eq!(res.status, 400, "{config}");
         }

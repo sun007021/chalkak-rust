@@ -290,6 +290,9 @@ impl AdminAction {
                     && before.values != after.values
             }
             AdminAction::NoticeDeleted => is_notice_deleted(before, after),
+            AdminAction::AiPromptVersionCreated => {
+                before.is_empty() && is_valid_ai_prompt_version_state(after)
+            }
             AdminAction::BannerCreated => {
                 before.is_empty() && is_valid_banner_state(after, &BANNER_STATE_FIELDS)
             }
@@ -301,8 +304,7 @@ impl AdminAction {
             }
             AdminAction::AppVersionUpdated => is_app_version_updated(before, after),
             // 아래 작업의 상태 전이 규칙은 해당 기능을 옮기는 이슈에서 채운다. 그때까지 감사 로그로 기록할 수 없다.
-            AdminAction::AiPromptVersionCreated
-            | AdminAction::ReminderCreated
+            AdminAction::ReminderCreated
             | AdminAction::ReminderUpdated
             | AdminAction::ReminderDeleted => false,
         }
@@ -482,6 +484,9 @@ const TOPIC_STATE_FIELDS: [&str; 4] = ["title", "topicDate", "startsAt", "endsAt
 const DELETED_TOPIC_STATE_FIELDS: [&str; 5] =
     ["title", "topicDate", "startsAt", "endsAt", "deletedAt"];
 const PUSH_SCHEDULE_FIELDS: [&str; 1] = ["sendTime"];
+const AI_PROMPT_VERSION_STATE_FIELDS: [&str; 2] = ["type", "version"];
+/// `AiPromptType`의 이름들.
+const AI_PROMPT_TYPES: [&str; 1] = ["PHOTO_REVIEW"];
 const APP_VERSION_FIELDS: [&str; 4] = [
     "platform",
     "minimumSupportedVersion",
@@ -573,6 +578,19 @@ fn is_minute_time(text: &str) -> bool {
         && matches!(b[3], b'0'..=b'5')
         && b[4].is_ascii_digit()
         && &b[5..] == b":00"
+}
+
+/// `isAiPromptVersionCreated`: 이후 상태는 `type`(알려진 용도)과 `version`(1 이상의 정수)만 가진다.
+fn is_valid_ai_prompt_version_state(state: &AuditSnapshot) -> bool {
+    state.has_exactly_fields(&AI_PROMPT_VERSION_STATE_FIELDS)
+        && state
+            .value("type")
+            .and_then(Value::as_str)
+            .is_some_and(|name| AI_PROMPT_TYPES.contains(&name))
+        && state
+            .value("version")
+            .and_then(Value::as_i64)
+            .is_some_and(|version| (1..=i64::from(i32::MAX)).contains(&version))
 }
 
 fn is_valid_notice_state(state: &AuditSnapshot) -> bool {
@@ -1255,6 +1273,98 @@ mod tests {
         );
     }
 
+    // AiPromptVersionAuditTransitionTest
+    fn prompt_version_audit(
+        before: Value,
+        after: Value,
+        target: AdminTargetType,
+    ) -> Result<AdminAuditLog, AppError> {
+        AdminAuditLog::create(
+            id(),
+            AdminAction::AiPromptVersionCreated,
+            target,
+            id(),
+            None,
+            &snap(before),
+            &snap(after),
+            occurred_at(),
+            id(),
+        )
+    }
+
+    #[test]
+    fn 프롬프트_버전_생성은_빈_이전_상태와_유형_버전만_있는_이후_상태를_허용한다() {
+        let after = json!({"type": "PHOTO_REVIEW", "version": 1});
+        let log = prompt_version_audit(json!({}), after.clone(), AdminTargetType::AiPromptVersion)
+            .unwrap();
+        assert!(log.before_state.is_empty());
+        assert_eq!(Value::Object(log.after_state), after);
+    }
+
+    #[test]
+    fn 프롬프트_버전_생성은_잘못된_대상_이전_상태_필드_값을_거절한다() {
+        let valid = json!({"type": "PHOTO_REVIEW", "version": 1});
+        let cases = [
+            (
+                valid.clone(),
+                valid.clone(),
+                AdminTargetType::AiPromptVersion,
+            ),
+            (json!({}), valid.clone(), AdminTargetType::Topic),
+            (
+                json!({}),
+                json!({"type": "PHOTO_REVIEW"}),
+                AdminTargetType::AiPromptVersion,
+            ),
+            (
+                json!({}),
+                json!({"version": 1}),
+                AdminTargetType::AiPromptVersion,
+            ),
+            (
+                json!({}),
+                json!({"type": "PHOTO_REVIEW", "version": 1, "model": "gpt-6.1-sol"}),
+                AdminTargetType::AiPromptVersion,
+            ),
+            (
+                json!({}),
+                json!({"type": "UNKNOWN", "version": 1}),
+                AdminTargetType::AiPromptVersion,
+            ),
+            (
+                json!({}),
+                json!({"type": 1, "version": 1}),
+                AdminTargetType::AiPromptVersion,
+            ),
+            (
+                json!({}),
+                json!({"type": "PHOTO_REVIEW", "version": 0}),
+                AdminTargetType::AiPromptVersion,
+            ),
+            (
+                json!({}),
+                json!({"type": "PHOTO_REVIEW", "version": -1}),
+                AdminTargetType::AiPromptVersion,
+            ),
+            (
+                json!({}),
+                json!({"type": "PHOTO_REVIEW", "version": "1"}),
+                AdminTargetType::AiPromptVersion,
+            ),
+            (
+                json!({}),
+                json!({"type": "PHOTO_REVIEW", "version": 1.5}),
+                AdminTargetType::AiPromptVersion,
+            ),
+        ];
+        for (before, after, target) in cases {
+            assert!(
+                prompt_version_audit(before.clone(), after.clone(), target).is_err(),
+                "{before} {after} {target:?}"
+            );
+        }
+    }
+
     #[test]
     fn 작업_표는_원본과_같다() {
         let required: Vec<&str> = AdminAction::ALL
@@ -1300,6 +1410,14 @@ mod tests {
             assert_eq!(AdminAction::parse(action.as_str()), Some(action));
         }
         assert_eq!(AdminAction::parse("post_approved"), None);
+        assert_eq!(
+            AdminAction::parse("AI_PROMPT_VERSION_CREATED"),
+            Some(AdminAction::AiPromptVersionCreated)
+        );
+        assert_eq!(
+            AdminTargetType::parse("AI_PROMPT_VERSION"),
+            Some(AdminTargetType::AiPromptVersion)
+        );
         assert_eq!(
             AdminTargetType::parse("TOPIC"),
             Some(AdminTargetType::Topic)

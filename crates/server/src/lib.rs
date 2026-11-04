@@ -13,6 +13,8 @@ use std::sync::Arc;
 
 use chalkak_app::admin::AdminConfig;
 use chalkak_app::admin::bootstrap::AdminAccount;
+use chalkak_app::aireview::AiReviewWiring;
+use chalkak_app::aireview::openai::OpenAiResponsesReviewGenerator;
 use chalkak_app::analytics::{self, UserMetricsAggregationRunner};
 use chalkak_app::jobs::{self, AppleRevocation, Job, JobDeps, Jobs};
 use chalkak_app::notification::push_worker_config::build_push_worker;
@@ -181,6 +183,12 @@ pub fn build_handler_with(
             moderation_pending_listener(settings, Arc::clone(&logger)),
         ),
         analytics,
+        ai_review: AiReviewWiring {
+            generator: Arc::new(
+                OpenAiResponsesReviewGenerator::new(&settings.openai, Arc::clone(&clock))
+                    .expect("OpenAI 클라이언트를 만들 수 없습니다"),
+            ),
+        },
     };
     let router = register_routes(Routes::new(Arc::clone(&logger)), &ctx).into_router();
     Arc::new(build_chain(
